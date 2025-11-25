@@ -1,0 +1,25 @@
+{
+  "name": "mcp-connection-key",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:agent": "node chatgpt-agent/server.js",
+    "start:connection-key": "node connection-key/server.js",
+    "start:all": "concurrently \"npm start\" \"npm run start:agent\" \"npm run start:connection-key\"",
+    "dev": "node --watch index.js",
+    "dev:agent": "node --watch chatgpt-agent/server.js",
+    "dev:connection-key": "node --watch connection-key/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "openai": "^4.28.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Dependencies kopieren
+COPY package*.json ./
+
+# Dependencies installieren
+RUN npm ci --only=production
+
+# Code kopieren
+COPY connection-key/ ./connection-key/
+COPY config.js ./
+
+# Port freigeben
+EXPOSE 3000
+
+# Server starten
+CMD ["node", "connection-key/server.js"]
+

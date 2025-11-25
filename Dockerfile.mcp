@@ -1,0 +1,19 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Dependencies kopieren
+COPY package*.json ./
+
+# Dependencies installieren
+RUN npm ci --only=production
+
+# Code kopieren
+COPY index.js config.js ./
+
+# Port freigeben
+EXPOSE 7777
+
+# Server starten
+CMD ["node", "index.js"]
+

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mcp-server": {
+      "command": "node",
+      "args": [
+        "C:\\AppProgrammierung\\Projekte\\MCP_Connection_Key\\index.js"
+      ],
+      "cwd": "C:\\AppProgrammierung\\Projekte\\MCP_Connection_Key",
+      "env": {}
+    }
+  }
+}
+  

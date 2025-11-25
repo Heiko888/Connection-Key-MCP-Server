@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # n8n - Workflow Engine
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-change-me}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # MCP Server - Tool-Server für Cursor/AI
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: mcp-server
+    ports:
+      - "7777:7777"
+    environment:
+      - NODE_ENV=production
+      - N8N_BASE_URL=http://n8n:5678
+      - N8N_API_KEY=${N8N_API_KEY:-}
+    volumes:
+      - ./index.js:/app/index.js
+      - ./config.js:/app/config.js
+    depends_on:
+      - n8n
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ChatGPT-Agent - KI-Gehirn
+  chatgpt-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: chatgpt-agent
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MCP_SERVER_URL=http://mcp-server:7777
+      - N8N_BASE_URL=http://n8n:5678
+      - PORT=4000
+    depends_on:
+      - mcp-server
+      - n8n
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Connection-Key Server - Zentrale API
+  connection-key:
+    build:
+      context: .
+      dockerfile: Dockerfile.connection-key
+    container_name: connection-key
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CHATGPT_AGENT_URL=http://chatgpt-agent:4000
+      - MCP_SERVER_URL=http://mcp-server:7777
+      - N8N_BASE_URL=http://n8n:5678
+      - AUTH_ENABLED=${AUTH_ENABLED:-true}
+      - API_KEY=${API_KEY:-}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+    depends_on:
+      - chatgpt-agent
+      - mcp-server
+      - n8n
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  n8n_data:
+
+networks:
+  app-network:
+    driver: bridge
+

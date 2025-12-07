@@ -138,6 +138,8 @@ Speichert User-Daten über n8n Webhook. Nützlich für App-User-Login und Datenv
 
 ## Installation
 
+### Lokale Entwicklung
+
 1. Stellen Sie sicher, dass Node.js installiert ist
 2. Installieren Sie die Abhängigkeiten:
 ```bash
@@ -159,6 +161,23 @@ npm install
    export N8N_BASE_URL="https://n8n.deinedomain.tld"
    export N8N_API_KEY="your-api-key"
    ```
+
+### Hetzner Server Deployment
+
+Für die Einrichtung auf einem Hetzner Server gibt es ein automatisches Setup-Script:
+
+**Schnellstart:**
+```bash
+# Auf Hetzner Server
+curl -o setup-hetzner.sh https://raw.githubusercontent.com/Heiko888/Connection-Key-MCP-Server/main/setup-hetzner.sh
+chmod +x setup-hetzner.sh
+sudo ./setup-hetzner.sh
+```
+
+**Weitere Informationen:**
+- [HETZNER_QUICKSTART.md](./HETZNER_QUICKSTART.md) - Schnelleinrichtung
+- [DEPLOYMENT_HETZNER.md](./DEPLOYMENT_HETZNER.md) - Detaillierte Anleitung
+- [ENV_SETUP_HETZNER.md](./ENV_SETUP_HETZNER.md) - .env Datei Setup
 
 ## Konfiguration in Cursor IDE
 

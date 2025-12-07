@@ -1,0 +1,143 @@
+{
+  "name": "Double Opt In Mailchimp / ConnectionKey.de",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mailchimp-confirmed",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-mailchimp",
+      "name": "Mailchimp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "mailchimp-confirmed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.type}}",
+              "value2": "subscribe"
+            },
+            {
+              "value1": "={{$json.data.status}}",
+              "value2": "subscribed"
+            }
+          ]
+        }
+      },
+      "id": "if-subscribed",
+      "name": "Check Status = subscribed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = $input.item.json.data?.email || $input.item.json.email || '';\nconst mergeFields = $input.item.json.data?.merge_fields || $input.item.json.merge_fields || {};\n\nreturn [{\n  email: email.toLowerCase().trim(),\n  firstname: mergeFields.FNAME || mergeFields.fname || '',\n  lastname: mergeFields.LNAME || mergeFields.lname || '',\n  source: 'mailchimp'\n}];"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.the-connection-key.de/api/new-subscriber",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "firstname",
+              "value": "={{ $json.firstname }}"
+            },
+            {
+              "name": "lastname",
+              "value": "={{ $json.lastname }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $json.source }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-to-api",
+      "name": "Send to ConnectionKey API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Mailchimp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Status = subscribed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status = subscribed": {
+      "main": [
+        [
+          {
+            "node": "Prepare Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Payload": {
+      "main": [
+        [
+          {
+            "node": "Send to ConnectionKey API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-27T00:00:00.000Z",
+  "versionId": "1"
+}
+

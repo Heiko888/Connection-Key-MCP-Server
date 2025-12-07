@@ -1,3 +1,29 @@
+#!/bin/bash
+# Deaktiviert den MCP Server in docker-compose.yml
+
+cd /opt/mcp-connection-key
+
+echo "🛑 Deaktiviere MCP Server..."
+echo ""
+
+# 1. Container stoppen und entfernen
+echo "1. Stoppe MCP Server Container..."
+docker-compose stop mcp-server 2>/dev/null || true
+docker-compose rm -f mcp-server 2>/dev/null || true
+echo "✅ Container gestoppt"
+echo ""
+
+# 2. Backup erstellen
+echo "2. Erstelle Backup von docker-compose.yml..."
+cp docker-compose.yml docker-compose.yml.backup
+echo "✅ Backup erstellt: docker-compose.yml.backup"
+echo ""
+
+# 3. docker-compose.yml anpassen
+echo "3. Passe docker-compose.yml an..."
+
+# Erstelle neue docker-compose.yml ohne mcp-server
+cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
 services:
@@ -69,4 +95,29 @@ volumes:
 networks:
   app-network:
     driver: bridge
+EOF
+
+echo "✅ docker-compose.yml angepasst"
+echo ""
+
+# 4. Services neu starten
+echo "4. Starte Services neu..."
+docker-compose up -d
+echo ""
+
+# 5. Status prüfen
+echo "5. Prüfe Status..."
+sleep 5
+docker-compose ps
+echo ""
+
+echo "✅ MCP Server wurde deaktiviert!"
+echo ""
+echo "Hinweis:"
+echo "  - MCP Server wird lokal mit Cursor IDE verwendet"
+echo "  - Auf Hetzner laufen jetzt nur: n8n, chatgpt-agent, connection-key"
+echo ""
+echo "Falls Sie die Änderung rückgängig machen möchten:"
+echo "  cp docker-compose.yml.backup docker-compose.yml"
+echo "  docker-compose up -d"
 

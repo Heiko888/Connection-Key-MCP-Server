@@ -29,17 +29,48 @@ fi
 echo "✅ Production-Verzeichnis gefunden"
 echo ""
 
-# 3. OPENAI_API_KEY aus Haupt-.env lesen
-if ! grep -q "OPENAI_API_KEY=" "$MAIN_ENV"; then
-    echo "❌ OPENAI_API_KEY nicht in Haupt-.env gefunden!"
-    exit 1
+# 3. OPENAI_API_KEY finden
+OPENAI_KEY=""
+
+# Versuche aus Haupt-.env zu lesen
+if [ -f "$MAIN_ENV" ] && grep -q "OPENAI_API_KEY=" "$MAIN_ENV"; then
+    OPENAI_KEY=$(grep "OPENAI_API_KEY=" "$MAIN_ENV" | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs)
 fi
 
-OPENAI_KEY=$(grep "OPENAI_API_KEY=" "$MAIN_ENV" | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs)
-
+# Falls nicht gefunden, versuche aus MCP Server Environment
 if [ -z "$OPENAI_KEY" ] || [ "$OPENAI_KEY" = "" ]; then
-    echo "❌ OPENAI_API_KEY ist leer in Haupt-.env!"
-    exit 1
+    if [ -f "/opt/mcp/.env" ] && grep -q "OPENAI_API_KEY=" "/opt/mcp/.env"; then
+        OPENAI_KEY=$(grep "OPENAI_API_KEY=" "/opt/mcp/.env" | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs)
+        echo "   ℹ️  Key aus /opt/mcp/.env gelesen"
+    fi
+fi
+
+# Falls immer noch nicht gefunden
+if [ -z "$OPENAI_KEY" ] || [ "$OPENAI_KEY" = "" ]; then
+    echo "⚠️  OPENAI_API_KEY nicht in .env Dateien gefunden!"
+    echo ""
+    echo "📋 Mögliche Lösungen:"
+    echo "   1. Key manuell in /opt/mcp-connection-key/.env setzen:"
+    echo "      echo 'OPENAI_API_KEY=sk-your-key-here' >> /opt/mcp-connection-key/.env"
+    echo ""
+    echo "   2. Oder Key direkt in production/.env eintragen:"
+    echo "      nano $PROD_ENV"
+    echo ""
+    echo "   3. Prüfen Sie, ob MCP Agenten funktionieren:"
+    echo "      curl -X POST http://localhost:7000/agent/marketing -H 'Content-Type: application/json' -d '{\"message\":\"Test\"}'"
+    echo ""
+    read -p "Möchten Sie den Key jetzt manuell eingeben? (j/n): " response
+    if [[ "$response" =~ ^[Jj]$ ]]; then
+        read -sp "OPENAI_API_KEY eingeben: " OPENAI_KEY
+        echo ""
+        if [ -z "$OPENAI_KEY" ] || [ "$OPENAI_KEY" = "" ]; then
+            echo "❌ Kein Key eingegeben. Abgebrochen."
+            exit 1
+        fi
+    else
+        echo "⚠️  Setup abgebrochen. Bitte setzen Sie OPENAI_API_KEY manuell."
+        exit 1
+    fi
 fi
 
 echo "✅ OPENAI_API_KEY gefunden (Länge: ${#OPENAI_KEY} Zeichen)"

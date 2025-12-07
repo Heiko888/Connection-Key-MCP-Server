@@ -1,0 +1,41 @@
+Erstelle ein Life Purpose Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Lebenszweck und höhere Bestimmung:
+
+## 1. Inkarnationskreuz
+- Dein spezifisches Inkarnationskreuz
+- Lebensaufgabe und höherer Zweck
+- Evolutionäre Aufgabe
+
+## 2. Lebenszweck
+- Was ist deine Mission?
+- Dein Beitrag zur Welt
+- Höhere Bestimmung
+
+## 3. Talente & Gaben
+- Deine einzigartigen Talente
+- Wie du deine Gaben nutzt
+- Beitrag zur Gemeinschaft
+
+## 4. Lebensweg
+- Dein natürlicher Lebensweg
+- Richtung und Orientierung
+- Schritte zur Erfüllung
+
+## 5. Herausforderungen & Wachstum
+- Herausforderungen auf dem Weg
+- Wachstumsbereiche
+- Wie du Hindernisse überwindest
+
+## 6. Erfüllung & Sinn
+- Wie du Erfüllung findest
+- Sinn und Bedeutung im Leben
+- Praktische Schritte zur Umsetzung
+
+Sprache: Deutsch
+Stil: Inspirierend, tiefgreifend, motivierend, transformierend
+

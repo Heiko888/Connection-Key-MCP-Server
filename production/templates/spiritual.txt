@@ -1,0 +1,41 @@
+Erstelle ein Spiritual Growth Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf spirituelles Wachstum und Bewusstsein:
+
+## 1. Spiritueller Weg
+- Dein natürlicher spiritueller Ansatz
+- Wie du Spiritualität lebst
+- Verbindung mit dem Höheren Selbst
+
+## 2. Bewusstseins-Entwicklung
+- Zentren und Bewusstsein
+- Wie du Bewusstsein entwickelst
+- Spirituelle Wachstumsbereiche
+
+## 3. Meditation & Praxis
+- Meditation und spirituelle Praxis
+- Was zu deinem Typ passt
+- Praktische Übungen
+
+## 4. Intuition & Weisheit
+- Deine intuitive Verbindung
+- Wie du Weisheit empfängst
+- Spirituelle Einsichten
+
+## 5. Lebenszweck
+- Dein höherer Zweck (Inkarnationskreuz)
+- Spirituelle Mission
+- Evolutionäre Aufgabe
+
+## 6. Spirituelle Integration
+- Wie du Spiritualität im Alltag lebst
+- Balance zwischen Spiritualität und Materie
+- Praktische Anwendung
+
+Sprache: Deutsch
+Stil: Inspirierend, tiefgreifend, unterstützend, transformierend
+

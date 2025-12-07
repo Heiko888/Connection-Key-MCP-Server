@@ -1,0 +1,56 @@
+# Human Design Grundlagen
+
+## Die 4 Typen
+
+### 1. Generator (70% der Bevölkerung)
+- **Strategie:** Auf die innere Autorität warten und dann auf das reagieren, was kommt
+- **Autorität:** Meistens sakrale Autorität (Bauchgefühl)
+- **Energie:** Konstante, nachhaltige Energie
+- **Rolle:** Die Macher und Erbauer der Welt
+
+### 2. Manifestor (8% der Bevölkerung)
+- **Strategie:** Informieren, bevor man handelt
+- **Autorität:** Emotionale oder andere definierte Autorität
+- **Energie:** Spontane, kraftvolle Energie
+- **Rolle:** Die Initiatoren und Pioniere
+
+### 3. Projector (20% der Bevölkerung)
+- **Strategie:** Auf die Einladung warten
+- **Autorität:** Emotionale, sakrale oder andere definierte Autorität
+- **Energie:** Keine konstante Energie, braucht Pausen
+- **Rolle:** Die Führer und Berater
+
+### 4. Reflector (1% der Bevölkerung)
+- **Strategie:** Einen Mondzyklus (28 Tage) warten, bevor man wichtige Entscheidungen trifft
+- **Autorität:** Mondzyklus
+- **Energie:** Spiegelt die Energie der Umgebung
+- **Rolle:** Die Spiegel der Gemeinschaft
+
+## Die 9 Zentren
+
+### Definiert (farbig)
+- Stabile, konsistente Energie
+- Stärke und Talent
+- Kann nicht "ausgeschaltet" werden
+
+### Undefiniert (weiß)
+- Offen für Konditionierung
+- Weisheit durch Erfahrung
+- Kann lernen und sich anpassen
+
+## Profile
+
+Die Profile zeigen, wie wir uns in der Welt bewegen:
+- 1/3: Der Forscher/Entdecker
+- 1/4: Der Forscher/Freund
+- 2/4: Der Hermit/Freund
+- 2/5: Der Hermit/Heretiker
+- 3/5: Der Märtyrer/Heretiker
+- 3/6: Der Märtyrer/Role Model
+- 4/6: Der Opportunist/Role Model
+- 4/1: Der Opportunist/Forscher
+- 5/1: Der Heretiker/Forscher
+- 5/2: Der Heretiker/Hermit
+- 6/2: Der Role Model/Hermit
+- 6/3: Der Role Model/Märtyrer
+

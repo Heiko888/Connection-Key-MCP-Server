@@ -1,0 +1,42 @@
+Erstelle ein detailliertes Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Das Reading soll folgende Abschnitte enthalten:
+
+## 1. Typ-Analyse
+- Detaillierte Erklärung des Typs
+- Strategie (wie richtig entscheiden)
+- Autorität (innerer Entscheidungsmechanismus)
+- Rolle in der Welt
+
+## 2. Zentren
+- Definiert (farbig): Stabile Energien und Talente
+- Undefiniert (weiß): Offenheit und Lernbereiche
+- Detaillierte Erklärung jedes Zentrums
+
+## 3. Channels & Gates
+- Wichtige Channels (Verbindungen zwischen Zentren)
+- Relevante Gates (Tore in den Zentren)
+- Talente und Fähigkeiten
+
+## 4. Profile
+- Profil-Nummern und Bedeutung
+- Wie sich die Person in der Welt bewegt
+- Lebensrolle und Verhalten
+
+## 5. Inkarnationskreuz
+- Lebensaufgabe und höherer Zweck
+- Evolutionäre Aufgabe
+
+## 6. Praktische Anwendungen
+- Konkrete Empfehlungen für den Alltag
+- Wie die Strategie anwenden
+- Wie die Autorität nutzen
+- Häufige Fallen und wie sie vermeiden
+
+Sprache: Deutsch
+Stil: Authentisch, klar, wertvoll, persönlich, detailliert
+

@@ -1,0 +1,18 @@
+Erstelle ein detailliertes Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Das Reading soll enthalten:
+- Typ-Analyse (Generator, Manifestor, Projector, Reflector)
+- Strategie & Autorität
+- Zentren (definiert/undefiniert)
+- Channels & Gates
+- Profile
+- Inkarnationskreuz
+- Spezifische Insights und Empfehlungen
+
+Sprache: Deutsch
+Stil: Authentisch, klar, wertvoll, persönlich
+

@@ -1,0 +1,41 @@
+Erstelle ein Parenting & Family Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Elternschaft und Familie:
+
+## 1. Elternschafts-Stil
+- Dein natürlicher Elternschafts-Ansatz
+- Wie du als Elternteil bist
+- Stärken in der Erziehung
+
+## 2. Kommunikation mit Kindern
+- Wie du mit Kindern kommunizierst
+- Dein Kommunikationsstil
+- Bedürfnisse in der Kommunikation
+
+## 3. Familien-Dynamik
+- Wie du in der Familie bist
+- Deine Rolle in der Familie
+- Familien-Energie und Balance
+
+## 4. Erziehung & Entwicklung
+- Wie du Kinder erziehst
+- Unterstützung der kindlichen Entwicklung
+- Grenzen setzen und Freiheit geben
+
+## 5. Herausforderungen
+- Häufige Herausforderungen in der Elternschaft
+- Wie du mit verschiedenen Situationen umgehst
+- Unterstützung für deine Elternschaft
+
+## 6. Familien-Harmonie
+- Wie du Harmonie in der Familie schaffst
+- Balance zwischen Individuum und Familie
+- Praktische Tipps für den Alltag
+
+Sprache: Deutsch
+Stil: Unterstützend, verständnisvoll, praktisch, ermutigend
+

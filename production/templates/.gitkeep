@@ -1,0 +1,14 @@
+# Template-Dateien hier ablegen
+# Unterstützte Formate: .txt, .md, .json
+# 
+# Template-Variablen:
+# {{birthDate}} - Geburtsdatum
+# {{birthTime}} - Geburtszeit
+# {{birthPlace}} - Geburtsort
+#
+# Beispiel-Template (default.txt):
+# Erstelle ein Human Design Reading für:
+# - Geburtsdatum: {{birthDate}}
+# - Geburtszeit: {{birthTime}}
+# - Geburtsort: {{birthPlace}}
+

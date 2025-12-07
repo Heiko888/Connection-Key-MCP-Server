@@ -1,0 +1,41 @@
+Erstelle ein Relationship Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Beziehungen und Partnerschaft:
+
+## 1. Beziehungsdynamik
+- Wie die Person in Beziehungen ist
+- Beziehungsstil basierend auf Typ
+- Energie in Beziehungen
+
+## 2. Kommunikationsstil
+- Wie kommuniziert wird
+- Emotionale Kommunikation
+- Bedürfnisse in der Kommunikation
+
+## 3. Intimität & Nähe
+- Wie Nähe gelebt wird
+- Bedürfnisse nach Nähe und Distanz
+- Intimität basierend auf Zentren
+
+## 4. Kompatibilität
+- Mit welchen Typen gut harmoniert
+- Herausforderungen mit verschiedenen Typen
+- Wie verschiedene Energien zusammenarbeiten
+
+## 5. Beziehungs-Empfehlungen
+- Praktische Tipps für gesunde Beziehungen
+- Wie die Strategie in Beziehungen anwenden
+- Häufige Beziehungsfallen und wie vermeiden
+
+## 6. Partnerschaft
+- Was in einer Partnerschaft wichtig ist
+- Wie Entscheidungen gemeinsam treffen
+- Balance zwischen Individuum und Paar
+
+Sprache: Deutsch
+Stil: Einfühlsam, klar, wertvoll, unterstützend
+

@@ -15,6 +15,9 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://localhost:5678/
+      - N8N_DISABLE_UI_FEATURES=enterprise
+      - N8N_ENFORCE_SETTINGS_FILE=false
+      - N8N_LICENSE_AUTO_ACCEPT=false
     volumes:
       - n8n_data:/home/node/.n8n
     restart: unless-stopped
@@ -69,4 +72,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-

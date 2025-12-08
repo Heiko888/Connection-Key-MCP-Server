@@ -6,7 +6,9 @@
         "C:\\AppProgrammierung\\Projekte\\MCP_Connection_Key\\index.js"
       ],
       "cwd": "C:\\AppProgrammierung\\Projekte\\MCP_Connection_Key",
-      "env": {}
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
     }
   }
 }

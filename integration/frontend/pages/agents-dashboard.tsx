@@ -1,9 +1,10 @@
 /**
  * Agents Dashboard Page
- * Übersichtsseite für alle Agenten
+ * Übersichtsseite für alle 5 Agenten
  */
 
 import { AgentChat } from '../components/AgentChat';
+import { ReadingGenerator } from '../components/ReadingGenerator';
 
 export default function AgentsDashboard() {
   return (
@@ -50,6 +51,13 @@ export default function AgentsDashboard() {
             agentId="social-youtube" 
             agentName="Social-YouTube"
           />
+        </div>
+
+        {/* Reading Agent (5. Agent) */}
+        <div className="agent-card reading-agent-card">
+          <h2>🔮 Reading Agent</h2>
+          <p>Human Design Readings, Chart-Analysen, Persönlichkeitsanalysen</p>
+          <ReadingGenerator />
         </div>
       </div>
     </div>

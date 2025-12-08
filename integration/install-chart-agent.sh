@@ -179,7 +179,7 @@ cat > "$CONFIG_FILE" << 'JSON_END'
   "promptFile": "/opt/ck-agent/prompts/chart-development.txt",
   "model": "gpt-4",
   "temperature": 0.3,
-  "maxTokens": 8000,
+  "maxTokens": 6000,
   "capabilities": [
     "bodygraph-development",
     "penta-analysis-charts",

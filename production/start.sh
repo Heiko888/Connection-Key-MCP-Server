@@ -40,16 +40,15 @@ mkdir -p templates
 if pm2 list | grep -q "reading-agent"; then
     echo "🔄 Agent läuft bereits, starte neu..."
     pm2 restart reading-agent
-else
-    echo "🆕 Starte Agent neu..."
-    pm2 start server.js \
-        --name reading-agent \
-        --log logs/reading-agent.log \
-        --error logs/reading-agent-error.log \
-        --out logs/reading-agent-out.log \
-        --merge-logs \
-        --time
-fi
+    else
+        echo "🆕 Starte Agent neu..."
+        pm2 start server.js \
+            --name reading-agent \
+            -o logs/reading-agent-out.log \
+            -e logs/reading-agent-error.log \
+            --merge-logs \
+            --time
+    fi
 
 # PM2 beim Boot starten
 pm2 save

@@ -1,0 +1,254 @@
+{
+  "name": "Mailchimp API Sync → ConnectionKey (mit Keys)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://us21.api.mailchimp.com/3.0/lists/24f162b4c6/members",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_MAILCHIMP_API_KEY"
+            }
+          ]
+        },
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "status",
+                "value": "subscribed"
+              },
+              {
+                "name": "count",
+                "value": "1000"
+              }
+            ]
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": false
+            }
+          },
+          "ignoreResponseCode": false
+        }
+      },
+      "id": "get-mailchimp-members",
+      "name": "Get Mailchimp Members",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validiere Mailchimp API Response und normalisiere Struktur\nconst inputItem = $input.item;\n\n// Prüfe ob Input vorhanden ist\nif (!inputItem) {\n  console.error('Kein Input-Item erhalten');\n  return [{ json: { error: 'Kein Input-Item', source: 'validate-response' } }];\n}\n\n// n8n HTTP Request gibt Response in verschiedenen Formaten zurück\nlet responseData = null;\n\n// Option 1: Direkt in json\nif (inputItem.json && typeof inputItem.json === 'object') {\n  responseData = inputItem.json;\n}\n// Option 2: In body\nelse if (inputItem.body && typeof inputItem.body === 'object') {\n  responseData = inputItem.body;\n}\n// Option 3: In data\nelse if (inputItem.data && typeof inputItem.data === 'object') {\n  responseData = inputItem.data;\n}\n// Option 4: Direkt als Item\nelse if (typeof inputItem === 'object' && !inputItem.json && !inputItem.body) {\n  responseData = inputItem;\n}\n\n// Prüfe auf Fehler-Response von Mailchimp API\nif (responseData && responseData.status) {\n  // Mailchimp gibt Fehler manchmal mit 'status' Feld zurück\n  if (responseData.status >= 400 || responseData.title || responseData.detail) {\n    console.error('Mailchimp API Fehler:', responseData);\n    return [{ json: { \n      error: 'Mailchimp API Fehler', \n      status: responseData.status,\n      title: responseData.title || 'Unbekannter Fehler',\n      detail: responseData.detail || responseData.message || '',\n      source: 'validate-response'\n    } }];\n  }\n}\n\n// Prüfe ob Response-Daten vorhanden sind\nif (!responseData || typeof responseData !== 'object') {\n  console.error('Ungültige Response-Struktur:', inputItem);\n  return [{ json: { \n    error: 'Ungültige Response-Struktur', \n    received: JSON.stringify(inputItem).substring(0, 200),\n    source: 'validate-response'\n  } }];\n}\n\n// Normalisiere Response: Stelle sicher, dass 'members' Array vorhanden ist\nif (!responseData.members || !Array.isArray(responseData.members)) {\n  // Wenn keine Members, aber total_items vorhanden, dann leeres Array\n  if (responseData.total_items !== undefined) {\n    responseData.members = [];\n  } else {\n    console.error('Response hat kein members Array:', responseData);\n    return [{ json: { \n      error: 'Response hat kein members Array', \n      response_keys: Object.keys(responseData),\n      source: 'validate-response'\n    } }];\n  }\n}\n\n// Gib normalisierte Response zurück\nreturn [{ json: responseData }];"
+      },
+      "id": "validate-response",
+      "name": "Validate Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [550, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verarbeite Mailchimp API Response mit Fehlerbehandlung\nconst inputData = $input.item.json;\n\n// Prüfe ob Response vorhanden ist\nif (!inputData) {\n  console.error('Keine Response-Daten erhalten');\n  return [];\n}\n\n// Mailchimp API gibt Response manchmal direkt, manchmal in 'body' oder 'data'\nlet mailchimpResponse = inputData;\nif (inputData.body && typeof inputData.body === 'object') {\n  mailchimpResponse = inputData.body;\n} else if (inputData.data && typeof inputData.data === 'object') {\n  mailchimpResponse = inputData.data;\n} else if (inputData.json && typeof inputData.json === 'object') {\n  mailchimpResponse = inputData.json;\n}\n\n// Prüfe ob Members-Array vorhanden ist\nif (!mailchimpResponse || typeof mailchimpResponse !== 'object') {\n  console.error('Ungültige Response-Struktur:', mailchimpResponse);\n  return [];\n}\n\n// Extrahiere Members aus Response\nconst members = Array.isArray(mailchimpResponse.members) ? mailchimpResponse.members : [];\n\nif (members.length === 0) {\n  console.log('Keine Members gefunden in Response');\n  // Gib leeres Array zurück statt Fehler-Objekt\n  return [];\n}\n\n// Transformiere zu ConnectionKey Format mit sicherer Zugriffe\nconst subscribers = members\n  .filter(member => member && typeof member === 'object') // Nur gültige Member-Objekte\n  .map(member => {\n    try {\n      return {\n        email: member.email_address || member.email || '',\n        firstname: (member.merge_fields && (member.merge_fields.FNAME || member.merge_fields.fname)) || '',\n        lastname: (member.merge_fields && (member.merge_fields.LNAME || member.merge_fields.lname)) || '',\n        source: 'mailchimp-api-sync',\n        subscribed_at: member.timestamp_opt || member.timestamp_signup || null,\n        status: (member.status && typeof member.status === 'string') ? member.status : 'subscribed'\n      };\n    } catch (error) {\n      console.error('Fehler beim Transformieren eines Members:', error, member);\n      return null;\n    }\n  })\n  .filter(sub => sub !== null && sub.email && sub.email.length > 0); // Nur gültige Subscriber mit Email\n\nif (subscribers.length === 0) {\n  console.log('Keine gültigen Subscriber nach Transformation');\n  // Gib leeres Array zurück statt Fehler-Objekt\n  return [];\n}\n\nreturn subscribers.map(sub => ({ json: sub }));"
+      },
+      "id": "transform-members",
+      "name": "Transform Members",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-email",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "no-error",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-valid-subscribers",
+      "name": "Filter Valid Subscribers",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.the-connection-key.de/api/new-subscriber",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_N8N_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ $json }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json",
+              "fullResponse": false
+            }
+          },
+          "ignoreResponseCode": false
+        }
+      },
+      "id": "send-to-api",
+      "name": "Send to ConnectionKey API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log Fehler-Objekte (werden nicht an API gesendet)\nconst inputData = $input.item.json;\n\n// Prüfe ob es ein Fehler- oder Info-Objekt ist\nif (inputData.error || inputData.message || !inputData.email) {\n  console.log('Überspringe Fehler/Info-Objekt:', inputData);\n  // Gib leeres Array zurück, damit nichts weiterverarbeitet wird\n  return [];\n}\n\n// Gültiger Subscriber - weiterleiten\nreturn [{ json: inputData }];"
+      },
+      "id": "skip-errors",
+      "name": "Skip Errors",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Mailchimp Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Mailchimp Members": {
+      "main": [
+        [
+          {
+            "node": "Validate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Response": {
+      "main": [
+        [
+          {
+            "node": "Transform Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Members": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Send to ConnectionKey API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to ConnectionKey API": {
+      "main": [
+        []
+      ]
+    },
+    "Skip Errors": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-16T00:00:00.000Z",
+  "versionId": "1"
+}

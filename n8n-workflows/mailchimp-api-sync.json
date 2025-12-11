@@ -1,0 +1,140 @@
+{
+  "name": "Mailchimp API Sync → ConnectionKey",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://{{ $env.MAILCHIMP_DC }}.api.mailchimp.com/3.0/lists/{{ $env.MAILCHIMP_LIST_ID }}/members",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.MAILCHIMP_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "status",
+                "value": "subscribed"
+              },
+              {
+                "name": "count",
+                "value": "1000"
+              }
+            ]
+          }
+        }
+      },
+      "id": "get-mailchimp-members",
+      "name": "Get Mailchimp Members",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verarbeite Mailchimp API Response\nconst mailchimpResponse = $input.item.json;\n\n// Extrahiere Members aus Response\nconst members = mailchimpResponse.members || [];\n\n// Transformiere zu ConnectionKey Format\nconst subscribers = members.map(member => ({\n  email: member.email_address || member.email || '',\n  firstname: member.merge_fields?.FNAME || member.merge_fields?.fname || '',\n  lastname: member.merge_fields?.LNAME || member.merge_fields?.lname || '',\n  source: 'mailchimp-api-sync',\n  subscribed_at: member.timestamp_opt || member.timestamp_signup || null,\n  status: member.status || 'subscribed'\n})).filter(sub => sub.email);\n\nreturn subscribers.map(sub => ({ json: sub }));"
+      },
+      "id": "transform-members",
+      "name": "Transform Members",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.the-connection-key.de/api/new-subscriber",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.N8N_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ $json }}",
+        "options": {}
+      },
+      "id": "send-to-api",
+      "name": "Send to ConnectionKey API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Mailchimp Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Mailchimp Members": {
+      "main": [
+        [
+          {
+            "node": "Transform Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Members": {
+      "main": [
+        [
+          {
+            "node": "Send to ConnectionKey API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-16T00:00:00.000Z",
+  "versionId": "1"
+}

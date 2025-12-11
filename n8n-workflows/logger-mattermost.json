@@ -1,0 +1,78 @@
+{
+  "name": "LOGGER → Mattermost",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "log",
+        "httpMethod": "POST",
+        "options": {}
+      },
+      "id": "webhook-logger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "log"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.werdemeisterdeinergedanken.de/hooks/jt7w46gsxtr3pkqr75dkor9j3e",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ { \"channel\": $json.channel || '#tech', \"username\": $json.username || 'n8n-logger', \"text\": '### 🧾 Log\\n**traceId:** ' + ($json.traceId || 'n/a') + '\\n**source:** ' + ($json.source || 'n/a') + '\\n**status:** ' + ($json.status || 'n/a') + '\\n\\n---\\n' + ($json.message || '—') } }}",
+        "options": {}
+      },
+      "id": "mattermost-logger",
+      "name": "Send to Mattermost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"logged\": true, \"traceId\": $json.traceId || 'n/a' } }}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send to Mattermost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Mattermost": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-16T00:00:00.000Z",
+  "versionId": "1"
+}

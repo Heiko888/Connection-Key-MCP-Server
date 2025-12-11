@@ -1,0 +1,200 @@
+{
+  "name": "Marketingkonzepte Generierung",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://138.199.237.34:7000/agent/marketing",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ { \"message\": 'Erstelle ein vollständiges Marketingkonzept für diese Woche mit folgenden Bereichen:\\n\\n1. MARKETINGSTRATEGIE:\\n   - Zielgruppen-Analyse\\n   - Positionierung\\n   - Unique Selling Proposition\\n   - Kern-Botschaften\\n\\n2. KAMPAGNEN-IDEEN:\\n   - 3-5 konkrete Kampagnen-Konzepte\\n   - Zeitplan\\n   - Ziele & KPIs\\n   - Budget-Empfehlungen\\n\\n3. CONTENT-PLAN:\\n   - Wöchentlicher Content-Plan\\n   - Themen & Formate\\n   - Kanal-Verteilung (Instagram, YouTube, Newsletter, etc.)\\n   - Posting-Schedule\\n\\n4. KANAL-STRATEGIE:\\n   - Optimale Kanal-Nutzung\\n   - Content-Format pro Kanal\\n   - Cross-Promotion-Strategie\\n\\n5. MESSAGING & TONE:\\n   - Kern-Botschaften\\n   - Sprachstil\\n   - Call-to-Actions\\n\\nLiefer eine strukturierte, umsetzbare Marketingstrategie - nicht nur Social Media Posts, sondern ein vollständiges Konzept.', \"userId\": 'system' } }}",
+        "options": {}
+      },
+      "id": "call-marketing-agent",
+      "name": "Call Marketing Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assignment-1",
+              "name": "concept_type",
+              "value": "weekly_marketing_concept",
+              "type": "string"
+            },
+            {
+              "id": "assignment-2",
+              "name": "marketing_concept",
+              "value": "={{ $json.response || $json.message || 'Keine Antwort' }}",
+              "type": "string"
+            },
+            {
+              "id": "assignment-3",
+              "name": "created_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "assignment-4",
+              "name": "week",
+              "value": "={{ $now.toISOString().split('T')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "assignment-5",
+              "name": "agent_id",
+              "value": "marketing",
+              "type": "string"
+            },
+            {
+              "id": "assignment-6",
+              "name": "tokens",
+              "value": "={{ $json.tokens || 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare-data",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/marketing_concepts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ { \"concept_type\": $json.concept_type, \"marketing_concept\": $json.marketing_concept, \"week\": $json.week, \"agent_id\": $json.agent_id, \"tokens\": $json.tokens, \"created_at\": $json.created_at } }}",
+        "options": {}
+      },
+      "id": "save-to-supabase",
+      "name": "Save to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.werdemeisterdeinergedanken.de/hooks/jt7w46gsxtr3pkqr75dkor9j3e",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ { \"text\": '## 📊 Marketingkonzept generiert!\\n\\n**Zeit:** ' + $now + '\\n\\n**Status:** ✅ Erfolgreich gespeichert\\n\\n**Konzept-Typ:** ' + $('Prepare Data').item.json.concept_type + '\\n\\n**Woche:** ' + $('Prepare Data').item.json.week + '\\n\\n---\\n\\n**Vorschau:**\\n' + ($('Prepare Data').item.json.marketing_concept.substring(0, 500) || 'Konzept generiert') + '...', \"channel\": '#marketing', \"username\": 'Marketing Agent' } }}",
+        "options": {}
+      },
+      "id": "send-mattermost",
+      "name": "Send to Mattermost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call Marketing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Marketing Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Send to Mattermost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-18T00:00:00.000Z",
+  "versionId": "1"
+}
+
+
+

@@ -1,0 +1,113 @@
+{
+  "name": "Mailchimp - Get All Lists",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "mailchimp-get-lists",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "mailchimp-get-lists"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://us21.api.mailchimp.com/3.0/lists",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_MAILCHIMP_API_KEY"
+            }
+          ]
+        },
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "count",
+                "value": "100"
+              }
+            ]
+          }
+        }
+      },
+      "id": "get-lists",
+      "name": "Get All Lists",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatiere Listen für bessere Lesbarkeit\nconst response = $input.item.json;\nconst lists = response.lists || [];\n\n// Erstelle übersichtliche Liste\nconst formattedLists = lists.map(list => ({\n  id: list.id,\n  name: list.name,\n  member_count: list.stats?.member_count || 0,\n  created_at: list.date_created || 'N/A',\n  web_id: list.web_id || 'N/A'\n}));\n\nreturn [{\n  json: {\n    total_lists: lists.length,\n    lists: formattedLists,\n    message: 'Verwende die \"id\" als MAILCHIMP_LIST_ID'\n  }\n}];"
+      },
+      "id": "format-lists",
+      "name": "Format Lists",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Respond with Lists",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get All Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Lists": {
+      "main": [
+        [
+          {
+            "node": "Format Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Lists": {
+      "main": [
+        [
+          {
+            "node": "Respond with Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-16T00:00:00.000Z",
+  "versionId": "1"
+}

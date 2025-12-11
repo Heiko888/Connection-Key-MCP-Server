@@ -1,0 +1,230 @@
+# version: '3.8'  # Entfernt - obsolete in Docker Compose V2
+
+services:
+
+  # ------------------------------------------------------
+  # FRONTEND APPLICATION
+  # ------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* Variablen (werden in HTML eingebettet)
+        # WICHTIG: KEIN Bindestrich, KEIN Gleichheitszeichen - nur Doppelpunkt!
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://167.235.224.149}
+        NEXT_PUBLIC_CK_AGENT_URL: ${CK_AGENT_URL:-http://172.17.0.1:4000}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        # Server-Side ENV (für API-Routen während Build)
+        SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+        JWT_SECRET: ${JWT_SECRET}
+        CK_AGENT_URL: ${CK_AGENT_URL:-http://172.17.0.1:4000}
+        OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+        # Stripe (falls benötigt)
+        STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+        STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+        STRIPE_BASIC_PRICE_ID: ${STRIPE_BASIC_PRICE_ID:-}
+        STRIPE_PREMIUM_PRICE_ID: ${STRIPE_PREMIUM_PRICE_ID:-}
+        STRIPE_VIP_PRICE_ID: ${STRIPE_VIP_PRICE_ID:-}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # Node.js Runtime
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      NEXT_TELEMETRY_DISABLED: 1
+      NODE_OPTIONS: --max-old-space-size=3072
+      TSC_COMPILE_ON_ERROR: true
+      # Supabase (Client + Server)
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      # Auth
+      JWT_SECRET: ${JWT_SECRET}
+      # CK-Agent (läuft als PM2-Service auf Host, über Nginx HTTPS)
+      CK_AGENT_URL: ${CK_AGENT_URL:-https://agent.the-connection-key.de}
+      NEXT_PUBLIC_CK_AGENT_URL: ${NEXT_PUBLIC_CK_AGENT_URL:-https://agent.the-connection-key.de}
+      # OpenAI (falls benötigt)
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # Agent Integration - MCP Server & Reading Agent (Runtime only, nicht Build-Args)
+      MCP_SERVER_URL: ${MCP_SERVER_URL:-http://138.199.237.34:7000}
+      NEXT_PUBLIC_MCP_SERVER_URL: ${NEXT_PUBLIC_MCP_SERVER_URL:-http://138.199.237.34:7000}
+      READING_AGENT_URL: ${READING_AGENT_URL:-http://138.199.237.34:4001}
+      NEXT_PUBLIC_READING_AGENT_URL: ${NEXT_PUBLIC_READING_AGENT_URL:-http://138.199.237.34:4001}
+      # Stripe (Client + Server)
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ------------------------------------------------------
+  # NGINX REVERSE PROXY
+  # ------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - grafana
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # CK-AGENT — FIXED VERSION
+  # ------------------------------------------------------
+  ck-agent:
+    build:
+      context: ./ck-agent
+    container_name: ck-agent
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # GRAFANA
+  # ------------------------------------------------------
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # PROMETHEUS
+  # ------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus:/etc/prometheus/rules:ro
+      - prometheus-storage:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # NODE EXPORTER
+  # ------------------------------------------------------
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # ALERTMANAGER
+  # ------------------------------------------------------
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-storage:/alertmanager
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # REDIS (SICHER KONFIGURIERT)
+  # ------------------------------------------------------
+  redis:
+    image: redis:alpine
+    # ⚠️ Port NICHT öffentlich exponieren - nur interne Docker-Kommunikation
+    # ports:
+    #   - "6379:6379"  # ENTFERNT für Sicherheit
+    volumes:
+      - redis-storage:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: unless-stopped
+    # Passwort wird über --requirepass übergeben (sicherer als in redis.conf)
+    # Anführungszeichen schützen vor Sonderzeichen im Passwort
+    command: >
+      sh -c "redis-server /usr/local/etc/redis/redis.conf --requirepass \"$$REDIS_PASSWORD\""
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - app-network
+
+  # ------------------------------------------------------
+  # REDIS EXPORTER (SICHER KONFIGURIERT)
+  # ------------------------------------------------------
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - app-network
+
+# ------------------------------------------------------
+# NETWORKS & VOLUMES
+# ------------------------------------------------------
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  grafana-storage:
+  prometheus-storage:
+  alertmanager-storage:
+  redis-storage:
+

@@ -106,12 +106,30 @@ function loadKnowledge() {
   try {
     const files = fs.readdirSync(KNOWLEDGE_PATH);
     files.forEach(file => {
-      if (file.endsWith('.txt') || file.endsWith('.md')) {
-        const filePath = path.join(KNOWLEDGE_PATH, file);
+      const filePath = path.join(KNOWLEDGE_PATH, file);
+      const stat = fs.statSync(filePath);
+      
+      if (stat.isFile() && (file.endsWith('.txt') || file.endsWith('.md'))) {
         const content = fs.readFileSync(filePath, 'utf8');
         const key = path.basename(file, path.extname(file));
         knowledge[key] = content;
         log("info", `Knowledge geladen: ${key}`);
+      } else if (stat.isDirectory()) {
+        // Lade auch Dateien aus Unterordnern (z.B. brandbook/)
+        try {
+          const subFiles = fs.readdirSync(filePath);
+          subFiles.forEach(subFile => {
+            if (subFile.endsWith('.txt') || subFile.endsWith('.md')) {
+              const subFilePath = path.join(filePath, subFile);
+              const subContent = fs.readFileSync(subFilePath, 'utf8');
+              const subKey = `${file}-${path.basename(subFile, path.extname(subFile))}`;
+              knowledge[subKey] = subContent;
+              log("info", `Knowledge geladen (Unterordner): ${subKey}`);
+            }
+          });
+        } catch (subError) {
+          log("warn", `Konnte Unterordner nicht lesen: ${filePath}`, subError);
+        }
       }
     });
   } catch (error) {
@@ -184,7 +202,7 @@ app.post("/reading/generate", async (req, res) => {
     }
 
     // System-Prompt mit Knowledge und Templates
-    let systemPrompt = `Du bist ein Experte für Human Design Readings.
+    let systemPrompt = `Du bist ein Experte für Human Design Readings für "The Connection Key".
 
 Du erstellst detaillierte, präzise und wertvolle Human Design Readings basierend auf Geburtsdaten.
 
@@ -198,12 +216,49 @@ Deine Readings enthalten:
 - Spezifische Insights für den Reading-Typ (${readingType})
 
 Sprache: Deutsch
-Stil: Authentisch, klar, wertvoll, persönlich`;
+Stil: Authentisch, klar, wertvoll, persönlich
 
-    // Knowledge hinzufügen
-    if (Object.keys(knowledge).length > 0) {
-      systemPrompt += "\n\nZusätzliches Wissen:\n";
-      Object.values(knowledge).forEach(k => {
+WICHTIG: Nutze das Brand Book Wissen, um:
+- Den korrekten Tone of Voice von "The Connection Key" zu verwenden
+- Die Markenidentität und Werte in deinen Readings zu reflektieren
+- Die Kommunikationsrichtlinien einzuhalten
+- Den Brand Voice konsistent anzuwenden
+
+DESIGN-KONSISTENZ (KRITISCH):
+- Halte dich konsistent zum Design der App
+- Verwende die definierten Farben, Typografie und UI-Prinzipien
+- Reading Agent Farbe: #C7CEEA (Lavendel)
+- Typografie: Inter für UI, klare Hierarchie
+- Design-Prinzipien: Klar, einfach, zugänglich, responsive`;
+
+    // Brand Book Knowledge extrahieren
+    const brandbookKnowledge = [];
+    const otherKnowledge = [];
+    
+    Object.entries(knowledge).forEach(([key, content]) => {
+      if (key.startsWith('brandbook-') || key.includes('brandbook')) {
+        brandbookKnowledge.push(content);
+      } else {
+        otherKnowledge.push(content);
+      }
+    });
+
+    // Brand Book Knowledge zuerst hinzufügen (höhere Priorität)
+    if (brandbookKnowledge.length > 0) {
+      systemPrompt += "\n\n=== BRAND BOOK WISSEN (WICHTIG - IMMER VERWENDEN) ===\n";
+      systemPrompt += "Das folgende Brand Book Wissen MUSS in deinen Readings verwendet werden:\n";
+      systemPrompt += "- Markenidentität, Tone of Voice, Kommunikationsrichtlinien\n";
+      systemPrompt += "- Brand Voice, Werte, Mission\n";
+      systemPrompt += "- Verwende diese Informationen aktiv in deinen Readings!\n\n";
+      brandbookKnowledge.forEach(k => {
+        systemPrompt += k + "\n\n";
+      });
+    }
+
+    // Andere Knowledge hinzufügen
+    if (otherKnowledge.length > 0) {
+      systemPrompt += "\n\n=== ZUSÄTZLICHES HUMAN DESIGN WISSEN ===\n";
+      otherKnowledge.forEach(k => {
         systemPrompt += k + "\n";
       });
     }

@@ -1,0 +1,223 @@
+{
+  "workflows": [
+    {
+      "name": "Tägliche Marketing-Content-Generierung",
+      "description": "Generiert täglich um 9:00 Marketing-Content",
+      "nodes": [
+        {
+          "type": "n8n-nodes-base.scheduleTrigger",
+          "name": "Schedule Trigger",
+          "parameters": {
+            "rule": {
+              "interval": [
+                {
+                  "field": "cronExpression",
+                  "expression": "0 9 * * *"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Marketing Agent",
+          "parameters": {
+            "method": "POST",
+            "url": "http://138.199.237.34:7000/agent/marketing",
+            "authentication": "none",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "message",
+                  "value": "Erstelle 5 Social Media Posts für heute mit Themen: Manifestation, Energie, Human Design"
+                }
+              ]
+            },
+            "options": {
+              "response": {
+                "response": {
+                  "responseFormat": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "n8n-nodes-base.set",
+          "name": "Transform Data",
+          "parameters": {
+            "values": {
+              "string": [
+                {
+                  "name": "agent",
+                  "value": "marketing"
+                },
+                {
+                  "name": "response",
+                  "value": "={{ $json.response }}"
+                },
+                {
+                  "name": "created_at",
+                  "value": "={{ $now }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "n8n-nodes-base.supabase",
+          "name": "Save to Supabase",
+          "parameters": {
+            "operation": "insert",
+            "table": "agent_responses",
+            "columns": {
+              "mappingMode": "defineBelow",
+              "value": {
+                "agent": "={{ $json.agent }}",
+                "response": "={{ $json.response }}",
+                "created_at": "={{ $json.created_at }}"
+              }
+            }
+          }
+        }
+      ],
+      "connections": {
+        "Schedule Trigger": {
+          "main": [
+            [
+              {
+                "node": "Marketing Agent",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Marketing Agent": {
+          "main": [
+            [
+              {
+                "node": "Transform Data",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Transform Data": {
+          "main": [
+            [
+              {
+                "node": "Save to Supabase",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "Multi-Agent Content Pipeline",
+      "description": "Marketing → Social-YouTube → Automation",
+      "nodes": [
+        {
+          "type": "n8n-nodes-base.webhook",
+          "name": "Webhook Trigger",
+          "parameters": {
+            "path": "content-pipeline",
+            "httpMethod": "POST"
+          }
+        },
+        {
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Marketing Agent",
+          "parameters": {
+            "method": "POST",
+            "url": "http://138.199.237.34:7000/agent/marketing",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "message",
+                  "value": "={{ $json.body.topic ? 'Erstelle Marketing-Strategie für: ' + $json.body.topic : 'Erstelle Marketing-Strategie' }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Social-YouTube Agent",
+          "parameters": {
+            "method": "POST",
+            "url": "http://138.199.237.34:7000/agent/social-youtube",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "message",
+                  "value": "Erstelle Social Media Content basierend auf dieser Strategie: {{ $json.response }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Automation Agent",
+          "parameters": {
+            "method": "POST",
+            "url": "http://138.199.237.34:7000/agent/automation",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "message",
+                  "value": "Erstelle n8n Workflow für automatische Content-Verteilung"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "connections": {
+        "Webhook Trigger": {
+          "main": [
+            [
+              {
+                "node": "Marketing Agent",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Marketing Agent": {
+          "main": [
+            [
+              {
+                "node": "Social-YouTube Agent",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Social-YouTube Agent": {
+          "main": [
+            [
+              {
+                "node": "Automation Agent",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}
+

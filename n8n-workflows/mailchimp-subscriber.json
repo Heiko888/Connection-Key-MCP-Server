@@ -61,7 +61,7 @@
             },
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_N8N_API_KEY_HERE"
+              "value": "=Bearer {{ $env.N8N_API_KEY }}"
             }
           ]
         },
@@ -140,4 +140,3 @@
   "updatedAt": "2025-11-27T00:00:00.000Z",
   "versionId": "1"
 }
-

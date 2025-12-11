@@ -1,0 +1,151 @@
+{
+  "name": "Reading Generation → Mattermost",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reading-mattermost",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-reading",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "reading-mattermost"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://138.199.237.34:4001/reading/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "birthDate",
+              "value": "={{ $json.birthDate }}"
+            },
+            {
+              "name": "birthTime",
+              "value": "={{ $json.birthTime }}"
+            },
+            {
+              "name": "birthPlace",
+              "value": "={{ $json.birthPlace }}"
+            },
+            {
+              "name": "readingType",
+              "value": "={{ $json.readingType || 'detailed' }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "reading-agent",
+      "name": "Reading Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mattermost.ihre-domain.de/hooks/xxxxx",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=## 🔮 Neues Reading generiert!\n\n**User:** {{ $json.userId || 'Unbekannt' }}\n**Typ:** {{ $('Webhook Trigger').item.json.readingType || 'detailed' }}\n**Geburtsdatum:** {{ $('Webhook Trigger').item.json.birthDate }}\n\n---\n\n{{ $json.reading }}"
+            },
+            {
+              "name": "channel",
+              "value": "#readings"
+            },
+            {
+              "name": "username",
+              "value": "Reading Agent"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "mattermost",
+      "name": "Send to Mattermost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"readingId\": $json.readingId || \"unknown\" } }}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reading Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reading Agent": {
+      "main": [
+        [
+          {
+            "node": "Send to Mattermost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Mattermost": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

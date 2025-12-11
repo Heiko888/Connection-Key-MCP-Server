@@ -6,6 +6,9 @@ deploy.tar.gz
 .env.local
 .env.*.local
 
+# Redis Passwort (NIEMALS committen!)
+REDIS_PASSWORD.txt
+
 # Logs
 *.log
 npm-debug.log*

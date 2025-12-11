@@ -61,7 +61,7 @@
             },
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $env.N8N_API_KEY }}"
+              "value": "Bearer YOUR_N8N_API_KEY_HERE"
             }
           ]
         },

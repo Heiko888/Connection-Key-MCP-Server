@@ -139,15 +139,18 @@ http://localhost:3000/agents-dashboard
 
 ## 📚 Wichtige Dateien
 
-### Für Hetzner Server:
+### Für Hetzner Server
+
 - `integration/VERIFY_CORS_FIREWALL.sh` - CORS & Firewall Prüfung
 - `integration/install-hetzner-server.sh` - CORS-Setup
 
-### Für CK-App Server:
+### Für CK-App Server
+
 - `integration/install-ck-app-server.sh` - Vollständige Installation
 - `integration/DEPLOY_TO_SERVER.sh` - Deployment-Script
 
-### Dokumentation:
+### Dokumentation
+
 - `integration/ALLE_5_AGENTEN.md` - Agenten-Übersicht
 - `integration/DEPLOYMENT_READY.md` - Deployment-Anleitung
 - `integration/SERVER_SETUP_COMPLETE.md` - Server-Setup
@@ -155,4 +158,3 @@ http://localhost:3000/agents-dashboard
 ---
 
 **Projekt erfolgreich abgeschlossen!** ✅
-

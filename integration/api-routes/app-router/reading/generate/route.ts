@@ -21,6 +21,8 @@ const supabase = createClient(
 );
 
 export async function POST(request: NextRequest) {
+  let readingId: string | null = null;
+  
   try {
     // Request Body parsen
     const body = await request.json();
@@ -37,8 +39,64 @@ export async function POST(request: NextRequest) {
 
     // Validierte Daten
     const { data } = validation;
+    const readingType = (data?.readingType || 'detailed') as any;
 
-    // Reading Agent aufrufen
+    // ============================================
+    // SCHRITT 1: Reading-Eintrag in Supabase erstellen (Status: pending)
+    // ============================================
+    // Supabase generiert UUID automatisch - das ist unsere zentrale ID
+    const { data: pendingReading, error: createError } = await supabase
+      .from('readings')
+      .insert([{
+        // id wird von Supabase generiert (UUID)
+        user_id: data?.userId || null,
+        reading_type: readingType,
+        birth_date: data?.birthDate,
+        birth_time: data?.birthTime,
+        birth_place: data?.birthPlace,
+        // Für Compatibility Reading
+        ...(data?.readingType === 'compatibility' && {
+          birth_date2: data?.birthDate2,
+          birth_time2: data?.birthTime2,
+          birth_place2: data?.birthPlace2
+        }),
+        reading_text: '', // Wird später gefüllt
+        status: 'pending' // Start-Status
+      }])
+      .select()
+      .single();
+
+    if (createError || !pendingReading) {
+      console.error('Supabase Create Error:', createError);
+      return NextResponse.json(
+        createErrorResponse(
+          'Failed to create reading entry',
+          'DB_CREATE_ERROR',
+          createError?.message || 'Unknown error'
+        ),
+        { status: 500 }
+      );
+    }
+
+    // Zentrale ID verwenden (von Supabase generiert)
+    readingId = pendingReading.id;
+
+    // ============================================
+    // SCHRITT 2: Status auf 'processing' setzen
+    // ============================================
+    const { error: processingError } = await supabase
+      .from('readings')
+      .update({ status: 'processing' })
+      .eq('id', readingId);
+
+    if (processingError) {
+      console.error('Supabase Status Update Error (processing):', processingError);
+      // Weiter machen, auch wenn Status-Update fehlschlägt
+    }
+
+    // ============================================
+    // SCHRITT 3: Reading Agent aufrufen
+    // ============================================
     const response = await fetch(`${READING_AGENT_URL}/reading/generate`, {
       method: 'POST',
       headers: {
@@ -49,7 +107,7 @@ export async function POST(request: NextRequest) {
         birthDate: data?.birthDate,
         birthTime: data?.birthTime,
         birthPlace: data?.birthPlace,
-        readingType: data?.readingType,
+        readingType: readingType,
         // Für Compatibility Reading
         ...(data?.readingType === 'compatibility' && {
           birthDate2: data?.birthDate2,
@@ -60,12 +118,28 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
+      // ============================================
+      // FEHLER: Status auf 'failed' setzen
+      // ============================================
       const errorText = await response.text();
       console.error('Reading Agent Error:', {
         status: response.status,
         statusText: response.statusText,
-        error: errorText
+        error: errorText,
+        readingId
       });
+
+      // Status auf 'failed' setzen
+      await supabase
+        .from('readings')
+        .update({ 
+          status: 'failed',
+          metadata: {
+            error: errorText,
+            failedAt: new Date().toISOString()
+          }
+        })
+        .eq('id', readingId);
 
       const errorResponse = createErrorResponse(
         'Reading Agent request failed',
@@ -80,13 +154,11 @@ export async function POST(request: NextRequest) {
     }
 
     const readingData = await response.json();
-
-    // Standardisierte Response erstellen
-    const readingId = readingData.readingId || `reading-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const readingText = readingData.reading || readingData.text || '';
-    const readingType = (readingData.readingType || data?.readingType || 'detailed') as any;
 
-    // Metadaten für Persistenz
+    // ============================================
+    // SCHRITT 4: Reading-Daten in Supabase aktualisieren (Status: completed)
+    // ============================================
     const metadata = {
       birthDate: data?.birthDate || '',
       birthTime: data?.birthTime || '',
@@ -103,110 +175,33 @@ export async function POST(request: NextRequest) {
       })
     };
 
-    // Reading in Supabase speichern
-    try {
-      const { data: savedReading, error: dbError } = await supabase
-        .from('readings')
-        .insert([{
-          id: readingId, // Verwende generierte ID
-          user_id: data?.userId || null,
-          reading_type: readingType,
-          birth_date: data?.birthDate,
-          birth_time: data?.birthTime,
-          birth_place: data?.birthPlace,
-          // Für Compatibility Reading
-          ...(data?.readingType === 'compatibility' && {
-            birth_date2: data?.birthDate2,
-            birth_time2: data?.birthTime2,
-            birth_place2: data?.birthPlace2
-          }),
-          reading_text: readingText,
-          reading_sections: readingData.sections || null,
-          chart_data: readingData.chartData || null,
-          metadata: {
-            tokens: readingData.tokens || 0,
-            model: readingData.model || 'gpt-4',
-            timestamp: new Date().toISOString()
-          },
-          status: 'completed'
-        }])
-        .select()
-        .single();
+    const { data: completedReading, error: updateError } = await supabase
+      .from('readings')
+      .update({
+        reading_text: readingText,
+        reading_sections: readingData.sections || null,
+        chart_data: readingData.chartData || null,
+        metadata: {
+          tokens: readingData.tokens || 0,
+          model: readingData.model || 'gpt-4',
+          timestamp: new Date().toISOString()
+        },
+        status: 'completed'
+      })
+      .eq('id', readingId)
+      .select()
+      .single();
 
-      if (dbError) {
-        console.error('Supabase Insert Error:', dbError);
-        
-        // Falls Duplicate Key Error (ID bereits vorhanden), versuche mit neuer ID
-        if (dbError.code === '23505') {
-          const newReadingId = `reading-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-          
-          const { data: retryReading, error: retryError } = await supabase
-            .from('readings')
-            .insert([{
-              id: newReadingId,
-              user_id: data?.userId || null,
-              reading_type: readingType,
-              birth_date: data?.birthDate,
-              birth_time: data?.birthTime,
-              birth_place: data?.birthPlace,
-              ...(data?.readingType === 'compatibility' && {
-                birth_date2: data?.birthDate2,
-                birth_time2: data?.birthTime2,
-                birth_place2: data?.birthPlace2
-              }),
-              reading_text: readingText,
-              reading_sections: readingData.sections || null,
-              chart_data: readingData.chartData || null,
-              metadata: {
-                tokens: readingData.tokens || 0,
-                model: readingData.model || 'gpt-4',
-                timestamp: new Date().toISOString()
-              },
-              status: 'completed'
-            }])
-            .select()
-            .single();
-
-          if (retryError) {
-            console.error('Supabase Retry Insert Error:', retryError);
-            // Weiter mit Reading, auch wenn Speicherung fehlgeschlagen ist
-          } else {
-            // Verwende neue ID
-            const standardizedResponse: ReadingResponse = createReadingResponse(
-              newReadingId,
-              readingText,
-              readingType,
-              metadata,
-              readingData.sections || undefined,
-              readingData.chartData || undefined
-            );
-            return NextResponse.json(standardizedResponse);
-          }
-        } else {
-          // Anderer Datenbank-Fehler - loggen, aber Reading trotzdem zurückgeben
-          console.error('Supabase Insert Error (non-duplicate):', dbError);
-        }
-      } else {
-        // Erfolgreich gespeichert - verwende gespeicherte ID
-        const standardizedResponse: ReadingResponse = createReadingResponse(
-          savedReading.id,
-          readingText,
-          readingType,
-          metadata,
-          readingData.sections || undefined,
-          readingData.chartData || undefined
-        );
-        return NextResponse.json(standardizedResponse);
-      }
-    } catch (dbError: any) {
-      // Datenbank-Fehler - loggen, aber Reading trotzdem zurückgeben
-      console.error('Supabase Error:', dbError);
+    if (updateError) {
+      console.error('Supabase Update Error:', updateError);
+      // Weiter machen, auch wenn Update fehlschlägt
     }
 
-    // Falls Speicherung fehlgeschlagen ist, Reading trotzdem zurückgeben
-    // (Reading wurde generiert, nur Persistenz fehlgeschlagen)
+    // ============================================
+    // SCHRITT 5: Standardisierte Response zurückgeben
+    // ============================================
     const standardizedResponse: ReadingResponse = createReadingResponse(
-      readingId,
+      readingId, // Zentrale ID (von Supabase generiert)
       readingText,
       readingType,
       metadata,
@@ -214,7 +209,6 @@ export async function POST(request: NextRequest) {
       readingData.chartData || undefined
     );
 
-    // Erfolgreiche Antwort (auch wenn Persistenz fehlgeschlagen ist)
     return NextResponse.json(standardizedResponse);
 
   } catch (error: any) {

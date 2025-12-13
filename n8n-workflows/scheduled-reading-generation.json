@@ -1,0 +1,235 @@
+{
+  "name": "Scheduled Reading Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "notes": "Täglich um 9:00 Uhr"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": "subscribers",
+        "columns": {
+          "mappingMode": "all"
+        },
+        "limit": 10,
+        "options": {
+          "order": {
+            "orderBy": "created_at",
+            "orderDirection": "DESC"
+          }
+        }
+      },
+      "id": "get-new-subscribers",
+      "name": "Get New Subscribers",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Holt neue Subscriber (z.B. für Welcome Reading)"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-subscribers",
+      "name": "Split Subscribers",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "birthDate",
+              "value": "={{ $json.birthDate || '1990-01-01' }}"
+            },
+            {
+              "name": "birthTime",
+              "value": "={{ $json.birthTime || '12:00' }}"
+            },
+            {
+              "name": "birthPlace",
+              "value": "={{ $json.birthPlace || 'Unknown' }}"
+            },
+            {
+              "name": "readingType",
+              "value": "basic"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "generate-reading",
+      "name": "Generate Reading",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "notes": "Generiert Basic Reading für neuen Subscriber"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "readings",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.readingId }}",
+            "user_id": "={{ $json.userId || null }}",
+            "reading_type": "basic",
+            "birth_date": "={{ $json.birthDate || '1990-01-01' }}",
+            "birth_time": "={{ $json.birthTime || '12:00' }}",
+            "birth_place": "={{ $json.birthPlace || 'Unknown' }}",
+            "reading_text": "={{ $json.reading || $json.reading.text }}",
+            "reading_sections": "={{ $json.reading.sections || null }}",
+            "chart_data": "={{ $json.chartData || null }}",
+            "metadata": "={{ { tokens: $json.tokens || 0, model: $json.model || 'gpt-4', timestamp: $json.timestamp || $now } }}",
+            "status": "completed"
+          }
+        }
+      },
+      "id": "save-reading",
+      "name": "Save Reading",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.FRONTEND_URL || 'https://www.the-connection-key.de' }}/api/notifications/reading",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "readingId",
+              "value": "={{ $json.readingId }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.userId }}"
+            },
+            {
+              "name": "readingType",
+              "value": "basic"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            }
+          ]
+        }
+      },
+      "id": "notify-frontend",
+      "name": "Notify Frontend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get New Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Split Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Subscribers": {
+      "main": [
+        [
+          {
+            "node": "Generate Reading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Reading": {
+      "main": [
+        [
+          {
+            "node": "Save Reading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Reading": {
+      "main": [
+        [
+          {
+            "node": "Notify Frontend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["scheduled", "reading"],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-13T18:00:00.000Z",
+  "versionId": "1"
+}
+

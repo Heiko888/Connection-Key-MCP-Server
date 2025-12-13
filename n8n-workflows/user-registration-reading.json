@@ -1,0 +1,244 @@
+{
+  "name": "User Registration → Reading",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-registered",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-user-registered",
+      "name": "User Registered Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "user-registration"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-birth-data",
+              "leftValue": "={{ $json.body.birthDate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-birth-data",
+      "name": "Check Birth Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "notes": "Prüft ob Geburtsdaten vorhanden sind"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}"
+            },
+            {
+              "name": "birthDate",
+              "value": "={{ $json.body.birthDate }}"
+            },
+            {
+              "name": "birthTime",
+              "value": "={{ $json.body.birthTime || '12:00' }}"
+            },
+            {
+              "name": "birthPlace",
+              "value": "={{ $json.body.birthPlace || 'Unknown' }}"
+            },
+            {
+              "name": "readingType",
+              "value": "basic"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "generate-welcome-reading",
+      "name": "Generate Welcome Reading",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300],
+      "notes": "Generiert Welcome Reading für neuen User"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "readings",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.readingId }}",
+            "user_id": "={{ $json.body.userId }}",
+            "reading_type": "basic",
+            "birth_date": "={{ $json.body.birthDate }}",
+            "birth_time": "={{ $json.body.birthTime || '12:00' }}",
+            "birth_place": "={{ $json.body.birthPlace || 'Unknown' }}",
+            "reading_text": "={{ $json.reading || $json.reading.text }}",
+            "reading_sections": "={{ $json.reading.sections || null }}",
+            "chart_data": "={{ $json.chartData || null }}",
+            "metadata": "={{ { tokens: $json.tokens || 0, model: $json.model || 'gpt-4', timestamp: $json.timestamp || $now, source: 'user-registration' } }}",
+            "status": "completed"
+          }
+        }
+      },
+      "id": "save-welcome-reading",
+      "name": "Save Welcome Reading",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.FRONTEND_URL || 'https://www.the-connection-key.de' }}/api/notifications/reading",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "readingId",
+              "value": "={{ $json.readingId }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}"
+            },
+            {
+              "name": "readingType",
+              "value": "basic"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            },
+            {
+              "name": "message",
+              "value": "Willkommen! Dein Welcome Reading ist fertig."
+            }
+          ]
+        }
+      },
+      "id": "notify-user",
+      "name": "Notify User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, readingId: $json.readingId, message: 'Welcome Reading generiert' } }}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "User Registered Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Birth Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Birth Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Welcome Reading",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Welcome Reading": {
+      "main": [
+        [
+          {
+            "node": "Save Welcome Reading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Welcome Reading": {
+      "main": [
+        [
+          {
+            "node": "Notify User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify User": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["event-trigger", "user-registration", "reading"],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-13T18:00:00.000Z",
+  "versionId": "1"
+}
+

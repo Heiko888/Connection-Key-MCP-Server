@@ -1,0 +1,315 @@
+{
+  "name": "Reading Generation Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook-reading",
+      "name": "Reading Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "reading-generation",
+      "settings": {
+        "httpMethod": "POST",
+        "path": "reading",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-reading-type",
+              "leftValue": "={{ $json.body.readingType }}",
+              "rightValue": "compatibility",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-compatibility",
+      "name": "Check Compatibility",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId || 'anonymous' }}"
+            },
+            {
+              "name": "birthDate",
+              "value": "={{ $json.body.birthDate }}"
+            },
+            {
+              "name": "birthTime",
+              "value": "={{ $json.body.birthTime }}"
+            },
+            {
+              "name": "birthPlace",
+              "value": "={{ $json.body.birthPlace }}"
+            },
+            {
+              "name": "readingType",
+              "value": "={{ $json.body.readingType || 'detailed' }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "call-reading-agent",
+      "name": "Call Reading Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 200],
+      "notes": "Ruft Reading Agent auf Port 4001 auf"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId || 'anonymous' }}"
+            },
+            {
+              "name": "birthDate",
+              "value": "={{ $json.body.birthDate }}"
+            },
+            {
+              "name": "birthTime",
+              "value": "={{ $json.body.birthTime }}"
+            },
+            {
+              "name": "birthPlace",
+              "value": "={{ $json.body.birthPlace }}"
+            },
+            {
+              "name": "birthDate2",
+              "value": "={{ $json.body.birthDate2 }}"
+            },
+            {
+              "name": "birthTime2",
+              "value": "={{ $json.body.birthTime2 }}"
+            },
+            {
+              "name": "birthPlace2",
+              "value": "={{ $json.body.birthPlace2 }}"
+            },
+            {
+              "name": "readingType",
+              "value": "compatibility"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "call-reading-agent-compatibility",
+      "name": "Call Reading Agent (Compatibility)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 400],
+      "notes": "Ruft Reading Agent für Compatibility Reading auf"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "readings",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.readingId }}",
+            "user_id": "={{ $json.body.userId || null }}",
+            "reading_type": "={{ $json.readingType || $json.body.readingType }}",
+            "birth_date": "={{ $json.body.birthDate }}",
+            "birth_time": "={{ $json.body.birthTime }}",
+            "birth_place": "={{ $json.body.birthPlace }}",
+            "birth_date2": "={{ $json.body.birthDate2 || null }}",
+            "birth_time2": "={{ $json.body.birthTime2 || null }}",
+            "birth_place2": "={{ $json.body.birthPlace2 || null }}",
+            "reading_text": "={{ $json.reading || $json.reading.text }}",
+            "reading_sections": "={{ $json.reading.sections || null }}",
+            "chart_data": "={{ $json.chartData || null }}",
+            "metadata": "={{ { tokens: $json.tokens || 0, model: $json.model || 'gpt-4', timestamp: $json.timestamp || $now } }}",
+            "status": "completed"
+          }
+        }
+      },
+      "id": "save-to-supabase",
+      "name": "Save to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Speichert Reading in Supabase readings Tabelle"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.FRONTEND_URL || 'https://www.the-connection-key.de' }}/api/notifications/reading",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "readingId",
+              "value": "={{ $json.readingId }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}"
+            },
+            {
+              "name": "readingType",
+              "value": "={{ $json.readingType || $json.body.readingType }}"
+            },
+            {
+              "name": "status",
+              "value": "completed"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "notify-frontend",
+      "name": "Notify Frontend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300],
+      "notes": "Benachrichtigt Frontend über fertiges Reading"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, readingId: $json.readingId, message: 'Reading erfolgreich generiert und gespeichert' } }}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Reading Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Compatibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Compatibility": {
+      "main": [
+        [
+          {
+            "node": "Call Reading Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Reading Agent (Compatibility)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Reading Agent": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Reading Agent (Compatibility)": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Notify Frontend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Frontend": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-13T18:00:00.000Z",
+  "versionId": "1"
+}
+

@@ -1,11 +1,18 @@
 /**
  * ReadingGenerator Component
  * Komponente für Human Design Reading Generation
+ * 
+ * Verbesserte Version mit:
+ * - Status-Tracking
+ * - Verbesserte Error-Handling
+ * - ReadingDisplay Integration
  */
 
 'use client';
 
 import { useState } from 'react';
+import { ReadingDisplay } from './ReadingDisplay';
+import { ReadingResponse } from '../../api-routes/reading-response-types';
 
 const READING_TYPES = [
   { value: 'basic', label: 'Basic Reading' },
@@ -29,10 +36,10 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
   const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
   const [readingType, setReadingType] = useState('detailed');
-  const [reading, setReading] = useState('');
+  const [reading, setReading] = useState<ReadingResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [readingId, setReadingId] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +51,14 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
 
     setLoading(true);
     setError(null);
-    setReading('');
+    setReading(null);
+    setProgress(0);
 
     try {
-      const res = await fetch('/api/readings/generate', {
+      // Progress: Validierung
+      setProgress(10);
+
+      const res = await fetch('/api/reading/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,24 +68,80 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
           birthTime,
           birthPlace,
           readingType,
-          userId: userId || 'anonymous'
+          userId: userId || undefined
         }),
       });
 
+      // Progress: Request gesendet
+      setProgress(30);
+
       const data = await res.json();
 
+      // Progress: Response erhalten
+      setProgress(70);
+
       if (!data.success) {
-        throw new Error(data.error || 'Fehler beim Generieren des Readings');
+        // Detaillierte Fehlermeldung
+        const errorMessage = data.errors && data.errors.length > 0
+          ? data.errors.map((e: any) => e.message).join(', ')
+          : data.error || 'Fehler beim Generieren des Readings';
+        
+        throw new Error(errorMessage);
       }
 
-      setReading(data.reading);
-      setReadingId(data.readingId);
+      // Progress: Verarbeitung
+      setProgress(90);
+
+      // Standardisierte ReadingResponse
+      setReading(data as ReadingResponse);
+
+      // Progress: Fertig
+      setProgress(100);
+
+      // Progress nach kurzer Zeit zurücksetzen
+      setTimeout(() => setProgress(0), 1000);
 
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten');
       console.error('Reading Generation Error:', err);
+      setProgress(0);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleShare = async (readingId: string) => {
+    try {
+      // TODO: Implementiere Sharing-Logik
+      // z.B. Link generieren oder Social Media Share
+      const shareUrl = `${window.location.origin}/readings/${readingId}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Mein Human Design Reading',
+          text: 'Schau dir mein Human Design Reading an!',
+          url: shareUrl
+        });
+      } else {
+        // Fallback: Copy to Clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Link in Zwischenablage kopiert!');
+      }
+    } catch (error) {
+      console.error('Share Error:', error);
+    }
+  };
+
+  const handleExport = async (readingId: string, format: 'pdf' | 'text' | 'json') => {
+    try {
+      // TODO: Implementiere Export-Logik
+      // z.B. API-Call zu /api/readings/[id]/export?format=pdf
+      console.log(`Export Reading ${readingId} as ${format}`);
+      
+      // Placeholder
+      alert(`Export als ${format.toUpperCase()} wird implementiert...`);
+    } catch (error) {
+      console.error('Export Error:', error);
     }
   };
 
@@ -146,34 +213,51 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
         </button>
       </form>
 
-      {/* Error */}
-      {error && (
-        <div className="error-message">
-          <strong>Fehler:</strong> {error}
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Reading wird generiert...</p>
+          {progress > 0 && (
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Reading Result */}
-      {reading && (
+      {/* Error State */}
+      {error && (
+        <div className="error-message">
+          <div className="error-icon">⚠️</div>
+          <div className="error-content">
+            <strong>Fehler beim Generieren des Readings</strong>
+            <p>{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="error-dismiss"
+            >
+              Schließen
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Success State */}
+      {reading && !loading && (
         <div className="reading-result">
-          <div className="reading-header">
-            <h3>Ihr Human Design Reading</h3>
-            {readingId && <span className="reading-id">ID: {readingId}</span>}
+          <div className="success-notification">
+            <span className="success-icon">✓</span>
+            <span>Reading erfolgreich generiert!</span>
           </div>
-          <div className="reading-content">
-            {reading.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-          <button 
-            onClick={() => {
-              navigator.clipboard.writeText(reading);
-              alert('Reading in Zwischenablage kopiert!');
-            }}
-            className="copy-button"
-          >
-            Reading kopieren
-          </button>
+          <ReadingDisplay
+            reading={reading}
+            onShare={handleShare}
+            onExport={handleExport}
+          />
         </div>
       )}
     </div>

@@ -75,6 +75,19 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
       // Progress: Request gesendet
       setProgress(30);
 
+      // Prüfe Content-Type bevor JSON parsen
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error('API returned non-JSON:', {
+          status: res.status,
+          statusText: res.statusText,
+          contentType,
+          body: text.substring(0, 200)
+        });
+        throw new Error(`API-Fehler: Server antwortete nicht mit JSON. Status: ${res.status}. Antwort: ${text.substring(0, 100)}`);
+      }
+
       const data = await res.json();
 
       // Progress: Response erhalten

@@ -51,6 +51,19 @@ export async function generateReading(
       body: JSON.stringify(input),
     });
 
+    // Prüfe Content-Type bevor JSON parsen
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('API returned non-JSON:', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType,
+        body: text.substring(0, 200)
+      });
+      throw new Error(`API-Fehler: Server antwortete nicht mit JSON. Status: ${response.status}`);
+    }
+
     const data = await response.json();
 
     if (!response.ok) {

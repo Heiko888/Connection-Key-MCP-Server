@@ -12,7 +12,12 @@ import { createClient } from '@supabase/supabase-js';
 import { validateReadingRequest, formatValidationErrors } from '../../../reading-validation';
 import { createReadingResponse, createErrorResponse, ReadingResponse } from '../../../reading-response-types';
 
-const READING_AGENT_URL = process.env.READING_AGENT_URL || 'http://138.199.237.34:4001';
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL || 'http://138.199.237.34:7000';
+const MCP_API_KEY = process.env.MCP_API_KEY;
+
+if (!MCP_API_KEY) {
+  console.error('❌ MCP_API_KEY nicht gesetzt!');
+}
 
 // Supabase Client (Service Role für Admin-Zugriff)
 const supabase = createClient(
@@ -95,66 +100,81 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
-    // SCHRITT 3: Reading Agent aufrufen
+    // SCHRITT 3: MCP HTTP Gateway aufrufen
     // ============================================
-    const response = await fetch(`${READING_AGENT_URL}/reading/generate`, {
+    const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    const mcpResponse = await fetch(`${MCP_SERVER_URL}/agents/run`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MCP_API_KEY}`
       },
       body: JSON.stringify({
-        userId: data?.userId || 'anonymous',
-        birthDate: data?.birthDate,
-        birthTime: data?.birthTime,
-        birthPlace: data?.birthPlace,
-        readingType: readingType,
-        // Für Compatibility Reading
-        ...(data?.readingType === 'compatibility' && {
-          birthDate2: data?.birthDate2,
-          birthTime2: data?.birthTime2,
-          birthPlace2: data?.birthPlace2
-        })
-      }),
+        domain: 'reading',
+        task: 'generate',
+        payload: {
+          birthDate: data?.birthDate,
+          birthTime: data?.birthTime,
+          birthPlace: data?.birthPlace,
+          userId: data?.userId || null,
+          readingType: readingType
+        },
+        requestId
+      })
     });
 
-    if (!response.ok) {
-      // ============================================
-      // FEHLER: Status auf 'failed' setzen
-      // ============================================
-      const errorText = await response.text();
-      console.error('Reading Agent Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText,
-        readingId
-      });
-
+    if (!mcpResponse.ok) {
+      const errorData = await mcpResponse.json().catch(() => ({ error: { message: 'Unknown error' } }));
+      
       // Status auf 'failed' setzen
       await supabase
         .from('readings')
         .update({ 
           status: 'failed',
           metadata: {
-            error: errorText,
+            error: errorData.error?.message || 'MCP Gateway error',
             failedAt: new Date().toISOString()
           }
         })
         .eq('id', readingId);
 
-      const errorResponse = createErrorResponse(
-        'Reading Agent request failed',
-        'READING_AGENT_ERROR',
-        errorText
-      );
-
       return NextResponse.json(
-        errorResponse,
-        { status: response.status || 500 }
+        createErrorResponse(
+          errorData.error?.message || 'MCP Gateway request failed',
+          errorData.error?.code || 'MCP_ERROR',
+          errorData.error?.details || {}
+        ),
+        { status: mcpResponse.status }
       );
     }
 
-    const readingData = await response.json();
-    const readingText = readingData.reading || readingData.text || '';
+    const mcpResult = await mcpResponse.json();
+
+    if (!mcpResult.success) {
+      // Status auf 'failed' setzen
+      await supabase
+        .from('readings')
+        .update({ 
+          status: 'failed',
+          metadata: {
+            error: mcpResult.error?.message || 'Reading generation failed',
+            failedAt: new Date().toISOString()
+          }
+        })
+        .eq('id', readingId);
+
+      return NextResponse.json(
+        createErrorResponse(
+          mcpResult.error?.message || 'Reading generation failed',
+          mcpResult.error?.code || 'READING_ERROR',
+          mcpResult.error?.details || {}
+        ),
+        { status: 500 }
+      );
+    }
+
+    const readingText = mcpResult.data?.reading || '';
 
     // ============================================
     // SCHRITT 4: Reading-Daten in Supabase aktualisieren (Status: completed)
@@ -163,10 +183,11 @@ export async function POST(request: NextRequest) {
       birthDate: data?.birthDate || '',
       birthTime: data?.birthTime || '',
       birthPlace: data?.birthPlace || '',
-      tokens: readingData.tokens || 0,
-      model: readingData.model || 'gpt-4',
-      timestamp: readingData.timestamp || new Date().toISOString(),
+      tokens: mcpResult.data?.tokens || 0,
+      model: 'gpt-4',
+      timestamp: new Date().toISOString(),
       userId: data?.userId,
+      runtimeMs: mcpResult.runtimeMs || 0,
       // Für Compatibility Reading
       ...(data?.readingType === 'compatibility' && {
         birthDate2: data?.birthDate2,
@@ -175,16 +196,17 @@ export async function POST(request: NextRequest) {
       })
     };
 
-    const { data: completedReading, error: updateError } = await supabase
+    await supabase
       .from('readings')
       .update({
         reading_text: readingText,
-        reading_sections: readingData.sections || null,
-        chart_data: readingData.chartData || null,
+        reading_sections: null,
+        chart_data: mcpResult.data?.chartData || null,
         metadata: {
-          tokens: readingData.tokens || 0,
-          model: readingData.model || 'gpt-4',
-          timestamp: new Date().toISOString()
+          tokens: mcpResult.data?.tokens || 0,
+          model: 'gpt-4',
+          timestamp: new Date().toISOString(),
+          runtimeMs: mcpResult.runtimeMs || 0
         },
         status: 'completed'
       })
@@ -192,21 +214,16 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (updateError) {
-      console.error('Supabase Update Error:', updateError);
-      // Weiter machen, auch wenn Update fehlschlägt
-    }
-
     // ============================================
     // SCHRITT 5: Standardisierte Response zurückgeben
     // ============================================
     const standardizedResponse: ReadingResponse = createReadingResponse(
-      readingId, // Zentrale ID (von Supabase generiert)
+      readingId,
       readingText,
       readingType,
       metadata,
-      readingData.sections || undefined,
-      readingData.chartData || undefined
+      undefined,
+      mcpResult.data?.chartData
     );
 
     return NextResponse.json(standardizedResponse);

@@ -434,15 +434,17 @@ server.registerTool(
       success: z.boolean()
     })
   },
-  async ({ birthDate, birthTime, birthPlace, userId, readingType = "basic" }) => {
+  async ({ birthDate, birthTime, birthPlace, userId, readingType = "detailed" }) => {
+    const startTime = Date.now();
+    
     try {
       // Chart-Daten vorbereiten
       const chartData = {
         birthDate,
         birthTime,
         birthPlace,
-        userId,
-        readingType,
+        userId: userId || 'anonymous',
+        readingType: readingType || 'detailed',
         timestamp: new Date().toISOString()
       };
 
@@ -458,27 +460,32 @@ server.registerTool(
         body: JSON.stringify(chartData)
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`n8n webhook failed (${response.status}): ${errorText}`);
+      }
+
       const result = await response.json();
 
-      if (response.ok) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Human Design Reading erfolgreich generiert.\nReading ID: ${result.readingId || result.id || "N/A"}\n\n${result.reading || result.summary || "Reading erstellt"}`
-            }
-          ],
-          structuredContent: {
-            readingId: result.readingId || result.id || "",
-            chartData: result.chartData || chartData,
-            reading: result.reading || result.summary || "Reading wurde generiert",
-            success: true
+      // Normalisierte Response (für MCP Gateway)
+      return {
+        content: [
+          {
+            type: "text",
+            text: result.reading || result.summary || "Reading wurde generiert"
           }
-        };
-      } else {
-        throw new Error(result.message || "Reading konnte nicht generiert werden");
-      }
+        ],
+        structuredContent: {
+          success: true,
+          readingId: result.readingId || result.id || `reading-${Date.now()}`,
+          reading: result.reading || result.summary || "Reading wurde generiert",
+          chartData: result.chartData || chartData,
+          tokens: result.tokens || 0,
+          runtimeMs: Date.now() - startTime
+        }
+      };
     } catch (error) {
+      // Normalisierte Error-Response
       return {
         content: [
           {
@@ -487,10 +494,16 @@ server.registerTool(
           }
         ],
         structuredContent: {
+          success: false,
           readingId: "",
-          chartData: {},
           reading: `Fehler: ${error.message}`,
-          success: false
+          chartData: {},
+          tokens: 0,
+          runtimeMs: Date.now() - startTime,
+          error: {
+            code: "READING_GENERATION_ERROR",
+            message: error.message
+          }
         }
       };
     }

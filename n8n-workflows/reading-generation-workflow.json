@@ -28,14 +28,14 @@
     },
     {
       "parameters": {
-        "jsCode": "// Logging: readingId aus Webhook-Body extrahieren\nconst readingId = $input.item.json.body?.readingId || $input.item.json.readingId;\nconst readingType = $input.item.json.body?.readingType || $input.item.json.readingType || 'basic';\nconst chartData = $input.item.json.body?.chartData || $input.item.json.chartData || {};\n\nconsole.log(`[n8n Workflow] Reading Generation gestartet für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] readingType: ${readingType}`);\nconsole.log(`[n8n Workflow] chartData:`, JSON.stringify(chartData));\n\nreturn {\n  json: {\n    readingId: readingId,\n    readingType: readingType,\n    chartData: chartData,\n    body: $input.item.json.body || {}\n  }\n};"
+        "jsCode": "// Logging: Validierte Payload\nconst payload = $input.item.json;\n\nconsole.log(`[n8n Workflow] Reading Generation gestartet für readingId: ${payload.readingId}`);\nconsole.log(`[n8n Workflow] name: ${payload.name}`);\nconsole.log(`[n8n Workflow] readingType: ${payload.readingType}`);\nconsole.log(`[n8n Workflow] focus: ${payload.focus}`);\n\nreturn $input.all();"
       },
       "id": "log-start",
       "name": "Log Start",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [650, 300],
-      "notes": "Logging: readingId extrahieren und loggen"
+      "notes": "Logging: Validierte Payload"
     },
     {
       "parameters": {

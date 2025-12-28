@@ -30,81 +30,43 @@ export async function GET(
       );
     }
 
-    // Status mit History abrufen (via Supabase Function)
-    const { data, error } = await supabase
-      .rpc('get_reading_status', { p_reading_id: readingId });
+    // Status aus reading_jobs Tabelle lesen
+    let query = supabase
+      .from('reading_jobs')
+      .select('id, status, result, error, created_at, updated_at')
+      .eq('id', readingId)
+      .single();
 
-    if (error) {
-      // Fallback: Direkt aus readings Tabelle lesen
-      let query = supabase
-        .from('readings')
-        .select('id, status, created_at, updated_at')
-        .eq('id', readingId)
-        .single();
-
-      if (userId) {
-        query = query.eq('user_id', userId);
-      }
-
-      const { data: readingData, error: readingError } = await query;
-
-      if (readingError) {
-        if (readingError.code === 'PGRST116') {
-          return NextResponse.json(
-            createErrorResponse('Reading not found', 'READING_NOT_FOUND'),
-            { status: 404 }
-          );
-        }
-        console.error('Supabase fetch error:', readingError);
-        return NextResponse.json(
-          createErrorResponse('Failed to fetch reading status', 'DB_FETCH_ERROR', readingError.message),
-          { status: 500 }
-        );
-      }
-
-      // Status-History abrufen
-      const { data: historyData } = await supabase
-        .from('reading_status_history')
-        .select('*')
-        .eq('reading_id', readingId)
-        .order('changed_at', { ascending: false });
-
-      return NextResponse.json({
-        success: true,
-        status: {
-          readingId: readingData.id,
-          status: readingData.status,
-          createdAt: readingData.created_at,
-          updatedAt: readingData.updated_at,
-          statusHistory: historyData?.map(h => ({
-            oldStatus: h.old_status,
-            newStatus: h.new_status,
-            changedBy: h.changed_by,
-            changedAt: h.changed_at,
-            reason: h.reason
-          })) || []
-        }
-      });
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
-    // Function hat funktioniert
-    if (!data || data.length === 0) {
+    const { data: jobData, error: jobError } = await query;
+
+    if (jobError) {
+      if (jobError.code === 'PGRST116') {
+        return NextResponse.json(
+          createErrorResponse('Reading job not found', 'READING_NOT_FOUND'),
+          { status: 404 }
+        );
+      }
+      console.error('[Reading Status API] Supabase fetch error:', jobError);
       return NextResponse.json(
-        createErrorResponse('Reading not found', 'READING_NOT_FOUND'),
-        { status: 404 }
+        createErrorResponse('Failed to fetch reading status', 'DB_FETCH_ERROR', jobError.message),
+        { status: 500 }
       );
     }
 
-    const statusData = data[0];
-
+    // Response mit Status und optionalem Result
     return NextResponse.json({
       success: true,
       status: {
-        readingId: statusData.reading_id,
-        status: statusData.status,
-        createdAt: statusData.created_at,
-        updatedAt: statusData.updated_at,
-        statusHistory: statusData.status_history || []
+        readingId: jobData.id,
+        status: jobData.status,
+        result: jobData.result, // JSONB mit reading, chartData, etc.
+        error: jobData.error, // Fehlermeldung falls status='failed'
+        createdAt: jobData.created_at,
+        updatedAt: jobData.updated_at
       }
     });
 

@@ -267,6 +267,8 @@ cp integration/api-routes/app-router/reading/generate/route.ts \
 # Container neu bauen
 docker compose -f docker-compose-redis-fixed.yml build frontend
 docker compose -f docker-compose-redis-fixed.yml up -d frontend
+# Logs prüfen
+docker logs the-connection-key-frontend-1 --tail 50 | grep "Reading Generate API"
 ```
 
 ### MCP Core (Hetzner Server):
@@ -278,14 +280,23 @@ cp config.js production/
 # MCP Gateway Container neu bauen
 docker compose build mcp-gateway
 docker compose up -d mcp-gateway
+# Logs prüfen
+docker logs mcp-gateway --tail 50 | grep "MCP Core"
 ```
 
 ### n8n Workflow (Hetzner Server):
 ```bash
-# Workflow importieren in n8n UI
-# Oder via n8n API
+# Workflow importieren in n8n UI:
+# 1. Öffne https://n8n.werdemeisterdeinergedankenagent.de
+# 2. Workflows → Import from File
+# 3. Wähle: n8n-workflows/reading-generation-workflow.json
+# 4. Workflow aktivieren
+# 5. Prüfe Webhook-Pfad: /webhook/reading
+
+# Oder via n8n API:
 curl -X POST http://n8n:5678/api/v1/workflows \
   -H "Content-Type: application/json" \
+  -H "X-N8N-API-KEY: YOUR_API_KEY" \
   -d @n8n-workflows/reading-generation-workflow.json
 ```
 

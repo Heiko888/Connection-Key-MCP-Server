@@ -205,6 +205,19 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: 'readingId fehlt im Webhook-Payload', message: 'Workflow abgebrochen: readingId ist zwingend erforderlich' } }}",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500],
+      "notes": "Response wenn readingId fehlt"
     }
   ],
   "connections": {

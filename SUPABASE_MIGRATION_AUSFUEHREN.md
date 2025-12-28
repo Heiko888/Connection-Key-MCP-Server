@@ -1,172 +1,168 @@
-# 🔧 Supabase Migration ausführen
+# 📋 Supabase Migration ausführen - reading_jobs Tabelle
 
-**Datum:** 17.12.2025
-
-**Status:** Schritt-für-Schritt Anleitung
+**Datei:** `integration/supabase/migrations/009_create_reading_jobs_table.sql`
 
 ---
 
-## 📋 Übersicht
+## 🎯 SCHNELLANLEITUNG
 
-**Migration:** `008_user_registration_trigger.sql`
+### Schritt 1: Supabase Dashboard öffnen
 
-**Zweck:** Automatisch Welcome Reading bei User-Registrierung generieren
+1. Gehe zu: **https://supabase.com/dashboard**
+2. Wähle dein Projekt aus
+3. Klicke auf: **SQL Editor** (linke Sidebar)
 
-**Was macht die Migration:**
-- Erstellt Funktion `trigger_user_registration_reading()`
-- Erstellt Trigger `user_registration_reading_trigger`
-- Ruft n8n Webhook auf, wenn neuer User mit Geburtsdaten registriert wird
+### Schritt 2: Migration ausführen
 
----
+1. **Klicke auf:** "New query" (oder öffne einen neuen Tab)
+2. **Kopiere den kompletten Inhalt** von `009_create_reading_jobs_table.sql`
+3. **Füge den SQL-Code** in den Editor ein
+4. **Klicke auf:** "Run" (oder drücke `Ctrl+Enter` / `Cmd+Enter`)
 
-## 🚀 Schritt 1: Supabase Dashboard öffnen
+### Schritt 3: Prüfung
 
-1. **Supabase öffnen:** https://supabase.com
-2. **Einloggen**
-3. **Projekt auswählen** (dein ConnectionKey Projekt)
-
----
-
-## 🚀 Schritt 2: SQL Editor öffnen
-
-1. **Links im Menü:** **"SQL Editor"** klicken
-2. **"New query"** klicken (oder "+" Button)
-
----
-
-## 🚀 Schritt 3: Migration-Datei öffnen
-
-**Auf Server:**
-
-```bash
-cd /opt/mcp-connection-key
-cat integration/supabase/migrations/008_user_registration_trigger.sql
-```
-
-**Oder lokal:** Datei im Workspace öffnen:
-```
-integration/supabase/migrations/008_user_registration_trigger.sql
-```
-
----
-
-## 🚀 Schritt 4: SQL kopieren und ausführen
-
-1. **SQL kopieren** aus der Migration-Datei (Zeilen 10-43, ohne Kommentare)
-2. **In Supabase SQL Editor einfügen**
-3. **"Run"** klicken (oder Ctrl+Enter)
-
-**Wichtig:** Die Migration ist sicher:
-- `DROP TRIGGER IF EXISTS` verhindert Fehler
-- `CREATE OR REPLACE FUNCTION` ist idempotent
-
----
-
-## ✅ Schritt 5: Prüfen - Migration erfolgreich?
-
-**In Supabase SQL Editor:**
+**Führe diese Query aus, um zu prüfen, ob die Tabelle erstellt wurde:**
 
 ```sql
--- Prüfe ob Funktion existiert
-SELECT proname 
-FROM pg_proc 
-WHERE proname = 'trigger_user_registration_reading';
+-- Prüfe ob Tabelle existiert
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+  AND table_name = 'reading_jobs';
 ```
 
-**Erwartung:**
-```
-proname
---------------------------------
-trigger_user_registration_reading
-```
+**✅ Erwartet:** Eine Zeile mit `reading_jobs`
 
-**Trigger prüfen:**
+**Prüfe Schema:**
 
 ```sql
--- Prüfe ob Trigger existiert
-SELECT tgname, tgrelid::regclass as table_name
-FROM pg_trigger 
-WHERE tgname = 'user_registration_reading_trigger';
-```
-
-**Erwartung:**
-```
-tgname                              | table_name
-------------------------------------|------------
-user_registration_reading_trigger   | auth.users
-```
-
----
-
-## ⚠️ Wichtig: pg_net Extension
-
-**Die Migration verwendet `pg_net` Extension für HTTP Requests.**
-
-**Falls Fehler: "function net.http_post does not exist":**
-
-1. **Supabase Dashboard** → **Database** → **Extensions**
-2. **Suche:** `pg_net`
-3. **Aktivieren** (falls nicht aktiviert)
-
-**Oder via SQL:**
-
-```sql
-CREATE EXTENSION IF NOT EXISTS pg_net;
-```
-
----
-
-## 🧪 Schritt 6: Test (Optional)
-
-**Nach Migration ausgeführt:**
-
-**In Supabase SQL Editor:**
-
-```sql
--- Test: Prüfe Trigger-Struktur
+-- Prüfe alle Spalten
 SELECT 
-  t.tgname as trigger_name,
-  t.tgrelid::regclass as table_name,
-  p.proname as function_name,
-  t.tgenabled as enabled
-FROM pg_trigger t
-JOIN pg_proc p ON t.tgfoid = p.oid
-WHERE t.tgname = 'user_registration_reading_trigger';
+  column_name, 
+  data_type, 
+  is_nullable,
+  column_default
+FROM information_schema.columns 
+WHERE table_name = 'reading_jobs'
+ORDER BY ordinal_position;
 ```
 
-**Erwartung:**
-- ✅ Trigger existiert
-- ✅ Funktion ist verknüpft
-- ✅ Trigger ist aktiviert (`tgenabled = 'O'`)
+**✅ Erwartet:** 8 Spalten:
+- `id` (uuid, NOT NULL)
+- `user_id` (uuid, nullable)
+- `reading_type` (varchar, nullable)
+- `status` (varchar, NOT NULL, default 'pending')
+- `result` (jsonb, nullable)
+- `error` (text, nullable)
+- `created_at` (timestamp with time zone, NOT NULL)
+- `updated_at` (timestamp with time zone, NOT NULL)
+
+**Prüfe Indizes:**
+
+```sql
+-- Prüfe Indizes
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'reading_jobs';
+```
+
+**✅ Erwartet:** 5 Indizes
+
+**Prüfe Trigger:**
+
+```sql
+-- Prüfe Trigger
+SELECT trigger_name, event_manipulation, event_object_table
+FROM information_schema.triggers
+WHERE event_object_table = 'reading_jobs';
+```
+
+**✅ Erwartet:** 1 Trigger (`trigger_update_reading_jobs_updated_at`)
+
+**Prüfe RLS Policies:**
+
+```sql
+-- Prüfe RLS Policies
+SELECT policyname, cmd, qual
+FROM pg_policies
+WHERE tablename = 'reading_jobs';
+```
+
+**✅ Erwartet:** 2 Policies:
+- `Users can view their own reading_jobs` (SELECT)
+- `Service role can manage all reading_jobs` (ALL)
 
 ---
 
-## ✅ Checkliste
+## ⚠️ WICHTIGE HINWEISE
 
-- [ ] Supabase Dashboard geöffnet
-- [ ] SQL Editor geöffnet
-- [ ] Migration-Datei geöffnet
-- [ ] SQL kopiert
-- [ ] SQL in Supabase ausgeführt
-- [ ] Funktion existiert (Prüfung)
-- [ ] Trigger existiert (Prüfung)
-- [ ] pg_net Extension aktiviert (falls nötig)
+### Falls Fehler auftreten:
 
----
+**Fehler: "extension uuid-ossp already exists"**
+- ✅ **OK** - Extension existiert bereits, wird übersprungen
 
-## 🎯 Zusammenfassung
+**Fehler: "table reading_jobs already exists"**
+- ✅ **OK** - Tabelle existiert bereits
+- Prüfe ob Schema korrekt ist (siehe Prüfung oben)
 
-**Was wurde erstellt:**
-- ✅ Funktion `trigger_user_registration_reading()`
-- ✅ Trigger `user_registration_reading_trigger` auf `auth.users`
+**Fehler: "policy already exists"**
+- ✅ **OK** - Policy existiert bereits
+- Migration ist idempotent (kann mehrfach ausgeführt werden)
 
-**Was passiert jetzt:**
-- ✅ Bei neuer User-Registrierung mit Geburtsdaten
-- ✅ Trigger wird ausgelöst
-- ✅ Funktion ruft n8n Webhook auf
-- ✅ n8n Workflow startet automatisch
-- ✅ Welcome Reading wird generiert
+**Fehler: "function already exists"**
+- ✅ **OK** - Function existiert bereits
+- Wird durch `CREATE OR REPLACE` aktualisiert
 
 ---
 
-**🎉 Migration erfolgreich! Weiter mit Environment Variables!** 🚀
+## 🧪 TEST: Tabelle funktioniert
+
+**Nach erfolgreicher Migration, teste die Tabelle:**
+
+```sql
+-- Test 1: INSERT
+INSERT INTO reading_jobs (user_id, reading_type, status)
+VALUES (NULL, 'basic', 'pending')
+RETURNING id, status, created_at;
+
+-- Test 2: SELECT
+SELECT id, status, created_at 
+FROM reading_jobs 
+ORDER BY created_at DESC 
+LIMIT 1;
+
+-- Test 3: UPDATE (Trigger testen)
+UPDATE reading_jobs 
+SET status = 'processing'
+WHERE id = (SELECT id FROM reading_jobs ORDER BY created_at DESC LIMIT 1)
+RETURNING id, status, updated_at;
+
+-- Prüfe: updated_at sollte sich geändert haben
+SELECT id, status, created_at, updated_at
+FROM reading_jobs
+WHERE id = (SELECT id FROM reading_jobs ORDER BY created_at DESC LIMIT 1);
+```
+
+**✅ Erwartet:**
+- INSERT funktioniert
+- SELECT funktioniert
+- UPDATE funktioniert
+- `updated_at` wird automatisch aktualisiert (Trigger)
+
+---
+
+## ✅ ERFOLGSKRITERIEN
+
+- [ ] Migration ohne Fehler ausgeführt
+- [ ] Tabelle `reading_jobs` existiert
+- [ ] Alle 8 Spalten vorhanden
+- [ ] Alle 5 Indizes erstellt
+- [ ] Trigger funktioniert (`updated_at` wird automatisch aktualisiert)
+- [ ] RLS Policies aktiv
+- [ ] Test-INSERT/UPDATE funktioniert
+
+---
+
+**Status:** ✅ **Bereit für Ausführung**
+
+**Nächster Schritt:** Nach erfolgreicher Migration → Frontend deployen (Schritt 2)

@@ -11,7 +11,7 @@
       "webhookId": "reading-generation",
       "settings": {
         "httpMethod": "POST",
-        "path": "reading",
+        "path": "webhook/reading",
         "responseMode": "responseNode"
       }
     },
@@ -25,12 +25,12 @@
           },
           "conditions": [
             {
-              "id": "check-reading-type",
-              "leftValue": "={{ $json.body.readingType }}",
-              "rightValue": "compatibility",
+              "id": "check-reading-id",
+              "leftValue": "={{ $json.body.readingId || $json.readingId }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "equals"
+                "operation": "isNotEmpty"
               }
             }
           ],
@@ -38,38 +38,46 @@
         },
         "options": {}
       },
-      "id": "check-compatibility",
-      "name": "Check Compatibility",
+      "id": "check-reading-id",
+      "name": "Check Reading ID",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [450, 300]
+      "position": [450, 300],
+      "notes": "Prüft ob readingId vorhanden ist - Workflow bricht ab wenn fehlt"
     },
     {
       "parameters": {
-        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
+        "jsCode": "// Logging: readingId aus Webhook-Body extrahieren\nconst readingId = $input.item.json.body?.readingId || $input.item.json.readingId;\nconst readingType = $input.item.json.body?.readingType || $input.item.json.readingType || 'basic';\nconst chartData = $input.item.json.body?.chartData || $input.item.json.chartData || {};\n\nconsole.log(`[n8n Workflow] Reading Generation gestartet für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] readingType: ${readingType}`);\nconsole.log(`[n8n Workflow] chartData:`, JSON.stringify(chartData));\n\nreturn {\n  json: {\n    readingId: readingId,\n    readingType: readingType,\n    chartData: chartData,\n    body: $input.item.json.body || {}\n  }\n};"
+      },
+      "id": "log-start",
+      "name": "Log Start",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "notes": "Logging: readingId extrahieren und loggen"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CK_AGENT_URL || 'http://ck-agent:4000' }}/reading/generate",
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
             {
-              "name": "userId",
-              "value": "={{ $json.body.userId || 'anonymous' }}"
-            },
-            {
               "name": "birthDate",
-              "value": "={{ $json.body.birthDate }}"
+              "value": "={{ $json.chartData.birthDate || $json.body.chartData.birthDate }}"
             },
             {
               "name": "birthTime",
-              "value": "={{ $json.body.birthTime }}"
+              "value": "={{ $json.chartData.birthTime || $json.body.chartData.birthTime }}"
             },
             {
               "name": "birthPlace",
-              "value": "={{ $json.body.birthPlace }}"
+              "value": "={{ $json.chartData.birthPlace || $json.body.chartData.birthPlace }}"
             },
             {
               "name": "readingType",
-              "value": "={{ $json.body.readingType || 'detailed' }}"
+              "value": "={{ $json.readingType }}"
             }
           ]
         },
@@ -81,97 +89,69 @@
       "name": "Call Reading Agent",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [650, 200],
-      "notes": "Ruft Reading Agent auf Port 4001 auf"
+      "position": [850, 300],
+      "notes": "Ruft CK-Agent auf Port 4000 auf"
     },
     {
       "parameters": {
-        "url": "={{ $env.READING_AGENT_URL || 'http://138.199.237.34:4001' }}/reading/generate",
-        "authentication": "none",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "userId",
-              "value": "={{ $json.body.userId || 'anonymous' }}"
-            },
-            {
-              "name": "birthDate",
-              "value": "={{ $json.body.birthDate }}"
-            },
-            {
-              "name": "birthTime",
-              "value": "={{ $json.body.birthTime }}"
-            },
-            {
-              "name": "birthPlace",
-              "value": "={{ $json.body.birthPlace }}"
-            },
-            {
-              "name": "birthDate2",
-              "value": "={{ $json.body.birthDate2 }}"
-            },
-            {
-              "name": "birthTime2",
-              "value": "={{ $json.body.birthTime2 }}"
-            },
-            {
-              "name": "birthPlace2",
-              "value": "={{ $json.body.birthPlace2 }}"
-            },
-            {
-              "name": "readingType",
-              "value": "compatibility"
-            }
-          ]
-        },
-        "options": {
-          "timeout": 60000
-        }
+        "jsCode": "// Logging: Reading-Ergebnis vorbereiten\nconst readingId = $input.item.json.readingId;\nconst reading = $input.item.json.reading || $input.item.json.reading?.text || $input.item.json.text || '';\nconst readingType = $input.item.json.readingType || 'basic';\nconst chartData = $input.item.json.chartData || $input.item.json.chartData || {};\nconst tokens = $input.item.json.tokens || 0;\n\nconsole.log(`[n8n Workflow] Reading generiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Reading-Länge: ${reading.length} Zeichen`);\nconsole.log(`[n8n Workflow] Tokens: ${tokens}`);\n\n// Result JSON für reading_jobs.result vorbereiten (jsonb)\nconst resultJson = {\n  reading: reading,\n  readingType: readingType,\n  chartData: chartData,\n  tokens: tokens,\n  model: 'gpt-4',\n  timestamp: new Date().toISOString()\n};\n\nreturn {\n  json: {\n    readingId: readingId,\n    reading: reading,\n    readingType: readingType,\n    resultJson: resultJson\n  }\n};"
       },
-      "id": "call-reading-agent-compatibility",
-      "name": "Call Reading Agent (Compatibility)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [650, 400],
-      "notes": "Ruft Reading Agent für Compatibility Reading auf"
+      "id": "prepare-result",
+      "name": "Prepare Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "notes": "Bereitet result JSON für reading_jobs vor"
     },
     {
       "parameters": {
-        "operation": "insert",
-        "table": "readings",
+        "jsCode": "// Logging vor Update\nconst readingId = $input.item.json.readingId;\nconst resultJson = $input.item.json.resultJson;\n\nconsole.log(`[n8n Workflow] Update reading_jobs für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Result JSON:`, JSON.stringify(resultJson));\n\nreturn $input.all();"
+      },
+      "id": "log-before-update",
+      "name": "Log Before Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "notes": "Logging vor reading_jobs Update"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "reading_jobs",
+        "updateKey": "id",
+        "updateKeyValue": "={{ $json.readingId }}",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "id": "={{ $json.readingId }}",
-            "user_id": "={{ $json.body.userId || null }}",
-            "reading_type": "={{ $json.readingType || $json.body.readingType }}",
-            "birth_date": "={{ $json.body.birthDate }}",
-            "birth_time": "={{ $json.body.birthTime }}",
-            "birth_place": "={{ $json.body.birthPlace }}",
-            "birth_date2": "={{ $json.body.birthDate2 || null }}",
-            "birth_time2": "={{ $json.body.birthTime2 || null }}",
-            "birth_place2": "={{ $json.body.birthPlace2 || null }}",
-            "reading_text": "={{ $json.reading || $json.reading.text }}",
-            "reading_sections": "={{ $json.reading.sections || null }}",
-            "chart_data": "={{ $json.chartData || null }}",
-            "metadata": "={{ { tokens: $json.tokens || 0, model: $json.model || 'gpt-4', timestamp: $json.timestamp || $now } }}",
-            "status": "completed"
+            "status": "completed",
+            "result": "={{ $json.resultJson }}",
+            "updated_at": "={{ $now.toISO() }}"
           }
         }
       },
-      "id": "save-to-supabase",
-      "name": "Save to Supabase",
+      "id": "update-reading-job",
+      "name": "Update Reading Job",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [850, 300],
+      "position": [1450, 300],
       "credentials": {
         "supabaseApi": {
           "id": "supabase-credentials",
           "name": "Supabase API"
         }
       },
-      "notes": "Speichert Reading in Supabase readings Tabelle"
+      "notes": "Updated reading_jobs mit Status 'completed' und result JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Logging nach Update\nconst readingId = $input.item.json.id || $input.item.json.readingId;\nconst status = $input.item.json.status;\n\nconsole.log(`[n8n Workflow] reading_jobs updated für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Neuer Status: ${status}`);\n\nreturn $input.all();"
+      },
+      "id": "log-after-update",
+      "name": "Log After Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 300],
+      "notes": "Logging nach reading_jobs Update"
     },
     {
       "parameters": {
@@ -217,14 +197,14 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { success: true, readingId: $json.readingId, message: 'Reading erfolgreich generiert und gespeichert' } }}",
+        "responseBody": "={{ { success: true, readingId: $json.readingId || $json.id, message: 'Reading erfolgreich generiert und reading_jobs updated' } }}",
         "options": {}
       },
       "id": "webhook-response",
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1250, 300]
+      "position": [2050, 300]
     }
   ],
   "connections": {
@@ -232,25 +212,36 @@
       "main": [
         [
           {
-            "node": "Check Compatibility",
+            "node": "Check Reading ID",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Compatibility": {
+    "Check Reading ID": {
       "main": [
         [
           {
-            "node": "Call Reading Agent",
+            "node": "Log Start",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Call Reading Agent (Compatibility)",
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Start": {
+      "main": [
+        [
+          {
+            "node": "Call Reading Agent",
             "type": "main",
             "index": 0
           }
@@ -261,25 +252,47 @@
       "main": [
         [
           {
-            "node": "Save to Supabase",
+            "node": "Prepare Result",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Call Reading Agent (Compatibility)": {
+    "Prepare Result": {
       "main": [
         [
           {
-            "node": "Save to Supabase",
+            "node": "Log Before Update",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Save to Supabase": {
+    "Log Before Update": {
+      "main": [
+        [
+          {
+            "node": "Update Reading Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Reading Job": {
+      "main": [
+        [
+          {
+            "node": "Log After Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log After Update": {
       "main": [
         [
           {

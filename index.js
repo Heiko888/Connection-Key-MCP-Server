@@ -421,11 +421,9 @@ server.registerTool(
     title: "Human Design Reading generieren",
     description: "Generiert ein Human Design Reading basierend auf Geburtsdaten. Ruft n8n Workflow auf.",
     inputSchema: z.object({
-      birthDate: z.string().describe("Geburtsdatum im Format YYYY-MM-DD"),
-      birthTime: z.string().describe("Geburtszeit im Format HH:MM"),
-      birthPlace: z.string().describe("Geburtsort"),
-      userId: z.string().optional().describe("User-ID (optional)"),
-      readingType: z.enum(["basic", "detailed", "business", "relationship"]).optional().default("basic").describe("Art des Readings")
+      readingId: z.string().describe("Reading Job ID (UUID) - ZWINGEND erforderlich"),
+      readingType: z.enum(["basic", "detailed", "business", "relationship"]).optional().default("basic").describe("Art des Readings"),
+      chartData: z.record(z.unknown()).describe("Chart-Daten (birthDate, birthTime, birthPlace, etc.)")
     }),
     outputSchema: z.object({
       readingId: z.string(),
@@ -434,38 +432,48 @@ server.registerTool(
       success: z.boolean()
     })
   },
-  async ({ birthDate, birthTime, birthPlace, userId, readingType = "detailed" }) => {
+  async ({ readingId, readingType = "basic", chartData }) => {
     const startTime = Date.now();
     
+    console.log(`[MCP Core] generateReading aufgerufen für readingId: ${readingId}, readingType: ${readingType}`);
+    
+    // Validierung: readingId ist zwingend
+    if (!readingId || readingId.trim() === '') {
+      throw new Error('readingId ist zwingend erforderlich');
+    }
+    
     try {
-      // Chart-Daten vorbereiten
-      const chartData = {
-        birthDate,
-        birthTime,
-        birthPlace,
-        userId: userId || 'anonymous',
-        readingType: readingType || 'detailed',
-        timestamp: new Date().toISOString()
+      // Chart-Daten mit readingId erweitern
+      const payload = {
+        readingId: readingId, // ← ZWINGEND: readingId auf Root-Level
+        readingType: readingType || 'basic',
+        ...chartData // ← Chart-Daten (birthDate, birthTime, birthPlace, etc.)
       };
 
-      // n8n Webhook aufrufen
-      const webhookPath = config.n8n.webhooks.reading;
+      console.log(`[MCP Core] Rufe n8n Webhook auf für readingId: ${readingId}`);
+
+      // n8n Webhook aufrufen (verbindlich: /webhook/reading)
+      const webhookPath = config.n8n.webhooks.reading; // = "/webhook/reading"
       const url = `${config.n8n.baseUrl}${webhookPath}`;
+
+      console.log(`[MCP Core] n8n Webhook URL: ${url}`);
 
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(chartData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error(`[MCP Core] n8n Webhook Fehler (${response.status}) für readingId: ${readingId}`, errorText);
         throw new Error(`n8n webhook failed (${response.status}): ${errorText}`);
       }
 
       const result = await response.json();
+      console.log(`[MCP Core] n8n Webhook erfolgreich für readingId: ${readingId}`);
 
       // Normalisierte Response (für MCP Gateway)
       return {
@@ -477,7 +485,7 @@ server.registerTool(
         ],
         structuredContent: {
           success: true,
-          readingId: result.readingId || result.id || `reading-${Date.now()}`,
+          readingId: readingId, // ← Verwende readingId aus Input (nicht aus n8n Response)
           reading: result.reading || result.summary || "Reading wurde generiert",
           chartData: result.chartData || chartData,
           tokens: result.tokens || 0,
@@ -485,6 +493,8 @@ server.registerTool(
         }
       };
     } catch (error) {
+      console.error(`[MCP Core] Fehler beim Generieren des Readings für readingId: ${readingId}`, error);
+      
       // Normalisierte Error-Response
       return {
         content: [
@@ -495,9 +505,9 @@ server.registerTool(
         ],
         structuredContent: {
           success: false,
-          readingId: "",
+          readingId: readingId || "",
           reading: `Fehler: ${error.message}`,
-          chartData: {},
+          chartData: chartData || {},
           tokens: 0,
           runtimeMs: Date.now() - startTime,
           error: {

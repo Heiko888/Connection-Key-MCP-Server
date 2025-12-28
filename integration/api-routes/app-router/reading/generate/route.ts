@@ -47,35 +47,29 @@ export async function POST(request: NextRequest) {
     const readingType = (data?.readingType || 'detailed') as any;
 
     // ============================================
-    // SCHRITT 1: Reading-Eintrag in Supabase erstellen (Status: pending)
+    // SCHRITT 1: reading_jobs Eintrag in Supabase erstellen (Status: pending)
     // ============================================
     // Supabase generiert UUID automatisch - das ist unsere zentrale ID
-    const { data: pendingReading, error: createError } = await supabase
-      .from('readings')
+    console.log(`[Reading Generate API] Erstelle reading_jobs Eintrag für readingType: ${readingType}`);
+    
+    const { data: pendingJob, error: createError } = await supabase
+      .from('reading_jobs')
       .insert([{
         // id wird von Supabase generiert (UUID)
         user_id: data?.userId || null,
         reading_type: readingType,
-        birth_date: data?.birthDate,
-        birth_time: data?.birthTime,
-        birth_place: data?.birthPlace,
-        // Für Compatibility Reading
-        ...(data?.readingType === 'compatibility' && {
-          birth_date2: data?.birthDate2,
-          birth_time2: data?.birthTime2,
-          birth_place2: data?.birthPlace2
-        }),
-        reading_text: '', // Wird später gefüllt
-        status: 'pending' // Start-Status
+        status: 'pending',
+        result: null,
+        error: null
       }])
       .select()
       .single();
 
-    if (createError || !pendingReading) {
-      console.error('Supabase Create Error:', createError);
+    if (createError || !pendingJob) {
+      console.error('[Reading Generate API] Supabase Create Error:', createError);
       return NextResponse.json(
         createErrorResponse(
-          'Failed to create reading entry',
+          'Failed to create reading_jobs entry',
           'DB_CREATE_ERROR',
           createError?.message || 'Unknown error'
         ),
@@ -84,25 +78,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Zentrale ID verwenden (von Supabase generiert)
-    readingId = pendingReading.id;
+    readingId = pendingJob.id;
+    console.log(`[Reading Generate API] reading_jobs erstellt mit ID: ${readingId}`);
 
     // ============================================
-    // SCHRITT 2: Status auf 'processing' setzen
-    // ============================================
-    const { error: processingError } = await supabase
-      .from('readings')
-      .update({ status: 'processing' })
-      .eq('id', readingId);
-
-    if (processingError) {
-      console.error('Supabase Status Update Error (processing):', processingError);
-      // Weiter machen, auch wenn Status-Update fehlschlägt
-    }
-
-    // ============================================
-    // SCHRITT 3: MCP HTTP Gateway aufrufen
+    // SCHRITT 2: MCP HTTP Gateway aufrufen
     // ============================================
     const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Chart-Daten für Payload vorbereiten
+    const chartData = {
+      birthDate: data?.birthDate,
+      birthTime: data?.birthTime,
+      birthPlace: data?.birthPlace,
+      // Für Compatibility Reading
+      ...(data?.readingType === 'compatibility' && {
+        birthDate2: data?.birthDate2,
+        birthTime2: data?.birthTime2,
+        birthPlace2: data?.birthPlace2
+      })
+    };
+    
+    console.log(`[Reading Generate API] Rufe MCP Gateway auf mit readingId: ${readingId}`);
     
     const mcpResponse = await fetch(`${MCP_SERVER_URL}/agents/run`, {
       method: 'POST',
@@ -114,11 +111,9 @@ export async function POST(request: NextRequest) {
         domain: 'reading',
         task: 'generate',
         payload: {
-          birthDate: data?.birthDate,
-          birthTime: data?.birthTime,
-          birthPlace: data?.birthPlace,
-          userId: data?.userId || null,
-          readingType: readingType
+          readingId: readingId, // ← ZWINGEND: readingId muss im Payload sein
+          readingType: readingType,
+          chartData: chartData
         },
         requestId
       })
@@ -127,15 +122,15 @@ export async function POST(request: NextRequest) {
     if (!mcpResponse.ok) {
       const errorData = await mcpResponse.json().catch(() => ({ error: { message: 'Unknown error' } }));
       
+      console.error(`[Reading Generate API] MCP Gateway Fehler (${mcpResponse.status}) für readingId: ${readingId}`, errorData);
+      
       // Status auf 'failed' setzen
       await supabase
-        .from('readings')
+        .from('reading_jobs')
         .update({ 
           status: 'failed',
-          metadata: {
-            error: errorData.error?.message || 'MCP Gateway error',
-            failedAt: new Date().toISOString()
-          }
+          error: errorData.error?.message || 'MCP Gateway error',
+          updated_at: new Date().toISOString()
         })
         .eq('id', readingId);
 
@@ -150,17 +145,18 @@ export async function POST(request: NextRequest) {
     }
 
     const mcpResult = await mcpResponse.json();
+    console.log(`[Reading Generate API] MCP Gateway Response für readingId: ${readingId}`, { success: mcpResult.success });
 
     if (!mcpResult.success) {
+      console.error(`[Reading Generate API] MCP Gateway Fehler für readingId: ${readingId}`, mcpResult.error);
+      
       // Status auf 'failed' setzen
       await supabase
-        .from('readings')
+        .from('reading_jobs')
         .update({ 
           status: 'failed',
-          metadata: {
-            error: mcpResult.error?.message || 'Reading generation failed',
-            failedAt: new Date().toISOString()
-          }
+          error: mcpResult.error?.message || 'Reading generation failed',
+          updated_at: new Date().toISOString()
         })
         .eq('id', readingId);
 
@@ -174,59 +170,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const readingText = mcpResult.data?.reading || '';
-
     // ============================================
-    // SCHRITT 4: Reading-Daten in Supabase aktualisieren (Status: completed)
+    // SCHRITT 3: n8n updated reading_jobs automatisch
+    // Frontend wartet auf Status-Update via Polling
     // ============================================
-    const metadata = {
-      birthDate: data?.birthDate || '',
-      birthTime: data?.birthTime || '',
-      birthPlace: data?.birthPlace || '',
-      tokens: mcpResult.data?.tokens || 0,
-      model: 'gpt-4',
-      timestamp: new Date().toISOString(),
-      userId: data?.userId,
-      runtimeMs: mcpResult.runtimeMs || 0,
-      // Für Compatibility Reading
-      ...(data?.readingType === 'compatibility' && {
-        birthDate2: data?.birthDate2,
-        birthTime2: data?.birthTime2,
-        birthPlace2: data?.birthPlace2
-      })
-    };
+    console.log(`[Reading Generate API] MCP Gateway erfolgreich für readingId: ${readingId}. n8n wird reading_jobs updaten.`);
 
-    await supabase
-      .from('readings')
-      .update({
-        reading_text: readingText,
-        reading_sections: null,
-        chart_data: mcpResult.data?.chartData || null,
-        metadata: {
-          tokens: mcpResult.data?.tokens || 0,
-          model: 'gpt-4',
-          timestamp: new Date().toISOString(),
-          runtimeMs: mcpResult.runtimeMs || 0
-        },
-        status: 'completed'
-      })
-      .eq('id', readingId)
-      .select()
-      .single();
-
-    // ============================================
-    // SCHRITT 5: Standardisierte Response zurückgeben
-    // ============================================
-    const standardizedResponse: ReadingResponse = createReadingResponse(
-      readingId,
-      readingText,
-      readingType,
-      metadata,
-      undefined,
-      mcpResult.data?.chartData
-    );
-
-    return NextResponse.json(standardizedResponse);
+    // Standardisierte Response zurückgeben (Status wird via Polling abgefragt)
+    return NextResponse.json({
+      success: true,
+      readingId: readingId,
+      message: 'Reading generation started',
+      status: 'processing'
+    });
 
   } catch (error: any) {
     console.error('Reading Generate API Error:', error);

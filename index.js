@@ -422,8 +422,16 @@ server.registerTool(
     description: "Generiert ein Human Design Reading basierend auf Geburtsdaten. Ruft n8n Workflow auf.",
     inputSchema: z.object({
       readingId: z.string().describe("Reading Job ID (UUID) - ZWINGEND erforderlich"),
-      readingType: z.enum(["basic", "detailed", "business", "relationship"]).optional().default("basic").describe("Art des Readings"),
-      chartData: z.record(z.unknown()).describe("Chart-Daten (birthDate, birthTime, birthPlace, etc.)")
+      name: z.string().describe("Name (PFLICHTFELD)"),
+      birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe("Geburtsdatum im Format YYYY-MM-DD (PFLICHTFELD)"),
+      birthTime: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/).describe("Geburtszeit im Format HH:mm (PFLICHTFELD)"),
+      birthPlace: z.string().min(2).max(255).describe("Geburtsort (PFLICHTFELD)"),
+      readingType: z.enum(["basic", "detailed", "business", "relationship"]).describe("Reading-Typ (PFLICHTFELD)"),
+      focus: z.string().min(1).max(500).describe("Focus (PFLICHTFELD)"),
+      userId: z.string().optional().describe("User-ID (optional)"),
+      birthDate2: z.string().optional().describe("Geburtsdatum Person 2 (nur für Compatibility)"),
+      birthTime2: z.string().optional().describe("Geburtszeit Person 2 (nur für Compatibility)"),
+      birthPlace2: z.string().optional().describe("Geburtsort Person 2 (nur für Compatibility)")
     }),
     outputSchema: z.object({
       readingId: z.string(),
@@ -432,23 +440,52 @@ server.registerTool(
       success: z.boolean()
     })
   },
-  async ({ readingId, readingType = "basic", chartData }) => {
+  async ({ readingId, name, birthDate, birthTime, birthPlace, readingType, focus, userId, birthDate2, birthTime2, birthPlace2 }) => {
     const startTime = Date.now();
     
     console.log(`[MCP Core] generateReading aufgerufen für readingId: ${readingId}, readingType: ${readingType}`);
     
-    // Validierung: readingId ist zwingend
-    if (!readingId || readingId.trim() === '') {
-      throw new Error('readingId ist zwingend erforderlich');
+    // HARTE VALIDIERUNG: Alle PFLICHTFELDER müssen vorhanden sein
+    const requiredFields = { readingId, name, birthDate, birthTime, birthPlace, readingType, focus };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key, value]) => !value || (typeof value === 'string' && value.trim() === ''))
+      .map(([key]) => key);
+    
+    if (missingFields.length > 0) {
+      const errorMsg = `PFLICHTFELDER fehlen: ${missingFields.join(', ')}`;
+      console.error(`[MCP Core] VALIDIERUNGSFEHLER: ${errorMsg}`);
+      throw new Error(errorMsg);
+    }
+    
+    // Format-Validierung
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+      throw new Error('birthDate muss im Format YYYY-MM-DD sein');
+    }
+    
+    if (!/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(birthTime)) {
+      throw new Error('birthTime muss im Format HH:mm sein');
     }
     
     try {
-      // Chart-Daten mit readingId erweitern
+      // Payload-Struktur (Contract) - Normalisiert
       const payload = {
-        readingId: readingId, // ← ZWINGEND: readingId auf Root-Level
-        readingType: readingType || 'basic',
-        ...chartData // ← Chart-Daten (birthDate, birthTime, birthPlace, etc.)
+        readingId: readingId.trim(),
+        name: name.trim(),
+        birthDate: birthDate.trim(),
+        birthTime: birthTime.trim(),
+        birthPlace: birthPlace.trim(),
+        readingType: readingType,
+        focus: focus.trim(),
+        userId: userId || null,
+        // Für Compatibility Reading
+        ...(readingType === 'compatibility' && birthDate2 && birthTime2 && birthPlace2 && {
+          birthDate2: birthDate2.trim(),
+          birthTime2: birthTime2.trim(),
+          birthPlace2: birthPlace2.trim()
+        })
       };
+      
+      console.log(`[MCP Core] Payload validiert und normalisiert für readingId: ${readingId}`);
 
       console.log(`[MCP Core] Rufe n8n Webhook auf für readingId: ${readingId}`);
 

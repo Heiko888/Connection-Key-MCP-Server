@@ -17,33 +17,14 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "check-reading-id",
-              "leftValue": "={{ $json.body.readingId || $json.readingId }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "isNotEmpty"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
+        "jsCode": "// HARTE VALIDIERUNG: Alle PFLICHTFELDER prüfen\nconst body = $input.item.json.body || $input.item.json || {};\nconst errors = [];\n\n// PFLICHTFELDER\nconst requiredFields = {\n  readingId: body.readingId || $input.item.json.readingId,\n  name: body.name,\n  birthDate: body.birthDate,\n  birthTime: body.birthTime,\n  birthPlace: body.birthPlace,\n  readingType: body.readingType,\n  focus: body.focus\n};\n\n// Prüfe jedes Pflichtfeld\nObject.entries(requiredFields).forEach(([field, value]) => {\n  if (!value || (typeof value === 'string' && value.trim() === '')) {\n    errors.push(`${field} ist ein Pflichtfeld`);\n  }\n});\n\n// Format-Validierung\nif (requiredFields.birthDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(requiredFields.birthDate)) {\n  errors.push('birthDate muss im Format YYYY-MM-DD sein');\n}\n\nif (requiredFields.birthTime && !/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(requiredFields.birthTime)) {\n  errors.push('birthTime muss im Format HH:mm sein');\n}\n\n// HART ABBRECHEN bei Fehlern\nif (errors.length > 0) {\n  console.error('[n8n Workflow] VALIDIERUNGSFEHLER:', errors);\n  throw new Error(`VALIDIERUNGSFEHLER: ${errors.join('; ')}`);\n}\n\n// Payload normalisieren\nconst normalizedPayload = {\n  readingId: String(requiredFields.readingId).trim(),\n  name: String(requiredFields.name).trim(),\n  birthDate: String(requiredFields.birthDate).trim(),\n  birthTime: String(requiredFields.birthTime).trim(),\n  birthPlace: String(requiredFields.birthPlace).trim(),\n  readingType: String(requiredFields.readingType),\n  focus: String(requiredFields.focus).trim(),\n  userId: body.userId || null\n};\n\nconsole.log('[n8n Workflow] Payload validiert und normalisiert:', JSON.stringify(normalizedPayload, null, 2));\n\nreturn {\n  json: normalizedPayload\n};"
       },
-      "id": "check-reading-id",
-      "name": "Check Reading ID",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
+      "id": "validate-payload",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [450, 300],
-      "notes": "Prüft ob readingId vorhanden ist - Workflow bricht ab wenn fehlt"
+      "notes": "Harte Validierung aller PFLICHTFELDER - bricht bei Fehlern ab"
     },
     {
       "parameters": {
@@ -64,20 +45,28 @@
         "bodyParameters": {
           "parameters": [
             {
+              "name": "name",
+              "value": "={{ $json.name }}"
+            },
+            {
               "name": "birthDate",
-              "value": "={{ $json.chartData.birthDate || $json.body.chartData.birthDate }}"
+              "value": "={{ $json.birthDate }}"
             },
             {
               "name": "birthTime",
-              "value": "={{ $json.chartData.birthTime || $json.body.chartData.birthTime }}"
+              "value": "={{ $json.birthTime }}"
             },
             {
               "name": "birthPlace",
-              "value": "={{ $json.chartData.birthPlace || $json.body.chartData.birthPlace }}"
+              "value": "={{ $json.birthPlace }}"
             },
             {
               "name": "readingType",
               "value": "={{ $json.readingType }}"
+            },
+            {
+              "name": "focus",
+              "value": "={{ $json.focus }}"
             }
           ]
         },
@@ -94,14 +83,14 @@
     },
     {
       "parameters": {
-        "jsCode": "// Logging: Reading-Ergebnis vorbereiten\nconst readingId = $input.item.json.readingId;\nconst reading = $input.item.json.reading || $input.item.json.reading?.text || $input.item.json.text || '';\nconst readingType = $input.item.json.readingType || 'basic';\nconst chartData = $input.item.json.chartData || $input.item.json.chartData || {};\nconst tokens = $input.item.json.tokens || 0;\n\nconsole.log(`[n8n Workflow] Reading generiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Reading-Länge: ${reading.length} Zeichen`);\nconsole.log(`[n8n Workflow] Tokens: ${tokens}`);\n\n// Result JSON für reading_jobs.result vorbereiten (jsonb)\nconst resultJson = {\n  reading: reading,\n  readingType: readingType,\n  chartData: chartData,\n  tokens: tokens,\n  model: 'gpt-4',\n  timestamp: new Date().toISOString()\n};\n\nreturn {\n  json: {\n    readingId: readingId,\n    reading: reading,\n    readingType: readingType,\n    resultJson: resultJson\n  }\n};"
+        "jsCode": "// VALIDIERUNG: Reading muss vorhanden sein\nconst input = $input.item.json;\nconst readingId = input.readingId;\nconst reading = input.reading || input.reading?.text || input.text || '';\n\n// HART ABBRECHEN wenn Reading fehlt\nif (!reading || reading.trim() === '') {\n  console.error(`[n8n Workflow] FEHLER: Reading fehlt für readingId: ${readingId}`);\n  throw new Error('Reading wurde nicht generiert - Reading-Text fehlt');\n}\n\n// Payload-Daten aus vorherigen Nodes\nconst name = input.name || '';\nconst birthDate = input.birthDate || '';\nconst birthTime = input.birthTime || '';\nconst birthPlace = input.birthPlace || '';\nconst readingType = input.readingType || 'basic';\nconst focus = input.focus || '';\nconst userId = input.userId || null;\nconst chartData = input.chartData || {};\nconst tokens = input.tokens || 0;\n\nconsole.log(`[n8n Workflow] Reading generiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Reading-Länge: ${reading.length} Zeichen`);\nconsole.log(`[n8n Workflow] Tokens: ${tokens}`);\n\n// Result JSON für reading_jobs.result vorbereiten (jsonb)\nconst resultJson = {\n  reading: reading,\n  name: name,\n  readingType: readingType,\n  focus: focus,\n  chartData: chartData,\n  tokens: tokens,\n  model: 'gpt-4',\n  timestamp: new Date().toISOString()\n};\n\n// Daten für readings Tabelle vorbereiten\nconst readingsData = {\n  readingId: readingId,\n  name: name,\n  birthDate: birthDate,\n  birthTime: birthTime,\n  birthPlace: birthPlace,\n  readingType: readingType,\n  focus: focus,\n  userId: userId,\n  reading: reading,\n  chartData: chartData,\n  tokens: tokens\n};\n\nreturn {\n  json: {\n    readingId: readingId,\n    reading: reading,\n    readingType: readingType,\n    resultJson: resultJson,\n    readingsData: readingsData\n  }\n};"
       },
       "id": "prepare-result",
       "name": "Prepare Result",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1050, 300],
-      "notes": "Bereitet result JSON für reading_jobs vor"
+      "notes": "Bereitet result JSON und readings Daten vor - bricht ab wenn Reading fehlt"
     },
     {
       "parameters": {
@@ -116,15 +105,59 @@
     },
     {
       "parameters": {
+        "operation": "insert",
+        "table": "readings",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.readingId }}",
+            "user_id": "={{ $json.readingsData.userId || null }}",
+            "reading_type": "={{ $json.readingsData.readingType }}",
+            "birth_date": "={{ $json.readingsData.birthDate }}",
+            "birth_time": "={{ $json.readingsData.birthTime }}",
+            "birth_place": "={{ $json.readingsData.birthPlace }}",
+            "reading_text": "={{ $json.reading }}",
+            "chart_data": "={{ $json.readingsData.chartData || null }}",
+            "metadata": "={{ { name: $json.readingsData.name, focus: $json.readingsData.focus, tokens: $json.readingsData.tokens || 0, model: 'gpt-4', timestamp: $now.toISO() } }}",
+            "status": "completed"
+          }
+        }
+      },
+      "id": "save-reading",
+      "name": "Save Reading",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Speichert Reading in readings Tabelle - HART ABBRECHEN bei Fehler"
+    },
+    {
+      "parameters": {
+        "jsCode": "// VALIDIERUNG: Reading muss erfolgreich gespeichert worden sein\nconst input = $input.item.json;\nconst readingId = input.id || input.readingId;\n\nif (!readingId) {\n  console.error('[n8n Workflow] FEHLER: Reading wurde nicht gespeichert - keine ID zurückgegeben');\n  throw new Error('Reading wurde nicht gespeichert - INSERT fehlgeschlagen');\n}\n\nconsole.log(`[n8n Workflow] Reading erfolgreich gespeichert in readings Tabelle mit ID: ${readingId}`);\n\nreturn $input.all();"
+      },
+      "id": "validate-save",
+      "name": "Validate Save",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300],
+      "notes": "Validiert dass Reading gespeichert wurde - bricht ab wenn nicht"
+    },
+    {
+      "parameters": {
         "operation": "update",
         "table": "reading_jobs",
         "updateKey": "id",
-        "updateKeyValue": "={{ $json.readingId }}",
+        "updateKeyValue": "={{ $json.id || $json.readingId }}",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "status": "completed",
-            "result": "={{ $json.resultJson }}",
+            "result": "={{ $json.resultJson || { reading: $json.reading_text, readingType: $json.reading_type, timestamp: $now.toISO() } }}",
             "updated_at": "={{ $now.toISO() }}"
           }
         }
@@ -133,14 +166,14 @@
       "name": "Update Reading Job",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1450, 300],
+      "position": [1650, 300],
       "credentials": {
         "supabaseApi": {
           "id": "supabase-credentials",
           "name": "Supabase API"
         }
       },
-      "notes": "Updated reading_jobs mit Status 'completed' und result JSON"
+      "notes": "Updated reading_jobs NUR wenn Reading erfolgreich gespeichert wurde"
     },
     {
       "parameters": {
@@ -150,7 +183,7 @@
       "name": "Log After Update",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1650, 300],
+      "position": [1850, 300],
       "notes": "Logging nach reading_jobs Update"
     },
     {
@@ -204,20 +237,59 @@
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [2050, 300]
+      "position": [2250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ERROR HANDLER: Fehler-Logging und Response\nconst error = $input.item.json.error || $input.item.json.message || 'Unbekannter Fehler';\nconst readingId = $input.item.json.readingId || null;\n\nconsole.error(`[n8n Workflow] FEHLER: ${error} für readingId: ${readingId}`);\n\nreturn {\n  json: {\n    success: false,\n    error: error,\n    readingId: readingId,\n    message: `Workflow abgebrochen: ${error}`\n  }\n};"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 500],
+      "notes": "Error Handler für alle Fehler"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "reading_jobs",
+        "updateKey": "id",
+        "updateKeyValue": "={{ $json.readingId }}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "failed",
+            "error": "={{ $json.error || $json.message }}",
+            "updated_at": "={{ $now.toISO() }}"
+          }
+        }
+      },
+      "id": "update-job-failed",
+      "name": "Update Job Failed",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 500],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Setzt reading_jobs auf 'failed' bei Fehlern"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { success: false, error: 'readingId fehlt im Webhook-Payload', message: 'Workflow abgebrochen: readingId ist zwingend erforderlich' } }}",
+        "responseBody": "={{ { success: false, error: $json.error || $json.message, readingId: $json.readingId, message: 'Workflow abgebrochen' } }}",
         "options": {}
       },
       "id": "error-response",
       "name": "Error Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [650, 500],
-      "notes": "Response wenn readingId fehlt"
+      "position": [1050, 500],
+      "notes": "Error Response an Webhook"
     }
   ],
   "connections": {
@@ -225,25 +297,18 @@
       "main": [
         [
           {
-            "node": "Check Reading ID",
+            "node": "Validate Payload",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Reading ID": {
+    "Validate Payload": {
       "main": [
         [
           {
             "node": "Log Start",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Error Response",
             "type": "main",
             "index": 0
           }
@@ -273,6 +338,28 @@
       ]
     },
     "Prepare Result": {
+      "main": [
+        [
+          {
+            "node": "Save Reading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Reading": {
+      "main": [
+        [
+          {
+            "node": "Validate Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Save": {
       "main": [
         [
           {
@@ -321,6 +408,94 @@
         [
           {
             "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Reading Agent": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Result": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Reading": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Save": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Reading Job": {
+      "error": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "error",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Update Job Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Job Failed": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
             "type": "main",
             "index": 0
           }

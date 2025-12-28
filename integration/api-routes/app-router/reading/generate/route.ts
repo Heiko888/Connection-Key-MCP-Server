@@ -86,11 +86,16 @@ export async function POST(request: NextRequest) {
     // ============================================
     const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    // Chart-Daten für Payload vorbereiten
-    const chartData = {
-      birthDate: data?.birthDate,
-      birthTime: data?.birthTime,
-      birthPlace: data?.birthPlace,
+    // Payload-Struktur (Contract) - PFLICHTFELDER
+    const payload = {
+      readingId: readingId, // ← ZWINGEND: readingId muss im Payload sein
+      name: data?.name, // ← PFLICHTFELD
+      birthDate: data?.birthDate, // ← PFLICHTFELD (YYYY-MM-DD)
+      birthTime: data?.birthTime, // ← PFLICHTFELD (HH:mm)
+      birthPlace: data?.birthPlace, // ← PFLICHTFELD
+      readingType: readingType, // ← PFLICHTFELD
+      focus: data?.focus, // ← PFLICHTFELD
+      userId: data?.userId || null,
       // Für Compatibility Reading
       ...(data?.readingType === 'compatibility' && {
         birthDate2: data?.birthDate2,
@@ -99,7 +104,35 @@ export async function POST(request: NextRequest) {
       })
     };
     
+    // Explizite Validierung: Alle PFLICHTFELDER müssen vorhanden sein
+    const requiredFields = ['name', 'birthDate', 'birthTime', 'birthPlace', 'readingType', 'focus'];
+    const missingFields = requiredFields.filter(field => !payload[field as keyof typeof payload]);
+    
+    if (missingFields.length > 0) {
+      console.error(`[Reading Generate API] FEHLER: Pflichtfelder fehlen: ${missingFields.join(', ')}`);
+      
+      // Status auf 'failed' setzen
+      await supabase
+        .from('reading_jobs')
+        .update({ 
+          status: 'failed',
+          error: `Pflichtfelder fehlen: ${missingFields.join(', ')}`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', readingId);
+
+      return NextResponse.json(
+        createErrorResponse(
+          `Pflichtfelder fehlen: ${missingFields.join(', ')}`,
+          'MISSING_REQUIRED_FIELDS',
+          { missingFields }
+        ),
+        { status: 400 }
+      );
+    }
+    
     console.log(`[Reading Generate API] Rufe MCP Gateway auf mit readingId: ${readingId}`);
+    console.log(`[Reading Generate API] Payload:`, JSON.stringify(payload, null, 2));
     
     const mcpResponse = await fetch(`${MCP_SERVER_URL}/agents/run`, {
       method: 'POST',
@@ -110,11 +143,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         domain: 'reading',
         task: 'generate',
-        payload: {
-          readingId: readingId, // ← ZWINGEND: readingId muss im Payload sein
-          readingType: readingType,
-          chartData: chartData
-        },
+        payload: payload,
         requestId
       })
     });

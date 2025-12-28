@@ -28,7 +28,9 @@ export enum ValidationErrorCode {
   INVALID_BIRTH_PLACE = 'INVALID_BIRTH_PLACE',
   MISSING_COMPATIBILITY_DATA = 'MISSING_COMPATIBILITY_DATA',
   INVALID_USER_ID = 'INVALID_USER_ID',
-  FUTURE_DATE = 'FUTURE_DATE'
+  FUTURE_DATE = 'FUTURE_DATE',
+  MISSING_NAME = 'MISSING_NAME',
+  MISSING_FOCUS = 'MISSING_FOCUS'
 }
 
 // Validierungs-Fehler
@@ -41,10 +43,12 @@ export interface ValidationError {
 
 // Reading Request Interface
 export interface ReadingRequest {
+  name: string; // PFLICHTFELD
   birthDate: string;
   birthTime: string;
   birthPlace: string;
   readingType: string;
+  focus: string; // PFLICHTFELD
   userId?: string;
   // Für Compatibility Reading
   birthDate2?: string;
@@ -284,6 +288,70 @@ function validateCompatibilityReading(
 }
 
 /**
+ * Validiert Name (PFLICHTFELD)
+ */
+function validateName(name: any): ValidationError | null {
+  if (!name || typeof name !== 'string') {
+    return {
+      code: ValidationErrorCode.MISSING_NAME,
+      field: 'name',
+      message: 'name ist ein Pflichtfeld (string)'
+    };
+  }
+
+  const trimmed = name.trim();
+  if (trimmed.length === 0) {
+    return {
+      code: ValidationErrorCode.MISSING_NAME,
+      field: 'name',
+      message: 'name darf nicht leer sein'
+    };
+  }
+
+  if (trimmed.length > 255) {
+    return {
+      code: ValidationErrorCode.MISSING_NAME,
+      field: 'name',
+      message: 'name darf maximal 255 Zeichen lang sein'
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Validiert Focus (PFLICHTFELD)
+ */
+function validateFocus(focus: any): ValidationError | null {
+  if (!focus || typeof focus !== 'string') {
+    return {
+      code: ValidationErrorCode.MISSING_FOCUS,
+      field: 'focus',
+      message: 'focus ist ein Pflichtfeld (string)'
+    };
+  }
+
+  const trimmed = focus.trim();
+  if (trimmed.length === 0) {
+    return {
+      code: ValidationErrorCode.MISSING_FOCUS,
+      field: 'focus',
+      message: 'focus darf nicht leer sein'
+    };
+  }
+
+  if (trimmed.length > 500) {
+    return {
+      code: ValidationErrorCode.MISSING_FOCUS,
+      field: 'focus',
+      message: 'focus darf maximal 500 Zeichen lang sein'
+    };
+  }
+
+  return null;
+}
+
+/**
  * Haupt-Validierungs-Funktion
  */
 export function validateReadingRequest(body: any): ValidationResult {
@@ -301,29 +369,50 @@ export function validateReadingRequest(body: any): ValidationResult {
     };
   }
 
-  // Geburtsdatum validieren
+  // PFLICHTFELDER validieren (hart abbrechen bei Fehlern)
+  
+  // Name validieren (PFLICHTFELD)
+  const nameError = validateName(body.name);
+  if (nameError) {
+    errors.push(nameError);
+  }
+
+  // Geburtsdatum validieren (PFLICHTFELD)
   const birthDateError = validateBirthDate(body.birthDate);
   if (birthDateError) {
     errors.push(birthDateError);
   }
 
-  // Geburtszeit validieren
+  // Geburtszeit validieren (PFLICHTFELD)
   const birthTimeError = validateBirthTime(body.birthTime);
   if (birthTimeError) {
     errors.push(birthTimeError);
   }
 
-  // Geburtsort validieren
+  // Geburtsort validieren (PFLICHTFELD)
   const birthPlaceError = validateBirthPlace(body.birthPlace);
   if (birthPlaceError) {
     errors.push(birthPlaceError);
   }
 
-  // Reading-Typ validieren
-  const readingType = body.readingType || 'detailed';
-  const readingTypeError = validateReadingType(readingType);
-  if (readingTypeError) {
-    errors.push(readingTypeError);
+  // Reading-Typ validieren (PFLICHTFELD)
+  if (!body.readingType) {
+    errors.push({
+      code: ValidationErrorCode.INVALID_READING_TYPE,
+      field: 'readingType',
+      message: 'readingType ist ein Pflichtfeld'
+    });
+  } else {
+    const readingTypeError = validateReadingType(body.readingType);
+    if (readingTypeError) {
+      errors.push(readingTypeError);
+    }
+  }
+
+  // Focus validieren (PFLICHTFELD)
+  const focusError = validateFocus(body.focus);
+  if (focusError) {
+    errors.push(focusError);
   }
 
   // User-ID validieren (optional)
@@ -333,12 +422,12 @@ export function validateReadingRequest(body: any): ValidationResult {
   }
 
   // Compatibility Reading spezielle Validierung
-  if (readingType === 'compatibility') {
-    const compatibilityErrors = validateCompatibilityReading(readingType, body);
+  if (body.readingType === 'compatibility') {
+    const compatibilityErrors = validateCompatibilityReading(body.readingType, body);
     errors.push(...compatibilityErrors);
   }
 
-  // Wenn Fehler vorhanden, zurückgeben
+  // Wenn Fehler vorhanden, zurückgeben (HART ABBRECHEN)
   if (errors.length > 0) {
     return {
       valid: false,
@@ -351,10 +440,12 @@ export function validateReadingRequest(body: any): ValidationResult {
     valid: true,
     errors: [],
     data: {
+      name: body.name.trim(),
       birthDate: body.birthDate.trim(),
       birthTime: body.birthTime.trim(),
       birthPlace: body.birthPlace.trim(),
-      readingType: readingType,
+      readingType: body.readingType,
+      focus: body.focus.trim(),
       userId: body.userId?.trim() || undefined,
       // Für Compatibility Reading
       birthDate2: body.birthDate2?.trim() || undefined,

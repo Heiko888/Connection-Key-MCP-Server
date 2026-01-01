@@ -229,8 +229,19 @@
     },
     {
       "parameters": {
+        "jsCode": "// NORMALISIERE RESPONSE: Sicherstellen, dass nur EIN einziges JSON-Objekt zurückgegeben wird\n// Extrahiere das erste Item (falls mehrere vorhanden sind)\nconst inputItems = $input.all();\n\nif (inputItems.length === 0) {\n  console.error('[n8n Workflow] FEHLER: Keine Input-Items vorhanden');\n  throw new Error('Keine Daten für Response vorhanden');\n}\n\n// Nimm das erste Item (falls mehrere vorhanden sind)\nconst firstItem = inputItems[0].json;\n\n// Extrahiere readingId, status und readingText\nconst readingId = firstItem.readingId || firstItem.id || null;\nconst status = firstItem.status || 'completed';\nconst readingText = firstItem.reading || firstItem.reading_text || firstItem.readingsData?.reading || '';\n\n// VALIDIERUNG: Alle erforderlichen Felder müssen vorhanden sein\nif (!readingId) {\n  console.error('[n8n Workflow] FEHLER: readingId fehlt in Response');\n  throw new Error('readingId fehlt in Response-Daten');\n}\n\nif (!readingText || readingText.trim() === '') {\n  console.warn('[n8n Workflow] WARNUNG: readingText fehlt oder ist leer');\n}\n\nconsole.log(`[n8n Workflow] Response normalisiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Status: ${status}`);\nconsole.log(`[n8n Workflow] Reading-Text Länge: ${readingText.length} Zeichen`);\n\n// Rückgabe: NUR ein einziges JSON-Objekt mit readingId, status und readingText\nreturn {\n  json: {\n    readingId: readingId,\n    status: status,\n    readingText: readingText\n  }\n};"
+      },
+      "id": "normalize-response",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2050, 300],
+      "notes": "Sichert dass nur EIN einziges JSON-Objekt (readingId, status, readingText) an Respond-Node übergeben wird"
+    },
+    {
+      "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { success: true, readingId: $json.readingId || $json.id, message: 'Reading erfolgreich generiert und reading_jobs updated' } }}",
+        "responseBody": "={{ { success: true, readingId: $json.readingId, status: $json.status, readingText: $json.readingText, message: 'Reading erfolgreich generiert und reading_jobs updated' } }}",
         "options": {}
       },
       "id": "webhook-response",
@@ -407,6 +418,17 @@
       "main": [
         [
           {
+            "node": "Normalize Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Response": {
+      "main": [
+        [
+          {
             "node": "Webhook Response",
             "type": "main",
             "index": 0
@@ -513,4 +535,3 @@
   "updatedAt": "2025-12-13T18:00:00.000Z",
   "versionId": "1"
 }
-

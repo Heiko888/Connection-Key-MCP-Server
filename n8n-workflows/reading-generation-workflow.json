@@ -198,6 +198,7 @@
     },
     {
       "parameters": {
+        "method": "POST",
         "url": "={{ $env.FRONTEND_URL || 'https://www.the-connection-key.de' }}/api/notifications/reading",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",

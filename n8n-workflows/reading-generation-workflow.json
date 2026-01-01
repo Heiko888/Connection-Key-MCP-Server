@@ -138,7 +138,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// VALIDIERUNG: Reading muss erfolgreich gespeichert worden sein\nconst input = $input.item.json;\nconst readingId = input.id || input.readingId;\n\nif (!readingId) {\n  console.error('[n8n Workflow] FEHLER: Reading wurde nicht gespeichert - keine ID zurückgegeben');\n  throw new Error('Reading wurde nicht gespeichert - INSERT fehlgeschlagen');\n}\n\nconsole.log(`[n8n Workflow] Reading erfolgreich gespeichert in readings Tabelle mit ID: ${readingId}`);\n\nreturn $input.all();"
+        "jsCode": "// VALIDIERUNG: Reading muss erfolgreich gespeichert worden sein\n// WICHTIG: readingId und alle Daten müssen durch die Kette gereicht werden\nconst input = $input.item.json;\nconst readingId = input.readingId || input.id;\n\nif (!readingId) {\n  console.error('[n8n Workflow] FEHLER: Reading wurde nicht gespeichert - keine ID zurückgegeben');\n  throw new Error('Reading wurde nicht gespeichert - INSERT fehlgeschlagen');\n}\n\nconsole.log(`[n8n Workflow] Reading erfolgreich gespeichert in readings Tabelle mit ID: ${readingId}`);\n\n// WICHTIG: Alle Daten durch die Kette reichen (readingsData wird für Notify Frontend benötigt)\nreturn $input.all().map(item => ({\n  json: {\n    ...item.json,\n    readingId: readingId, // Sicherstellen dass readingId vorhanden ist\n    id: input.id || readingId // Supabase gibt id zurück\n    // readingsData, reading, readingType bleiben erhalten\n  }\n}));"
       },
       "id": "validate-save",
       "name": "Validate Save",
@@ -152,7 +152,7 @@
         "operation": "update",
         "table": "reading_jobs",
         "updateKey": "id",
-        "updateKeyValue": "={{ $json.id || $json.readingId }}",
+        "updateKeyValue": "={{ $json.readingId || $json.id }}",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -200,11 +200,11 @@
             },
             {
               "name": "userId",
-              "value": "={{ $json.body.userId }}"
+              "value": "={{ $json.readingsData?.userId || $json.userId || null }}"
             },
             {
               "name": "readingType",
-              "value": "={{ $json.readingType || $json.body.readingType }}"
+              "value": "={{ $json.readingType || $json.readingsData?.readingType }}"
             },
             {
               "name": "status",
@@ -252,7 +252,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ERROR HANDLER: Fehler-Logging und Response\nconst error = $input.item.json.error || $input.item.json.message || 'Unbekannter Fehler';\nconst readingId = $input.item.json.readingId || null;\n\nconsole.error(`[n8n Workflow] FEHLER: ${error} für readingId: ${readingId}`);\n\nreturn {\n  json: {\n    success: false,\n    error: error,\n    readingId: readingId,\n    message: `Workflow abgebrochen: ${error}`\n  }\n};"
+        "jsCode": "// ERROR HANDLER: Fehler-Logging und Response\n// WICHTIG: readingId muss aus dem ursprünglichen Payload geholt werden\nconst input = $input.item.json;\nconst error = input.error || input.message || 'Unbekannter Fehler';\n\n// readingId kann aus verschiedenen Quellen kommen:\n// 1. Direkt im JSON (wenn von Validate Payload kommt)\n// 2. Aus body.readingId (wenn von Webhook kommt)\n// 3. Aus dem ursprünglichen Payload\nconst readingId = input.readingId || input.body?.readingId || input.json?.readingId || null;\n\nconsole.error(`[n8n Workflow] FEHLER: ${error} für readingId: ${readingId}`);\n\nreturn {\n  json: {\n    success: false,\n    error: error,\n    readingId: readingId,\n    message: `Workflow abgebrochen: ${error}`\n  }\n};"
       },
       "id": "error-handler",
       "name": "Error Handler",
@@ -266,7 +266,7 @@
         "operation": "update",
         "table": "reading_jobs",
         "updateKey": "id",
-        "updateKeyValue": "={{ $json.readingId }}",
+        "updateKeyValue": "={{ $json.readingId || $json.id }}",
         "columns": {
           "mappingMode": "defineBelow",
           "value": {

@@ -157,7 +157,7 @@
           "mappingMode": "defineBelow",
           "value": {
             "status": "completed",
-            "result": "={{ $json.resultJson || { reading: $json.reading_text, readingType: $json.reading_type, timestamp: $now.toISO() } }}",
+            "progress": 100,
             "updated_at": "={{ $now.toISO() }}"
           }
         }

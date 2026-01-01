@@ -153,6 +153,16 @@
         "table": "reading_jobs",
         "updateKey": "id",
         "updateKeyValue": "={{ $json.readingId || $json.id }}",
+        "selectType": "manual",
+        "selectConditions": {
+          "conditions": [
+            {
+              "column": "id",
+              "condition": "equal",
+              "value": "={{ $json.readingId || $json.id }}"
+            }
+          ]
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -267,6 +277,16 @@
         "table": "reading_jobs",
         "updateKey": "id",
         "updateKeyValue": "={{ $json.readingId || $json.id }}",
+        "selectType": "manual",
+        "selectConditions": {
+          "conditions": [
+            {
+              "column": "id",
+              "condition": "equal",
+              "value": "={{ $json.readingId || $json.id }}"
+            }
+          ]
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {

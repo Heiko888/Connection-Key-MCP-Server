@@ -6,22 +6,34 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createErrorResponse } from '../../../../reading-response-types';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getUserSupabaseClient, requireUserAuth } from '../../../../lib/supabase-clients';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // User-Authentifizierung: JWT aus Authorization Header extrahieren
+    let userJwt: string;
+    try {
+      userJwt = requireUserAuth(request);
+    } catch (authError: any) {
+      return NextResponse.json(
+        createErrorResponse(
+          authError.message || 'Unauthorized - Missing or invalid Authorization header',
+          'UNAUTHORIZED'
+        ),
+        { status: 401 }
+      );
+    }
+
+    // Supabase Client mit User-JWT (RLS aktiv)
+    const supabase = getUserSupabaseClient(userJwt);
+
     const readingId = params.id;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId'); // Optional: für RLS
+    const userIdParam = searchParams.get('userId'); // Optional: für zusätzliche Validierung
 
     if (!readingId) {
       return NextResponse.json(
@@ -30,30 +42,29 @@ export async function GET(
       );
     }
 
-    // Status aus reading_jobs Tabelle lesen
-    let query = supabase
-      .from('reading_jobs')
-      .select('id, status, result, error, created_at, updated_at')
-      .eq('id', readingId)
-      .single();
+    // Status aus reading_jobs Tabelle lesen via RPC
+    // RPC verwendet SECURITY INVOKER → RLS filtert automatisch nach auth.uid() aus JWT
+    const { data: jobDataArray, error: jobError } = await supabase
+      .rpc('get_reading_job_status', {
+        p_reading_id: readingId
+      });
 
-    if (userId) {
-      query = query.eq('user_id', userId);
-    }
-
-    const { data: jobData, error: jobError } = await query;
+    // RPC gibt ein Array zurück, nehmen wir das erste Element
+    const jobData = jobDataArray && jobDataArray.length > 0 ? jobDataArray[0] : null;
 
     if (jobError) {
-      if (jobError.code === 'PGRST116') {
-        return NextResponse.json(
-          createErrorResponse('Reading job not found', 'READING_NOT_FOUND'),
-          { status: 404 }
-        );
-      }
-      console.error('[Reading Status API] Supabase fetch error:', jobError);
+      console.error('[Reading Status API] Supabase RPC error:', jobError);
       return NextResponse.json(
         createErrorResponse('Failed to fetch reading status', 'DB_FETCH_ERROR', jobError.message),
         { status: 500 }
+      );
+    }
+
+    if (!jobData) {
+      // RLS hat gefiltert → Reading Job existiert nicht oder User hat keinen Zugriff
+      return NextResponse.json(
+        createErrorResponse('Reading job not found', 'READING_NOT_FOUND'),
+        { status: 404 }
       );
     }
 

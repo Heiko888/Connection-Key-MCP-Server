@@ -6,22 +6,34 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createErrorResponse, createReadingResponse, ReadingResponse } from '../../../reading-response-types';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getUserSupabaseClient, requireUserAuth } from '../../../lib/supabase-clients';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // User-Authentifizierung: JWT aus Authorization Header extrahieren
+    let userJwt: string;
+    try {
+      userJwt = requireUserAuth(request);
+    } catch (authError: any) {
+      return NextResponse.json(
+        createErrorResponse(
+          authError.message || 'Unauthorized - Missing or invalid Authorization header',
+          'UNAUTHORIZED'
+        ),
+        { status: 401 }
+      );
+    }
+
+    // Supabase Client mit User-JWT (RLS aktiv)
+    const supabase = getUserSupabaseClient(userJwt);
+
     const readingId = params.id;
     const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId'); // Optional für zusätzliche Sicherheit
+    const userIdParam = searchParams.get('userId'); // Optional für zusätzliche Validierung
 
     // Validierung
     if (!readingId) {
@@ -46,33 +58,19 @@ export async function GET(
       );
     }
 
-    // Reading aus Supabase abrufen
-    let query = supabase
-      .from('readings')
-      .select('*')
-      .eq('id', readingId)
-      .single();
+    // Reading aus Supabase abrufen via RPC
+    // RPC verwendet SECURITY INVOKER → RLS filtert automatisch nach auth.uid() aus JWT
+    const { data: readingData, error: readingError } = await supabase
+      .rpc('get_reading_by_id', {
+        p_reading_id: readingId
+      });
 
-    // Optional: User-ID prüfen (zusätzliche Sicherheit)
-    if (userId) {
-      query = query.eq('user_id', userId);
-    }
-
-    const { data: reading, error } = await query;
+    // RPC gibt ein Array zurück, nehmen wir das erste Element
+    const reading = readingData && readingData.length > 0 ? readingData[0] : null;
+    const error = readingError;
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        // Not found
-        return NextResponse.json(
-          createErrorResponse(
-            'Reading not found',
-            'READING_NOT_FOUND'
-          ),
-          { status: 404 }
-        );
-      }
-
-      console.error('Supabase Query Error:', error);
+      console.error('Supabase RPC Error:', error);
       return NextResponse.json(
         createErrorResponse(
           'Failed to fetch reading',
@@ -84,6 +82,7 @@ export async function GET(
     }
 
     if (!reading) {
+      // RLS hat gefiltert → Reading existiert nicht oder User hat keinen Zugriff
       return NextResponse.json(
         createErrorResponse(
           'Reading not found',

@@ -6,44 +6,50 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createErrorResponse } from '../../../reading-response-types';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getUserSupabaseClient, requireUserAuth } from '../../../lib/supabase-clients';
 
 export async function GET(request: NextRequest) {
   try {
+    // User-Authentifizierung: JWT aus Authorization Header extrahieren
+    let userJwt: string;
+    try {
+      userJwt = requireUserAuth(request);
+    } catch (authError: any) {
+      return NextResponse.json(
+        createErrorResponse(
+          authError.message || 'Unauthorized - Missing or invalid Authorization header',
+          'UNAUTHORIZED'
+        ),
+        { status: 401 }
+      );
+    }
+
+    // Supabase Client mit User-JWT (RLS aktiv)
+    const supabase = getUserSupabaseClient(userJwt);
+
     // Query Parameters
     const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const readingType = searchParams.get('readingType');
 
-    // Validierung
-    if (!userId) {
-      return NextResponse.json(
-        createErrorResponse(
-          'userId query parameter is required',
-          'MISSING_USER_ID'
-        ),
-        { status: 400 }
-      );
-    }
+    // User-ID wird automatisch aus JWT extrahiert (RLS filtert)
+    // Optional: userId als Query-Parameter für zusätzliche Validierung
+    const userIdParam = searchParams.get('userId');
 
-    // UUID-Format prüfen
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId)) {
-      return NextResponse.json(
-        createErrorResponse(
-          'userId must be a valid UUID',
-          'INVALID_USER_ID'
-        ),
-        { status: 400 }
-      );
+    // Optional: userId Query-Parameter validieren (falls vorhanden)
+    if (userIdParam) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(userIdParam)) {
+        return NextResponse.json(
+          createErrorResponse(
+            'userId must be a valid UUID',
+            'INVALID_USER_ID'
+          ),
+          { status: 400 }
+        );
+      }
     }
 
     // Limit validieren
@@ -57,44 +63,41 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Readings aus Supabase abrufen
-    let query = supabase
-      .from('readings')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    // Readings aus Supabase abrufen via RPC
+    // RPC verwendet SECURITY INVOKER → RLS filtert automatisch nach auth.uid() aus JWT
+    const { data: readings, error: readingsError } = await supabase
+      .rpc('get_user_readings_list', {
+        p_limit: limit,
+        p_offset: offset,
+        p_reading_type: readingType || null
+      });
 
-    // Optional: Nach Reading-Typ filtern
-    if (readingType) {
-      query = query.eq('reading_type', readingType);
-    }
-
-    const { data: readings, error } = await query;
-
-    if (error) {
-      console.error('Supabase Query Error:', error);
+    if (readingsError) {
+      console.error('Supabase RPC Error:', readingsError);
       return NextResponse.json(
         createErrorResponse(
           'Failed to fetch readings',
           'DATABASE_ERROR',
-          error.message
+          readingsError.message
         ),
         { status: 500 }
       );
     }
 
-    // Gesamtanzahl für Pagination
-    let countQuery = supabase
-      .from('readings')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
+    // Gesamtanzahl für Pagination via RPC
+    // RPC verwendet SECURITY INVOKER → RLS filtert automatisch nach auth.uid() aus JWT
+    const { data: countData, error: countError } = await supabase
+      .rpc('get_user_readings_count', {
+        p_reading_type: readingType || null
+      });
 
-    if (readingType) {
-      countQuery = countQuery.eq('reading_type', readingType);
+    if (countError) {
+      console.error('Supabase RPC Count Error:', countError);
+      // Count-Fehler nicht kritisch, verwende 0 als Fallback
+      console.warn('Count query failed, using 0 as fallback');
     }
 
-    const { count } = await countQuery;
+    const count = countData || 0;
 
     // Erfolgreiche Antwort
     return NextResponse.json({

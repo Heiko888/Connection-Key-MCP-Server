@@ -7,12 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSystemSupabaseClient } from '../lib/supabase-clients';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// System-Client: Diese Route wird von n8n aufgerufen (Webhook)
+// Service Role Key notwendig für System-Operationen
+const supabase = getSystemSupabaseClient();
 
 export async function POST(request: NextRequest) {
   try {

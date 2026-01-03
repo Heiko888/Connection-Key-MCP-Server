@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserSupabaseClient, requireUserAuth } from '../../../../lib/supabase-clients';
+import { getUserSupabaseClient, requireUserAuth } from '../../../../../lib/supabase-clients';
 
 const READING_GENERATION_TIMEOUT_MS = parseInt(
   process.env.READING_GENERATION_TIMEOUT_MS || '120000',

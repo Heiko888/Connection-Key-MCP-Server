@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserSupabaseClient, requireUserAuth } from '../../../../lib/supabase-clients';
+import { getUserSupabaseClient, requireUserAuth } from '../../../../../lib/supabase-clients';
 
 // CORRECTION: Retry-Eligibility basiert auf error_code
 function isRetryableErrorCode(errorCode: string | null): boolean {

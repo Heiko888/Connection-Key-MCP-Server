@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
-const PORT = process.env.MCP_PORT || 4000;
+const PORT = process.env.PORT || 4000;
 const LOG_LEVEL = process.env.LOG_LEVEL || "info";
 
 // Pfade aus ENV lesen
@@ -187,6 +187,87 @@ app.get("/health", (req, res) => {
 });
 
 /**
+ * Essence aus Reading extrahieren
+ */
+async function generateEssence(readingText) {
+  if (!openai) {
+    throw new Error("OpenAI Client nicht initialisiert");
+  }
+
+  const essenceSystemPrompt = `Du erzeugst die ESSENCE eines Readings für „The Connection Key“.
+
+Die Essence ist KEINE Zusammenfassung.
+Die Essence ist KEINE Erklärung.
+Die Essence ist KEIN Coaching.
+Die Essence ist KEIN Rat.
+
+Die Essence beschreibt:
+- den energetischen Kern
+- die innere Bewegung
+- das zentrale Thema der aktuellen Phase
+
+Haltung und Ton:
+- ruhig
+- klar
+- präsent
+- erwachsen
+- nicht motivierend
+- nicht coachend
+- nicht erklärend
+
+Sprache:
+- präzise
+- reduziert
+- direkt
+- keine Metaphern
+- keine Bilder
+- keine Emojis
+- keine Marketingformulierungen
+
+Grenzen:
+- keine Ratschläge
+- keine Handlungsanweisungen
+- keine Zukunftsprognosen
+- keine Versprechen
+- keine Bewertungen
+
+Form:
+- Fließtext
+- keine Überschriften
+- keine Titel
+- keine Aufzählungen
+- keine Wiederholung von Formulierungen aus dem Reading
+
+Länge:
+150–250 Wörter
+
+Wichtig:
+Du abstrahierst.
+Du verdichtest.
+Du benennst Zustände – keine Inhalte.
+
+Gib ausschließlich den reinen Essence-Text zurück.`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: essenceSystemPrompt
+      },
+      {
+        role: "user",
+        content: readingText
+      }
+    ],
+    temperature: 0.5, // Niedrigere Temperature für präzisere Essence
+    max_tokens: 500
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+/**
  * Reading generieren
  */
 app.post("/reading/generate", async (req, res) => {
@@ -202,34 +283,67 @@ app.post("/reading/generate", async (req, res) => {
     }
 
     // System-Prompt mit Knowledge und Templates
-    let systemPrompt = `Du bist ein Experte für Human Design Readings für "The Connection Key".
+    let systemPrompt = `Du bist ein Reading Agent für „The Connection Key“.
 
-Du erstellst detaillierte, präzise und wertvolle Human Design Readings basierend auf Geburtsdaten.
+Deine Aufgabe ist es, auf Basis von Geburtsdaten ein Human Design Reading zu formulieren.
 
-Deine Readings enthalten:
-- Typ-Analyse
-- Strategie & Autorität
-- Zentren (definiert/undefiniert)
-- Channels & Gates
-- Profile
-- Inkarnationskreuz
-- Spezifische Insights für den Reading-Typ (${readingType})
+Haltung und Ton:
+- ruhig
+- klar
+- präsent
+- erwachsen
+- nicht motivierend
+- nicht coachend
+- nicht erklärend
 
-Sprache: Deutsch
-Stil: Authentisch, klar, wertvoll, persönlich
+Sprache:
+- präzise
+- reduziert
+- direkt
+- keine Metaphern
+- keine Emojis
+- keine Marketingformulierungen
+- keine Überhöhung
+- keine Versprechen
 
-WICHTIG: Nutze das Brand Book Wissen, um:
-- Den korrekten Tone of Voice von "The Connection Key" zu verwenden
-- Die Markenidentität und Werte in deinen Readings zu reflektieren
-- Die Kommunikationsrichtlinien einzuhalten
-- Den Brand Voice konsistent anzuwenden
+Grenzen:
+- kein Coaching
+- keine Ratschläge
+- keine Handlungsanweisungen
+- keine Zukunftsprognosen
+- keine Heilungs- oder Transformationsversprechen
 
-DESIGN-KONSISTENZ (KRITISCH):
-- Halte dich konsistent zum Design der App
-- Verwende die definierten Farben, Typografie und UI-Prinzipien
-- Reading Agent Farbe: #C7CEEA (Lavendel)
-- Typografie: Inter für UI, klare Hierarchie
-- Design-Prinzipien: Klar, einfach, zugänglich, responsive`;
+Ziel:
+Du spiegelst energetische Zusammenhänge und innere Dynamiken.
+Du beschreibst Zustände, Strukturen und Wirkprinzipien – nicht Wege oder Lösungen.
+
+Inhaltlicher Rahmen (abhängig vom Reading-Typ ${readingType}):
+- Typ
+- Strategie
+- Autorität
+- Profil
+- Zentren (definiert / undefiniert)
+- ggf. Kanäle, Tore oder Inkarnationskreuz
+
+Du nutzt dein internes Wissen über Human Design.
+Du erklärst keine Grundlagen.
+Du setzt Wissen voraus.
+
+Brand-Konsistenz:
+Alle Formulierungen müssen mit der Haltung von „The Connection Key“ übereinstimmen:
+- Klarheit statt Anleitung
+- Spiegelung statt Bewertung
+- Präsenz statt Motivation
+
+Form:
+- Fließtext
+- keine Aufzählungen
+- keine Überschriften
+- keine Titel
+
+Du bleibst fokussiert.
+Du bleibst klar.
+Du bleibst innerhalb des Rahmens.`;
 
     // Brand Book Knowledge extrahieren
     const brandbookKnowledge = [];
@@ -243,13 +357,9 @@ DESIGN-KONSISTENZ (KRITISCH):
       }
     });
 
-    // Brand Book Knowledge zuerst hinzufügen (höhere Priorität)
+    // Brand Book Knowledge zuerst hinzufügen (höchste Priorität)
     if (brandbookKnowledge.length > 0) {
-      systemPrompt += "\n\n=== BRAND BOOK WISSEN (WICHTIG - IMMER VERWENDEN) ===\n";
-      systemPrompt += "Das folgende Brand Book Wissen MUSS in deinen Readings verwendet werden:\n";
-      systemPrompt += "- Markenidentität, Tone of Voice, Kommunikationsrichtlinien\n";
-      systemPrompt += "- Brand Voice, Werte, Mission\n";
-      systemPrompt += "- Verwende diese Informationen aktiv in deinen Readings!\n\n";
+      systemPrompt += "\n\n=== BRAND BOOK WISSEN (HÖCHSTE PRIORITÄT) ===\n";
       brandbookKnowledge.forEach(k => {
         systemPrompt += k + "\n\n";
       });
@@ -302,10 +412,23 @@ DESIGN-KONSISTENZ (KRITISCH):
     const reading = completion.choices[0].message.content;
     const readingId = `reading-${Date.now()}-${userId || "anonymous"}`;
 
+    // Essence generieren (optional, Fehler werden ignoriert)
+    let essence = null;
+    try {
+      essence = await generateEssence(reading);
+    } catch (essenceError) {
+      log("error", "Essence-Generierung fehlgeschlagen", {
+        error: essenceError.message,
+        readingId
+      });
+      // Essence-Fehler nicht kritisch, Reading wird trotzdem zurückgegeben
+    }
+
     res.json({
       success: true,
       readingId,
       reading,
+      essence: essence,
       readingType,
       birthDate,
       birthTime,

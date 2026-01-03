@@ -39,7 +39,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $env.CK_AGENT_URL || 'http://ck-agent:4000' }}/reading/generate",
+        "url": "={{ $env.READING_AGENT_URL || 'http://localhost:4000' }}/reading/generate",
         "authentication": "none",
         "sendBody": true,
         "bodyParameters": {
@@ -79,7 +79,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [850, 300],
-      "notes": "Ruft CK-Agent auf Port 4000 auf"
+      "notes": "Ruft Reading Agent (production/server.js) auf Port 4000 auf"
     },
     {
       "parameters": {

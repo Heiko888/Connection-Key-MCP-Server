@@ -6,13 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSystemSupabaseClient } from '../../../lib/supabase-clients';
 
-// Supabase Client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// System-Client: Agent Tasks werden von System/Agenten verwaltet
+// Service Role Key notwendig für System-Operationen
+const supabase = getSystemSupabaseClient();
 
 // GET: Tasks abrufen
 export async function GET(req: NextRequest) {
@@ -25,9 +23,10 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Query aufbauen
+    // Gezielte Spaltenauswahl für Task-Liste: alle Felder die für Task-Liste benötigt werden
     let query = supabase
-      .from('agent_tasks')
-      .select('*')
+      .from('v_agent_tasks')
+      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 

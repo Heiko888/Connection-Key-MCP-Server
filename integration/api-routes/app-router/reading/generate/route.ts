@@ -19,14 +19,19 @@ if (!MCP_API_KEY) {
   console.error('❌ MCP_API_KEY nicht gesetzt!');
 }
 
-// Supabase Client (Service Role für Admin-Zugriff)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Supabase Client für System-Operationen (RLS umgangen - bewusst!)
+// Diese Route erstellt reading_jobs Einträge - System-Operation
+import { getSystemSupabaseClient } from '../../../lib/supabase-clients';
+
+function getSupabaseClient() {
+  return getSystemSupabaseClient();
+}
 
 export async function POST(request: NextRequest) {
   let readingId: string | null = null;
+  
+  // Supabase Client initialisieren (zur Laufzeit, nicht beim Build)
+  const supabase = getSupabaseClient();
   
   try {
     // Request Body parsen
@@ -53,7 +58,7 @@ export async function POST(request: NextRequest) {
     console.log(`[Reading Generate API] Erstelle reading_jobs Eintrag für readingType: ${readingType}`);
     
     const { data: pendingJob, error: createError } = await supabase
-      .from('reading_jobs')
+      .from('v_reading_jobs')
       .insert([{
         // id wird von Supabase generiert (UUID)
         user_id: data?.userId || null,
@@ -113,7 +118,7 @@ export async function POST(request: NextRequest) {
       
       // Status auf 'failed' setzen
       await supabase
-        .from('reading_jobs')
+        .from('v_reading_jobs')
         .update({ 
           status: 'failed',
           error: `Pflichtfelder fehlen: ${missingFields.join(', ')}`,
@@ -155,7 +160,7 @@ export async function POST(request: NextRequest) {
       
       // Status auf 'failed' setzen
       await supabase
-        .from('reading_jobs')
+        .from('v_reading_jobs')
         .update({ 
           status: 'failed',
           error: errorData.error?.message || 'MCP Gateway error',
@@ -181,7 +186,7 @@ export async function POST(request: NextRequest) {
       
       // Status auf 'failed' setzen
       await supabase
-        .from('reading_jobs')
+        .from('v_reading_jobs')
         .update({ 
           status: 'failed',
           error: mcpResult.error?.message || 'Reading generation failed',

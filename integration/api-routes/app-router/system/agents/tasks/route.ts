@@ -9,14 +9,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { requireSystemAuth, SystemAuthError } from '@/lib/system-auth';
+import { getSystemSupabaseClient } from '../../../../lib/supabase-clients';
 
-// Supabase Client mit Service Role Key (bypass RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// System-Client: System-Route für Agent Tasks
+// Service Role Key notwendig für System-Operationen (RLS umgangen - bewusst!)
+const supabase = getSystemSupabaseClient();
 
 // GET: Tasks abrufen
 export async function GET(request: NextRequest) {
@@ -32,9 +30,10 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Query aufbauen
+    // Gezielte Spaltenauswahl für System Task-Liste: alle Felder die für Task-Liste benötigt werden
     let query = supabase
-      .from('agent_tasks')
-      .select('*')
+      .from('v_agent_tasks')
+      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -83,7 +82,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof SystemAuthError) {
       return NextResponse.json(
         {
@@ -137,7 +136,7 @@ export async function POST(request: NextRequest) {
       
       // Fallback: Manuelle Statistiken berechnen
       let statsQuery = supabase
-        .from('agent_tasks')
+        .from('v_agent_tasks')
         .select('status, agent_id', { count: 'exact' });
       
       if (userId) {
@@ -194,7 +193,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof SystemAuthError) {
       return NextResponse.json(
         {

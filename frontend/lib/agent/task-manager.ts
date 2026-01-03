@@ -73,7 +73,7 @@ export class TaskManager {
     userId?: string
   ): Promise<AgentTask> {
     const { data, error } = await supabase
-      .from('agent_tasks')
+      .from('v_agent_tasks')
       .insert({
         agent_id: agentId,
         agent_name: agentName,
@@ -135,7 +135,7 @@ export class TaskManager {
     }
 
     const { data, error } = await supabase
-      .from('agent_tasks')
+      .from('v_agent_tasks')
       .update(updateData)
       .eq('id', taskId)
       .select()
@@ -156,9 +156,10 @@ export class TaskManager {
     tasks: AgentTask[];
     total: number;
   }> {
+    // Gezielte Spaltenauswahl für Task-Liste: alle Felder aus AgentTask Interface
     let query = supabase
-      .from('agent_tasks')
-      .select('*', { count: 'exact' })
+      .from('v_agent_tasks')
+      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     // Filter anwenden
@@ -194,9 +195,10 @@ export class TaskManager {
    * Ruft einen einzelnen Task ab
    */
   static async getTask(taskId: string): Promise<AgentTask | null> {
+    // Gezielte Spaltenauswahl für einzelnen Task: alle Felder aus AgentTask Interface
     const { data, error } = await supabase
-      .from('agent_tasks')
-      .select('*')
+      .from('v_agent_tasks')
+      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at')
       .eq('id', taskId)
       .single();
 
@@ -232,7 +234,7 @@ export class TaskManager {
 
     // Fallback: Manuelle Berechnung
     let query = supabase
-      .from('agent_tasks')
+      .from('v_agent_tasks')
       .select('status, metadata');
 
     if (filters?.userId) {
@@ -249,23 +251,23 @@ export class TaskManager {
       throw new Error(`Failed to fetch statistics: ${error.message}`);
     }
 
-    const tasks = data || [];
+    const tasks: AgentTask[] = data || [];
     const statistics: TaskStatistics = {
       total: tasks.length,
-      pending: tasks.filter((t) => t.status === 'pending').length,
-      processing: tasks.filter((t) => t.status === 'processing').length,
-      completed: tasks.filter((t) => t.status === 'completed').length,
-      failed: tasks.filter((t) => t.status === 'failed').length,
-      cancelled: tasks.filter((t) => t.status === 'cancelled').length,
+      pending: tasks.filter((t: AgentTask) => t.status === 'pending').length,
+      processing: tasks.filter((t: AgentTask) => t.status === 'processing').length,
+      completed: tasks.filter((t: AgentTask) => t.status === 'completed').length,
+      failed: tasks.filter((t: AgentTask) => t.status === 'failed').length,
+      cancelled: tasks.filter((t: AgentTask) => t.status === 'cancelled').length,
     };
 
     // Berechne durchschnittliche Dauer
     const completedTasks = tasks.filter(
-      (t) => t.status === 'completed' && t.metadata?.duration_ms
+      (t: AgentTask) => t.status === 'completed' && t.metadata?.duration_ms
     );
     if (completedTasks.length > 0) {
       const totalDuration = completedTasks.reduce(
-        (sum, t) => sum + (t.metadata?.duration_ms || 0),
+        (sum: number, t: AgentTask) => sum + (t.metadata?.duration_ms || 0),
         0
       );
       statistics.avg_duration_ms = Math.round(totalDuration / completedTasks.length);
@@ -279,7 +281,7 @@ export class TaskManager {
    */
   static async deleteTask(taskId: string): Promise<void> {
     const { error } = await supabase
-      .from('agent_tasks')
+      .from('v_agent_tasks')
       .delete()
       .eq('id', taskId);
 
@@ -308,7 +310,7 @@ export class TaskManager {
           schema: 'public',
           table: 'agent_tasks',
         },
-        (payload) => {
+        (payload: { new: AgentTask }) => {
           callback(payload.new as AgentTask);
         }
       )

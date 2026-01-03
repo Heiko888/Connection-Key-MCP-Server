@@ -8,20 +8,28 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getUserSupabaseClient, requireUserAuth } from '../../../lib/supabase-clients';
 
 const MCP_SERVER_URL = process.env.MCP_SERVER_URL || 'http://138.199.237.34:7000';
 const RELATIONSHIP_ANALYSIS_AGENT_ID = 'relationship-analysis-agent';
 const READING_AGENT_URL = process.env.READING_AGENT_URL || 'http://138.199.237.34:7000';
 
-// Supabase Client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(req: NextRequest) {
   try {
+    // User-Authentifizierung: JWT aus Authorization Header extrahieren
+    let userJwt: string;
+    try {
+      userJwt = requireUserAuth(req);
+    } catch (authError: any) {
+      return NextResponse.json({
+        success: false,
+        error: authError.message || 'Unauthorized - Missing or invalid Authorization header'
+      }, { status: 401 });
+    }
+
+    // Supabase Client mit User-JWT (RLS aktiv)
+    const supabase = getUserSupabaseClient(userJwt);
+
     const body = await req.json();
     const { reading_type, client_name, reading_data } = body;
 
@@ -164,7 +172,7 @@ export async function POST(req: NextRequest) {
 
       // Reading in Supabase speichern
       const { data: savedReading, error: saveError } = await supabase
-        .from('readings')
+        .from('v_readings')
         .insert([{
           user_id: body.userId || null,
           reading_type: 'connection',

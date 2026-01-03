@@ -7,13 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createErrorResponse } from '../../../reading-response-types';
+import { getSystemSupabaseClient } from '../../../lib/supabase-clients';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// System-Client: Diese Route wird von n8n aufgerufen (Webhook)
+// Service Role Key notwendig für System-Operationen
+const supabase = getSystemSupabaseClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Reading aus Supabase abrufen (für Verifikation)
     const { data: reading, error: readError } = await supabase
-      .from('readings')
+      .from('v_readings')
       .select('id, user_id, reading_type, status')
       .eq('id', readingId)
       .single();

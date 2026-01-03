@@ -7,17 +7,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSystemSupabaseClient } from '../../../lib/supabase-clients';
 
 const MCP_SERVER_URL = process.env.MCP_SERVER_URL || 'http://138.199.237.34:7000';
 const AGENT_ID = 'sales';
 const AGENT_NAME = 'Sales Agent';
 
-// Supabase Client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// System-Client: Agent-Route für System-Agenten
+// Service Role Key notwendig für System-Operationen (RLS umgangen - bewusst!)
+const supabase = getSystemSupabaseClient();
 
 export async function POST(req: NextRequest) {
   let taskId: string | null = null;
@@ -39,7 +37,7 @@ export async function POST(req: NextRequest) {
     // SCHRITT 1: Task in Supabase erstellen (Status: pending)
     // ============================================
     const { data: pendingTask, error: createError } = await supabase
-      .from('agent_tasks')
+      .from('v_agent_tasks')
       .insert([{
         user_id: userId || null,
         agent_id: AGENT_ID,
@@ -63,7 +61,7 @@ export async function POST(req: NextRequest) {
     // ============================================
     if (taskId) {
       await supabase
-        .from('agent_tasks')
+        .from('v_agent_tasks')
         .update({ 
           status: 'processing',
           started_at: new Date().toISOString()
@@ -97,7 +95,7 @@ export async function POST(req: NextRequest) {
       // Task als failed markieren
       if (taskId) {
         await supabase
-          .from('agent_tasks')
+          .from('v_agent_tasks')
           .update({
             status: 'failed',
             error_message: fetchError.name === 'AbortError' 
@@ -124,7 +122,7 @@ export async function POST(req: NextRequest) {
       // Task als failed markieren
       if (taskId) {
         await supabase
-          .from('agent_tasks')
+          .from('v_agent_tasks')
           .update({
             status: 'failed',
             error_message: `Agent request failed: ${response.status} ${errorText}`,
@@ -149,7 +147,7 @@ export async function POST(req: NextRequest) {
     // ============================================
     if (taskId) {
       await supabase
-        .from('agent_tasks')
+        .from('v_agent_tasks')
         .update({
           status: 'completed',
           response: responseText,
@@ -169,7 +167,7 @@ export async function POST(req: NextRequest) {
 
       // Auch in agent_responses speichern (für n8n-Workflows)
       await supabase
-        .from('agent_responses')
+        .from('v_agent_responses')
         .insert([{
           task_id: taskId,
           agent: AGENT_ID,
@@ -221,7 +219,7 @@ export async function POST(req: NextRequest) {
     // Task als failed markieren
     if (taskId) {
       await supabase
-        .from('agent_tasks')
+        .from('v_agent_tasks')
         .update({
           status: 'failed',
           error_message: error.message || 'Internal server error',

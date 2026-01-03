@@ -75,7 +75,8 @@ export async function generateReading(
     return {
       success: false,
       error: error.message || 'Failed to generate reading',
-      code: 'NETWORK_ERROR'
+      code: 'NETWORK_ERROR',
+      timestamp: new Date().toISOString()
     };
   }
 }
@@ -179,7 +180,8 @@ export async function getReadingById(
     return {
       success: false,
       error: error.message || 'Failed to get reading',
-      code: 'NETWORK_ERROR'
+      code: 'NETWORK_ERROR',
+      timestamp: new Date().toISOString()
     };
   }
 }

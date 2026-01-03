@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "tsc --noEmit",
     "start": "node index.js",
     "start:agent": "node chatgpt-agent/server.js",
     "start:connection-key": "node connection-key/server.js",

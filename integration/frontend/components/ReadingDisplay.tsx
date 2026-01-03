@@ -12,7 +12,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ReadingResponse } from '../../api-routes/reading-response-types';
+import { ReadingResponse, DetailedReadingSections, isDetailedReadingSections } from '../../api-routes/reading-response-types';
 
 interface ReadingDisplayProps {
   reading: ReadingResponse;
@@ -58,6 +58,11 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
     }
 
     const sections = reading.reading.sections;
+    
+    // Type guard helper
+    const hasProperty = (obj: any, prop: string): boolean => {
+      return obj && typeof obj === 'object' && prop in obj;
+    };
 
     return (
       <div className="reading-sections">
@@ -70,34 +75,34 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
         )}
 
         {/* Type */}
-        {sections.type && (
+        {hasProperty(sections, 'type') && sections.type && (
           <section className="reading-section">
             <h3>Typ</h3>
             {typeof sections.type === 'string' ? (
               <p>{sections.type}</p>
-            ) : (
+            ) : isDetailedReadingSections(sections) && typeof sections.type === 'object' && sections.type ? (
               <div>
                 <h4>{sections.type.name}</h4>
                 <p>{sections.type.description}</p>
                 {sections.type.characteristics && (
                   <ul>
-                    {sections.type.characteristics.map((char, idx) => (
+                    {sections.type.characteristics.map((char: string, idx: number) => (
                       <li key={idx}>{char}</li>
                     ))}
                   </ul>
                 )}
               </div>
-            )}
+            ) : null}
           </section>
         )}
 
         {/* Strategy */}
-        {sections.strategy && (
+        {hasProperty(sections, 'strategy') && sections.strategy && (
           <section className="reading-section">
             <h3>Strategie</h3>
             {typeof sections.strategy === 'string' ? (
               <p>{sections.strategy}</p>
-            ) : (
+            ) : isDetailedReadingSections(sections) && typeof sections.strategy === 'object' && sections.strategy ? (
               <div>
                 <h4>{sections.strategy.name}</h4>
                 <p>{sections.strategy.description}</p>
@@ -108,17 +113,17 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </section>
         )}
 
         {/* Authority */}
-        {sections.authority && (
+        {hasProperty(sections, 'authority') && sections.authority && (
           <section className="reading-section">
             <h3>Autorität</h3>
             {typeof sections.authority === 'string' ? (
               <p>{sections.authority}</p>
-            ) : (
+            ) : isDetailedReadingSections(sections) && typeof sections.authority === 'object' && sections.authority ? (
               <div>
                 <h4>{sections.authority.name}</h4>
                 <p>{sections.authority.description}</p>
@@ -129,29 +134,29 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </section>
         )}
 
         {/* Profile */}
-        {sections.profile && (
+        {hasProperty(sections, 'profile') && sections.profile && (
           <section className="reading-section">
             <h3>Profil</h3>
             {typeof sections.profile === 'string' ? (
               <p>{sections.profile}</p>
-            ) : (
+            ) : isDetailedReadingSections(sections) && typeof sections.profile === 'object' && sections.profile && 'line1' in sections.profile ? (
               <div>
                 <h4>Profil {sections.profile.line1}/{sections.profile.line2}</h4>
                 <p>{sections.profile.description}</p>
                 {sections.profile.characteristics && (
                   <ul>
-                    {sections.profile.characteristics.map((char, idx) => (
+                    {sections.profile.characteristics.map((char: string, idx: number) => (
                       <li key={idx}>{char}</li>
                     ))}
                   </ul>
                 )}
               </div>
-            )}
+            ) : null}
           </section>
         )}
 
@@ -174,7 +179,7 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
               <div>
                 <h4>Definierte Zentren</h4>
                 <ul>
-                  {sections.centers.defined?.map((center: string, idx: number) => (
+                  {Array.isArray(sections.centers.defined) && sections.centers.defined.map((center: string, idx: number) => (
                     <li key={idx}>{center}</li>
                   ))}
                 </ul>

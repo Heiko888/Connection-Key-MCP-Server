@@ -20,7 +20,13 @@
     "jsx": "preserve",
     "incremental": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./integration/frontend/*"],
+      "@/lib/*": ["./integration/frontend/lib/*"],
+      "@/components/*": ["./integration/frontend/components/*"]
+    }
   },
   "include": [
     "**/*.ts",

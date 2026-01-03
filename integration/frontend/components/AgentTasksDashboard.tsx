@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface AgentTask {
   id: string;
@@ -101,7 +101,7 @@ export function AgentTasksDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit, currentPage, selectedAgent, selectedStatus, searchQuery]);
 
   // Statistiken abrufen
   const fetchStatistics = useCallback(async () => {
@@ -124,7 +124,7 @@ export function AgentTasksDashboard() {
     } catch (err) {
       console.error('Fetch Statistics Error:', err);
     }
-  };
+  }, [selectedAgent]);
 
   useEffect(() => {
     fetchTasks();

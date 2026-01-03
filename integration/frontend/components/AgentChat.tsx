@@ -8,7 +8,7 @@
 import { useState } from 'react';
 
 interface AgentChatProps {
-  agentId: 'marketing' | 'automation' | 'sales' | 'social-youtube';
+  agentId: 'marketing' | 'automation' | 'sales' | 'social-youtube' | 'chart';
   agentName: string;
   userId?: string;
 }

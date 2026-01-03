@@ -1,17 +1,26 @@
 import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 
-const SYSTEM_TOKEN = process.env.AGENT_SYSTEM_TOKEN!;
-const HMAC_SECRET = process.env.AGENT_HMAC_SECRET || '';
-const ALLOWED_IPS = (process.env.AGENT_ALLOWED_IPS || '')
-  .split(',')
-  .map(ip => ip.trim())
-  .filter(ip => ip.length > 0);
+// Lazy loading: Environment variables werden erst zur Laufzeit geprüft
+function getSystemToken(): string {
+  const token = process.env.AGENT_SYSTEM_TOKEN;
+  if (!token) {
+    throw new Error(
+      '❌ AGENT_SYSTEM_TOKEN is not defined in environment variables'
+    );
+  }
+  return token;
+}
 
-if (!SYSTEM_TOKEN) {
-  throw new Error(
-    '❌ AGENT_SYSTEM_TOKEN is not defined in environment variables'
-  );
+function getHmacSecret(): string {
+  return process.env.AGENT_HMAC_SECRET || '';
+}
+
+function getAllowedIPs(): string[] {
+  return (process.env.AGENT_ALLOWED_IPS || '')
+    .split(',')
+    .map(ip => ip.trim())
+    .filter(ip => ip.length > 0);
 }
 
 export class SystemAuthError extends Error {
@@ -33,10 +42,11 @@ function getClientIP(request: NextRequest): string {
 }
 
 function verifyIP(request: NextRequest) {
-  if (!ALLOWED_IPS.length) return;
+  const allowedIPs = getAllowedIPs();
+  if (!allowedIPs.length) return;
 
   const ip = getClientIP(request);
-  if (!ALLOWED_IPS.includes(ip)) {
+  if (!allowedIPs.includes(ip)) {
     throw new SystemAuthError(`IP not allowed: ${ip}`);
   }
 }
@@ -50,13 +60,15 @@ function verifyToken(request: NextRequest) {
     throw new SystemAuthError('Missing system authentication token');
   }
 
-  if (token !== SYSTEM_TOKEN) {
+  const systemToken = getSystemToken();
+  if (token !== systemToken) {
     throw new SystemAuthError('Invalid system authentication token');
   }
 }
 
 function verifyHMAC(request: NextRequest) {
-  if (!HMAC_SECRET) return; // HMAC optional if secret not set
+  const hmacSecret = getHmacSecret();
+  if (!hmacSecret) return; // HMAC optional if secret not set
 
   const signature = request.headers.get('x-agent-signature');
   const timestamp = request.headers.get('x-agent-timestamp');
@@ -81,7 +93,7 @@ function verifyHMAC(request: NextRequest) {
   const payload = `${timestamp}.${body}`;
 
   const expected = crypto
-    .createHmac('sha256', HMAC_SECRET)
+    .createHmac('sha256', hmacSecret)
     .update(payload)
     .digest('hex');
 
@@ -122,9 +134,14 @@ export function requireSystemAuth(
  * (z. B. für Dual-Mode Routes)
  */
 export function isSystemRequest(request: NextRequest): boolean {
-  const token =
-    request.headers.get('x-agent-token') ||
-    request.headers.get('authorization')?.replace('Bearer ', '');
+  try {
+    const token =
+      request.headers.get('x-agent-token') ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
 
-  return token === SYSTEM_TOKEN;
+    const systemToken = getSystemToken();
+    return token === systemToken;
+  } catch {
+    return false;
+  }
 }

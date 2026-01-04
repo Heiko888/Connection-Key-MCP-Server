@@ -21,7 +21,7 @@ interface ReadingDisplayProps {
 }
 
 export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayProps) {
-  const [activeTab, setActiveTab] = useState<'text' | 'sections' | 'chart'>('text');
+  const [activeTab, setActiveTab] = useState<'text' | 'essence' | 'sections' | 'chart'>('text');
   const [copied, setCopied] = useState(false);
 
   // Copy to Clipboard
@@ -313,6 +313,14 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
         >
           Vollständiger Text
         </button>
+        {reading.essence && (
+          <button
+            className={activeTab === 'essence' ? 'active' : ''}
+            onClick={() => setActiveTab('essence')}
+          >
+            Essence
+          </button>
+        )}
         {reading.reading.sections && (
           <button
             className={activeTab === 'sections' ? 'active' : ''}
@@ -336,6 +344,14 @@ export function ReadingDisplay({ reading, onShare, onExport }: ReadingDisplayPro
         {activeTab === 'text' && (
           <div className="reading-text">
             {reading.reading.text.split('\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'essence' && reading.essence && (
+          <div className="reading-essence">
+            {reading.essence.split('\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
           </div>

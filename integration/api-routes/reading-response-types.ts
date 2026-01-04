@@ -242,6 +242,7 @@ export interface ReadingResponse {
       | ParentingReadingSections | SpiritualReadingSections | CompatibilityReadingSections
       | LifePurposeReadingSections; // Strukturierte Sections (optional)
   };
+  essence?: string; // Optional: Essence - energetischer Kern des Readings
   metadata: ReadingMetadata;
   chartData?: ChartData; // Optional: Chart-Daten
 }
@@ -275,7 +276,8 @@ export function createReadingResponse(
   readingType: ReadingType,
   metadata: Omit<ReadingMetadata, 'readingType'>,
   sections?: any,
-  chartData?: ChartData
+  chartData?: ChartData,
+  essence?: string // Optional: Essence
 ): ReadingResponse {
   return {
     success: true,
@@ -284,6 +286,7 @@ export function createReadingResponse(
       text: readingText,
       ...(sections && { sections })
     },
+    ...(essence && { essence }), // Essence hinzufügen, falls vorhanden
     metadata: {
       readingType,
       ...metadata

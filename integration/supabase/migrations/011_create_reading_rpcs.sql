@@ -76,41 +76,43 @@ $$;
 CREATE OR REPLACE FUNCTION get_reading_by_id(
   p_reading_id UUID
 )
-RETURNS TABLE (
-  id UUID,
-  user_id UUID,
-  reading_type VARCHAR(50),
-  reading_text TEXT,
-  birth_date DATE,
-  birth_time TIME,
-  birth_place VARCHAR(255),
-  birth_date2 DATE,
-  birth_time2 TIME,
-  birth_place2 VARCHAR(255),
-  reading_sections JSONB,
-  chart_data JSONB,
-  metadata JSONB,
-  created_at TIMESTAMP WITH TIME ZONE
-)
+    RETURNS TABLE (
+      id UUID,
+      user_id UUID,
+      reading_type VARCHAR(50),
+      reading_text TEXT,
+      birth_date DATE,
+      birth_time TIME,
+      birth_place VARCHAR(255),
+      birth_date2 DATE,
+      birth_time2 TIME,
+      birth_place2 VARCHAR(255),
+      reading_sections JSONB,
+      chart_data JSONB,
+      essence TEXT,
+      metadata JSONB,
+      created_at TIMESTAMP WITH TIME ZONE
+    )
 LANGUAGE sql
 SECURITY INVOKER  -- ← RLS greift!
 STABLE
 AS $$
-  SELECT 
-    r.id,
-    r.user_id,
-    r.reading_type,
-    r.reading_text,
-    r.birth_date,
-    r.birth_time,
-    r.birth_place,
-    r.birth_date2,
-    r.birth_time2,
-    r.birth_place2,
-    r.reading_sections,
-    r.chart_data,
-    r.metadata,
-    r.created_at
+      SELECT 
+        r.id,
+        r.user_id,
+        r.reading_type,
+        r.reading_text,
+        r.birth_date,
+        r.birth_time,
+        r.birth_place,
+        r.birth_date2,
+        r.birth_time2,
+        r.birth_place2,
+        r.reading_sections,
+        r.chart_data,
+        r.essence,
+        r.metadata,
+        r.created_at
   FROM readings r
   WHERE 
     r.id = p_reading_id

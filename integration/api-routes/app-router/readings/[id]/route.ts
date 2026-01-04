@@ -112,7 +112,8 @@ export async function GET(
         })
       },
       reading.reading_sections || undefined,
-      reading.chart_data || undefined
+      reading.chart_data || undefined,
+      reading.essence || undefined // Essence hinzufügen
     );
 
     // Erfolgreiche Antwort

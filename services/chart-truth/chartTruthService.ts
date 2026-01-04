@@ -15,8 +15,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
 
-// Import des Berechnungsmoduls (CommonJS)
-const ChartCalculationAstronomy = require(path.join(__dirname, '../../integration/scripts/chart-calculation-astronomy.js'));
+// Dynamischer Import des Berechnungsmoduls (CommonJS)
+// Wird zur Laufzeit geladen, nicht zur Build-Zeit
+let ChartCalculationAstronomy: any = null;
+
+function loadChartCalculationModule() {
+  if (!ChartCalculationAstronomy) {
+    const chartCalculationPath = path.join(process.cwd(), 'services', 'chart-truth', 'chart-calculation-astronomy.js');
+    ChartCalculationAstronomy = require(chartCalculationPath);
+  }
+  return ChartCalculationAstronomy;
+}
 
 // Chart-Version (Truth Contract Version)
 const CHART_VERSION = '1.0.0';
@@ -225,8 +234,9 @@ export async function getChartTruth(input: ChartTruthInput): Promise<ChartTruthO
   const inputHash = calculateInputHash(input);
   const calculatedAt = new Date().toISOString();
 
-  // Bestehendes Modul instanziieren
-  const calculator = new ChartCalculationAstronomy();
+  // Bestehendes Modul instanziieren (dynamisch zur Laufzeit geladen)
+  const ChartCalculationModule = loadChartCalculationModule();
+  const calculator = new ChartCalculationModule();
 
   // Koordinaten direkt verwenden: Überschreibe geocode() um Geocoding zu umgehen
   const originalGeocode = calculator.geocode.bind(calculator);

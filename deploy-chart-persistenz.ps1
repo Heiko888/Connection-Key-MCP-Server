@@ -60,6 +60,11 @@ scp services/chart-truth/chartTruthService.ts root@${CK_APP_SERVER}:/opt/hd-app/
 scp services/chart-truth/chartTruthService.test.ts root@${CK_APP_SERVER}:/opt/hd-app/The-Connection-Key/frontend/services/chart-truth/chartTruthService.test.ts
 scp services/chart-truth/README.md root@${CK_APP_SERVER}:/opt/hd-app/The-Connection-Key/frontend/services/chart-truth/README.md
 
+# Chart-Calculation-Modul (benötigt für Chart-Truth-Service)
+Write-Host "   Kopiere Chart-Calculation-Modul..." -ForegroundColor Gray
+ssh root@$CK_APP_SERVER "mkdir -p /opt/hd-app/The-Connection-Key/frontend/integration/scripts"
+scp integration/scripts/chart-calculation-astronomy.js root@${CK_APP_SERVER}:/opt/hd-app/The-Connection-Key/frontend/integration/scripts/chart-calculation-astronomy.js
+
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ Chart-Truth Service kopiert" -ForegroundColor Green
 } else {
@@ -118,8 +123,4 @@ Write-Host "   1. Supabase Migrationen ausführen (017, 018)" -ForegroundColor G
 Write-Host "   2. n8n Workflows importieren (chart-calculation, reading-generation)" -ForegroundColor Gray
 Write-Host "   3. API testen: POST /api/chart/truth" -ForegroundColor Gray
 Write-Host "   4. Logs prüfen auf beiden Servern" -ForegroundColor Gray
-Write-Host ""
-Write-Host "🔍 Logs prüfen:" -ForegroundColor Cyan
-Write-Host "   Hetzner: ssh root@$HETZNER_SERVER 'cd /opt/mcp-connection-key; docker compose logs --tail 50'" -ForegroundColor Gray
-Write-Host "   CK-App:  ssh root@$CK_APP_SERVER 'cd /opt/hd-app/The-Connection-Key; docker compose logs --tail 50 frontend'" -ForegroundColor Gray
 Write-Host ""

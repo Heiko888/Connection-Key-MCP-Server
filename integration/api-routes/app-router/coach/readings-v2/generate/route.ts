@@ -132,8 +132,9 @@ async function persistReading(
 
   // Prompt-Hash berechnen (optional, für Reproduzierbarkeit)
   const { createHash } = await import('crypto');
+  const agentConfig = getAgent(agentId);
   const promptHash = createHash('sha256')
-    .update(agent.systemPrompt)
+    .update(agentConfig.systemPrompt)
     .digest('hex');
 
   const { error } = await supabase
@@ -214,7 +215,6 @@ export async function POST(request: NextRequest) {
     const chartData = await loadChart(chartId);
 
     // 2. Rufe Reading-Agent auf
-    const agent = getAgent(agentId);
     const agentResult = await callReadingAgent(agentId, chartData, depth, style, userId || undefined);
 
     // 3. Persistiere Reading

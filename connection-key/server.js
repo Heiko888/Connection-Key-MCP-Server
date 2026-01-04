@@ -22,7 +22,7 @@ export class ConnectionKeyServer {
   constructor(options = {}) {
     this.config = {
       port: options.port || config.port || process.env.PORT || 3000,
-      chatgptAgentUrl: options.chatgptAgentUrl || config.chatgptAgent.url,
+      readingAgentUrl: options.readingAgentUrl || config.readingAgent.url,
       enableAuth: options.enableAuth !== false, // Standard: true
       ...options
     };

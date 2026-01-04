@@ -4,7 +4,7 @@ import { config } from "../config.js";
 import { validateMatchingRequest } from "../middleware/validation.js";
 
 const router = express.Router();
-const CHATGPT_AGENT_URL = config.chatgptAgent.url;
+const READING_AGENT_URL = config.readingAgent.url;
 
 /**
  * POST /api/matching
@@ -19,7 +19,7 @@ router.post("/", validateMatchingRequest, async (req, res, next) => {
       const message = `Führe ein Partner-Matching durch zwischen User ${userId1 || "1"} und User ${userId2 || "2"}. ${matchingType ? `Art: ${matchingType}` : ""}`;
 
       const response = await axios.post(
-        `${CHATGPT_AGENT_URL}/chat`,
+        `${READING_AGENT_URL}/chat`,
         {
           userId: userId1 || "matching-user",
           message,
@@ -32,7 +32,7 @@ router.post("/", validateMatchingRequest, async (req, res, next) => {
           }
         },
         {
-          timeout: config.chatgptAgent.timeout
+          timeout: config.readingAgent.timeout
         }
       );
 
@@ -45,7 +45,7 @@ router.post("/", validateMatchingRequest, async (req, res, next) => {
 
     // Option 2: Direkt über Agent-API
     const response = await axios.post(
-      `${CHATGPT_AGENT_URL}/matching`,
+      `${READING_AGENT_URL}/matching`,
       {
         userId1,
         userId2,
@@ -53,7 +53,7 @@ router.post("/", validateMatchingRequest, async (req, res, next) => {
         user2Chart
       },
       {
-        timeout: config.chatgptAgent.timeout
+        timeout: config.readingAgent.timeout
       }
     );
 
@@ -71,7 +71,7 @@ router.post("/", validateMatchingRequest, async (req, res, next) => {
     } else if (error.request) {
       res.status(503).json({
         success: false,
-        error: "ChatGPT-Agent nicht erreichbar"
+        error: "Reading Agent nicht erreichbar"
       });
     } else {
       next(error);

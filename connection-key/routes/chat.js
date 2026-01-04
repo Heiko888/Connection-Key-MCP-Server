@@ -4,7 +4,7 @@ import { config } from "../config.js";
 import { validateChatRequest } from "../middleware/validation.js";
 
 const router = express.Router();
-const CHATGPT_AGENT_URL = config.chatgptAgent.url;
+const READING_AGENT_URL = config.readingAgent.url;
 
 /**
  * POST /api/chat
@@ -14,16 +14,16 @@ router.post("/", validateChatRequest, async (req, res, next) => {
   try {
     const { userId, message, context } = req.body;
 
-    // An ChatGPT-Agent weiterleiten
+    // An Reading Agent weiterleiten
     const response = await axios.post(
-      `${CHATGPT_AGENT_URL}/chat`,
+      `${READING_AGENT_URL}/chat`,
       {
         userId,
         message,
         context: context || {}
       },
       {
-        timeout: config.chatgptAgent.timeout,
+        timeout: config.readingAgent.timeout,
         headers: {
           "Content-Type": "application/json"
         }
@@ -45,10 +45,10 @@ router.post("/", validateChatRequest, async (req, res, next) => {
         details: error.response.data
       });
     } else if (error.request) {
-      // Keine Antwort vom ChatGPT-Agent
+      // Keine Antwort vom Reading Agent
       res.status(503).json({
         success: false,
-        error: "ChatGPT-Agent nicht erreichbar",
+        error: "Reading Agent nicht erreichbar",
         message: "Der Agent-Service ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut."
       });
     } else {
@@ -67,9 +67,9 @@ router.get("/session/:userId", async (req, res, next) => {
     const { userId } = req.params;
 
     const response = await axios.get(
-      `${CHATGPT_AGENT_URL}/session/${userId}`,
+      `${READING_AGENT_URL}/session/${userId}`,
       {
-        timeout: config.chatgptAgent.timeout
+        timeout: config.readingAgent.timeout
       }
     );
 
@@ -98,9 +98,9 @@ router.delete("/session/:userId", async (req, res, next) => {
     const { userId } = req.params;
 
     const response = await axios.delete(
-      `${CHATGPT_AGENT_URL}/session/${userId}`,
+      `${READING_AGENT_URL}/session/${userId}`,
       {
-        timeout: config.chatgptAgent.timeout
+        timeout: config.readingAgent.timeout
       }
     );
 

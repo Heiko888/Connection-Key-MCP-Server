@@ -190,7 +190,7 @@ API_KEY=$api_key
 # ============================================
 N8N_BASE_URL=http://n8n:5678
 MCP_SERVER_URL=http://mcp-server:7777
-CHATGPT_AGENT_URL=http://chatgpt-agent:4000
+READING_AGENT_URL=http://localhost:4000
 CONNECTION_KEY_URL=http://connection-key:3000
 
 # ============================================

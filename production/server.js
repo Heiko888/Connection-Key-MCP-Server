@@ -268,24 +268,125 @@ Gib ausschließlich den reinen Essence-Text zurück.`;
 }
 
 /**
- * Reading generieren
+ * Reading generieren (B1+B2: Strikt an Chart-Truth gebunden)
  */
 app.post("/reading/generate", async (req, res) => {
   try {
-    const { userId, birthDate, birthTime, birthPlace, readingType = "detailed" } = req.body;
+    // Input-Format: Chart-Truth-Contract
+    const { 
+      chart_id, 
+      chart_version, 
+      chart, 
+      context = "personality", 
+      depth = "advanced", 
+      style = "ruhig",
+      userId 
+    } = req.body;
 
-    // Validierung
-    if (!birthDate || !birthTime || !birthPlace) {
+    // Validierung: Chart-JSON ist erforderlich
+    if (!chart || typeof chart !== 'object') {
       return res.status(400).json({
         success: false,
-        error: "birthDate, birthTime und birthPlace sind erforderlich"
+        error: "chart (Chart-Truth-Contract) ist erforderlich"
       });
     }
 
-    // System-Prompt mit Knowledge und Templates
-    let systemPrompt = `Du bist ein Reading Agent für „The Connection Key“.
+    if (!chart.core || !chart.centers || !chart.channels || !chart.gates) {
+      return res.status(400).json({
+        success: false,
+        error: "chart muss core, centers, channels und gates enthalten"
+      });
+    }
 
-Deine Aufgabe ist es, auf Basis von Geburtsdaten ein Human Design Reading zu formulieren.
+    // Validierung: context, depth, style
+    const validContexts = ['business', 'relationship', 'crisis', 'personality'];
+    const validDepths = ['basic', 'advanced', 'professional'];
+    const validStyles = ['klar', 'ruhig', 'direkt', 'empathisch'];
+
+    if (!validContexts.includes(context)) {
+      return res.status(400).json({
+        success: false,
+        error: `context muss einer von ${validContexts.join(', ')} sein`
+      });
+    }
+
+    if (!validDepths.includes(depth)) {
+      return res.status(400).json({
+        success: false,
+        error: `depth muss einer von ${validDepths.join(', ')} sein`
+      });
+    }
+
+    if (!validStyles.includes(style)) {
+      return res.status(400).json({
+        success: false,
+        error: `style muss einer von ${validStyles.join(', ')} sein`
+      });
+    }
+
+    // System-Prompt: B1+B2 Regeln
+    let systemPrompt = `Du bist ein Reading-Interpretations-Agent innerhalb einer Human-Design-Plattform.
+
+Du interpretierst ausschließlich eine bereitgestellte, kanonische Chart-Struktur („Chart-Truth-Contract") und erzeugst daraus ein Reading.
+
+🧱 B1 – HARTE SYSTEMREGELN (NICHT VERHANDELBAR)
+
+❌ VERBOTE (absolut):
+- Du darfst niemals Geburtsdaten interpretieren oder neu berechnen
+- Du darfst niemals Gates, Channels, Zentren, Typ, Profil oder Autorität ableiten
+- Du darfst niemals fehlende Chart-Informationen ergänzen
+- Du darfst niemals Aussagen treffen, die nicht aus dem Chart-JSON ableitbar sind
+- Du darfst niemals Chart-Daten „korrigieren", „anzweifeln" oder „relativieren"
+- Wenn eine Information nicht im Chart-JSON vorhanden ist, dann existiert sie für dich nicht
+
+✅ ERLAUBT:
+- Du darfst vorhandene Chart-Strukturen kontextuell interpretieren
+- Du darfst Zusammenhänge zwischen vorhandenen Feldern erklären
+- Du darfst Spannungen, Potenziale und Dynamiken beschreiben
+- Du darfst erklären, wie sich etwas auswirkt – nicht ob es existiert
+
+🧠 B2 – PROMPT-ARCHITEKTUR
+
+1️⃣ Chart ist Wahrheit:
+Alles, was du sagst, muss sich klar auf mindestens eines beziehen:
+- Typ (aus chart.core.type)
+- Autorität (aus chart.core.authority)
+- definierte / offene Zentren (aus chart.centers)
+- Kanäle (aus chart.channels)
+- Profil (aus chart.core.profile)
+
+2️⃣ Kontext steuert die Perspektive:
+Der context (${context}) entscheidet nicht, was wahr ist, sondern worauf du den Fokus legst:
+- business → Entscheidungen, Energie, Zusammenarbeit
+- relationship → Nähe, Abgrenzung, Dynamik
+- crisis → Stabilität, Überforderung, Regulation
+- personality → Selbsterkenntnis, Muster, Verhalten
+
+3️⃣ Depth steuert die Tiefe:
+- basic → verständlich, wenig Fachbegriffe
+- advanced → differenziert, erklärend
+- professional → systemisch, präzise, ohne Vereinfachung
+
+4️⃣ Style steuert die Sprache:
+- niemals esoterisch
+- niemals absolutistisch
+- keine Heilsversprechen
+- keine Diagnosen
+
+🚧 ANTI-HALLUZINATIONS-SCHRANKEN (PFLICHT):
+Wenn dir etwas fehlt oder unklar ist:
+- Sage explizit: „Dieses Chart liefert dazu keine eindeutige Aussage."
+- Oder: „Aus den vorhandenen Daten lässt sich lediglich Folgendes ableiten …"
+- ❌ Nicht: improvisieren
+- ❌ Nicht: verallgemeinern
+- ❌ Nicht: typische Human-Design-Phrasen einbauen
+
+🧪 SELBSTPRÜFUNG (vor jeder Antwort):
+Bevor du antwortest, prüfe:
+1. Kann ich jede Kernaussage auf Chart-Daten zurückführen?
+2. Habe ich nichts ergänzt, was nicht im JSON steht?
+3. Würde ein zweiter Agent mit demselben Chart zu ähnlichen Aussagen kommen?
+Wenn eine Antwort nein ist → Aussage entfernen.
 
 Haltung und Ton:
 - ruhig
@@ -313,39 +414,25 @@ Grenzen:
 - keine Zukunftsprognosen
 - keine Heilungs- oder Transformationsversprechen
 
-Ziel:
-Du spiegelst energetische Zusammenhänge und innere Dynamiken.
-Du beschreibst Zustände, Strukturen und Wirkprinzipien – nicht Wege oder Lösungen.
+📤 OUTPUT-STRUKTUR (EMPFOHLEN):
+1. Kurze Einordnung des Charts im gewählten Kontext
+2. Zentrale Dynamiken (aus Typ / Zentren / Profil)
+3. Konkrete Auswirkungen im Kontext
+4. Mögliche Spannungsfelder (ohne Wertung)
+5. Klarer, ruhiger Abschluss
 
-Inhaltlicher Rahmen (abhängig vom Reading-Typ ${readingType}):
-- Typ
-- Strategie
-- Autorität
-- Profil
-- Zentren (definiert / undefiniert)
-- ggf. Kanäle, Tore oder Inkarnationskreuz
+Kein Marketing. Kein Coaching-Pitch. Kein „Du solltest".
 
-Du nutzt dein internes Wissen über Human Design.
-Du erklärst keine Grundlagen.
-Du setzt Wissen voraus.
+🛑 ABSCHLUSSREGEL:
+Du bist kein Lehrer, kein Heiler, kein Ratgeber.
+Du bist ein Interpret einer strukturellen energetischen Realität.
 
-Brand-Konsistenz:
-Alle Formulierungen müssen mit der Haltung von „The Connection Key“ übereinstimmen:
-- Klarheit statt Anleitung
-- Spiegelung statt Bewertung
-- Präsenz statt Motivation
+🧾 ERWARTETES ERGEBNIS:
+- Zwei Readings mit identischem chart_id, gleichem context und depth → inhaltlich konsistent
+- Unterschiedlicher context → andere Perspektive, gleiche Wahrheit
+- Unterschiedliche depth → gleiche Aussagen, andere Tiefe`;
 
-Form:
-- Fließtext
-- keine Aufzählungen
-- keine Überschriften
-- keine Titel
-
-Du bleibst fokussiert.
-Du bleibst klar.
-Du bleibst innerhalb des Rahmens.`;
-
-    // Brand Book Knowledge extrahieren
+    // Brand Book Knowledge extrahieren (für Kontext, nicht für Chart-Berechnung)
     const brandbookKnowledge = [];
     const otherKnowledge = [];
     
@@ -357,40 +444,36 @@ Du bleibst innerhalb des Rahmens.`;
       }
     });
 
-    // Brand Book Knowledge zuerst hinzufügen (höchste Priorität)
+    // Brand Book Knowledge hinzufügen
     if (brandbookKnowledge.length > 0) {
-      systemPrompt += "\n\n=== BRAND BOOK WISSEN (HÖCHSTE PRIORITÄT) ===\n";
+      systemPrompt += "\n\n=== BRAND BOOK WISSEN (FÜR KONTEXT & STIL) ===\n";
       brandbookKnowledge.forEach(k => {
         systemPrompt += k + "\n\n";
       });
     }
 
-    // Andere Knowledge hinzufügen
+    // Andere Knowledge hinzufügen (für Interpretation, nicht für Berechnung)
     if (otherKnowledge.length > 0) {
-      systemPrompt += "\n\n=== ZUSÄTZLICHES HUMAN DESIGN WISSEN ===\n";
+      systemPrompt += "\n\n=== HUMAN DESIGN INTERPRETATIONS-WISSEN ===\n";
       otherKnowledge.forEach(k => {
         systemPrompt += k + "\n";
       });
     }
 
-    // Template verwenden falls vorhanden
-    let template = "";
-    if (templates[readingType]) {
-      template = templates[readingType];
-    } else if (templates.default) {
-      template = templates.default;
-    }
+    // User-Prompt: Chart-JSON als Input
+    const userPrompt = `Interpretiere dieses Chart-Truth-Contract:
 
-    // User-Prompt
-    const userPrompt = template
-      ? template.replace(/\{\{birthDate\}\}/g, birthDate)
-                .replace(/\{\{birthTime\}\}/g, birthTime)
-                .replace(/\{\{birthPlace\}\}/g, birthPlace)
-      : `Erstelle ein Human Design Reading für:
-- Geburtsdatum: ${birthDate}
-- Geburtszeit: ${birthTime}
-- Geburtsort: ${birthPlace}
-- Reading-Typ: ${readingType}`;
+Chart-ID: ${chart_id || 'nicht angegeben'}
+Chart-Version: ${chart_version || 'nicht angegeben'}
+
+Chart-Daten:
+${JSON.stringify(chart, null, 2)}
+
+Kontext: ${context}
+Tiefe: ${depth}
+Stil: ${style}
+
+WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas fehlt, sage es explizit. Ergänze nichts.`;
 
     // OpenAI API aufrufen
     const completion = await openai.chat.completions.create({
@@ -405,7 +488,7 @@ Du bleibst innerhalb des Rahmens.`;
           content: userPrompt
         }
       ],
-      temperature: 0.7,
+      temperature: 0.6, // Niedrigere Temperature für konsistentere Interpretationen
       max_tokens: 4000
     });
 
@@ -429,10 +512,11 @@ Du bleibst innerhalb des Rahmens.`;
       readingId,
       reading,
       essence: essence,
-      readingType,
-      birthDate,
-      birthTime,
-      birthPlace,
+      chart_id: chart_id || null,
+      chart_version: chart_version || null,
+      context,
+      depth,
+      style,
       tokens: completion.usage.total_tokens,
       timestamp: new Date().toISOString()
     });
@@ -441,7 +525,7 @@ Du bleibst innerhalb des Rahmens.`;
       error: error.message,
       stack: error.stack,
       userId,
-      birthDate
+      chart_id: req.body.chart_id
     });
     res.status(500).json({
       success: false,

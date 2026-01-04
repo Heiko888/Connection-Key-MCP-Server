@@ -27,8 +27,30 @@ function loadChartCalculationModule() {
   return ChartCalculationAstronomy;
 }
 
-// Chart-Version (Truth Contract Version)
-const CHART_VERSION = '1.0.0';
+// Chart-Versionen (Truth Contract Versions)
+const DEFAULT_CHART_VERSION = '1.0.0';
+const SUPPORTED_VERSIONS = ['1.0.0', '1.1.0', '1.1.1'] as const;
+
+export type ChartVersion = typeof SUPPORTED_VERSIONS[number];
+
+// Versionierungsstrategie
+export const CHART_VERSIONS = {
+  '1.0.0': {
+    engine: 'astronomy-engine',
+    status: 'stable',
+    description: 'Astronomy-Engine / Fallback'
+  },
+  '1.1.0': {
+    engine: 'swiss-ephemeris',
+    status: 'experimental',
+    description: 'Swiss Ephemeris'
+  },
+  '1.1.1': {
+    engine: 'swiss-ephemeris',
+    status: 'stable',
+    description: 'Swiss Ephemeris (Bugfix)'
+  }
+} as const;
 
 /**
  * Input-Format (verbindlich)
@@ -39,6 +61,7 @@ export interface ChartTruthInput {
   latitude: number;
   longitude: number;
   timezone: string;     // IANA (z.B. Europe/Berlin)
+  chart_version?: ChartVersion;  // Optional: Default 1.0.0
 }
 
 /**
@@ -121,10 +144,76 @@ function coordinatesToPlaceString(latitude: number, longitude: number): string {
 }
 
 /**
+ * Berechnet Chart mit Version 1.0.0 (Astronomy-Engine)
+ */
+async function calculateChartV1(input: ChartTruthInput): Promise<any> {
+  const ChartCalculationModule = loadChartCalculationModule();
+  const calculator = new ChartCalculationModule();
+
+  // Koordinaten direkt verwenden: Überschreibe geocode() um Geocoding zu umgehen
+  const originalGeocode = calculator.geocode.bind(calculator);
+  calculator.geocode = async (place: string) => {
+    if (place.includes(',') && place.split(',').length === 2) {
+      const parts = place.split(',').map(s => s.trim());
+      const lat = parseFloat(parts[0]);
+      const lon = parseFloat(parts[1]);
+      if (!isNaN(lat) && !isNaN(lon)) {
+        return { latitude: lat, longitude: lon };
+      }
+    }
+    return originalGeocode(place);
+  };
+
+  const birthPlace = coordinatesToPlaceString(input.latitude, input.longitude);
+  return await calculator.calculateHumanDesignChart(
+    input.birth_date,
+    input.birth_time,
+    birthPlace
+  );
+}
+
+/**
+ * Berechnet Chart mit Version 1.1.0 (Swiss Ephemeris) - STUB
+ * TODO: Implementiere Swiss Ephemeris Integration
+ */
+async function calculateChartSwiss(input: ChartTruthInput): Promise<any> {
+  // STUB: Aktuell noch nicht implementiert
+  // Fallback auf V1 für jetzt
+  console.warn('[Chart-Truth] Swiss Ephemeris (1.1.0) noch nicht implementiert, verwende V1.0.0');
+  return await calculateChartV1(input);
+  
+  // Zukünftige Implementierung:
+  // const swissEphemeris = require('swisseph');
+  // const julianDay = calculateJulianDay(input.birth_date, input.birth_time, input.timezone);
+  // const planets = swissEphemeris.calculatePlanets(julianDay);
+  // return transformSwissEphemerisToChart(planets);
+}
+
+/**
+ * Engine-Routing nach chart_version
+ */
+async function calculateChartByVersion(input: ChartTruthInput): Promise<any> {
+  const version = input.chart_version || DEFAULT_CHART_VERSION;
+
+  switch (version) {
+    case '1.0.0':
+      return await calculateChartV1(input);
+    
+    case '1.1.0':
+    case '1.1.1':
+      return await calculateChartSwiss(input);
+    
+    default:
+      throw new Error(`Unsupported chart_version: ${version}. Supported versions: ${SUPPORTED_VERSIONS.join(', ')}`);
+  }
+}
+
+/**
  * Transformiert Output des bestehenden Moduls ins Truth Contract Format
  */
 function transformToTruthContract(
   input: ChartTruthInput,
+  chartVersion: ChartVersion,
   inputHash: string,
   calculatedAt: string,
   chartData: any
@@ -198,7 +287,7 @@ function transformToTruthContract(
   const definition = `${definedCentersCount}/9`;
 
   return {
-    chart_version: CHART_VERSION,
+    chart_version: chartVersion,
     calculated_at: calculatedAt,
     input_hash: inputHash,
     input,
@@ -218,7 +307,7 @@ function transformToTruthContract(
 /**
  * Single Source of Truth für Chart-Berechnungen
  * 
- * @param input - ChartTruthInput (verbindliches Format)
+ * @param input - ChartTruthInput (verbindliches Format, chart_version optional)
  * @returns ChartTruthOutput (Truth Contract)
  * @throws Error bei ungültigem Input oder Berechnungsfehler
  */
@@ -230,43 +319,35 @@ export async function getChartTruth(input: ChartTruthInput): Promise<ChartTruthO
     throw new Error('Invalid input: All fields are required (birth_date, birth_time, latitude, longitude, timezone)');
   }
 
+  // Chart-Version bestimmen (Default: 1.0.0)
+  const chartVersion: ChartVersion = input.chart_version || DEFAULT_CHART_VERSION;
+
+  // Validierung: Version muss unterstützt sein
+  if (!SUPPORTED_VERSIONS.includes(chartVersion)) {
+    throw new Error(`Unsupported chart_version: ${chartVersion}. Supported versions: ${SUPPORTED_VERSIONS.join(', ')}`);
+  }
+
   // Input Hash berechnen (vor Berechnung, deterministisch)
+  // WICHTIG: input_hash wird NUR aus Geburtsdaten gebildet (ohne chart_version)
+  // Dedupe greift pro Version: (input_hash, chart_version)
   const inputHash = calculateInputHash(input);
   const calculatedAt = new Date().toISOString();
 
-  // Bestehendes Modul instanziieren (dynamisch zur Laufzeit geladen)
-  const ChartCalculationModule = loadChartCalculationModule();
-  const calculator = new ChartCalculationModule();
-
-  // Koordinaten direkt verwenden: Überschreibe geocode() um Geocoding zu umgehen
-  const originalGeocode = calculator.geocode.bind(calculator);
-  calculator.geocode = async (place: string) => {
-    // Wenn Place-String Koordinaten-Format hat (lat,lon), parse es direkt
-    if (place.includes(',') && place.split(',').length === 2) {
-      const parts = place.split(',').map(s => s.trim());
-      const lat = parseFloat(parts[0]);
-      const lon = parseFloat(parts[1]);
-      if (!isNaN(lat) && !isNaN(lon)) {
-        return { latitude: lat, longitude: lon };
-      }
-    }
-    // Fallback: Original-Geocoding (sollte nicht passieren bei korrektem Input)
-    return originalGeocode(place);
-  };
-
   try {
-    // Verwende Koordinaten als Place-String (wird von überschriebenem geocode() geparst)
-    const birthPlace = coordinatesToPlaceString(input.latitude, input.longitude);
-    const chartData = await calculator.calculateHumanDesignChart(
-      input.birth_date,
-      input.birth_time,
-      birthPlace
-    );
+    // Engine-Routing: Berechne Chart mit entsprechender Engine
+    const chartData = await calculateChartByVersion(input);
 
     // Transformiere ins Truth Contract Format
-    return transformToTruthContract(input, inputHash, calculatedAt, chartData);
+    return transformToTruthContract(input, chartVersion, inputHash, calculatedAt, chartData);
   } catch (error: any) {
     // Fehler sichtbar machen (kein stilles Abfangen)
-    throw new Error(`Chart calculation failed: ${error.message}`);
+    throw new Error(`Chart calculation failed (version ${chartVersion}): ${error.message}`);
   }
+}
+
+/**
+ * Gibt unterstützte Chart-Versionen zurück
+ */
+export function getSupportedVersions(): typeof CHART_VERSIONS {
+  return CHART_VERSIONS;
 }

@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getChartTruth, ChartTruthInput, ChartTruthOutput } from '../../../../services/chart-truth/chartTruthService';
+import { getChartTruth, ChartTruthInput, ChartTruthOutput, getSupportedVersions } from '../../../../services/chart-truth/chartTruthService';
 import { getSystemSupabaseClient } from '../../../../lib/supabase-clients';
 
 export async function POST(request: NextRequest) {
@@ -51,13 +51,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Input-Format (verbindlich)
+    // Optional: chart_version validieren
+    const supportedVersions = ['1.0.0', '1.1.0', '1.1.1'];
+    if (body.chart_version && !supportedVersions.includes(body.chart_version)) {
+      return NextResponse.json(
+        { error: `Unsupported chart_version: ${body.chart_version}. Supported: ${supportedVersions.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Input-Format (verbindlich, chart_version optional)
     const input: ChartTruthInput = {
       birth_date: body.birth_date,
       birth_time: body.birth_time,
       latitude: body.latitude,
       longitude: body.longitude,
-      timezone: body.timezone
+      timezone: body.timezone,
+      chart_version: body.chart_version || undefined // Optional, Default in Service
     };
 
     // Ruft ausschließlich getChartTruth() auf
@@ -107,10 +117,17 @@ export async function POST(request: NextRequest) {
     // Chart erfolgreich persistiert (oder deduped)
     const chartId = chartData?.id;
 
-    // Output erweitert um chart_id und persisted
+    // Output erweitert um chart_id, persisted und engine
+    const versionInfo = chart.chart_version ? {
+      engine: chart.chart_version.startsWith('1.1') ? 'swiss-ephemeris' : 'astronomy-engine',
+      version_status: chart.chart_version === '1.0.0' ? 'stable' : 
+                      chart.chart_version === '1.1.0' ? 'experimental' : 'stable'
+    } : {};
+
     return NextResponse.json({
       chart_id: chartId,
       persisted: true,
+      ...versionInfo,
       ...chart
     });
 
@@ -148,8 +165,10 @@ export async function GET() {
       birth_time: 'string (HH:MM)',
       latitude: 'number',
       longitude: 'number',
-      timezone: 'string (IANA, z.B. Europe/Berlin)'
+      timezone: 'string (IANA, z.B. Europe/Berlin)',
+      chart_version: 'string (optional, default: 1.0.0, supported: 1.0.0, 1.1.0, 1.1.1)'
     },
+    supportedVersions: getSupportedVersions(),
     outputFormat: {
       chart_id: 'uuid (neu)',
       persisted: 'boolean (neu)',

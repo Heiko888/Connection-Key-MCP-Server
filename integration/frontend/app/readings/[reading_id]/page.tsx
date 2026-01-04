@@ -1,21 +1,26 @@
 /**
- * Reading Detail Page
+ * Reading Detail Page (D2)
  * Zeigt ein einzelnes Reading mit Chart-Visualisierung
  * 
  * Datenfluss:
- * 1. Lade Reading via reading_id
- * 2. Extrahiere chart_id
- * 3. Rendere ChartLoader mit chart_id
- * 4. Rendere Reading-Content
+ * 1. Lade Reading via reading_id (öffentlich, read-only)
+ * 2. Extrahiere chart_id, agent_id, etc.
+ * 3. Rendere ReadingHeader mit Metadaten
+ * 4. Rendere ReadingLayout (Chart + Reading)
+ * 5. Rendere ReadingMetadata (einklappbar)
  * 
  * Regeln:
  * - Chart-Fehler darf Reading nicht verstecken
  * - Beide Bereiche haben eigene Fehlerstates
+ * - Kein Login erforderlich (read-only)
  */
 
 import { notFound } from 'next/navigation';
-import { ReadingDisplay } from '../../../components/ReadingDisplay';
 import { ChartLoader } from '../../../components/chart/ChartLoader';
+import { ReadingHeader } from '../../../components/reading/ReadingHeader';
+import { ReadingContent } from '../../../components/reading/ReadingContent';
+import { ReadingLayout } from '../../../components/reading/ReadingLayout';
+import { ReadingMetadata } from '../../../components/reading/ReadingMetadata';
 import { getSystemSupabaseClient } from '../../../../lib/supabase-clients';
 
 interface ReadingPageProps {
@@ -26,14 +31,15 @@ interface ReadingPageProps {
 
 interface ReadingData {
   id: string;
-  user_id: string | null;
   reading_type: string;
   reading_text: string;
   essence: string | null;
   chart_id: string | null;
   chart_version: string | null;
+  agent_id: string | null;
+  agent_version: string | null;
   created_at: string;
-  metadata: any;
+  status: string;
 }
 
 async function loadReading(readingId: string): Promise<ReadingData | null> {
@@ -41,8 +47,9 @@ async function loadReading(readingId: string): Promise<ReadingData | null> {
     const supabase = getSystemSupabaseClient();
     const { data: reading, error } = await supabase
       .from('readings')
-      .select('id, user_id, reading_type, reading_text, essence, chart_id, chart_version, created_at, metadata')
+      .select('id, reading_type, reading_text, essence, chart_id, chart_version, agent_id, agent_version, created_at, status')
       .eq('id', readingId)
+      .eq('status', 'completed') // Nur completed Readings
       .single();
 
     if (error || !reading) {
@@ -63,93 +70,52 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
     notFound();
   }
 
-  // Transform ReadingData zu ReadingResponse Format (für ReadingDisplay)
-  const readingResponse = {
-    success: true,
-    reading: {
-      id: reading.id,
-      text: reading.reading_text,
-      sections: null, // TODO: Falls sections in DB gespeichert werden
-    },
-    essence: reading.essence || undefined,
-    chartData: null, // Chart wird über ChartLoader geladen, nicht hier
-    metadata: reading.metadata || {},
-    timestamp: reading.created_at,
-  };
+  // Kontext aus reading_type oder agent_id ableiten
+  const context = reading.agent_id || reading.reading_type || null;
 
   return (
     <div className="reading-page">
-      <div className="reading-page-header">
-        <h1>Reading Details</h1>
-        <p className="reading-id">ID: {reading.id}</p>
-        <p className="reading-type">Type: {reading.reading_type}</p>
-      </div>
+      {/* Reading Header */}
+      <ReadingHeader
+        context={context}
+        agentId={reading.agent_id}
+        agentVersion={reading.agent_version}
+        createdAt={reading.created_at}
+      />
 
-      <div className="reading-page-content">
-        {/* Chart Section */}
-        <div className="reading-chart-section">
-          <h2>Chart</h2>
-          {reading.chart_id ? (
+      {/* Reading Layout: Chart + Content */}
+      <ReadingLayout
+        chart={
+          reading.chart_id ? (
             <ChartLoader chartId={reading.chart_id} />
           ) : (
             <div className="chart-missing">
               <p>⚠️ Keine Chart-Referenz vorhanden</p>
               <p className="chart-missing-detail">Dieses Reading hat keine chart_id</p>
             </div>
-          )}
-        </div>
+          )
+        }
+        reading={
+          <ReadingContent
+            text={reading.reading_text}
+            essence={reading.essence}
+          />
+        }
+      />
 
-        {/* Reading Content Section */}
-        <div className="reading-content-section">
-          <h2>Reading</h2>
-          <ReadingDisplay reading={readingResponse} />
-        </div>
-      </div>
+      {/* Technische Metadaten */}
+      <ReadingMetadata
+        readingId={reading.id}
+        chartId={reading.chart_id}
+        chartVersion={reading.chart_version}
+        agentId={reading.agent_id}
+        agentVersion={reading.agent_version}
+      />
 
       <style jsx>{`
         .reading-page {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-        .reading-page-header {
-          margin-bottom: 2rem;
-          padding-bottom: 1rem;
-          border-bottom: 2px solid #eee;
-        }
-        .reading-page-header h1 {
-          margin: 0 0 0.5rem 0;
-          color: #333;
-        }
-        .reading-id {
-          color: #666;
-          font-size: 0.9rem;
-          font-family: monospace;
-          margin: 0.25rem 0;
-        }
-        .reading-type {
-          color: #666;
-          font-size: 0.9rem;
-          margin: 0.25rem 0;
-        }
-        .reading-page-content {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-        }
-        @media (max-width: 768px) {
-          .reading-page-content {
-            grid-template-columns: 1fr;
-          }
-        }
-        .reading-chart-section,
-        .reading-content-section {
-          min-height: 400px;
-        }
-        .reading-chart-section h2,
-        .reading-content-section h2 {
-          margin: 0 0 1rem 0;
-          color: #444;
+          min-height: 100vh;
+          background-color: #f5f5f5;
         }
         .chart-missing {
           padding: 2rem;

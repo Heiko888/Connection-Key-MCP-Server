@@ -82,37 +82,23 @@
     },
     {
       "parameters": {
+        "jsCode": "// B1+B2: Bereite Chart-Truth-Contract für Reading Agent vor\n// WICHTIG: Reading Agent erhält nur Chart-JSON, keine Geburtsdaten\nconst input = $input.item.json;\n\n// Chart-Daten extrahieren\nconst chartData = input.chartData || {};\nconst chartId = input.chart_id || null;\nconst chartVersion = input.chart_version || '1.0.0';\n\n// Validierung: Chart muss vorhanden sein\nif (!chartData.core || !chartData.centers || !chartData.channels || !chartData.gates) {\n  console.error('[n8n Workflow] FEHLER: Chart-Daten unvollständig');\n  throw new Error('Chart-Daten müssen core, centers, channels und gates enthalten');\n}\n\n// Context, Depth, Style aus readingType/focus ableiten\n// readingType: basic, detailed, business, relationship, etc.\n// focus: zusätzlicher Kontext\nconst readingType = input.readingType || 'detailed';\nconst focus = input.focus || '';\n\n// Context-Mapping\nlet context = 'personality'; // Default\nif (readingType.includes('business') || readingType.includes('career')) {\n  context = 'business';\n} else if (readingType.includes('relationship') || readingType.includes('compatibility')) {\n  context = 'relationship';\n} else if (readingType.includes('crisis') || readingType.includes('health')) {\n  context = 'crisis';\n}\n\n// Depth-Mapping\nlet depth = 'advanced'; // Default\nif (readingType === 'basic') {\n  depth = 'basic';\n} else if (readingType === 'detailed' || readingType === 'professional') {\n  depth = 'professional';\n}\n\n// Style: immer 'ruhig' (Brand-Konsistenz)\nconst style = 'ruhig';\n\n// Chart-Truth-Contract zusammenstellen\nconst chartTruthContract = {\n  chart_id: chartId,\n  chart_version: chartVersion,\n  chart: {\n    core: chartData.core,\n    centers: chartData.centers,\n    channels: chartData.channels,\n    gates: chartData.gates\n  },\n  context: context,\n  depth: depth,\n  style: style,\n  userId: input.userId || null\n};\n\nconsole.log('[n8n Workflow] Chart-Truth-Contract für Reading Agent vorbereitet');\nconsole.log(`[n8n Workflow] chart_id: ${chartId}`);\nconsole.log(`[n8n Workflow] context: ${context}, depth: ${depth}, style: ${style}`);\n\nreturn [{\n  json: chartTruthContract\n}];"
+      },
+      "id": "prepare-chart-truth",
+      "name": "Prepare Chart Truth",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1150, 300],
+      "notes": "B1+B2: Bereitet Chart-Truth-Contract für Reading Agent vor"
+    },
+    {
+      "parameters": {
         "url": "={{ $env.READING_AGENT_URL || 'http://localhost:4000' }}/reading/generate",
         "authentication": "none",
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "name",
-              "value": "={{ $json.name }}"
-            },
-            {
-              "name": "birthDate",
-              "value": "={{ $json.birthDate }}"
-            },
-            {
-              "name": "birthTime",
-              "value": "={{ $json.birthTime }}"
-            },
-            {
-              "name": "birthPlace",
-              "value": "={{ $json.birthPlace }}"
-            },
-            {
-              "name": "readingType",
-              "value": "={{ $json.readingType }}"
-            },
-            {
-              "name": "focus",
-              "value": "={{ $json.focus }}"
-            }
-          ]
-        },
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { chart_id: $json.chart_id, chart_version: $json.chart_version, chart: $json.chart, context: $json.context, depth: $json.depth, style: $json.style, userId: $json.userId } }}",
         "options": {
           "timeout": 60000
         }
@@ -121,8 +107,8 @@
       "name": "Call Reading Agent",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [850, 300],
-      "notes": "Ruft Reading Agent (production/server.js) auf Port 4000 auf"
+      "position": [1350, 300],
+      "notes": "B1+B2: Ruft Reading Agent mit Chart-Truth-Contract auf (keine Geburtsdaten)"
     },
     {
       "parameters": {
@@ -428,6 +414,17 @@
       ]
     },
     "Combine Chart Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare Chart Truth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Chart Truth": {
       "main": [
         [
           {

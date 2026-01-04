@@ -24,26 +24,9 @@ services:
     networks:
       - app-network
 
-  # ChatGPT-Agent - KI-Gehirn
-  chatgpt-agent:
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
-    container_name: chatgpt-agent
-    ports:
-      - "4000:4000"
-    environment:
-      - NODE_ENV=production
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - N8N_BASE_URL=http://n8n:5678
-      - PORT=4000
-    depends_on:
-      - n8n
-    restart: unless-stopped
-    networks:
-      - app-network
-
   # Connection-Key Server - Zentrale API
+  # HINWEIS: Reading Agent läuft über PM2 (production/server.js) auf Port 4000
+  # Kein Docker-Container für Reading Agent mehr!
   connection-key:
     build:
       context: .
@@ -54,13 +37,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - CHATGPT_AGENT_URL=http://chatgpt-agent:4000
+      - READING_AGENT_URL=${READING_AGENT_URL:-http://localhost:4000}
       - N8N_BASE_URL=http://n8n:5678
       - AUTH_ENABLED=${AUTH_ENABLED:-true}
       - API_KEY=${API_KEY:-}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
     depends_on:
-      - chatgpt-agent
       - n8n
     restart: unless-stopped
     networks:

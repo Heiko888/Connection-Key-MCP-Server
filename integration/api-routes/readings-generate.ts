@@ -5,7 +5,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const READING_AGENT_URL = process.env.READING_AGENT_URL || 'http://138.199.237.34:4001';
+const READING_AGENT_URL = process.env.READING_AGENT_URL || 'http://localhost:4000';
 
 export default async function handler(
   req: NextApiRequest,

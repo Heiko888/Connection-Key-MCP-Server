@@ -5,10 +5,10 @@ export const config = {
   // Server Port
   port: process.env.PORT || 3000,
 
-  // ChatGPT-Agent URL
-  chatgptAgent: {
-    url: process.env.CHATGPT_AGENT_URL || "http://localhost:4000",
-    timeout: parseInt(process.env.CHATGPT_AGENT_TIMEOUT || "30000", 10)
+  // Reading Agent URL (production/server.js über PM2)
+  readingAgent: {
+    url: process.env.READING_AGENT_URL || "http://localhost:4000",
+    timeout: parseInt(process.env.READING_AGENT_TIMEOUT || "30000", 10)
   },
 
   // MCP Server URL (optional, für direkte Aufrufe)

@@ -4,7 +4,7 @@ import { config } from "../config.js";
 import { validateReadingRequest } from "../middleware/validation.js";
 
 const router = express.Router();
-const CHATGPT_AGENT_URL = config.chatgptAgent.url;
+const READING_AGENT_URL = config.readingAgent.url;
 
 /**
  * POST /api/reading/generate
@@ -14,37 +14,9 @@ router.post("/generate", validateReadingRequest, async (req, res, next) => {
   try {
     const { userId, birthDate, birthTime, birthPlace, readingType } = req.body;
 
-    // Option 1: Über ChatGPT-Agent (empfohlen - nutzt natürliche Sprache)
-    if (req.query.method === "agent" || !req.query.method) {
-      const message = `Erstelle mir ein Human Design Reading für ${birthDate}, ${birthTime}, ${birthPlace}. ${readingType ? `Art: ${readingType}` : ""}`;
-
-      const response = await axios.post(
-        `${CHATGPT_AGENT_URL}/chat`,
-        {
-          userId: userId || "anonymous",
-          message,
-          context: {
-            birthDate,
-            birthTime,
-            birthPlace,
-            readingType: readingType || "detailed"
-          }
-        },
-        {
-          timeout: config.chatgptAgent.timeout
-        }
-      );
-
-      return res.json({
-        success: true,
-        method: "agent",
-        ...response.data
-      });
-    }
-
-    // Option 2: Direkt über Agent-API
+    // Direkt über Reading Agent API (production/server.js)
     const response = await axios.post(
-      `${CHATGPT_AGENT_URL}/reading/generate`,
+      `${READING_AGENT_URL}/reading/generate`,
       {
         userId,
         birthDate,
@@ -52,9 +24,9 @@ router.post("/generate", validateReadingRequest, async (req, res, next) => {
         birthPlace,
         readingType: readingType || "detailed"
       },
-      {
-        timeout: config.chatgptAgent.timeout
-      }
+        {
+          timeout: config.readingAgent.timeout
+        }
     );
 
     res.json({
@@ -71,7 +43,7 @@ router.post("/generate", validateReadingRequest, async (req, res, next) => {
     } else if (error.request) {
       res.status(503).json({
         success: false,
-        error: "ChatGPT-Agent nicht erreichbar"
+        error: "Reading Agent nicht erreichbar"
       });
     } else {
       next(error);

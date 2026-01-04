@@ -39,6 +39,49 @@
     },
     {
       "parameters": {
+        "jsCode": "// Map Input für Chart-Truth-API\n// WICHTIG: Chart-Daten werden über Chart-Truth-API geholt, nicht berechnet\n// Kein Geocoding, keine Defaults\nconst payload = $input.item.json;\n\n// Prüfe ob Koordinaten vorhanden sind (optional)\nif (payload.latitude && payload.longitude && payload.timezone) {\n  return [{\n    json: {\n      birth_date: payload.birthDate,\n      birth_time: payload.birthTime,\n      latitude: Number(payload.latitude),\n      longitude: Number(payload.longitude),\n      timezone: payload.timezone,\n      // Original-Payload für später\n      _originalPayload: payload\n    }\n  }];\n} else {\n  // Keine Koordinaten → Chart-Daten werden nicht geholt\n  console.log('[n8n Workflow] Keine Koordinaten vorhanden, Chart-Daten werden nicht geholt');\n  return [{\n    json: {\n      _skipChart: true,\n      _originalPayload: payload\n    }\n  }];\n}"
+      },
+      "id": "map-chart-input",
+      "name": "Map Chart Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300],
+      "notes": "Mappt Input für Chart-Truth-API - keine Berechnung"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://localhost:3000' }}/api/chart/truth",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ $json._skipChart ? {} : { birth_date: $json.birth_date, birth_time: $json.birth_time, latitude: $json.latitude, longitude: $json.longitude, timezone: $json.timezone } }}",
+        "options": {
+          "timeout": 30000,
+          "ignoreResponseCode": true
+        }
+      },
+      "id": "get-chart-truth",
+      "name": "Get Chart Truth",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "notes": "Holt Chart-Daten über Chart-Truth-API - keine Human-Design-Logik in n8n"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Kombiniere Chart-Daten mit Original-Payload\n// WICHTIG: Chart-Daten werden über Chart-Truth-API geholt und persistiert\n// Reading speichert chart_id statt Chart-JSON\nconst chartResponse = $input.item.json;\nconst originalPayload = chartResponse._originalPayload || $('Map Chart Input').item.json._originalPayload;\n\n// Chart-Referenzen extrahieren (falls vorhanden)\nlet chartId = null;\nlet chartVersion = null;\nlet chartInputHash = null;\nlet chartDataForReading = {}; // Für Reading Agent (runtime only)\n\nif (!chartResponse._skipChart && chartResponse.chart_version && chartResponse.chart_id) {\n  // Chart wurde erfolgreich geholt und persistiert\n  chartId = chartResponse.chart_id;\n  chartVersion = chartResponse.chart_version;\n  chartInputHash = chartResponse.input_hash;\n  \n  // Chart-JSON für Reading Agent (runtime only, wird nicht gespeichert)\n  chartDataForReading = {\n    core: chartResponse.core,\n    centers: chartResponse.centers,\n    channels: chartResponse.channels,\n    gates: chartResponse.gates\n  };\n  \n  console.log('[n8n Workflow] Chart-Daten geholt über Chart-Truth-API');\n  console.log(`[n8n Workflow] chart_id: ${chartId}`);\n  console.log(`[n8n Workflow] chart_version: ${chartVersion}`);\n} else {\n  console.log('[n8n Workflow] Keine Chart-Daten geholt (keine Koordinaten oder Fehler)');\n}\n\n// Original-Payload mit Chart-Referenzen kombinieren\nreturn [{\n  json: {\n    ...originalPayload,\n    chart_id: chartId,\n    chart_version: chartVersion,\n    chart_input_hash: chartInputHash,\n    chartData: chartDataForReading // Nur für Reading Agent (runtime)\n  }\n}];"
+      },
+      "id": "combine-chart-data",
+      "name": "Combine Chart Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [950, 300],
+      "notes": "Kombiniert Chart-Daten mit Original-Payload"
+    },
+    {
+      "parameters": {
         "url": "={{ $env.READING_AGENT_URL || 'http://localhost:4000' }}/reading/generate",
         "authentication": "none",
         "sendBody": true,
@@ -83,7 +126,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// VALIDIERUNG: Reading muss vorhanden sein\nconst input = $input.item.json;\nconst readingId = input.readingId;\nconst reading = input.reading || input.reading?.text || input.text || '';\nconst essence = input.essence || null; // Essence extrahieren\n\n// HART ABBRECHEN wenn Reading fehlt\nif (!reading || reading.trim() === '') {\n  console.error(`[n8n Workflow] FEHLER: Reading fehlt für readingId: ${readingId}`);\n  throw new Error('Reading wurde nicht generiert - Reading-Text fehlt');\n}\n\n// Payload-Daten aus vorherigen Nodes\nconst name = input.name || '';\nconst birthDate = input.birthDate || '';\nconst birthTime = input.birthTime || '';\nconst birthPlace = input.birthPlace || '';\nconst readingType = input.readingType || 'basic';\nconst focus = input.focus || '';\nconst userId = input.userId || null;\nconst chartData = input.chartData || {};\nconst tokens = input.tokens || 0;\n\nconsole.log(`[n8n Workflow] Reading generiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Reading-Länge: ${reading.length} Zeichen`);\nconsole.log(`[n8n Workflow] Essence vorhanden: ${essence ? 'Ja (' + essence.length + ' Zeichen)' : 'Nein'}`);\nconsole.log(`[n8n Workflow] Tokens: ${tokens}`);\n\n// Result JSON für reading_jobs.result vorbereiten (jsonb)\nconst resultJson = {\n  reading: reading,\n  essence: essence, // Essence hinzufügen\n  name: name,\n  readingType: readingType,\n  focus: focus,\n  chartData: chartData,\n  tokens: tokens,\n  model: 'gpt-4',\n  timestamp: new Date().toISOString()\n};\n\n// Daten für readings Tabelle vorbereiten\nconst readingsData = {\n  readingId: readingId,\n  name: name,\n  birthDate: birthDate,\n  birthTime: birthTime,\n  birthPlace: birthPlace,\n  readingType: readingType,\n  focus: focus,\n  userId: userId,\n  reading: reading,\n  essence: essence, // Essence hinzufügen\n  chartData: chartData,\n  tokens: tokens\n};\n\nreturn {\n  json: {\n    readingId: readingId,\n    reading: reading,\n    essence: essence, // Essence weitergeben\n    readingType: readingType,\n    resultJson: resultJson,\n    readingsData: readingsData\n  }\n};"
+        "jsCode": "// VALIDIERUNG: Reading muss vorhanden sein\nconst input = $input.item.json;\nconst readingId = input.readingId;\nconst reading = input.reading || input.reading?.text || input.text || '';\nconst essence = input.essence || null; // Essence extrahieren\n\n// HART ABBRECHEN wenn Reading fehlt\nif (!reading || reading.trim() === '') {\n  console.error(`[n8n Workflow] FEHLER: Reading fehlt für readingId: ${readingId}`);\n  throw new Error('Reading wurde nicht generiert - Reading-Text fehlt');\n}\n\n// Payload-Daten aus vorherigen Nodes\nconst name = input.name || '';\nconst birthDate = input.birthDate || '';\nconst birthTime = input.birthTime || '';\nconst birthPlace = input.birthPlace || '';\nconst readingType = input.readingType || 'basic';\nconst focus = input.focus || '';\nconst userId = input.userId || null;\nconst chartData = input.chartData || {}; // Für Reading Agent (runtime only)\nconst chartId = input.chart_id || null; // chart_id für Persistenz\nconst chartVersion = input.chart_version || null;\nconst chartInputHash = input.chart_input_hash || null;\nconst tokens = input.tokens || 0;\n\nconsole.log(`[n8n Workflow] Reading generiert für readingId: ${readingId}`);\nconsole.log(`[n8n Workflow] Reading-Länge: ${reading.length} Zeichen`);\nconsole.log(`[n8n Workflow] Essence vorhanden: ${essence ? 'Ja (' + essence.length + ' Zeichen)' : 'Nein'}`);\nconsole.log(`[n8n Workflow] Tokens: ${tokens}`);\n\n// Result JSON für reading_jobs.result vorbereiten (jsonb)\nconst resultJson = {\n  reading: reading,\n  essence: essence, // Essence hinzufügen\n  name: name,\n  readingType: readingType,\n  focus: focus,\n  chart_id: chartId, // chart_id statt Chart-JSON\n  chart_version: chartVersion,\n  tokens: tokens,\n  model: 'gpt-4',\n  timestamp: new Date().toISOString()\n};\n\n// Daten für readings Tabelle vorbereiten\nconst readingsData = {\n  readingId: readingId,\n  name: name,\n  birthDate: birthDate,\n  birthTime: birthTime,\n  birthPlace: birthPlace,\n  readingType: readingType,\n  focus: focus,\n  userId: userId,\n  reading: reading,\n  essence: essence, // Essence hinzufügen\n  chart_id: chartId, // chart_id statt chartData\n  chart_version: chartVersion,\n  chart_input_hash: chartInputHash,\n  tokens: tokens\n};\n\nreturn {\n  json: {\n    readingId: readingId,\n    reading: reading,\n    essence: essence, // Essence weitergeben\n    readingType: readingType,\n    resultJson: resultJson,\n    readingsData: readingsData\n  }\n};"
       },
       "id": "prepare-result",
       "name": "Prepare Result",
@@ -118,7 +161,10 @@
             "birth_place": "={{ $json.readingsData.birthPlace }}",
             "reading_text": "={{ $json.reading }}",
             "essence": "={{ $json.readingsData.essence || null }}",
-            "chart_data": "={{ $json.readingsData.chartData || null }}",
+            "chart_id": "={{ $json.readingsData.chart_id || null }}",
+            "chart_version": "={{ $json.readingsData.chart_version || null }}",
+            "chart_input_hash": "={{ $json.readingsData.chart_input_hash || null }}",
+            "chart_data": "={{ null }}",
             "metadata": "={{ { name: $json.readingsData.name, focus: $json.readingsData.focus, tokens: $json.readingsData.tokens || 0, model: 'gpt-4', timestamp: $now.toISO() } }}",
             "status": "completed"
           }
@@ -349,6 +395,39 @@
       ]
     },
     "Log Start": {
+      "main": [
+        [
+          {
+            "node": "Map Chart Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Chart Input": {
+      "main": [
+        [
+          {
+            "node": "Get Chart Truth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chart Truth": {
+      "main": [
+        [
+          {
+            "node": "Combine Chart Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Chart Data": {
       "main": [
         [
           {

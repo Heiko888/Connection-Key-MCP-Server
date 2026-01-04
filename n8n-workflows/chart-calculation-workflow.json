@@ -15,13 +15,37 @@
     },
     {
       "parameters": {
-        "jsCode": "// Chart-Berechnung mit Swiss Ephemeris\n// Berechnet Human Design Chart-Daten basierend auf Geburtsdaten\n\nconst { birthDate, birthTime, birthPlace } = $input.item.json;\n\n// Parse Geburtsdaten\nconst [year, month, day] = birthDate.split('-').map(Number);\nconst [hours, minutes] = birthTime.split(':').map(Number);\n\n// Berechne Julian Day\nfunction calculateJulianDay(year, month, day, hours, minutes) {\n  const a = Math.floor((14 - month) / 12);\n  const y = year + 4800 - a;\n  const m = month + 12 * a - 3;\n  \n  const jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;\n  \n  const jd = jdn + (hours - 12) / 24 + minutes / 1440;\n  return jd;\n}\n\nconst julianDay = calculateJulianDay(year, month, day, hours, minutes);\n\n// Konvertiere Planetenposition zu Human Design Gate\nfunction positionToGate(longitude) {\n  let normalized = longitude % 360;\n  if (normalized < 0) normalized += 360;\n  const gate = Math.floor(normalized / 5.625) + 1;\n  return gate > 64 ? 64 : gate;\n}\n\nfunction positionToLine(longitude, gate) {\n  const normalized = longitude % 360;\n  if (normalized < 0) normalized += 360;\n  const gateStart = (gate - 1) * 5.625;\n  const positionInGate = normalized - gateStart;\n  const line = Math.floor(positionInGate / 0.9375) + 1;\n  return line > 6 ? 6 : line;\n}\n\n// Swiss Ephemeris API aufrufen (oder Fallback)\nasync function calculatePlanets(julianDay) {\n  try {\n    // Option: Nutze externe Swiss Ephemeris API\n    // const response = await fetch(`https://api.astro.com/swisseph?jd=${julianDay}&planets=0,1,2,3,4,5,6,7,8,9,10,11`);\n    // const data = await response.json();\n    // return data;\n    \n    // Fallback: Vereinfachte Berechnung (für Test)\n    return calculatePlanetsFallback(julianDay);\n  } catch (error) {\n    console.warn('Swiss Ephemeris API nicht verfügbar, nutze Fallback');\n    return calculatePlanetsFallback(julianDay);\n  }\n}\n\nfunction calculatePlanetsFallback(julianDay) {\n  const planets = {};\n  const baseAngle = (julianDay % 360) * 2;\n  \n  planets.sun = { longitude: baseAngle, gate: positionToGate(baseAngle), line: positionToLine(baseAngle, positionToGate(baseAngle)) };\n  planets.moon = { longitude: (baseAngle + 30) % 360, gate: positionToGate((baseAngle + 30) % 360), line: positionToLine((baseAngle + 30) % 360, positionToGate((baseAngle + 30) % 360)) };\n  planets.mercury = { longitude: (baseAngle + 60) % 360, gate: positionToGate((baseAngle + 60) % 360), line: positionToLine((baseAngle + 60) % 360, positionToGate((baseAngle + 60) % 360)) };\n  planets.venus = { longitude: (baseAngle + 90) % 360, gate: positionToGate((baseAngle + 90) % 360), line: positionToLine((baseAngle + 90) % 360, positionToGate((baseAngle + 90) % 360)) };\n  planets.mars = { longitude: (baseAngle + 120) % 360, gate: positionToGate((baseAngle + 120) % 360), line: positionToLine((baseAngle + 120) % 360, positionToGate((baseAngle + 120) % 360)) };\n  planets.jupiter = { longitude: (baseAngle + 150) % 360, gate: positionToGate((baseAngle + 150) % 360), line: positionToLine((baseAngle + 150) % 360, positionToGate((baseAngle + 150) % 360)) };\n  planets.saturn = { longitude: (baseAngle + 180) % 360, gate: positionToGate((baseAngle + 180) % 360), line: positionToLine((baseAngle + 180) % 360, positionToGate((baseAngle + 180) % 360)) };\n  planets.uranus = { longitude: (baseAngle + 210) % 360, gate: positionToGate((baseAngle + 210) % 360), line: positionToLine((baseAngle + 210) % 360, positionToGate((baseAngle + 210) % 360)) };\n  planets.neptune = { longitude: (baseAngle + 240) % 360, gate: positionToGate((baseAngle + 240) % 360), line: positionToLine((baseAngle + 240) % 360, positionToGate((baseAngle + 240) % 360)) };\n  planets.pluto = { longitude: (baseAngle + 270) % 360, gate: positionToGate((baseAngle + 270) % 360), line: positionToLine((baseAngle + 270) % 360, positionToGate((baseAngle + 270) % 360)) };\n  planets.northNode = { longitude: (baseAngle + 300) % 360, gate: positionToGate((baseAngle + 300) % 360), line: positionToLine((baseAngle + 300) % 360, positionToGate((baseAngle + 300) % 360)) };\n  planets.southNode = { longitude: (baseAngle + 330) % 360, gate: positionToGate((baseAngle + 330) % 360), line: positionToLine((baseAngle + 330) % 360, positionToGate((baseAngle + 330) % 360)) };\n  \n  return planets;\n}\n\nconst planetsData = await calculatePlanets(julianDay);\n\nconst definedGates = [];\nconst planets = {};\n\nfor (const [planetName, planetData] of Object.entries(planetsData)) {\n  if (planetData.gate) {\n    definedGates.push(planetData.gate);\n    planets[planetName] = {\n      gate: planetData.gate,\n      line: planetData.line || 1,\n      longitude: planetData.longitude\n    };\n  }\n}\n\nconst uniqueGates = [...new Set(definedGates)];\n\nfunction calculateChannels(gates) {\n  const channelMap = {\n    \"1-8\": [1, 8], \"2-14\": [2, 14], \"3-60\": [3, 60], \"7-31\": [7, 31], \"10-20\": [10, 20], \"13-33\": [13, 33],\n    \"17-62\": [17, 62], \"18-58\": [18, 58], \"19-49\": [19, 49], \"20-34\": [20, 34], \"20-57\": [20, 57], \"21-45\": [21, 45],\n    \"23-43\": [23, 43], \"24-61\": [24, 61], \"25-51\": [25, 51], \"26-44\": [26, 44], \"27-50\": [27, 50], \"28-38\": [28, 38],\n    \"29-46\": [29, 46], \"30-41\": [30, 41], \"32-54\": [32, 54], \"35-36\": [35, 36], \"37-40\": [37, 40], \"39-55\": [39, 55],\n    \"42-53\": [42, 53], \"47-64\": [47, 64], \"48-57\": [48, 57], \"49-4\": [49, 4], \"51-25\": [51, 25], \"52-9\": [52, 9],\n    \"53-42\": [53, 42], \"54-32\": [54, 32], \"55-39\": [55, 39], \"56-11\": [56, 11], \"57-20\": [57, 20], \"57-10\": [57, 10],\n    \"59-6\": [59, 6], \"60-3\": [60, 3], \"61-24\": [61, 24], \"62-17\": [62, 17], \"63-4\": [63, 4], \"64-47\": [64, 47]\n  };\n  \n  const activeChannels = [];\n  for (const [channelName, channelGates] of Object.entries(channelMap)) {\n    if (channelGates.every(gate => gates.includes(gate))) {\n      activeChannels.push(channelName);\n    }\n  }\n  return { active: activeChannels, details: {} };\n}\n\nfunction calculateCenters(gates) {\n  const centerMap = {\n    head: [64, 61, 63], ajna: [47, 24, 4], throat: [23, 8, 20, 16, 35, 45, 12, 33, 31, 56, 62],\n    g: [1, 2, 7, 10, 13, 15, 25, 46], heart: [21, 26, 40, 51],\n    solarPlexus: [6, 22, 36, 37, 49, 55, 30, 50, 58, 19, 60, 41],\n    sacral: [5, 14, 29, 9, 3, 42, 27, 34, 59], spleen: [48, 57, 18, 28, 32, 44, 50, 52, 58],\n    root: [19, 39, 38, 41, 58, 60, 52, 53, 54]\n  };\n  \n  const definedCenters = [];\n  const undefinedCenters = [];\n  const details = {};\n  \n  for (const [centerName, centerGates] of Object.entries(centerMap)) {\n    const isDefined = centerGates.some(gate => gates.includes(gate));\n    if (isDefined) definedCenters.push(centerName);\n    else undefinedCenters.push(centerName);\n    details[centerName] = { defined: isDefined, gates: centerGates.filter(g => gates.includes(g)) };\n  }\n  \n  return { defined: definedCenters, undefined: undefinedCenters, details };\n}\n\nfunction calculateType(centers) {\n  const sacralDefined = centers.defined.includes('sacral');\n  const throatDefined = centers.defined.includes('throat');\n  const spleenDefined = centers.defined.includes('spleen');\n  if (sacralDefined && throatDefined) return 'Generator';\n  if (throatDefined && !sacralDefined) return 'Manifestor';\n  if (!sacralDefined && !throatDefined && spleenDefined) return 'Projector';\n  if (!sacralDefined && !throatDefined && !spleenDefined) return 'Reflector';\n  return null;\n}\n\nfunction calculateProfile(sun, earth) {\n  if (!sun || !earth) return null;\n  return `${sun.line || 1}/${earth.line || 1}`;\n}\n\nfunction calculateAuthority(centers) {\n  if (centers.defined.includes('sacral')) return 'Sacral';\n  if (centers.defined.includes('solarPlexus')) return 'Emotional';\n  if (centers.defined.includes('spleen')) return 'Splenic';\n  if (centers.defined.includes('heart')) return 'Ego';\n  if (centers.defined.includes('g')) return 'Self';\n  if (centers.defined.includes('throat')) return 'Environmental';\n  return null;\n}\n\nfunction calculateStrategy(type) {\n  const strategies = { 'Generator': 'Wait to respond', 'Manifestor': 'Inform', 'Projector': 'Wait for invitation', 'Reflector': 'Wait 28 days' };\n  return strategies[type] || null;\n}\n\nfunction calculateIncarnationCross(sun, earth) {\n  if (!sun || !earth) return null;\n  return { name: `Cross of ${sun.gate}-${earth.gate}`, type: 'Right Angle', sunGate: sun.gate, sunLine: sun.line, earthGate: earth.gate, earthLine: earth.line, meaning: null };\n}\n\nconst channels = calculateChannels(uniqueGates);\nconst centers = calculateCenters(uniqueGates);\nconst type = calculateType(centers);\nconst profile = calculateProfile(planetsData.sun, planetsData.earth || planetsData.moon);\nconst authority = calculateAuthority(centers);\nconst strategy = calculateStrategy(type);\nconst incarnationCross = calculateIncarnationCross(planetsData.sun, planetsData.earth || planetsData.moon);\n\nconst chartData = {\n  type, profile, authority, strategy, planets,\n  gates: { defined: uniqueGates.sort((a, b) => a - b), undefined: Array.from({length: 64}, (_, i) => i + 1).filter(g => !uniqueGates.includes(g)), emphasis: uniqueGates.sort((a, b) => a - b) },\n  channels, centers, incarnationCross,\n  birthDate, birthTime, birthPlace, calculatedAt: new Date().toISOString()\n};\n\nreturn { json: chartData };"
+        "jsCode": "// Input-Mapping: Konvertiert Webhook-Input ins Chart-Truth-Format\n// Kein Geocoding, keine Defaults, keine Korrekturen\n\nconst input = $input.item.json.body || $input.item.json || {};\n\n// Mapping ins verbindliche Input-Format\nreturn [{\n  json: {\n    birth_date: input.birthDate || input.birth_date,\n    birth_time: input.birthTime || input.birth_time,\n    latitude: Number(input.latitude),\n    longitude: Number(input.longitude),\n    timezone: input.timezone\n  }\n}];"
       },
-      "id": "calculate-chart",
-      "name": "Calculate Chart Data",
+      "id": "map-input",
+      "name": "Map Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [450, 300]
+      "position": [450, 300],
+      "notes": "Mappt Webhook-Input ins Chart-Truth-Format - keine Berechnung, nur Mapping"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_URL || 'http://localhost:3000' }}/api/chart/truth",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "call-chart-truth-api",
+      "name": "Call Chart Truth API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300],
+      "notes": "Ruft Chart-Truth-API auf - keine Human-Design-Logik in n8n"
     },
     {
       "parameters": {
@@ -32,7 +56,7 @@
       "name": "Respond with Chart Data",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [650, 300]
+      "position": [850, 300]
     }
   ],
   "connections": {
@@ -40,14 +64,25 @@
       "main": [
         [
           {
-            "node": "Calculate Chart Data",
+            "node": "Map Input",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Calculate Chart Data": {
+    "Map Input": {
+      "main": [
+        [
+          {
+            "node": "Call Chart Truth API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Chart Truth API": {
       "main": [
         [
           {
@@ -66,7 +101,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2025-12-09T00:00:00.000Z",
-  "versionId": "1"
+  "updatedAt": "2025-01-03T00:00:00.000Z",
+  "versionId": "2"
 }
-

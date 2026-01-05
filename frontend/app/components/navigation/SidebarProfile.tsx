@@ -64,7 +64,7 @@ export default function SidebarProfile() {
           fontWeight: 700,
         }}
       >
-        {!profileImage && getInitials(user?.email || 'User')}
+        {!profileImage && getInitials((user as any)?.email ?? 'User')}
       </Avatar>
       <Box>
         <Typography
@@ -76,7 +76,7 @@ export default function SidebarProfile() {
             mb: 0.5,
           }}
         >
-          {user?.email?.split('@')[0] || 'Benutzer'}
+          {(user as any)?.email?.split('@')[0] || 'Benutzer'}
         </Typography>
         <Typography
           variant="body2"
@@ -85,7 +85,7 @@ export default function SidebarProfile() {
             fontSize: isMobile ? '0.85rem' : '0.75rem',
           }}
         >
-          {user?.package ? user.package.charAt(0).toUpperCase() + user.package.slice(1) : 'Basic'} Paket
+          {(user as any)?.package ? (user as any).package.charAt(0).toUpperCase() + (user as any).package.slice(1) : 'Basic'} Paket
         </Typography>
       </Box>
     </Box>

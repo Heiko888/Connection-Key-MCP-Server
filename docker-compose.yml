@@ -32,8 +32,8 @@ services:
       context: .
       dockerfile: Dockerfile.connection-key
     container_name: connection-key
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -44,6 +44,37 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
     depends_on:
       - n8n
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Frontend - Next.js Dev Mode (SSR)
+  frontend:
+    image: node:20-alpine
+    container_name: connection-key-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npx next dev -p 3005"
+    expose:
+      - "3005"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: connection-key-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - connection-key
+      - frontend
     restart: unless-stopped
     networks:
       - app-network

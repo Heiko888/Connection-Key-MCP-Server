@@ -1,7 +1,7 @@
 // WICHTIG: Dieses File sollte nur auf der Server-Seite verwendet werden
 // Für Client-Seite verwende '@/utils/supabase/client' direkt
 
-import { createClient as createBrowserClient } from '@/utils/supabase/client';
+import { createClient as createBrowserClient } from '../../utils/supabase/client';
 
 // Helper function um zu prüfen, ob wir im Browser oder Server sind
 function createSupabaseClientInstance() {

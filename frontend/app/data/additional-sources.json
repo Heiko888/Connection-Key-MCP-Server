@@ -1,0 +1,83 @@
+{
+  "personalNotes": [
+    {
+      "id": "note_001",
+      "title": "Persönliche Strategie-Erfahrungen",
+      "content": "Meine Erfahrungen mit meiner Human Design Strategie...",
+      "tags": ["strategie", "persönlich", "erfahrung"],
+      "dateCreated": "2025-08-08",
+      "category": "personal_experience"
+    }
+  ],
+  "externalResources": [
+    {
+      "id": "resource_001", 
+      "title": "Human Design Zentren Übersicht",
+      "content": "Die 9 Zentren im Human Design System:\n\n**Kopf-Zentrum (Crown):** Inspiration und Druck zu verstehen\n**Ajna-Zentrum:** Mentale Verarbeitung und Konzepte\n**Kehl-Zentrum:** Manifestation und Ausdruck\n**G-Zentrum:** Identität und Richtung\n**Herz-Zentrum:** Willenskraft und Ego\n**Milz-Zentrum:** Intuition und Überlebensmodus\n**Solarplexus:** Emotionen und Klarheit\n**Sakral-Zentrum:** Lebenskraft und Antworten\n**Wurzel-Zentrum:** Druck und Antrieb",
+      "tags": ["zentren", "grundlagen", "übersicht"],
+      "source": "internal_knowledge",
+      "category": "foundational_knowledge"
+    },
+    {
+      "id": "resource_002",
+      "title": "Die 5 Human Design Typen",
+      "content": "**Generator (70%):** Energie-Typ mit sakraler Antwort\n- Strategie: Auf das Leben reagieren\n- Signatur: Zufriedenheit\n- Nicht-Selbst: Frustration\n\n**Manifestierender Generator (33%):** Schneller Multi-Tasker\n- Strategie: Reagieren + Informieren\n- Signatur: Zufriedenheit + Frieden\n- Nicht-Selbst: Frustration + Ärger\n\n**Projektor (20%):** Führer und Berater\n- Strategie: Warten auf Einladung\n- Signatur: Erfolg\n- Nicht-Selbst: Verbitterung\n\n**Manifestor (9%):** Initiator und Unabhängiger\n- Strategie: Informieren\n- Signature: Frieden\n- Nicht-Selbst: Ärger\n\n**Reflektor (1%):** Spiegel der Gemeinschaft\n- Strategie: Warten einen Mondzyklus\n- Signatur: Überraschung\n- Nicht-Selbst: Enttäuschung",
+      "tags": ["typen", "strategie", "grundlagen"],
+      "source": "internal_knowledge", 
+      "category": "foundational_knowledge"
+    }
+  ],
+  "astrologicalData": [
+    {
+      "id": "astro_001",
+      "title": "Mond-Zyklen und Human Design",
+      "content": "Der Mondzyklus spielt eine wichtige Rolle im Human Design, besonders für Reflektoren. Als einziger Typ ohne konstante Definition müssen Reflektoren einen ganzen Mondzyklus (ca. 29,5 Tage) warten, bevor sie wichtige Entscheidungen treffen.\n\n🔗 **Erweiterte Analyse:** [Mond-Transit Kalender](https://www.astro.com/horoscope) | [Human Design Mond-Zyklen](https://www.jovianarchive.com/Transit)",
+      "tags": ["mond", "zyklen", "astrologie", "reflektor", "transit"],
+      "category": "astrological_context"
+    },
+    {
+      "id": "astro_002", 
+      "title": "Planetare Einflüsse auf die Zentren",
+      "content": "Jedes Zentrum im Human Design wird von spezifischen planetaren Energien beeinflusst:\n\n**Kopf-Zentrum:** Neptun und Pluto (Inspiration, Transformation)\n**Ajna-Zentrum:** Neptun und Uranus (Konzepte, Innovation)\n**Kehl-Zentrum:** Merkur und Uranus (Kommunikation, Manifestation)\n**G-Zentrum:** Sonne und Mars (Identität, Richtung)\n**Herz-Zentrum:** Mars und Sonne (Willenskraft, Ego)\n**Milz-Zentrum:** Neptun und Uranus (Intuition, Instinkt)\n**Solarplexus:** Mars und Neptun (Emotionen, Klarheit)\n**Sakral-Zentrum:** Mars und Jupiter (Lebenskraft, Antworten)\n**Wurzel-Zentrum:** Saturn und Pluto (Druck, Antrieb)\n\n🔗 **Erweiterte Analyse:** [Aktuelle Planetenstellungen](https://www.astro.com/h/actastrolog_g.htm) | [Zentren-Transit-Rechner](https://www.mybodygraph.com/transits)",
+      "tags": ["planeten", "zentren", "einflüsse", "transit", "astrologie"],
+      "category": "astrological_context"
+    },
+    {
+      "id": "astro_003",
+      "title": "Jahreszeiten und Human Design Energie",
+      "content": "Die vier Jahreszeiten bringen unterschiedliche energetische Qualitäten:\n\n**Frühling (Widder-Energie):** Zeit für neue Projekte und Manifestation\n**Sommer (Krebs-Energie):** Emotionale Tiefe und Familienthemen\n**Herbst (Waage-Energie):** Balance und Beziehungsthemen\n**Winter (Steinbock-Energie):** Struktur, Reflexion und Planung\n\n🔗 **Erweiterte Analyse:** [Saisonale Energien](https://www.astro.com/horoscope/yearly-horoscope) | [Human Design Jahreszyklen](https://humandesign.tools/seasonal-guide)",
+      "tags": ["jahreszeiten", "energie", "zyklen", "natur", "astrologie"],
+      "category": "astrological_context"
+    },
+    {
+      "id": "astro_004",
+      "title": "Rückläufige Planeten und Human Design",
+      "content": "Rückläufige Planeten haben besonderen Einfluss auf das Human Design:\n\n**Merkur rückläufig:** Kommunikation überdenken, Kehl-Zentrum Themen\n**Venus rückläufig:** Beziehungsklärung, Herz-Zentrum Reflexion\n**Mars rückläufig:** Energie neu ausrichten, Sakral/Wurzel-Zentrum\n**Jupiter rückläufig:** Inneres Wachstum, spirituelle Expansion\n**Saturn rückläufig:** Strukturen überprüfen, Wurzel-Zentrum Themen\n\n🔗 **Erweiterte Analyse:** [Rückläufige Planeten Kalender](https://www.astro.com/h/retro_g.htm) | [Human Design Retrograde Guide](https://humandesignlifecoaching.com/retrograde-planets/)",
+      "tags": ["rückläufig", "planeten", "reflexion", "zentren", "astrologie"],
+      "category": "astrological_context"
+    },
+    {
+      "id": "astro_005",
+      "title": "Neumond und Vollmond Zyklen",
+      "content": "Die Mondphasen bieten kraftvolle Zeiten für Human Design Arbeit:\n\n**Neumond:** Neue Intentionen setzen, besonders kraftvoll für Manifestoren\n**Zunehmender Mond:** Energie aufbauen, ideal für Generatoren\n**Vollmond:** Höhepunkt der Energie, Klarheit für alle Typen\n**Abnehmender Mond:** Loslassen und Reflexion, besonders wichtig für Projektoren\n\n🔗 **Erweiterte Analyse:** [Mondphasen Kalender](https://www.timeanddate.com/moon/phases/) | [Human Design Mond-Rituale](https://www.humandesignschool.com/moon-cycles)",
+      "tags": ["neumond", "vollmond", "mondphasen", "ritual", "zyklen"],
+      "category": "astrological_context"
+    },
+    {
+      "id": "astro_006",
+      "title": "Astrologie-Tools für Human Design Vertiefung",
+      "content": "Empfohlene Tools und Websites für die astrologische Vertiefung deiner Human Design Analyse:\n\n**Kostenlose Tools:**\n🔗 [Astro.com](https://www.astro.com) - Geburtshoroskop und Transite\n🔗 [TimePassages](https://timepassages.com) - Aktuelle Planetenstellungen\n🔗 [Astro-Charts.com](https://astro-charts.com) - Schnelle Horoskoperstellung\n\n**Human Design spezifisch:**\n🔗 [MyBodyGraph.com](https://www.mybodygraph.com) - HD Charts mit astrologischen Details\n🔗 [HumanDesign.tools](https://humandesign.tools) - Transit-Überlagerungen\n🔗 [Jovian Archive](https://www.jovianarchive.com) - Offizielle HD Ressourcen\n\n**Vertiefung:**\n🔗 [Cafe Astrology](https://cafeastrology.com) - Astrologische Grundlagen\n🔗 [Astrodienst](https://www.astro.com/astrology) - Professionelle Deutungen",
+      "tags": ["tools", "websites", "ressourcen", "vertiefung", "links"],
+      "category": "astrological_context"
+    }
+  ],
+  "communityWisdom": [
+    {
+      "id": "community_001",
+      "title": "Häufige Herausforderungen nach Typ",
+      "content": "Generatoren: Überarbeitung und Ja-Sagen zu allem\nProjektoren: Ungefragte Ratschläge geben\nManifestoren: Vergessen zu informieren\nReflektoren: Sich unter Druck setzen, schnelle Entscheidungen zu treffen",
+      "tags": ["herausforderungen", "typen", "community"],
+      "category": "community_insights"
+    }
+  ]
+}

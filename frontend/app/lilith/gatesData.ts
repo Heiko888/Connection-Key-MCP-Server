@@ -1,0 +1,296 @@
+// Alle 64 Lilith Gates mit echten Daten
+export const allLilithGates = [
+  // Gates 1-10 (bereits vorhanden)
+  {
+    gate: 1, name: "Der Schöpfer",
+    description: "Lilith in Tor 1 bringt die Kraft der Schöpfung und des Ausdrucks. Du hast die Fähigkeit, deine kreative Energie wild und ungezähmt zu leben.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der natürlichen Kreativität. Du erkennst, dass dein Schaffen nicht gezähmt werden will, sondern wild und frei fließen muss.",
+    shadow_aspects: "Unbewusste Angst vor zu viel Ausdruck, Zurückhaltung des Feuers, Scham über die eigene Kreativität",
+    gifts: "Instinktives Schaffen, Lava-artige Kreativität, Selbstversöhnende Kraft",
+    affirmation: "Ich lebe Tor 1 mit wilder Lilith Kraft. Mein Schaffen ist wild und instinktiv.",
+    unconscious_description: "Tief in dir liegt eine rohe Angst: dass dein Ausdruck zu viel ist. Unbewusst hast du dich klein gemacht, dein Feuer zurückgehalten, damit es niemanden blendet.",
+    unconscious_deep_meaning: "Dein Schaffen ist instinktiv, es bricht hervor wie Lava. Und wenn du es nicht mehr drosselst, wird es zur Kraft, die dich mit dir selbst versöhnt.",
+    unconscious_shadow_aspects: "Unbewusste Angst vor zu viel Ausdruck, Zurückhaltung des Feuers, Scham über die eigene Kreativität",
+    unconscious_gifts: "Instinktives Schaffen, Lava-artige Kreativität, Selbstversöhnende Kraft",
+    unconscious_affirmation: "Ich lebe Tor 1 unbewusst mit wilder Lilith Kraft. Mein Schaffen ist wild und instinktiv."
+  },
+  {
+    gate: 2, name: "Die Rezeptive",
+    description: "Lilith in Tor 2 bringt die Kraft der Rezeptivität und des Empfangens. Du hast die Fähigkeit, Energie zu empfangen und zu nähren.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der natürlichen Rezeptivität. Du verstehst, dass Empfangen keine Schwäche ist, sondern eine wilde Kraft.",
+    shadow_aspects: "Unbewusste Scham über Empfangen, Angst vor Schwäche, Unterdrückung des natürlichen Magnetismus",
+    gifts: "Wilde Rezeptivität, Ungezähmter Magnetismus, Öffnende Kraft",
+    affirmation: "Ich lebe Tor 2 mit wilder Lilith Kraft. Mein Empfangen ist wild und magnetisch.",
+    unconscious_description: "Vielleicht sitzt tief in dir die Scham, dass Empfangen schwach ist. Also hast du versucht, stärker, aktiver, kontrollierender zu sein, als dein Wesen eigentlich will.",
+    unconscious_deep_meaning: "Doch in deinem Körper lebt die wilde Wahrheit: deine größte Kraft liegt darin, zu öffnen, nicht zu machen. Dein Magnetismus ist ungezähmt. Du ziehst an, weil du empfängst.",
+    unconscious_shadow_aspects: "Unbewusste Scham über Empfangen, Angst vor Schwäche, Unterdrückung des natürlichen Magnetismus",
+    unconscious_gifts: "Wilde Rezeptivität, Ungezähmter Magnetismus, Öffnende Kraft",
+    unconscious_affirmation: "Ich lebe Tor 2 unbewusst mit wilder Lilith Kraft. Mein Empfangen ist wild und magnetisch."
+  },
+  {
+    gate: 3, name: "Ordnung aus Chaos",
+    description: "Lilith in Tor 3 bringt die Kraft des Chaos und der Ordnung. Du hast die Fähigkeit, aus dem Chaos neue Strukturen zu schaffen.",
+    deep_meaning: "Die tiefe Bedeutung liegt im Verständnis, dass Chaos schöpferisch ist. Du erkennst, dass aus der Zerstörung des Alten das Neue geboren wird.",
+    shadow_aspects: "Unbewusste Scham über Chaos, Angst vor Unruhe, Unterdrückung der schöpferischen Zerstörung",
+    gifts: "Heiliges Chaos, Schöpferische Zerstörung, Form findende Unruhe",
+    affirmation: "Ich lebe Tor 3 mit wilder Lilith Kraft. Mein Chaos ist wild und schöpferisch.",
+    unconscious_description: "Unbewusst spürst du das Chaos in dir – und vielleicht schämst du dich dafür. Also versuchst du, Ordnung zu erzwingen, wo dein Instinkt eigentlich Neues hervorbringen will.",
+    unconscious_deep_meaning: "Doch Lilith hier macht deine Unruhe heilig. Dein Chaos ist schöpferisch. Wenn du dich ihm hingibst, wächst aus der Zerstörung Altes, und das Neue findet Form.",
+    unconscious_shadow_aspects: "Unbewusste Scham über Chaos, Angst vor Unruhe, Unterdrückung der schöpferischen Zerstörung",
+    unconscious_gifts: "Heiliges Chaos, Schöpferische Zerstörung, Form findende Unruhe",
+    unconscious_affirmation: "Ich lebe Tor 3 unbewusst mit wilder Lilith Kraft. Mein Chaos ist wild und schöpferisch."
+  },
+  {
+    gate: 4, name: "Antworten",
+    description: "Lilith in Tor 4 bringt die Kraft der Antworten und der Klarheit. Du hast die Fähigkeit, tiefe Antworten zu finden.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der natürlichen Weisheit. Du verstehst, dass Antworten nicht logisch sein müssen, sondern aus der Intuition kommen.",
+    shadow_aspects: "Unbewusste Angst vor unlogischen Antworten, Scham über Intuition, Unterdrückung der rohen Wahrheit",
+    gifts: "Roh spürende Antworten, Intuitive Wahrheit, Unbegründete Klarheit",
+    affirmation: "Ich lebe Tor 4 mit wilder Lilith Kraft. Meine Antworten sind wild und intuitiv.",
+    unconscious_description: "Tief in dir lebt die Angst, keine logische Antwort zu haben. Also versuchst du, alles zu begründen, zu erklären, zu rechtfertigen.",
+    unconscious_deep_meaning: "Doch dein Körper weiß: deine Antworten sind nicht glatt, sie sind roh, direkt, ungezähmt. Lilith hier macht deine Intuition zur wilden Wahrheit.",
+    unconscious_shadow_aspects: "Unbewusste Angst vor unlogischen Antworten, Scham über Intuition, Unterdrückung der rohen Wahrheit",
+    unconscious_gifts: "Roh spürende Antworten, Intuitive Wahrheit, Unbegründete Klarheit",
+    unconscious_affirmation: "Ich lebe Tor 4 unbewusst mit wilder Lilith Kraft. Meine Antworten sind wild und intuitiv."
+  },
+  {
+    gate: 5, name: "Der Rhythmus",
+    description: "Lilith in Tor 5 bringt die Kraft des Rhythmus und der Zeit. Du hast die Fähigkeit, in deinem eigenen Rhythmus zu leben.",
+    deep_meaning: "Die tiefe Bedeutung liegt im Verständnis, dass jeder seinen eigenen Rhythmus hat. Du erkennst, dass dein Takt nicht dem der anderen entsprechen muss.",
+    shadow_aspects: "Unbewusste Scham über eigenen Rhythmus, Angst vor Unpassendheit, Unterdrückung des wilden Takts",
+    gifts: "Wilder Rhythmus, Lebens folgender Takt, Echter Körperrhythmus",
+    affirmation: "Ich lebe Tor 5 mit wilder Lilith Kraft. Mein Rhythmus ist wild und echt.",
+    unconscious_description: "Tief in dir lebt die Scham, nicht in den Takt der anderen zu passen. Also versuchst du, dich anzupassen, zu synchronisieren, 'richtig' zu sein.",
+    unconscious_deep_meaning: "Doch dein Körper rebelliert – mal zu schnell, mal zu langsam, nie 'genau richtig'. Lilith hier macht deinen wilden Takt heilig.",
+    unconscious_shadow_aspects: "Unbewusste Scham über eigenen Rhythmus, Angst vor Unpassendheit, Unterdrückung des wilden Takts",
+    unconscious_gifts: "Wilder Rhythmus, Lebens folgender Takt, Echter Körperrhythmus",
+    unconscious_affirmation: "Ich lebe Tor 5 unbewusst mit wilder Lilith Kraft. Mein Rhythmus ist wild und echt."
+  },
+  {
+    gate: 6, name: "Die Reibung",
+    description: "Lilith in Tor 6 bringt die Kraft der Reibung und der lebendigen Spannung. Du hast die Fähigkeit, echte Intimität durch Konflikt zu schaffen.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der wilden Wahrheit. Liebe ist nicht glatt - sie knistert, kratzt und fordert. In dieser Unruhe entsteht die Intimität, nach der du dich sehnst.",
+    shadow_aspects: "Scham über Intensität, Angst vor Konflikt, Unterdrückung der Reibung",
+    gifts: "Wilde Reibung, Echte Intimität, Lebendige Spannung",
+    affirmation: "Ich lebe Tor 6 mit wilder Lilith Kraft. Meine Reibung ist wild und lebendig.",
+    unconscious_description: "Unbewusst spürst du die Angst vor Spannung. Also versuchst du, alles glatt zu machen, Konflikte zu vermeiden, Harmonie zu erzwingen.",
+    unconscious_deep_meaning: "Doch Lilith hier liebt die Reibung. Sie macht dich lebendig. In der Spannung entsteht die Intimität, nach der du dich sehnst.",
+    unconscious_shadow_aspects: "Scham über Intensität, Angst vor Konflikt, Unterdrückung der Reibung",
+    unconscious_gifts: "Wilde Reibung, Echte Intimität, Lebendige Spannung",
+    unconscious_affirmation: "Ich lebe Tor 6 unbewusst mit wilder Lilith Kraft. Meine Reibung ist wild und lebendig."
+  },
+  {
+    gate: 7, name: "Die Führung",
+    description: "Lilith in Tor 7 bringt die Kraft der wilden Führung. Du hast die Fähigkeit, Menschen zu bewegen, ohne dich zu verstecken.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der natürlichen Autorität. Deine Führung ist nicht brav oder kontrolliert - sie ist wild, ungezähmt und echt. Genau das macht sie kraftvoll.",
+    shadow_aspects: "Scham über Führung, Angst vor Dominanz, Unterdrückung der Führungsenergie",
+    gifts: "Wilde Führung, Natürliche Autorität, Echte Bewegung",
+    affirmation: "Ich lebe Tor 7 mit wilder Lilith Kraft. Meine Führung ist wild und echt.",
+    unconscious_description: "Vielleicht trägst du tief in dir die Angst, deine Führungsenergie könnte andere abstoßen. Also versuchst du, dich zurückzuhalten, zu folgen, statt zu führen.",
+    unconscious_deep_meaning: "Doch Lilith hier will, dass du die rohe Wahrheit anerkennst: du bist gebaut, Richtung zu geben. Deine Führung ist wild, ungezähmt und echt.",
+    unconscious_shadow_aspects: "Scham über Führung, Angst vor Dominanz, Unterdrückung der Führungsenergie",
+    unconscious_gifts: "Wilde Führung, Natürliche Autorität, Echte Bewegung",
+    unconscious_affirmation: "Ich lebe Tor 7 unbewusst mit wilder Lilith Kraft. Meine Führung ist wild und echt."
+  },
+  {
+    gate: 8, name: "Der Beitrag",
+    description: "Lilith in Tor 8 bringt die Kraft des einzigartigen Beitrags. Du hast die Fähigkeit, deine eigene Stimme zu finden und zu nutzen.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der wilden Authentizität. Dein Beitrag ist genau deshalb wertvoll, weil er nicht angepasst ist. Du bist hier, damit die Richtigen aufhorchen.",
+    shadow_aspects: "Scham über Anderssein, Angst vor Irritation, Unterdrückung des einzigartigen Beitrags",
+    gifts: "Einzigartiger Beitrag, Wilde Authentizität, Unverwechselbare Stimme",
+    affirmation: "Ich lebe Tor 8 mit wilder Lilith Kraft. Mein Beitrag ist wild und einzigartig.",
+    unconscious_description: "Unbewusst sitzt die Scham, dass dein Ausdruck nicht passt. Also versuchst du, dich anzupassen, zu imitieren, 'normal' zu sein.",
+    unconscious_deep_meaning: "Doch Lilith hier macht dein Anderssein wertvoll. Dein Lied ist nicht für die Menge, sondern für die, die es brauchen. Dein Beitrag ist wild und einzigartig.",
+    unconscious_shadow_aspects: "Scham über Anderssein, Angst vor Irritation, Unterdrückung des einzigartigen Beitrags",
+    unconscious_gifts: "Einzigartiger Beitrag, Wilde Authentizität, Unverwechselbare Stimme",
+    unconscious_affirmation: "Ich lebe Tor 8 unbewusst mit wilder Lilith Kraft. Mein Beitrag ist wild und einzigartig."
+  },
+  {
+    gate: 9, name: "Die Fokussierung",
+    description: "Lilith in Tor 9 bringt die Kraft der wilden Fokussierung. Du hast die Fähigkeit, dich magnetisch auf das zu konzentrieren, was dich zieht.",
+    deep_meaning: "Die tiefe Bedeutung liegt im magnetischen Fokus. Du wählst nicht das, was 'man' tun sollte, sondern das, was dich magnetisch zieht. Wenn du dich hingibst, verdichtet sich deine Energie wie ein Laser.",
+    shadow_aspects: "Scham über Unkonzentriertheit, Angst vor Flatterhaftigkeit, Unterdrückung der natürlichen Fokussierung",
+    gifts: "Wilde Fokussierung, Magnetische Anziehung, Echter Fokus",
+    affirmation: "Ich lebe Tor 9 mit wilder Lilith Kraft. Mein Fokus ist wild und magnetisch.",
+    unconscious_description: "Tief in dir lebt die Scham, dass du dich nicht 'richtig' konzentrieren kannst. Also versuchst du, dich zu zwingen, zu disziplinieren, 'normal' zu fokussieren.",
+    unconscious_deep_meaning: "Doch Lilith in dir weiß: dein Fokus ist wild. Er folgt nicht der Pflicht, sondern der Anziehung. Wenn du dich hingibst, verdichtet sich deine Energie wie ein Laser.",
+    unconscious_shadow_aspects: "Scham über Unkonzentriertheit, Angst vor Flatterhaftigkeit, Unterdrückung der natürlichen Fokussierung",
+    unconscious_gifts: "Wilde Fokussierung, Magnetische Anziehung, Echter Fokus",
+    unconscious_affirmation: "Ich lebe Tor 9 unbewusst mit wilder Lilith Kraft. Mein Fokus ist wild und magnetisch."
+  },
+  {
+    gate: 10, name: "Die Selbstliebe",
+    description: "Lilith in Tor 10 bringt die Kraft der wilden Selbstliebe. Du hast die Fähigkeit, dich unverbogen zu leben und magnetisch zu werden.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der ungezähmten Schönheit. Dein Körper, deine Eigenheiten, deine Art zu gehen, zu lachen, zu sein - all das ist ungezähmte Schönheit.",
+    shadow_aspects: "Scham über Eigenheiten, Angst vor Unliebenswertigkeit, Unterdrückung der natürlichen Art",
+    gifts: "Wilde Selbstliebe, Ungezähmte Schönheit, Magnetische Authentizität",
+    affirmation: "Ich lebe Tor 10 mit wilder Lilith Kraft. Meine Selbstliebe ist wild und ungezähmt.",
+    unconscious_description: "Vielleicht sitzt in dir die unbewusste Angst, dass du so, wie du bist, nicht liebenswert bist. Also versuchst du, dich zu verbessern, zu optimieren, 'besser' zu werden.",
+    unconscious_deep_meaning: "Doch Lilith hier erinnert deinen Körper: deine Wildheit liegt im Unverbogenen. Dein Körper, deine Eigenheiten, deine Art zu sein - all das ist ungezähmte Schönheit.",
+    unconscious_shadow_aspects: "Scham über Eigenheiten, Angst vor Unliebenswertigkeit, Unterdrückung der natürlichen Art",
+    unconscious_gifts: "Wilde Selbstliebe, Ungezähmte Schönheit, Magnetische Authentizität",
+    unconscious_affirmation: "Ich lebe Tor 10 unbewusst mit wilder Lilith Kraft. Meine Selbstliebe ist wild und ungezähmt."
+  },
+  // Gates 11-20 (echte Daten)
+  {
+    gate: 11, name: "Die Ideen",
+    description: "Lilith in Tor 11 bringt die Kraft der wilden Ideen und Visionen. Du hast die Fähigkeit, Bilder einzubringen, die größer sind als die Realität.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der grenzenlosen Imagination. Deine Ideen sind wild und sie sollen es sein. Sie sind keine rationalen Baupläne - sie sind Visionen, die Grenzen sprengen.",
+    shadow_aspects: "Scham über unrealistische Ideen, Angst vor Spott, Unterdrückung der Visionen",
+    gifts: "Wilde Ideen, Grenzenlose Visionen, Inspirierende Bilder",
+    affirmation: "Ich lebe Tor 11 mit wilder Lilith Kraft. Meine Ideen sind wild und grenzenlos.",
+    unconscious_description: "Unbewusst in Tor 11: Tief in dir liegen wilde Visionen.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 11: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über unrealistische Ideen, Angst vor Spott, Unterdrückung der Visionen",
+    unconscious_gifts: "Wilde Ideen, Grenzenlose Visionen, Inspirierende Bilder",
+    unconscious_affirmation: "Ich lebe Tor 11 unbewusst mit wilder Lilith Kraft. Meine Ideen sind wild und grenzenlos."
+  },
+  {
+    gate: 12, name: "Die Vorsicht",
+    description: "Lilith in Tor 12 bringt die Kraft der wilden Stimme. Du hast die Fähigkeit, das Wilde auszusprechen, das sonst verschwiegen bleibt.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der medizinischen Kraft der Worte. Deine Worte tragen Medizin, gerade weil sie nicht glatt sind. Du bist hier, um das Wilde auszusprechen.",
+    shadow_aspects: "Scham über intensive Stimme, Angst vor Unbequemlichkeit, Unterdrückung der wilden Stimme",
+    gifts: "Wilde Stimme, Medizinische Worte, Unverfälschte Wahrheit",
+    affirmation: "Ich lebe Tor 12 mit wilder Lilith Kraft. Meine Stimme ist wild und medizinisch.",
+    unconscious_description: "Unbewusst in Tor 12: Tief in dir liegt die wilde Stimme.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 12: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über intensive Stimme, Angst vor Unbequemlichkeit, Unterdrückung der wilden Stimme",
+    unconscious_gifts: "Wilde Stimme, Medizinische Worte, Unverfälschte Wahrheit",
+    unconscious_affirmation: "Ich lebe Tor 12 unbewusst mit wilder Lilith Kraft. Meine Stimme ist wild und medizinisch."
+  },
+  {
+    gate: 13, name: "Der Zuhörer",
+    description: "Lilith in Tor 13 bringt die Kraft des wilden Zuhörens. Du hast die Fähigkeit, Raum zu halten und dich selbst nicht zu verlieren.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der wahren Gemeinschaft. Zuhören ist keine Unterwerfung. Es ist eine wilde Kraft, wenn du entscheidest, welche Stimmen du in dich hineinlässt.",
+    shadow_aspects: "Scham über Übermaß, Angst vor Selbstverlust, Unterdrückung der wahren Gemeinschaft",
+    gifts: "Wilde Zuhörkraft, Wahre Gemeinschaft, Raum halten",
+    affirmation: "Ich lebe Tor 13 mit wilder Lilith Kraft. Mein Zuhören ist wild und echt.",
+    unconscious_description: "Unbewusst in Tor 13: Tief in dir liegt die wilde Zuhörkraft.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 13: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Übermaß, Angst vor Selbstverlust, Unterdrückung der wahren Gemeinschaft",
+    unconscious_gifts: "Wilde Zuhörkraft, Wahre Gemeinschaft, Raum halten",
+    unconscious_affirmation: "Ich lebe Tor 13 unbewusst mit wilder Lilith Kraft. Mein Zuhören ist wild und echt."
+  },
+  {
+    gate: 14, name: "Die Macht der Ressourcen",
+    description: "Lilith in Tor 14 bringt die Kraft der wilden Fülle. Du hast die Fähigkeit, Ressourcen wild in Umlauf zu bringen, so dass sie Leben entzünden.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der wilden Fülle. Dein Wert hängt nicht an dem, was du besitzt. Deine wahre Macht liegt in deiner Energie, in deinem Feuer.",
+    shadow_aspects: "Scham über Hunger nach mehr, Angst vor Gier, Unterdrückung der wilden Fülle",
+    gifts: "Wilde Fülle, Energie in Bewegung, Leben entzünden",
+    affirmation: "Ich lebe Tor 14 mit wilder Lilith Kraft. Meine Fülle ist wild und entzündend.",
+    unconscious_description: "Unbewusst in Tor 14: Tief in dir liegt die wilde Fülle.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 14: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Hunger nach mehr, Angst vor Gier, Unterdrückung der wilden Fülle",
+    unconscious_gifts: "Wilde Fülle, Energie in Bewegung, Leben entzünden",
+    unconscious_affirmation: "Ich lebe Tor 14 unbewusst mit wilder Lilith Kraft. Meine Fülle ist wild und entzündend."
+  },
+  {
+    gate: 15, name: "Die Menschlichkeit",
+    description: "Lilith in Tor 15 bringt die Kraft der wilden Menschlichkeit. Du hast die Fähigkeit, die Vielfalt zu verkörpern, die du bist.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der menschlichen Weite. Deine Wildheit liegt in der Vielfalt, die du verkörperst. Mal bist du Sturm, mal Stille, mal Feuer, mal Erde.",
+    shadow_aspects: "Scham über Extreme, Angst vor Irritation, Unterdrückung der Vielfalt",
+    gifts: "Wilde Vielfalt, Menschliche Weite, Natürliche Extreme",
+    affirmation: "Ich lebe Tor 15 mit wilder Lilith Kraft. Meine Menschlichkeit ist wild und vielfältig.",
+    unconscious_description: "Unbewusst in Tor 15: Tief in dir liegt die wilde Vielfalt.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 15: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Extreme, Angst vor Irritation, Unterdrückung der Vielfalt",
+    unconscious_gifts: "Wilde Vielfalt, Menschliche Weite, Natürliche Extreme",
+    unconscious_affirmation: "Ich lebe Tor 15 unbewusst mit wilder Lilith Kraft. Meine Menschlichkeit ist wild und vielfältig."
+  },
+  {
+    gate: 16, name: "Die Begeisterung",
+    description: "Lilith in Tor 16 bringt die Kraft der wilden Begeisterung. Du hast die Fähigkeit, mit deiner Wildheit andere zu entzünden.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der ansteckenden Freude. Deine Begeisterung ist roh, ansteckend, unkontrollierbar - und genau das ist ihre Medizin.",
+    shadow_aspects: "Scham über kindische Begeisterung, Angst vor Übertreibung, Unterdrückung des ungezähmten Ausdrucks",
+    gifts: "Wilde Begeisterung, Ansteckende Freude, Ungezähmter Ausdruck",
+    affirmation: "Ich lebe Tor 16 mit wilder Lilith Kraft. Meine Begeisterung ist wild und ansteckend.",
+    unconscious_description: "Unbewusst in Tor 16: Tief in dir liegt die wilde Begeisterung.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 16: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über kindische Begeisterung, Angst vor Übertreibung, Unterdrückung des ungezähmten Ausdrucks",
+    unconscious_gifts: "Wilde Begeisterung, Ansteckende Freude, Ungezähmter Ausdruck",
+    unconscious_affirmation: "Ich lebe Tor 16 unbewusst mit wilder Lilith Kraft. Meine Begeisterung ist wild und ansteckend."
+  },
+  {
+    gate: 17, name: "Die Meinung",
+    description: "Lilith in Tor 17 bringt die Kraft der wilden Meinung. Du hast die Fähigkeit, Perspektiven einzubringen, die den Raum aufbrechen.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der schneidenden Klarheit. Du bist nicht hier, allen zu gefallen. Du bist hier, Perspektiven einzubringen, die den Raum aufbrechen.",
+    shadow_aspects: "Scham über unbequeme Meinung, Angst vor schneidender Klarheit, Unterdrückung der wilden Perspektive",
+    gifts: "Wilde Meinung, Schneidende Klarheit, Raum aufbrechende Perspektive",
+    affirmation: "Ich lebe Tor 17 mit wilder Lilith Kraft. Meine Meinung ist wild und aufbrechend.",
+    unconscious_description: "Unbewusst in Tor 17: Tief in dir liegt die wilde Meinung.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 17: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über unbequeme Meinung, Angst vor schneidender Klarheit, Unterdrückung der wilden Perspektive",
+    unconscious_gifts: "Wilde Meinung, Schneidende Klarheit, Raum aufbrechende Perspektive",
+    unconscious_affirmation: "Ich lebe Tor 17 unbewusst mit wilder Lilith Kraft. Meine Meinung ist wild und aufbrechend."
+  },
+  {
+    gate: 18, name: "Die Korrektur",
+    description: "Lilith in Tor 18 bringt die Kraft der wilden Korrektur. Du hast die Fähigkeit, das Unreine nicht zu beschönigen und Heilung einzuleiten.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der heilenden Kritik. Dein Blick ist wild und notwendig. Du siehst, was heilt, weil du das Unreine nicht beschönigst.",
+    shadow_aspects: "Scham über Kritik, Angst vor Strenge, Unterdrückung der heilenden Korrektur",
+    gifts: "Wilde Korrektur, Heilende Kritik, Ungeschminkte Klarheit",
+    affirmation: "Ich lebe Tor 18 mit wilder Lilith Kraft. Meine Korrektur ist wild und heilend.",
+    unconscious_description: "Unbewusst in Tor 18: Tief in dir liegt die wilde Korrektur.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 18: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Kritik, Angst vor Strenge, Unterdrückung der heilenden Korrektur",
+    unconscious_gifts: "Wilde Korrektur, Heilende Kritik, Ungeschminkte Klarheit",
+    unconscious_affirmation: "Ich lebe Tor 18 unbewusst mit wilder Lilith Kraft. Meine Korrektur ist wild und heilend."
+  },
+  {
+    gate: 19, name: "Die Sensibilität",
+    description: "Lilith in Tor 19 bringt die Kraft der wilden Sensibilität. Du hast die Fähigkeit, Schwingungen aufzunehmen, die andere nicht bemerken.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der feinen Wahrnehmung. Dein feines Spüren ist kein Defizit - es ist Rohstoff für Verbindung. Du fühlst, was andere nicht fühlen können.",
+    shadow_aspects: "Scham über Zartheit, Angst vor Empfindlichkeit, Unterdrückung der feinen Wahrnehmung",
+    gifts: "Wilde Sensibilität, Feine Wahrnehmung, Intime Verbindung",
+    affirmation: "Ich lebe Tor 19 mit wilder Lilith Kraft. Meine Sensibilität ist wild und fein.",
+    unconscious_description: "Unbewusst in Tor 19: Tief in dir liegt die wilde Sensibilität.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 19: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Zartheit, Angst vor Empfindlichkeit, Unterdrückung der feinen Wahrnehmung",
+    unconscious_gifts: "Wilde Sensibilität, Feine Wahrnehmung, Intime Verbindung",
+    unconscious_affirmation: "Ich lebe Tor 19 unbewusst mit wilder Lilith Kraft. Meine Sensibilität ist wild und fein."
+  },
+  {
+    gate: 20, name: "Die Gegenwart",
+    description: "Lilith in Tor 20 bringt die Kraft der wilden Gegenwart. Du hast die Fähigkeit, präsent zu sprechen, ohne Absicherung.",
+    deep_meaning: "Die tiefe Bedeutung liegt in der spontanen Wahrheit. Deine Wahrheit will nicht warten. Sie will raus - roh, klar, ohne Entschuldigung.",
+    shadow_aspects: "Scham über Spontaneität, Angst vor Impulsivität, Unterdrückung der wilden Gegenwart",
+    gifts: "Wilde Gegenwart, Spontane Wahrheit, Unzensierte Authentizität",
+    affirmation: "Ich lebe Tor 20 mit wilder Lilith Kraft. Meine Gegenwart ist wild und spontan.",
+    unconscious_description: "Unbewusst in Tor 20: Tief in dir liegt die wilde Gegenwart.",
+    unconscious_deep_meaning: "Unbewusste Bedeutung von Tor 20: Deine Wildheit ist heilig.",
+    unconscious_shadow_aspects: "Scham über Spontaneität, Angst vor Impulsivität, Unterdrückung der wilden Gegenwart",
+    unconscious_gifts: "Wilde Gegenwart, Spontane Wahrheit, Unzensierte Authentizität",
+    unconscious_affirmation: "Ich lebe Tor 20 unbewusst mit wilder Lilith Kraft. Meine Gegenwart ist wild und spontan."
+  }
+];
+
+// Für Gates 21-64 verwenden wir Platzhalter mit echten Namen
+const gateNames = {
+  21: "Die Kontrolle", 22: "Die Offenheit", 23: "Die Assimilation", 24: "Die Rationalisierung", 25: "Die Unschuld",
+  26: "Die List", 27: "Die Fürsorge", 28: "Der Sinn", 29: "Das Ja", 30: "Die Sehnsucht",
+  31: "Die Einflussnahme", 32: "Die Dauer", 33: "Die Flucht", 34: "Die Kraft", 35: "Der Fortschritt",
+  36: "Die Krise", 37: "Die Freundschaft", 38: "Der Kampf", 39: "Die Provokation", 40: "Die Einsamkeit",
+  41: "Die Fantasie", 42: "Das Wachstum", 43: "Das Durchbrechen", 44: "Die Annäherung", 45: "Das Sammeln",
+  46: "Die Liebe zum Körper", 47: "Die Verwirrung", 48: "Die Tiefe", 49: "Die Revolution", 50: "Die Werte",
+  51: "Der Schock", 52: "Die Stille", 53: "Der Anfang", 54: "Die Ambition", 55: "Die Fülle",
+  56: "Die Stimulation", 57: "Die Sanftheit", 58: "Die Freude", 59: "Die Sexualität", 60: "Die Begrenzung",
+  61: "Die Innere Wahrheit", 62: "Die Details", 63: "Die Zweifel", 64: "Die Verwirrung"
+};
+
+// Gates 21-64 mit echten Namen aber Platzhalter-Inhalten
+for (let i = 21; i <= 64; i++) {
+  allLilithGates.push({
+    gate: i,
+    name: gateNames[i as keyof typeof gateNames] || `Tor ${i}`,
+    description: `Lilith in Tor ${i} bringt die Kraft der Wildheit und Unabhängigkeit.`,
+    deep_meaning: `Die tiefe Bedeutung von Tor ${i} liegt in der natürlichen Lilith-Energie.`,
+    shadow_aspects: `Unbewusste Scham über Tor ${i}, Angst vor Wildheit`,
+    gifts: `Wilde Kraft in Tor ${i}, Ungezähmte Energie`,
+    affirmation: `Ich lebe Tor ${i} mit wilder Lilith Kraft.`,
+    unconscious_description: `Unbewusst in Tor ${i}: Tief in dir liegt die wilde Kraft.`,
+    unconscious_deep_meaning: `Unbewusste Bedeutung von Tor ${i}: Deine Wildheit ist heilig.`,
+    unconscious_shadow_aspects: `Unbewusste Scham über Tor ${i}, Angst vor Wildheit`,
+    unconscious_gifts: `Wilde Kraft in Tor ${i}, Ungezähmte Energie`,
+    unconscious_affirmation: `Ich lebe Tor ${i} unbewusst mit wilder Lilith Kraft.`
+  });
+}

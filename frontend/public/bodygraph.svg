@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hintergrund -->
+  <rect width="400" height="400" fill="rgba(255,255,255,0.02)" />
+  
+  <!-- Kopf-Zentrum -->
+  <circle cx="200" cy="50" r="25" fill="#fbbf24" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="55" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Kopf</text>
+  
+  <!-- Ajna-Zentrum -->
+  <circle cx="200" cy="100" r="25" fill="#8b5cf6" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="105" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Ajna</text>
+  
+  <!-- Kehlkopf-Zentrum -->
+  <circle cx="200" cy="150" r="25" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="155" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Kehlkopf</text>
+  
+  <!-- G-Zentrum -->
+  <circle cx="200" cy="200" r="30" fill="#10b981" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="205" text-anchor="middle" fill="white" font-size="12" font-weight="bold">G</text>
+  
+  <!-- Herz-Zentrum -->
+  <circle cx="200" cy="250" r="25" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="255" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Herz</text>
+  
+  <!-- Milz-Zentrum -->
+  <circle cx="120" cy="200" r="25" fill="#f59e0b" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="120" y="205" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Milz</text>
+  
+  <!-- Sakral-Zentrum -->
+  <circle cx="200" cy="300" r="30" fill="#ec4899" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="305" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Sakral</text>
+  
+  <!-- Wurzel-Zentrum -->
+  <circle cx="200" cy="350" r="25" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="200" y="355" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Wurzel</text>
+  
+  <!-- Solarplexus-Zentrum -->
+  <circle cx="280" cy="200" r="25" fill="#f97316" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text x="280" y="205" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Solar</text>
+  
+  <!-- Verbindungslinien -->
+  <line x1="200" y1="75" x2="200" y2="75" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="200" y1="125" x2="200" y2="125" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="200" y1="175" x2="200" y2="170" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="200" y1="230" x2="200" y2="225" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="200" y1="275" x2="200" y2="270" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="200" y1="330" x2="200" y2="325" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="170" y1="200" x2="145" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <line x1="230" y1="200" x2="255" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Tore -->
+  <circle cx="100" cy="380" r="8" fill="#FFD700" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <circle cx="160" cy="380" r="8" fill="#FFD700" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <circle cx="220" cy="380" r="8" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <circle cx="280" cy="380" r="8" fill="#FFD700" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  
+  <!-- Legende -->
+  <text x="20" y="20" fill="white" font-size="12" font-weight="bold">Definiert</text>
+  <circle cx="80" cy="15" r="8" fill="#10b981"/>
+  <text x="100" y="20" fill="white" font-size="10">Aktiv</text>
+  
+  <text x="20" y="40" fill="white" font-size="12" font-weight="bold">Undefiniert</text>
+  <circle cx="80" cy="35" r="8" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="100" y="40" fill="white" font-size="10">Inaktiv</text>
+</svg>

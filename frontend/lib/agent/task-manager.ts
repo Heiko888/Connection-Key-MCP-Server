@@ -1,326 +1,117 @@
 /**
- * Agent Task Manager
- * 
- * Zentrale Verwaltung für Agent-Tasks mit Supabase-Integration
- * Ersetzt in-memory Store durch persistente Supabase-Speicherung
+ * Task Manager für Agent Tasks
+ * Hilfsfunktionen zum Erstellen und Verwalten von Agent Tasks
  */
 
-import { createClient } from '@supabase/supabase-js';
-
-// Supabase Client (Client-side)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// Types
 export interface AgentTask {
   id: string;
   user_id?: string;
   agent_id: string;
   agent_name: string;
   task_message: string;
-  task_type: 'chat' | 'generation' | 'analysis' | 'other';
+  task_type: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
   response?: string;
   response_data?: any;
-  metadata?: {
-    tokens?: number;
-    model?: string;
-    duration_ms?: number;
-    [key: string]: any;
-  };
-  error_message?: string;
-  error_details?: any;
+  metadata?: any;
   created_at: string;
   updated_at: string;
   started_at?: string;
   completed_at?: string;
+  error_message?: string;
 }
 
-export interface TaskStatistics {
-  total: number;
-  pending: number;
-  processing: number;
-  completed: number;
-  failed: number;
-  cancelled?: number;
-  avg_duration_ms?: number;
-}
+// In-Memory Store (wird von /api/agents/tasks/route.ts verwendet)
+// Wird später durch Supabase ersetzt
+export const tasksStore: AgentTask[] = [];
 
-export interface TaskFilters {
-  userId?: string;
-  agentId?: string;
-  status?: AgentTask['status'];
-  limit?: number;
-  offset?: number;
+/**
+ * Erstellt einen neuen Task
+ */
+export function createTask(params: {
+  user_id?: string;
+  agent_id: string;
+  agent_name: string;
+  task_message: string;
+  task_type?: string;
+  metadata?: any;
+}): AgentTask {
+  const task: AgentTask = {
+    id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    user_id: params.user_id,
+    agent_id: params.agent_id,
+    agent_name: params.agent_name,
+    task_message: params.task_message,
+    task_type: params.task_type || 'general',
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    metadata: params.metadata || {}
+  };
+
+  tasksStore.push(task);
+  return task;
 }
 
 /**
- * Task Manager Class
- * 
- * Verwaltet Agent-Tasks mit Supabase als persistenter Speicher
+ * Aktualisiert einen Task
  */
-export class TaskManager {
-  /**
-   * Erstellt einen neuen Task
-   */
-  static async createTask(
-    agentId: string,
-    agentName: string,
-    taskMessage: string,
-    taskType: AgentTask['task_type'] = 'chat',
-    userId?: string
-  ): Promise<AgentTask> {
-    const { data, error } = await supabase
-      .from('v_agent_tasks')
-      .insert({
-        agent_id: agentId,
-        agent_name: agentName,
-        task_message: taskMessage,
-        task_type: taskType,
-        status: 'pending',
-        user_id: userId || null,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('TaskManager: Create Task Error', error);
-      throw new Error(`Failed to create task: ${error.message}`);
-    }
-
-    return data as AgentTask;
+export function updateTask(
+  taskId: string,
+  updates: Partial<AgentTask>
+): AgentTask | null {
+  const taskIndex = tasksStore.findIndex(t => t.id === taskId);
+  if (taskIndex === -1) {
+    return null;
   }
 
-  /**
-   * Aktualisiert Task-Status
-   */
-  static async updateTaskStatus(
-    taskId: string,
-    status: AgentTask['status'],
-    updates?: {
-      response?: string;
-      response_data?: any;
-      error_message?: string;
-      error_details?: any;
-      metadata?: any;
-    }
-  ): Promise<AgentTask> {
-    const updateData: any = {
-      status,
-      updated_at: new Date().toISOString(),
-    };
+  const task = tasksStore[taskIndex];
+  const updatedTask: AgentTask = {
+    ...task,
+    ...updates,
+    updated_at: new Date().toISOString()
+  };
 
-    // Status-spezifische Timestamps
-    if (status === 'processing' && !updates?.metadata?.started_at) {
-      updateData.started_at = new Date().toISOString();
-    }
-    if (status === 'completed' || status === 'failed') {
-      updateData.completed_at = new Date().toISOString();
-    }
-
-    // Zusätzliche Updates
-    if (updates) {
-      if (updates.response) updateData.response = updates.response;
-      if (updates.response_data) updateData.response_data = updates.response_data;
-      if (updates.error_message) updateData.error_message = updates.error_message;
-      if (updates.error_details) updateData.error_details = updates.error_details;
-      if (updates.metadata) {
-        updateData.metadata = {
-          ...updateData.metadata,
-          ...updates.metadata,
-        };
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('v_agent_tasks')
-      .update(updateData)
-      .eq('id', taskId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('TaskManager: Update Task Error', error);
-      throw new Error(`Failed to update task: ${error.message}`);
-    }
-
-    return data as AgentTask;
-  }
-
-  /**
-   * Ruft Tasks ab (mit Filtern)
-   */
-  static async getTasks(filters: TaskFilters = {}): Promise<{
-    tasks: AgentTask[];
-    total: number;
-  }> {
-    // Gezielte Spaltenauswahl für Task-Liste: alle Felder aus AgentTask Interface
-    let query = supabase
-      .from('v_agent_tasks')
-      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at', { count: 'exact' })
-      .order('created_at', { ascending: false });
-
-    // Filter anwenden
-    if (filters.userId) {
-      query = query.eq('user_id', filters.userId);
-    }
-    if (filters.agentId) {
-      query = query.eq('agent_id', filters.agentId);
-    }
-    if (filters.status) {
-      query = query.eq('status', filters.status);
-    }
-
-    // Pagination
-    const limit = filters.limit || 50;
-    const offset = filters.offset || 0;
-    query = query.range(offset, offset + limit - 1);
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      console.error('TaskManager: Get Tasks Error', error);
-      throw new Error(`Failed to fetch tasks: ${error.message}`);
-    }
-
-    return {
-      tasks: (data || []) as AgentTask[],
-      total: count || 0,
-    };
-  }
-
-  /**
-   * Ruft einen einzelnen Task ab
-   */
-  static async getTask(taskId: string): Promise<AgentTask | null> {
-    // Gezielte Spaltenauswahl für einzelnen Task: alle Felder aus AgentTask Interface
-    const { data, error } = await supabase
-      .from('v_agent_tasks')
-      .select('id, user_id, agent_id, agent_name, task_message, task_type, status, response, response_data, metadata, error_message, error_details, created_at, updated_at, started_at, completed_at')
-      .eq('id', taskId)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // Not found
-        return null;
-      }
-      console.error('TaskManager: Get Task Error', error);
-      throw new Error(`Failed to fetch task: ${error.message}`);
-    }
-
-    return data as AgentTask;
-  }
-
-  /**
-   * Ruft Statistiken ab
-   */
-  static async getStatistics(filters?: {
-    userId?: string;
-    agentId?: string;
-  }): Promise<TaskStatistics> {
-    // Versuche RPC-Funktion zu verwenden
-    const { data: rpcData, error: rpcError } = await supabase
-      .rpc('get_agent_task_statistics', {
-        p_user_id: filters?.userId || null,
-        p_agent_id: filters?.agentId || null,
-      });
-
-    if (!rpcError && rpcData && rpcData.length > 0) {
-      return rpcData[0] as TaskStatistics;
-    }
-
-    // Fallback: Manuelle Berechnung
-    let query = supabase
-      .from('v_agent_tasks')
-      .select('status, metadata');
-
-    if (filters?.userId) {
-      query = query.eq('user_id', filters.userId);
-    }
-    if (filters?.agentId) {
-      query = query.eq('agent_id', filters.agentId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('TaskManager: Get Statistics Error', error);
-      throw new Error(`Failed to fetch statistics: ${error.message}`);
-    }
-
-    const tasks: AgentTask[] = data || [];
-    const statistics: TaskStatistics = {
-      total: tasks.length,
-      pending: tasks.filter((t: AgentTask) => t.status === 'pending').length,
-      processing: tasks.filter((t: AgentTask) => t.status === 'processing').length,
-      completed: tasks.filter((t: AgentTask) => t.status === 'completed').length,
-      failed: tasks.filter((t: AgentTask) => t.status === 'failed').length,
-      cancelled: tasks.filter((t: AgentTask) => t.status === 'cancelled').length,
-    };
-
-    // Berechne durchschnittliche Dauer
-    const completedTasks = tasks.filter(
-      (t: AgentTask) => t.status === 'completed' && t.metadata?.duration_ms
-    );
-    if (completedTasks.length > 0) {
-      const totalDuration = completedTasks.reduce(
-        (sum: number, t: AgentTask) => sum + (t.metadata?.duration_ms || 0),
-        0
-      );
-      statistics.avg_duration_ms = Math.round(totalDuration / completedTasks.length);
-    }
-
-    return statistics;
-  }
-
-  /**
-   * Löscht einen Task (optional, für Cleanup)
-   */
-  static async deleteTask(taskId: string): Promise<void> {
-    const { error } = await supabase
-      .from('v_agent_tasks')
-      .delete()
-      .eq('id', taskId);
-
-    if (error) {
-      console.error('TaskManager: Delete Task Error', error);
-      throw new Error(`Failed to delete task: ${error.message}`);
-    }
-  }
-
-  /**
-   * Abonniert Task-Updates (Real-time)
-   */
-  static subscribeToTasks(
-    callback: (task: AgentTask) => void,
-    filters?: {
-      userId?: string;
-      agentId?: string;
-    }
-  ) {
-    let channel = supabase
-      .channel('agent_tasks_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'agent_tasks',
-        },
-        (payload: { new: AgentTask }) => {
-          callback(payload.new as AgentTask);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }
+  tasksStore[taskIndex] = updatedTask;
+  return updatedTask;
 }
 
-// Export default instance (für einfache Verwendung)
-export default TaskManager;
+/**
+ * Markiert einen Task als "processing"
+ */
+export function startTask(taskId: string): AgentTask | null {
+  return updateTask(taskId, {
+    status: 'processing',
+    started_at: new Date().toISOString()
+  });
+}
+
+/**
+ * Markiert einen Task als "completed" mit Response
+ */
+export function completeTask(
+  taskId: string,
+  response: string,
+  response_data?: any
+): AgentTask | null {
+  return updateTask(taskId, {
+    status: 'completed',
+    response,
+    response_data,
+    completed_at: new Date().toISOString()
+  });
+}
+
+/**
+ * Markiert einen Task als "failed" mit Fehlermeldung
+ */
+export function failTask(
+  taskId: string,
+  error_message: string
+): AgentTask | null {
+  return updateTask(taskId, {
+    status: 'failed',
+    error_message,
+    completed_at: new Date().toISOString()
+  });
+}

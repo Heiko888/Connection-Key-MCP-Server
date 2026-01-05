@@ -1,0 +1,23 @@
+[
+  {
+    "id": "reflection_1",
+    "question": "Was bedeutet dieses Tor/Kanal für meine aktuelle Lebenssituation?",
+    "category": "kanäle",
+    "tags": ["Selbstreflexion", "Human Design"],
+    "createdAt": "2025-08-10T12:05:00.000Z"
+  },
+  {
+    "id": "reflection_2",
+    "question": "Wie kann ich die Energie dieses Tores/Kanals konstruktiv nutzen?",
+    "category": "tore",
+    "tags": ["Entwicklung", "Potenzial"],
+    "createdAt": "2025-08-10T12:05:00.000Z"
+  },
+  {
+    "id": "reflection_3",
+    "question": "Welche Schattenseiten zeigen sich bei mir in Bezug auf dieses Thema?",
+    "category": "schatten",
+    "tags": ["Schattenarbeit", "Persönlichkeit"],
+    "createdAt": "2025-08-10T12:05:00.000Z"
+  }
+]

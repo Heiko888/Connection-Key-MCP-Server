@@ -64,11 +64,22 @@ Heute wurde eine **vollständige Systemanalyse** beider Server durchgeführt und
 **Funktioniert:**
 - ✅ Connection-Key Server (Express, Port 3000)
 - ✅ Reading Agent (PM2, Port 4000) - AKTIV!
-- ✅ N8N Workflows (5 aktiv, Port 5678)
+- ✅ N8N Workflows (5 aktiv, 6+ mit Mattermost, Port 5678)
 - ✅ Supabase Integration (heute fertiggestellt)
 - ✅ Stripe Webhook → Supabase Persistenz
 - ✅ Redis Queue (heute installiert)
 - ✅ Nginx Reverse Proxy
+
+### **SERVER 3: MATTERMOST (135.181.26.222)**
+
+**Status:** ⚠️ Integration vorhanden, Server-Status unklar
+
+**Integration:**
+- ⚠️ 4 N8N-Workflows (nicht aktiv)
+- ✅ 1 Workflow aktiv (LOGGER → Mattermost)
+- ⚠️ 6 Agent-Routes referenzieren Mattermost
+- ❌ Webhook-URLs nicht konfiguriert
+- ❌ Server-Erreichbarkeit unklar (Timeout)
 
 **Teilweise/Nicht aktiv:**
 - ⚠️ Chart-Truth-Service (30% - Demo-Daten)

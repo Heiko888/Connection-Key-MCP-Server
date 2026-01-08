@@ -93,7 +93,8 @@
 | CK-App Frontend (167) | ✅ Online | Next.js, Port 3000, SSL |
 | MCP Connection-Key Server (138) | ✅ Online | Express, Port 3000 |
 | Reading Agent (PM2) | ✅ Aktiv | Port 4000, 3 Tage Uptime |
-| n8n Workflows | ✅ Aktiv | 5 Workflows, Port 5678 |
+| n8n Workflows | ✅ Aktiv | 5 Workflows aktiv, 6+ mit Mattermost, Port 5678 |
+| Mattermost Integration | ⚠️ Teilweise | Webhooks in N8N, Server erreichbar? |
 | Supabase Integration | ✅ Fertig | Client + 4 Tabellen |
 | Stripe Webhook | ✅ Fertig | Empfang + Persistenz |
 | Redis Queue | ✅ Läuft | Container, Port 6379 |

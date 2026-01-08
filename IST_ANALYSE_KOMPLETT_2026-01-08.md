@@ -202,9 +202,9 @@ Frontend läuft auf Server 167 (CK-App), nicht hier.
 | Connection-Key API | ⚠️ 70% | Routes ja, DB nein |
 | Reading Agent (PM2) | ✅ 100% | Voll funktional |
 | Stripe Checkout | ✅ 100% | Funktioniert |
-| Stripe Webhook | ⚠️ 50% | Empfang ja, DB nein |
-| n8n Workflows | ❌ 0% | Container gestoppt |
-| Supabase Integration | ❌ 0% | Nicht implementiert |
+| Stripe Webhook | ✅ 100% | Empfang + DB Persistenz |
+| n8n Workflows | ✅ 100% | 5 Workflows aktiv |
+| Supabase Integration | ✅ 100% | Vollständig integriert |
 | JWT Auth | ⚠️ 50% | API Key ja, JWT nein |
 
 ---
@@ -722,8 +722,9 @@ Aktuell: Nur Placeholders
 | Task | Status | Kritikalität | Erledigt am |
 |------|--------|--------------|-------------|
 | n8n Container starten | ✅ | 🔴 Kritisch | 8.1.2026 05:53 |
-| Supabase Client integrieren | ❌ | 🔴 Kritisch | - |
-| Stripe → Supabase Webhook | ❌ | 🔴 Kritisch | - |
+| Supabase Client integrieren | ✅ | 🔴 Kritisch | 8.1.2026 06:25 |
+| Stripe → Supabase Webhook | ✅ | 🔴 Kritisch | 8.1.2026 06:25 |
+| Supabase Tabellen erstellen | ✅ | 🔴 Kritisch | 8.1.2026 06:30 |
 | JWT Auth fertigstellen | ❌ | 🟡 Hoch | - |
 | Reading-Jobs auslagern | ❌ | 🟡 Hoch | - |
 | Chat History speichern | ❌ | 🟢 Mittel | - |

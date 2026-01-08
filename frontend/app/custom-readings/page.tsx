@@ -607,7 +607,7 @@ export default function CustomReadingsPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          sx={{ mb: 10 }}
+          style={{ marginBottom: '80px' }}
         >
           <Typography variant="h2" sx={{ 
             color: 'white',
@@ -999,7 +999,7 @@ export default function CustomReadingsPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          sx={{ mt: 10 }}
+          style={{ marginTop: '80px' }}
         >
           <Grid container spacing={4}>
             {[

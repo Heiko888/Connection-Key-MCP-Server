@@ -27,9 +27,9 @@ import {
 } from '@mui/material';
 import PageLayout from '@/app/components/PageLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { 
-  Heart, 
-  MapPin, 
+import {
+  Heart,
+  MapPin,
   Calendar,
   Users,
   Star,
@@ -49,7 +49,11 @@ import {
   Zap,
   Shield,
   Brain,
-  Eye
+  Eye,
+  Plus,
+  X,
+  Trash2,
+  Filter
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';

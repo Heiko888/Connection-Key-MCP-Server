@@ -21,7 +21,7 @@ import {
 import { motion } from 'framer-motion';
 import PublicHeader from '../../components/PublicHeader';
 import Logo from '../../components/Logo';
-import { blogArticles } from '../page';
+import { blogArticles } from '../data';
 
 // Content-Typen für bessere Formatierung
 type ContentItem = 

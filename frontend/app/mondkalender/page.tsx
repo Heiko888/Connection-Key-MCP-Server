@@ -251,7 +251,7 @@ export default function MondkalenderPage() {
         const allowedPackages = ['basic', 'premium', 'vip', 'admin'];
         
         // PRIORITÄT 1: useAuth().user.package (kommt aus Supabase)
-        let packageId = user?.package || 'basic';
+        let packageId = (user as any)?.package ?? 'basic';
         
         // Normalisiere ungültige Werte zu 'basic'
         if (!allowedPackages.includes(packageId)) {
@@ -273,7 +273,7 @@ export default function MondkalenderPage() {
         }
         
         setUserSubscription({
-          userId: user?.id || 'unknown',
+          userId: (user as any)?.id ?? 'unknown',
           packageId: packageId,
           plan: packageId,
           status: 'active',
@@ -288,7 +288,7 @@ export default function MondkalenderPage() {
         console.error('Fehler beim Laden des Abonnements:', error);
         // Fallback: Basic-Plan
         setUserSubscription({
-          userId: user?.id || 'unknown',
+          userId: (user as any)?.id ?? 'unknown',
           packageId: 'basic',
           plan: 'basic',
           status: 'active',

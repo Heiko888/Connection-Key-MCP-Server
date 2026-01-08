@@ -3,6 +3,7 @@ import cors from "cors";
 import { config } from "./config.js";
 import { chatRouter } from "./routes/chat.js";
 import { readingRouter } from "./routes/reading.js";
+import { stripeRouter } from "./routes/stripe.js";
 import { matchingRouter } from "./routes/matching.js";
 import { userRouter } from "./routes/user.js";
 import { authMiddleware } from "./middleware/auth.js";
@@ -12,7 +13,7 @@ import { requestLogger } from "./middleware/logger.js";
 /**
  * Connection-Key Server
  * 
- * Zentrale API für die App
+ * Zentrale API f??r die App
  * - Kommuniziert mit ChatGPT-Agent
  * - Verwaltet Authentication
  * - Validiert Inputs
@@ -40,7 +41,10 @@ export class ConnectionKeyServer {
       credentials: true
     }));
 
-    // Body Parser
+    // Stripe Webhook ben??tigt raw body
+    this.app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+
+    // Body Parser f??r alle anderen Routes
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
@@ -69,10 +73,17 @@ export class ConnectionKeyServer {
           chat: "POST /api/chat",
           reading: "POST /api/reading/generate",
           matching: "POST /api/matching",
+          stripe_webhook: "POST /api/stripe/webhook (public)",
+          stripe_checkout: "POST /api/stripe/create-checkout-session",
           user: "GET /api/user/:userId"
         }
       });
     });
+
+    // Stripe Webhook Route (PUBLIC - ohne Auth, da Stripe Signature pr??ft)
+    const stripeWebhookRouter = express.Router();
+    stripeWebhookRouter.use(stripeRouter);
+    this.app.use("/api/stripe", stripeWebhookRouter);
 
     // API Routes (mit Auth, wenn aktiviert)
     const apiRouter = express.Router();
@@ -106,15 +117,16 @@ export class ConnectionKeyServer {
 
   start() {
     this.app.listen(this.config.port, () => {
-      console.log(`🚀 Connection-Key Server läuft auf Port ${this.config.port}`);
-      console.log(`📡 Health Check: http://localhost:${this.config.port}/health`);
-      console.log(`💬 API Base: http://localhost:${this.config.port}/api`);
-      console.log(`🔐 Authentication: ${this.config.enableAuth ? "Aktiviert" : "Deaktiviert"}`);
+      console.log(`???? Connection-Key Server l??uft auf Port ${this.config.port}`);
+      console.log(`???? Health Check: http://localhost:${this.config.port}/health`);
+      console.log(`???? API Base: http://localhost:${this.config.port}/api`);
+      console.log(`???? Stripe Webhook (public): http://localhost:${this.config.port}/api/stripe/webhook`);
+      console.log(`???? Authentication: ${this.config.enableAuth ? "Aktiviert" : "Deaktiviert"}`);
     });
   }
 }
 
-// Server starten, wenn direkt ausgeführt
+// Server starten, wenn direkt ausgef??hrt
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new ConnectionKeyServer();
   server.start();

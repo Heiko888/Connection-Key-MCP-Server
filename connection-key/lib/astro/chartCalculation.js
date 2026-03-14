@@ -339,7 +339,11 @@ function calcDesignJD(jdBirth) {
 export async function calculateHumanDesignChart(input) {
   const { birthDate, birthTime, birthPlace } = input;
   const placeStr = typeof birthPlace === "string" ? birthPlace : birthPlace?.name || "";
-  let coords = typeof birthPlace === "object" && birthPlace?.lat != null ? { lat: birthPlace.lat, lon: birthPlace.lon } : null;
+  let coords = typeof birthPlace === "object" && birthPlace?.lat != null
+    ? { lat: birthPlace.lat, lon: birthPlace.lon }
+    : typeof birthPlace === "object" && birthPlace?.latitude != null
+    ? { lat: birthPlace.latitude, lon: birthPlace.longitude }
+    : null;
   if (!coords && placeStr) coords = await geocodePlace(placeStr);
 
   const { year, month, day } = parseDate(birthDate || "");

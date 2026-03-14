@@ -7,14 +7,15 @@ import { readingsV3Router } from "./routes/readings-v3.js";
 import { stripeRouter } from "./routes/stripe.js";
 import { matchingRouter } from "./routes/matching.js";
 import { userRouter } from "./routes/user.js";
+import chartRouter from "./routes/chart.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { requestLogger } from "./middleware/logger.js";
 
 /**
  * Connection-Key Server
- * 
- * Zentrale API f??r die App
+ *
+ * Zentrale API für die App
  * - Kommuniziert mit ChatGPT-Agent
  * - Verwaltet Authentication
  * - Validiert Inputs
@@ -42,10 +43,10 @@ export class ConnectionKeyServer {
       credentials: true
     }));
 
-    // Stripe Webhook ben??tigt raw body
+    // Stripe Webhook benötigt raw body
     this.app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
-    // Body Parser f??r alle anderen Routes
+    // Body Parser für alle anderen Routes
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
@@ -76,6 +77,7 @@ export class ConnectionKeyServer {
           readings_v3: "POST /api/readings-v3/create (NEW)",
           readings_v3_status: "GET /api/readings-v3/status/:readingId (NEW)",
           readings_v3_agents: "GET /api/readings-v3/agents (NEW)",
+          chart: "POST /api/chart/calculate (NEW)",
           matching: "POST /api/matching",
           stripe_webhook: "POST /api/stripe/webhook (public)",
           stripe_checkout: "POST /api/stripe/create-checkout-session",
@@ -84,7 +86,7 @@ export class ConnectionKeyServer {
       });
     });
 
-    // Stripe Webhook Route (PUBLIC - ohne Auth, da Stripe Signature pr??ft)
+    // Stripe Webhook Route (PUBLIC - ohne Auth, da Stripe Signature prüft)
     const stripeWebhookRouter = express.Router();
     stripeWebhookRouter.use(stripeRouter);
     this.app.use("/api/stripe", stripeWebhookRouter);
@@ -100,6 +102,8 @@ export class ConnectionKeyServer {
     apiRouter.use("/chat", chatRouter);
     apiRouter.use("/reading", readingRouter);
     apiRouter.use("/readings-v3", readingsV3Router);
+    apiRouter.use("/chart", chartRouter);
+    apiRouter.use("/charts", chartRouter); // Alias für Frontend-Kompatibilität
     apiRouter.use("/matching", matchingRouter);
     apiRouter.use("/user", userRouter);
 
@@ -122,18 +126,17 @@ export class ConnectionKeyServer {
 
   start() {
     this.app.listen(this.config.port, () => {
-      console.log(`???? Connection-Key Server l??uft auf Port ${this.config.port}`);
-      console.log(`???? Health Check: http://localhost:${this.config.port}/health`);
-      console.log(`???? API Base: http://localhost:${this.config.port}/api`);
-      console.log(`???? Stripe Webhook (public): http://localhost:${this.config.port}/api/stripe/webhook`);
-      console.log(`???? Authentication: ${this.config.enableAuth ? "Aktiviert" : "Deaktiviert"}`);
+      console.log(`Connection-Key Server läuft auf Port ${this.config.port}`);
+      console.log(`Health Check: http://localhost:${this.config.port}/health`);
+      console.log(`API Base: http://localhost:${this.config.port}/api`);
+      console.log(`Stripe Webhook (public): http://localhost:${this.config.port}/api/stripe/webhook`);
+      console.log(`Authentication: ${this.config.enableAuth ? "Aktiviert" : "Deaktiviert"}`);
     });
   }
 }
 
-// Server starten, wenn direkt ausgef??hrt
+// Server starten, wenn direkt ausgeführt
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new ConnectionKeyServer();
   server.start();
 }
-

@@ -28,7 +28,7 @@ router.post("/calculate", async (req, res, next) => {
       });
     }
 
-    const placeStr = typeof birthPlace === "string" ? birthPlace : (birthPlace?.name || birthPlace);
+    const placeStr = typeof birthPlace === "string" ? birthPlace : (birthPlace?.name || birthPlace?.city || null);
     console.log(`[Chart] Calculating: ${birthDate} ${birthTime} at ${placeStr}`);
 
     const chart = await calculateHumanDesignChart({

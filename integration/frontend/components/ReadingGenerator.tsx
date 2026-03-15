@@ -31,21 +31,24 @@ interface ReadingGeneratorProps {
   userId?: string;
 }
 
-export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
+export function ReadingGenerator({ userId }: ReadingGeneratorProps): JSX.Element {
+  const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
   const [readingType, setReadingType] = useState('detailed');
+  const [focus, setFocus] = useState('personality');
   const [reading, setReading] = useState<ReadingResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [readingId, setReadingId] = useState<string | null>(null);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!birthDate || !birthTime || !birthPlace) {
-      setError('Bitte füllen Sie alle Felder aus');
+    if (!name || !birthDate || !birthTime || !birthPlace || !focus) {
+      setError('Bitte füllen Sie alle Pflichtfelder aus');
       return;
     }
 
@@ -58,19 +61,37 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
       // Progress: Validierung
       setProgress(10);
 
-      const res = await fetch('/api/reading/generate', {
+      // Prefer V4 queue endpoint; fallback to legacy if not deployed.
+      let res = await fetch('/api/reading/generate-v4', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          name,
           birthDate,
           birthTime,
           birthPlace,
           readingType,
+          focus,
           userId: userId || undefined
         }),
       });
+      if (res.status === 404) {
+        res = await fetch('/api/reading/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            birthDate,
+            birthTime,
+            birthPlace,
+            readingType,
+            focus,
+            userId: userId || undefined,
+          }),
+        });
+      }
 
       // Progress: Request gesendet
       setProgress(30);
@@ -105,14 +126,70 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
       // Progress: Verarbeitung
       setProgress(90);
 
-      // Standardisierte ReadingResponse
-      setReading(data as ReadingResponse);
+      // Case A: API liefert direkt ein fertiges ReadingResponse
+      if (data?.reading && data?.metadata && data?.readingId) {
+        setReading(data as ReadingResponse);
+        setProgress(100);
+        setTimeout(() => setProgress(0), 1000);
+        return;
+      }
 
-      // Progress: Fertig
-      setProgress(100);
+      // Case B: Async Job gestartet → Poll Status, dann lade public Reading
+      if (data?.readingId) {
+        setReadingId(data.readingId);
 
-      // Progress nach kurzer Zeit zurücksetzen
-      setTimeout(() => setProgress(0), 1000);
+        const maxPolls = 180; // ~6 Minuten bei 2s
+        for (let i = 0; i < maxPolls; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          const statusRes = await fetch(`/api/readings/${data.readingId}/public/status`);
+          if (statusRes.ok) {
+            // eslint-disable-next-line no-await-in-loop
+            const statusJson = await statusRes.json();
+            const status = statusJson?.status?.status;
+            if (status === 'completed' || status === 'done') {
+              // eslint-disable-next-line no-await-in-loop
+              const readingRes = await fetch(`/api/readings/${data.readingId}/public`);
+              if (!readingRes.ok) throw new Error('Reading ist noch nicht verfügbar');
+              // eslint-disable-next-line no-await-in-loop
+              const readingJson = await readingRes.json();
+              const readingText = readingJson?.reading?.reading_text || '';
+
+              setReading({
+                success: true,
+                readingId: data.readingId,
+                reading: { text: readingText },
+                metadata: {
+                  readingType: readingType as any,
+                  birthDate,
+                  birthTime,
+                  birthPlace,
+                  tokens: 0,
+                  model: 'unknown',
+                  timestamp: new Date().toISOString(),
+                  userId: userId || undefined,
+                },
+              });
+              setProgress(100);
+              setTimeout(() => setProgress(0), 1000);
+              return;
+            }
+
+            if (status === 'failed' || status === 'timeout') {
+              const errMsg = statusJson?.status?.error || 'Reading-Job fehlgeschlagen';
+              throw new Error(errMsg);
+            }
+          }
+
+          // Progress grob hochziehen
+          setProgress(Math.min(95, 70 + Math.round((i / maxPolls) * 25)));
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+
+        throw new Error('Timeout: Reading wurde nicht rechtzeitig fertig');
+      }
+
+      throw new Error('Ungültige Antwort: keine readingId erhalten');
 
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten');
@@ -164,6 +241,19 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
 
       {/* Form */}
       <form onSubmit={handleGenerate} className="reading-form">
+        <div className="form-group">
+          <label htmlFor="name">Name *</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="z.B. Heiko"
+            required
+            disabled={loading}
+          />
+        </div>
+
         <div className="form-group">
           <label htmlFor="birthDate">Geburtsdatum *</label>
           <input
@@ -217,9 +307,22 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
           </select>
         </div>
 
+        <div className="form-group">
+          <label htmlFor="focus">Fokus *</label>
+          <input
+            type="text"
+            id="focus"
+            value={focus}
+            onChange={(e) => setFocus(e.target.value)}
+            placeholder="z.B. personality, business, relationship …"
+            required
+            disabled={loading}
+          />
+        </div>
+
         <button 
           type="submit" 
-          disabled={loading || !birthDate || !birthTime || !birthPlace}
+          disabled={loading || !name || !birthDate || !birthTime || !birthPlace || !focus}
           className="generate-button"
         >
           {loading ? 'Reading wird generiert...' : 'Reading generieren'}
@@ -271,6 +374,15 @@ export function ReadingGenerator({ userId }: ReadingGeneratorProps) {
             onShare={handleShare}
             onExport={handleExport}
           />
+        </div>
+      )}
+
+      {readingId && !reading && !loading && (
+        <div className="reading-result">
+          <div className="success-notification">
+            <span className="success-icon">⏳</span>
+            <span>Reading wird generiert (ID: {readingId})</span>
+          </div>
         </div>
       )}
     </div>

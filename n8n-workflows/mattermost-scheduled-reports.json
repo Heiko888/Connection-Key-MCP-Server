@@ -49,32 +49,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://mattermost.ihre-domain.de/hooks/xxxxx",
+        "url": "={{ $env.MATTERMOST_WEBHOOK_URL }}",
         "authentication": "none",
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "text",
-              "value": "=## 📢 Täglicher Marketing-Content generiert!\n\n**Zeit:** {{ $now }}\n\n---\n\n{{ $json.response }}"
-            },
-            {
-              "name": "channel",
-              "value": "#marketing"
-            },
-            {
-              "name": "username",
-              "value": "Marketing Agent"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": '## 📢 Täglicher Marketing-Content generiert!\\n\\n**Zeit:** ' + (new Date().toISOString()) + '\\n\\n---\\n\\n' + ($json.response || 'Keine Antwort'), \"channel\": $env.MATTERMOST_CHANNEL || '#marketing', \"username\": 'Marketing Agent' } }}",
+        "options": {}
       },
       "id": "mattermost",
       "name": "Send to Mattermost",

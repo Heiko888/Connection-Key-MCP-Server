@@ -17,7 +17,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://chat.werdemeisterdeinergedanken.de/hooks/jt7w46gsxtr3pkqr75dkor9j3e",
+        "url": "={{ $env.MATTERMOST_WEBHOOK_URL || 'https://chat.werdemeisterdeinergedanken.de/hooks/jt7w46gsxtr3pkqr75dkor9j3e' }}",
         "authentication": "none",
         "sendBody": true,
         "contentType": "json",

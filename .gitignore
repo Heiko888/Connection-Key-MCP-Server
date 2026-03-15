@@ -29,3 +29,6 @@ Thumbs.db
 dist/
 build/
 *.tar.gz
+
+# Auslese-Report von Server 138 (kann Keys/Secrets enthalten – nicht committen)
+reading-engine-138-*.txt

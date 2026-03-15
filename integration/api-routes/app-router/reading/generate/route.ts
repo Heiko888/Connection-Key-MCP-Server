@@ -210,7 +210,8 @@ export async function POST(request: NextRequest) {
     // ============================================
     console.log(`[Reading Generate API] MCP Gateway erfolgreich für readingId: ${readingId}. n8n wird reading_jobs updaten.`);
 
-    // Standardisierte Response zurückgeben (Status wird via Polling abgefragt)
+    // Standardisierte Response zurückgeben (Status wird via Polling abgefragt).
+    // Wichtig: Frontend pollt über /api/readings/[id]/public/status.
     return NextResponse.json({
       success: true,
       readingId: readingId,

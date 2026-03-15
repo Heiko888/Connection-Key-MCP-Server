@@ -105,4 +105,94 @@ router.get("/:chartId", async (req, res, next) => {
   }
 });
 
+const HD_CHANNELS = [
+  [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,57],
+  [11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],[20,57],
+  [21,45],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],[29,46],[30,41],
+  [32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64],
+];
+
+const GATE_CENTER = {
+  1:'g',2:'g',3:'sacral',4:'ajna',5:'sacral',6:'emotional',7:'g',8:'throat',
+  9:'sacral',10:'g',11:'ajna',12:'throat',13:'g',14:'sacral',15:'g',16:'throat',
+  17:'ajna',18:'spleen',19:'root',20:'throat',21:'heart',22:'emotional',23:'throat',
+  24:'ajna',25:'g',26:'heart',27:'spleen',28:'spleen',29:'sacral',30:'emotional',
+  31:'throat',32:'spleen',33:'throat',34:'sacral',35:'throat',36:'emotional',
+  37:'emotional',38:'root',39:'root',40:'heart',41:'root',42:'sacral',43:'ajna',
+  44:'spleen',45:'throat',46:'g',47:'ajna',48:'spleen',49:'emotional',50:'spleen',
+  51:'heart',52:'root',53:'root',54:'root',55:'emotional',56:'throat',57:'spleen',
+  58:'root',59:'sacral',60:'root',61:'head',62:'throat',63:'head',64:'head',
+};
+
+router.post('/composite', async (req, res) => {
+  try {
+    const { persons } = req.body;
+    if (!persons || persons.length < 2) {
+      return res.status(400).json({ success: false, error: 'Mindestens 2 Personen erforderlich' });
+    }
+
+    const results = await Promise.all(persons.map(p =>
+      calculateHumanDesignChart({
+        birthDate: p.date || p.birthDate,
+        birthTime: p.time || p.birthTime,
+        birthPlace: p.coords || p.birthPlace || p.location,
+      })
+    ));
+
+    const gateSets = results.map(r => new Set(r.gates || []));
+    const allGates = [...new Set(results.flatMap(r => r.gates || []))];
+    const compositeChannels = [];
+    const connections = { electromagnetic: [], dominance: [], companionship: [], compromise: [] };
+
+    for (const [gA, gB] of HD_CHANNELS) {
+      const hasA = gateSets.map(s => s.has(gA));
+      const hasB = gateSets.map(s => s.has(gB));
+      if (!hasA.some(Boolean) && !hasB.some(Boolean)) continue;
+
+      const channelKey = `${gA}-${gB}`;
+
+      for (let i = 0; i < persons.length; i++) {
+        for (let j = i + 1; j < persons.length; j++) {
+          if ((hasA[i] && hasB[j]) || (hasB[i] && hasA[j])) {
+            connections.electromagnetic.push({ channel: channelKey, persons: [i, j] });
+            if (!compositeChannels.includes(channelKey)) compositeChannels.push(channelKey);
+          }
+        }
+      }
+
+      for (let i = 0; i < persons.length; i++) {
+        if (hasA[i] && hasB[i]) {
+          if (!compositeChannels.includes(channelKey)) compositeChannels.push(channelKey);
+          for (let j = 0; j < persons.length; j++) {
+            if (i !== j && (hasA[j] || hasB[j]) && !(hasA[j] && hasB[j])) {
+              connections.dominance.push({ channel: channelKey, dominant: i, other: j });
+            }
+          }
+          const othersHaveNone = gateSets.every((_, j) => i === j || (!hasA[j] && !hasB[j]));
+          if (othersHaveNone) connections.companionship.push({ channel: channelKey, person: i });
+        }
+      }
+
+      const aCount = hasA.filter(Boolean).length;
+      const bCount = hasB.filter(Boolean).length;
+      if ((aCount > 1 || bCount > 1) && !compositeChannels.includes(channelKey)) {
+        connections.compromise.push({ channel: channelKey });
+      }
+    }
+
+    const compositeCenters = {};
+    const allCenter = new Set(allGates.map(g => GATE_CENTER[g]).filter(Boolean));
+    for (const c of allCenter) compositeCenters[c] = true;
+
+    res.json({
+      success: true,
+      persons: results,
+      composite: { gates: allGates, channels: compositeChannels, centers: compositeCenters, connections },
+    });
+  } catch (err) {
+    console.error('[composite]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 export default router;

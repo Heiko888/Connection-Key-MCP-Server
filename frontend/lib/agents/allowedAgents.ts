@@ -9,6 +9,8 @@ export const ALLOWED_AGENTS = [
   'social-youtube',
   'chart',
   'ui-ux',
+  'video-creation',
+  'chart-architect',
 ] as const;
 
 export type AllowedAgent = typeof ALLOWED_AGENTS[number];

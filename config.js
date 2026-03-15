@@ -2,35 +2,55 @@
 // Diese Datei enthält alle externen Service-URLs und API-Konfigurationen
 
 export const config = {
+  // Authentication
+  auth: {
+    enabled: process.env.AUTH_ENABLED !== 'false',
+    apiKey: process.env.API_KEY || ''
+  },
+  
+  // CORS
+  cors: {
+    allowedOrigins: process.env.CORS_ORIGINS || '*'
+  },
+  
+  // Server
+  port: parseInt(process.env.PORT) || 3000,
+  
+  // Reading Agent
+  readingAgent: {
+    url: process.env.READING_AGENT_URL || 'http://localhost:4000'
+  },
+  
   // n8n Konfiguration
   n8n: {
-    // URL zu deinem n8n Server (z.B. https://n8n.deinedomain.tld oder http://localhost:5678)
-    baseUrl: process.env.N8N_BASE_URL || "http://localhost:5678",
-    // API Key für n8n (falls benötigt)
-    apiKey: process.env.N8N_API_KEY || "",
-    // Webhook-Pfade
+    baseUrl: process.env.N8N_BASE_URL || 'http://localhost:5678',
+    apiKey: process.env.N8N_API_KEY || '',
     webhooks: {
-      reading: "/webhook/reading",
-      matching: "/webhook/matching",
-      chartAnalysis: "/webhook/chart-analysis",
-      userData: "/webhook/user-data"
+      reading: '/webhook/reading',
+      matching: '/webhook/matching',
+      chartAnalysis: '/webhook/chart-analysis',
+      userData: '/webhook/user-data'
     },
-    // API-Pfade
     api: {
-      workflows: "/api/v1/workflows",
-      executions: "/api/v1/executions"
+      workflows: '/api/v1/workflows',
+      executions: '/api/v1/executions'
     }
   },
   
-  // Connection-Key Server Konfiguration (falls MCP direkt mit Connection-Key kommuniziert)
+  // Connection-Key Server Konfiguration
   connectionKey: {
-    baseUrl: process.env.CONNECTION_KEY_URL || "http://localhost:3000",
-    apiKey: process.env.CONNECTION_KEY_API_KEY || ""
+    baseUrl: process.env.CONNECTION_KEY_URL || 'http://localhost:3000',
+    apiKey: process.env.CONNECTION_KEY_API_KEY || ''
   },
   
-  // OpenAI Konfiguration (falls direkt verwendet)
+  // OpenAI Konfiguration
   openai: {
-    apiKey: process.env.OPENAI_API_KEY || ""
+    apiKey: process.env.OPENAI_API_KEY || ''
+  },
+  
+  // Supabase Konfiguration
+  supabase: {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || ''
   }
 };
-

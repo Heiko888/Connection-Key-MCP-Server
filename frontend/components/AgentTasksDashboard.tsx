@@ -362,7 +362,9 @@ export function AgentTasksDashboard() {
                 <option value="automation">Automation</option>
                 <option value="sales">Sales</option>
                 <option value="social-youtube">Social-YouTube</option>
+                <option value="video-creation">Video Creation</option>
                 <option value="chart-development">Chart Development</option>
+                <option value="chart-architect">Chart Architect</option>
                 <option value="ui-ux">UI/UX</option>
               </select>
             </div>

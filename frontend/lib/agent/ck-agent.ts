@@ -2,11 +2,10 @@
  * Agent Client
  * Verbindung zu Agent-Services für Reading-Generierung
  * 
- * MIGRATION ZU MCP-SERVER:
- * - Primär: MCP-Server (Port 7000) - /agents/reading
- * - Fallback: CK-Agent (Port 4000) - /run (Legacy)
+ * AKTUELL:
+ * - Reading Agent (Port 4000) - /reading/generate
  * 
- * Ziel: Alles über MCP-Server steuern
+ * Port 7000 wurde abgeschaltet - alles läuft über Port 4000
  */
 
 export interface AgentConfig {
@@ -39,14 +38,17 @@ export interface AgentResponse {
 }
 
 /**
- * Zentrale Funktion zur Ermittlung der MCP-Server-URL
+ * Zentrale Funktion zur Ermittlung der MCP Server URL
  * 
- * MIGRATION: MCP-Server ist jetzt primär für Readings
+ * Frontend ruft über HTTPS auf: https://mcp.the-connection-key.de
+ * Nginx Reverse Proxy leitet intern weiter zu:
+ * - localhost:4000 → Reading Agent (V3 Readings)
+ * - localhost:3000 → Main MCP
  */
 export function getMcpServerUrl(): string {
   const mcpUrl = process.env.MCP_SERVER_URL 
     || process.env.NEXT_PUBLIC_MCP_SERVER_URL 
-    || 'http://138.199.237.34:7000';
+    || 'https://mcp.the-connection-key.de';
   
   console.log('🔍 DEBUG getMcpServerUrl:');
   console.log('  - MCP_SERVER_URL:', process.env.MCP_SERVER_URL || 'undefined');

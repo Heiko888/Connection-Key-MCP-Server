@@ -75,8 +75,8 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // ✅ signIn hat KEINE Parameter
-      await signIn();
+      // ✅ signIn mit Email und Passwort
+      await signIn(formData.email, formData.password);
 
       setSuccess('✅ Login erfolgreich! Weiterleitung...');
       setTimeout(() => {

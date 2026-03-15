@@ -54,13 +54,15 @@ export async function POST(request: NextRequest) {
     // ============================================
     // SCHRITT 1: reading_jobs Eintrag in Supabase erstellen (Status: pending)
     // ============================================
-    // Supabase generiert UUID automatisch - das ist unsere zentrale ID
-    console.log(`[Reading Generate API] Erstelle reading_jobs Eintrag für readingType: ${readingType}`);
+    // Generiere zentrale Reading ID (wird für job.id UND job.reading_id verwendet)
+    const centralReadingId = crypto.randomUUID();
+    console.log(`[Reading Generate API] Erstelle reading_jobs Eintrag für readingType: ${readingType}, ID: ${centralReadingId}`);
     
     const { data: pendingJob, error: createError } = await supabase
       .from('v_reading_jobs')
       .insert([{
-        // id wird von Supabase generiert (UUID)
+        id: centralReadingId, // ✅ Explizite Job-ID setzen
+        reading_id: centralReadingId, // ✅ FIX: reading_id = id (same UUID)
         user_id: data?.userId || null,
         reading_type: readingType,
         status: 'pending',
@@ -82,9 +84,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Zentrale ID verwenden (von Supabase generiert)
+    // Zentrale ID verwenden (beide IDs sind identisch)
     readingId = pendingJob.id;
-    console.log(`[Reading Generate API] reading_jobs erstellt mit ID: ${readingId}`);
+    console.log(`[Reading Generate API] reading_jobs erstellt mit ID: ${readingId} (reading_id: ${pendingJob.reading_id})`);
 
     // ============================================
     // SCHRITT 2: MCP HTTP Gateway aufrufen

@@ -102,7 +102,9 @@ export default function SeitenlistePage() {
       { pfad: '/coach/agents/automation', name: 'Automation Agent' },
       { pfad: '/coach/agents/sales', name: 'Sales Agent' },
       { pfad: '/coach/agents/social-youtube', name: 'Social-YouTube Agent' },
+      { pfad: '/coach/agents/video-creation', name: 'Video Creation Agent' },
       { pfad: '/coach/agents/chart', name: 'Chart Development Agent' },
+      { pfad: '/coach/agents/chart-architect', name: 'Chart Architect Agent' },
       { pfad: '/coach/agents/ui-ux', name: 'UI/UX Agent' },
     ]},
     

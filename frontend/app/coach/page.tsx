@@ -78,6 +78,10 @@ function CoachHomeContent() {
     },
   ];
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <Box
       sx={{
@@ -99,7 +103,7 @@ function CoachHomeContent() {
       }}
     >
       {/* Animierte Sterne im Hintergrund */}
-      {mounted && starPositions.map((star, i) => (
+      {starPositions.map((star, i) => (
         <motion.div
           key={`star-${i}`}
           style={{

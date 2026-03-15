@@ -1,33 +1,19 @@
-// TEMPORARY STUB: Dummy Supabase Client für Build-Fix
-// TODO: Später durch echten Supabase Client ersetzen
-
 'use client';
 
-// Dummy Supabase Client Interface
-const createDummyClient = () => ({
-  auth: {
-    getUser: async () => ({ data: { user: null }, error: null }),
-    getSession: async () => ({ data: { session: null }, error: null }),
-    signOut: async () => ({ error: null }),
-    onAuthStateChange: () => ({ data: { subscription: null }, error: null }),
-  },
-  from: (_table: string) => ({
-    select: (_columns?: string) => ({ 
-      eq: (_column: string, _value: any) => ({ 
-        maybeSingle: async () => ({ data: null, error: null }),
-        single: async () => ({ data: null, error: null }),
-      }),
-      maybeSingle: async () => ({ data: null, error: null }),
-      single: async () => ({ data: null, error: null }),
-    }),
-    insert: (_data: any) => ({ select: async (_columns?: string) => ({ data: null, error: null }) }),
-    update: (_data: any) => ({ eq: (_column: string, _value: any) => ({ select: async (_columns?: string) => ({ data: null, error: null }) }) }),
-    delete: () => ({ eq: (_column: string, _value: any) => async () => ({ data: null, error: null }) }),
-  }),
-});
+import { createBrowserClient } from '@supabase/ssr';
 
 export function createClient() {
-  return createDummyClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase environment variables');
+    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'SET' : 'MISSING');
+    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'MISSING');
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
 
 // Factory-Funktion für Singleton Client

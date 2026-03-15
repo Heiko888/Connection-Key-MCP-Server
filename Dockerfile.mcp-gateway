@@ -8,6 +8,12 @@ RUN npm ci --only=production
 COPY mcp-gateway.js ./
 COPY index.js ./
 COPY config.js ./
+RUN mkdir -p production
+COPY production/agent-marketing.js ./production/agent-marketing.cjs
+COPY production/agent-sales.js ./production/agent-sales.cjs
+COPY production/agent-social.js ./production/agent-social.cjs
+COPY production/agent-video.js ./production/agent-video.cjs
+COPY production/agent-design.js ./production/agent-design.cjs
 
 EXPOSE 7000
 

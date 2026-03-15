@@ -12,7 +12,15 @@ import express from 'express';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { createRequire } from 'module';
 import Anthropic from '@anthropic-ai/sdk';
+
+const require = createRequire(import.meta.url);
+const { handleMarketingAgent } = require('./production/agent-marketing.cjs');
+const { handleSalesAgent }     = require('./production/agent-sales.cjs');
+const { handleSocialAgent }    = require('./production/agent-social.cjs');
+const { handleVideoAgent }     = require('./production/agent-video.cjs');
+const { handleDesignAgent }    = require('./production/agent-design.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -95,37 +103,11 @@ const AGENT_SYSTEM_PROMPTS = {
   'ui-ux': 'Du bist ein Design-Begleiter für Human Design Coaches. Du hilfst bei der visuellen Gestaltung von Webseiten und Materialien. Antworte auf Deutsch.',
 };
 
-const agentRoutes = ['marketing', 'automation', 'sales', 'social-youtube', 'chart', 'ui-ux'];
-agentRoutes.forEach(agentId => {
-  app.post(`/agent/${agentId}`, async (req, res) => {
-    const { message, userId, chartData } = req.body;
-    if (!message) {
-      return res.status(400).json({ success: false, agent: agentId, error: 'message is required', timestamp: new Date().toISOString() });
-    }
-    try {
-      const systemPrompt = AGENT_SYSTEM_PROMPTS[agentId] || 'Du bist ein hilfreicher Assistent für Human Design Coaches. Antworte auf Deutsch.';
-      const userMessage = chartData ? `Chart-Daten:\n${JSON.stringify(chartData, null, 2)}\n\nFrage: ${message}` : message;
-      const claudeRes = await anthropic.messages.create({
-        model: 'claude-sonnet-4-5',
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }],
-        max_tokens: 2000,
-      });
-      res.json({
-        success: true,
-        agent: agentId,
-        message: message,
-        response: claudeRes.content[0].text,
-        tokens: claudeRes.usage.input_tokens + claudeRes.usage.output_tokens,
-        model: 'claude-sonnet-4-5',
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error(`[Agent ${agentId}] Fehler:`, error.message);
-      res.status(500).json({ success: false, agent: agentId, error: error.message, timestamp: new Date().toISOString() });
-    }
-  });
-});
+app.post('/agent/marketing',      handleMarketingAgent);
+app.post('/agent/sales',          handleSalesAgent);
+app.post('/agent/social-youtube', handleSocialAgent);
+app.post('/agent/video',          handleVideoAgent);
+app.post('/agent/ui-ux',          handleDesignAgent);
 
 
 // Chart-Architect / Bodygraph-Gestalter
@@ -334,56 +316,6 @@ app.post('/agents/reading', async (req, res) => {
   });
 });
 
-// Agent Routes - Vereinfachte Endpoints ohne Auth für Agent Chat
-const agentRoutes = ['marketing', 'automation', 'sales', 'social-youtube', 'chart', 'ui-ux'];
-
-agentRoutes.forEach(agentId => {
-  app.post(`/agent/${agentId}`, async (req, res) => {
-    const { message, userId } = req.body;
-    
-    if (!message) {
-      return res.status(400).json({
-        success: false,
-        agent: agentId,
-        message: '',
-        response: '',
-        error: 'message is required',
-        timestamp: new Date().toISOString()
-      });
-    }
-    
-    // TODO: Hier OpenAI Integration oder anderen Agent-Service aufrufen
-    // Placeholder Response
-    res.json({
-      success: true,
-      agent: agentId,
-      message: message,
-      response: `[${agentId.toUpperCase()} AGENT] Ich habe deine Nachricht erhalten: "${message}". Die vollständige Integration wird gerade implementiert.`,
-      tokens: 50,
-      model: 'gpt-4',
-      timestamp: new Date().toISOString()
-    });
-  });
-});
-
-// Reading Agent Route - Spezialfall
-app.post('/agents/reading', async (req, res) => {
-  const { readingType, clientName, readingData, agentConfig } = req.body;
-  
-  if (!readingType || !clientName) {
-    return res.status(400).json({
-      ok: false,
-      error: 'readingType and clientName are required'
-    });
-  }
-  
-  // TODO: Hier Reading-Generierung implementieren
-  // Placeholder Response
-  res.json({
-    ok: true,
-    result: `[READING AGENT] Reading für ${clientName} (Typ: ${readingType}) wird generiert. Die vollständige Integration wird gerade implementiert.`
-  });
-});
 
 // POST /agents/run
 app.post('/agents/run', authMiddleware, async (req, res) => {

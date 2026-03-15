@@ -21,6 +21,31 @@ services:
     networks:
       - app-network
 
+  # MCP HTTP Gateway
+  mcp-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-gateway
+    container_name: mcp-gateway
+    ports:
+      - "7000:7000"
+    environment:
+      - NODE_ENV=production
+      - MCP_PORT=7000
+      - MCP_API_KEY=${CK_AGENT_SECRET}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - CANVA_CLIENT_ID=${CANVA_CLIENT_ID:-}
+      - CANVA_CLIENT_SECRET=${CANVA_CLIENT_SECRET:-}
+      - CANVA_REDIRECT_URI=${CANVA_REDIRECT_URI:-}
+      - CANVA_MCP_URL=${CANVA_MCP_URL:-https://mcp.canva.com/mcp}
+      - FRONTEND_URL=${FRONTEND_URL:-https://coach.the-connection-key.de}
+    restart: unless-stopped
+    networks:
+      - app-network
+
   # Connection-Key Server - Zentrale API
   connection-key:
     build:

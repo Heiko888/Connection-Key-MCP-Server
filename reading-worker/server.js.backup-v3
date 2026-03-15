@@ -1,0 +1,143 @@
+import express from "express";
+import { Worker } from "bullmq";
+import IORedis from "ioredis";
+import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
+
+const app = express();
+
+/* ======================================================
+   Supabase Client
+====================================================== */
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+/* ======================================================
+   Knowledge & Templates laden
+====================================================== */
+const KNOWLEDGE_PATH = "/app/knowledge";
+const TEMPLATES_PATH = "/app/templates";
+
+function loadTextFiles(dir) {
+  if (!fs.existsSync(dir)) {
+    console.warn(`⚠️ Verzeichnis nicht gefunden: ${dir}`);
+    return {};
+  }
+
+  const files = fs.readdirSync(dir);
+  const data = {};
+
+  for (const file of files) {
+    const fullPath = path.join(dir, file);
+
+    if (fs.statSync(fullPath).isFile()) {
+      const key = file.replace(".txt", "");
+      data[key] = fs.readFileSync(fullPath, "utf8");
+      console.log(`📚 Geladen: ${key}`);
+    }
+  }
+
+  return data;
+}
+
+const knowledge = loadTextFiles(KNOWLEDGE_PATH);
+const templates = loadTextFiles(TEMPLATES_PATH);
+
+console.log(
+  `✅ Knowledge geladen: ${Object.keys(knowledge).length}, Templates: ${Object.keys(templates).length}`
+);
+
+/* ======================================================
+   Redis / BullMQ
+====================================================== */
+const redis = new IORedis({
+  host: process.env.REDIS_HOST || "redis-queue-secure",
+  port: 6379,
+  password: process.env.REDIS_PASSWORD,
+  maxRetriesPerRequest: null
+});
+
+const readingWorker = new Worker(
+  "reading-queue",
+  async (job) => {
+    console.log("📥 Job empfangen:", job.id);
+
+    const {
+      readingId,
+      agentId,
+      userId,
+      clientName,
+      context,
+      depth,
+      style
+    } = job.data;
+
+    /* ======================================================
+       Reading-Content (V3 – bewusst simpel)
+       → OpenAI kommt im nächsten Schritt
+    ====================================================== */
+    const baseTemplate =
+      templates[agentId] || templates["default"] || "";
+
+    const content = `
+${baseTemplate}
+
+---  
+Reading-ID: ${readingId}
+User: ${clientName || userId}
+Agent: ${agentId}
+Kontext: ${context || agentId}
+Tiefe: ${depth || "advanced"}
+Stil: ${style || "klar"}
+
+Knowledge geladen: ${Object.keys(knowledge).length} Dateien
+Templates geladen: ${Object.keys(templates).length} Dateien
+`.trim();
+
+    /* ======================================================
+       DB Update
+       ⚠️ Annahme: View public.reading_jobs existiert
+    ====================================================== */
+    const { error } = await supabase
+      .from("reading_jobs")
+      .update({
+        status: "completed",
+        progress: 100,
+        updated_at: new Date().toISOString()
+      })
+      .eq("reading_id", readingId);
+
+    if (error) {
+      console.error("❌ Supabase Update Fehler:", error);
+      throw error;
+    }
+
+    console.log("✅ Reading abgeschlossen:", readingId);
+  },
+  { connection: redis }
+);
+
+readingWorker.on("failed", (job, err) => {
+  console.error("❌ Job failed:", job?.id, err);
+});
+
+console.log("🟢 BullMQ Worker aktiv (Queue: reading-queue)");
+
+/* ======================================================
+   HTTP Health
+====================================================== */
+app.get("/health", (_, res) => {
+  res.json({
+    status: "ok",
+    knowledgeFiles: Object.keys(knowledge).length,
+    templateFiles: Object.keys(templates).length
+  });
+});
+
+const PORT = 4000;
+app.listen(PORT, () => {
+  console.log("✅ Reading Agent läuft auf Port", PORT);
+});

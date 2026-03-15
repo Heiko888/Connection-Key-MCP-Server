@@ -1,0 +1,1292 @@
+/**
+ * Combined Reading Worker (V3 + V4)
+ * - BullMQ Worker für reading-queue (V3) und reading-queue-v4 (V4)
+ * - loadKnowledge() und loadTemplates() als inline Funktionen
+ * - Verwendet gemeinsame V4 Supabase Datenbank für beide Queues
+ */
+
+import express from "express";
+import { Worker } from "bullmq";
+import IORedis from "ioredis";
+import { createClient } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
+import OpenAI from "openai";
+
+const app = express();
+
+// ======================================================
+// loadKnowledge() - inline (aus production/server.js)
+// ======================================================
+function loadKnowledge(knowledgePath = "/app/knowledge") {
+  const knowledge = {};
+
+  if (!fs.existsSync(knowledgePath)) {
+    console.warn(`⚠️  Knowledge-Pfad nicht gefunden: ${knowledgePath}`);
+    return knowledge;
+  }
+
+  try {
+    const files = fs.readdirSync(knowledgePath);
+    files.forEach(file => {
+      const filePath = path.join(knowledgePath, file);
+      const stat = fs.statSync(filePath);
+
+      if (stat.isFile() && (file.endsWith('.txt') || file.endsWith('.md'))) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const key = path.basename(file, path.extname(file));
+        knowledge[key] = content;
+        console.log(`✅ Knowledge geladen: ${key}`);
+      } else if (stat.isDirectory()) {
+        try {
+          const subFiles = fs.readdirSync(filePath);
+          subFiles.forEach(subFile => {
+            if (subFile.endsWith('.txt') || subFile.endsWith('.md')) {
+              const subFilePath = path.join(filePath, subFile);
+              const subContent = fs.readFileSync(subFilePath, 'utf8');
+              const subKey = `${file}-${path.basename(subFile, path.extname(subFile))}`;
+              knowledge[subKey] = subContent;
+              console.log(`✅ Knowledge geladen (Unterordner): ${subKey}`);
+            }
+          });
+        } catch (subError) {
+          console.warn(`⚠️  Konnte Unterordner nicht lesen: ${filePath}`, subError);
+        }
+      }
+    });
+  } catch (error) {
+    console.error("❌ Fehler beim Laden der Knowledge:", error);
+  }
+
+  return knowledge;
+}
+
+// ======================================================
+// loadTemplates() - inline (aus production/server.js)
+// ======================================================
+function loadTemplates(templatePath = "/app/templates") {
+  const templates = {};
+
+  if (!fs.existsSync(templatePath)) {
+    console.warn(`⚠️  Template-Pfad nicht gefunden: ${templatePath}`);
+    return templates;
+  }
+
+  try {
+    const files = fs.readdirSync(templatePath);
+    files.forEach(file => {
+      if (file.endsWith('.txt') || file.endsWith('.md') || file.endsWith('.json')) {
+        const filePath = path.join(templatePath, file);
+        const content = fs.readFileSync(filePath, 'utf8');
+        const key = path.basename(file, path.extname(file));
+        templates[key] = content;
+        console.log(`✅ Template geladen: ${key}`);
+      }
+    });
+  } catch (error) {
+    console.error("❌ Fehler beim Laden der Templates:", error);
+  }
+
+  return templates;
+}
+
+// ======================================================
+// Knowledge & Templates laden
+// ======================================================
+const knowledge = loadKnowledge("/app/knowledge");
+const templates = loadTemplates("/app/templates");
+
+console.log("📚 Knowledge-Dateien:", Object.keys(knowledge).length);
+console.log("📄 Template-Dateien:", Object.keys(templates).length);
+
+// ======================================================
+// OpenAI Client
+// ======================================================
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// ======================================================
+// Supabase Client (V4 - wird für BEIDE Queues verwendet)
+// ======================================================
+const supabase = createClient(
+  process.env.V4_SUPABASE_URL,
+  process.env.V4_SUPABASE_SERVICE_KEY,
+  {
+    db: { schema: 'v4' }
+  }
+);
+
+console.log("✅ Supabase (V4):", process.env.V4_SUPABASE_URL?.substring(0, 40) + "...");
+
+// ======================================================
+// Redis / BullMQ
+// ======================================================
+const redis = new IORedis({
+  host: process.env.REDIS_HOST || "redis-queue-secure",
+  port: 6379,
+  password: process.env.REDIS_PASSWORD,
+  maxRetriesPerRequest: null
+});
+
+// ======================================================
+// generateReading() - Simplified Version
+// ======================================================
+async function generateReading({ agentId, template, userData }) {
+  console.log("🤖 Generiere Reading:", { agentId, template });
+
+  // Wähle Template
+  const templateContent = templates[template] || templates['default'] ||
+    "Erstelle ein Human Design Reading basierend auf den gegebenen Daten.";
+
+  // Erstelle System Prompt
+  const systemPrompt = `Du bist ein Reading-Agent für Human Design.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${Object.entries(knowledge).slice(0, 5).map(([key, val]) => `\n### ${key}\n${val.substring(0, 500)}`).join('\n')}
+
+Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
+
+  // Erstelle User Message
+  const userMessage = `Erstelle ein Reading für:
+Name: ${userData.client_name || 'Unbekannt'}
+Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
+Geburtszeit: ${userData.birth_time || 'Unbekannt'}
+Geburtsort: ${userData.birth_location || 'Unbekannt'}
+
+${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
+
+  // OpenAI Call
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userMessage }
+    ],
+    temperature: 0.7,
+    max_tokens: 4000
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+// ======================================================
+// WORKER 1: V3 Queue (reading-queue)
+// Nutzt V4 Supabase, aber coach_readings Tabelle
+// ======================================================
+const workerV3 = new Worker(
+  "reading-queue",
+  async (job) => {
+    console.log("📥 [V3] Job empfangen:", job.id);
+
+    const { readingId, agentId } = job.data;
+
+    try {
+      // Reading erzeugen
+      const content = await generateReading({
+        agentId: agentId || 'default',
+        template: agentId || 'default',
+        userData: job.data
+      });
+
+      // Update coach_readings (in V4 Supabase!)
+      const { error } = await supabase
+        .from("coach_readings")
+        .update({
+          status: "completed",
+          content
+        })
+        .eq("id", readingId);
+
+      if (error) throw error;
+
+      console.log("✅ [V3] Reading abgeschlossen:", readingId);
+    } catch (err) {
+      console.error("❌ [V3] Fehler:", err);
+      throw err;
+    }
+  },
+  { connection: redis }
+);
+
+workerV3.on("failed", (job, err) => {
+  console.error("❌ [V3] Job failed:", job?.id, err);
+});
+
+console.log("🟢 V3 Worker aktiv (Queue: reading-queue)");
+
+// ======================================================
+// WORKER 2: V4 Queue (reading-queue-v4)
+// Nutzt readings + reading_jobs Tabellen
+// ======================================================
+const workerV4 = new Worker(
+  "reading-queue-v4",
+  async (job) => {
+    console.log("📥 [V4] Job empfangen:", job.id);
+
+    const { readingId } = job.data;
+
+    try {
+      // 1. Reading aus readings Tabelle holen
+      const { data: reading, error: readingError } = await supabase
+        .schema("public")
+        .from("readings")
+        .select("*")
+        .eq("id", readingId)
+        .single();
+
+      if (readingError) throw readingError;
+
+      // 2. Job Status auf "processing" setzen (falls reading_jobs existiert)
+      const { error: jobUpdateError } = await supabase
+        .from("reading_jobs")
+        .update({
+          status: "processing",
+          progress: 10,
+          started_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      // Ignoriere Fehler falls reading_jobs noch nicht existiert
+      if (jobUpdateError) {
+        console.warn("⚠️ [V4] Konnte reading_jobs nicht aktualisieren:", jobUpdateError.message);
+      }
+
+      // 3. Reading erzeugen
+      const content = await generateReading({
+        agentId: reading.reading_type || 'default',
+        template: reading.reading_type || 'default',
+        userData: {
+          client_name: reading.client_name,
+          birth_date: reading.birth_date,
+          birth_time: reading.birth_time,
+          birth_location: reading.birth_location,
+          ...(reading.client_data || {})
+        }
+      });
+
+      // 4. Reading aktualisieren
+      const { error: updateError } = await supabase
+        .schema("public")
+        .from("readings")
+        .update({
+          status: "completed",
+          content,
+          completed_at: new Date().toISOString()
+        })
+        .eq("id", readingId);
+
+      if (updateError) throw updateError;
+
+      // 5. Job als completed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "completed",
+          progress: 100,
+          completed_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      console.log("✅ [V4] Reading abgeschlossen:", readingId);
+    } catch (err) {
+      console.error("❌ [V4] Fehler:", err);
+
+      // Job als failed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "failed",
+          error: err.message
+        })
+        .eq("reading_id", readingId)
+        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+
+      throw err;
+    }
+  },
+  { connection: redis }
+);
+
+workerV4.on("failed", (job, err) => {
+  console.error("❌ [V4] Job failed:", job?.id, err);
+});
+
+console.log("🟢 V4 Worker aktiv (Queue: reading-queue-v4)");
+
+// ======================================================
+// WORKER 3: Connection Queue (V4 - 2 Personen)
+// ======================================================
+const connectionWorker = new Worker(
+  "reading-queue-v4-connection",
+  async (job) => {
+    console.log("📥 [Connection] Job empfangen:", job.id);
+
+    const { readingId, personA, personB, connectionQuestion } = job.data;
+
+    try {
+      // 1. Reading aus readings Tabelle holen
+      const { data: reading, error: readingError } = await supabase
+        .schema("public")
+        .from("readings")
+        .select("*")
+        .eq("id", readingId)
+        .single();
+
+      if (readingError) throw readingError;
+
+      // 2. Job Status auf "processing" setzen
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "processing",
+          progress: 10,
+          started_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      // 3. Charts für beide Personen berechnen (placeholder - wird später mit Chart-Truth-Service ersetzt)
+      const personAChart = {
+        type: "Generator",
+        gates: [1, 2, 3],
+        centers: ["Sacral", "Throat"],
+        note: "Placeholder - Chart-Truth-Service Integration folgt"
+      };
+
+      const personBChart = {
+        type: "Manifestor",
+        gates: [8, 14, 60],
+        centers: ["Throat", "Heart"],
+        note: "Placeholder - Chart-Truth-Service Integration folgt"
+      };
+
+      // 4. Connection Dynamics analysieren
+      const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
+
+      // 5. Update connection_readings mit Charts und Dynamics
+      await supabase
+        .schema("public")
+        .from("connection_readings")
+        .update({
+          person_a_chart: personAChart,
+          person_b_chart: personBChart,
+          electromagnetic_channels: dynamics.electromagnetic_channels,
+          complementary_gates: dynamics.complementary_gates,
+          dynamics: dynamics,
+          similarities: dynamics.similarities,
+          differences: dynamics.differences
+        })
+        .eq("reading_id", readingId);
+
+      // 6. Reading erzeugen
+      const content = await generateReading({
+        agentId: 'connection',
+        template: 'connection',
+        userData: {
+          personA,
+          personB,
+          personAChart,
+          personBChart,
+          dynamics,
+          connectionQuestion
+        }
+      });
+
+      // 7. Reading aktualisieren
+      await supabase
+        .schema("public")
+        .from("readings")
+        .update({
+          status: "completed",
+          content,
+          completed_at: new Date().toISOString()
+        })
+        .eq("id", readingId);
+
+      // 8. Job als completed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "completed",
+          progress: 100,
+          completed_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      console.log("✅ [Connection] Reading abgeschlossen:", readingId);
+    } catch (err) {
+      console.error("❌ [Connection] Fehler:", err);
+
+      // Job als failed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "failed",
+          error: err.message
+        })
+        .eq("reading_id", readingId)
+        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+
+      throw err;
+    }
+  },
+  { connection: redis }
+);
+
+connectionWorker.on("failed", (job, err) => {
+  console.error("❌ [Connection] Job failed:", job?.id, err);
+});
+
+console.log("🟢 Connection Worker aktiv (Queue: reading-queue-v4-connection)");
+
+// ======================================================
+// WORKER 4: Penta Queue (V4 - 3-7 Personen)
+// ======================================================
+const pentaWorker = new Worker(
+  "reading-queue-v4-penta",
+  async (job) => {
+    console.log("📥 [Penta] Job empfangen:", job.id);
+
+    const { readingId, groupName, groupContext, members } = job.data;
+
+    try {
+      // 1. Reading aus readings Tabelle holen
+      const { data: reading, error: readingError } = await supabase
+        .schema("public")
+        .from("readings")
+        .select("*")
+        .eq("id", readingId)
+        .single();
+
+      if (readingError) throw readingError;
+
+      // 2. Job Status auf "processing" setzen
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "processing",
+          progress: 10,
+          started_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      // 3. Charts für alle Mitglieder berechnen (placeholder)
+      const memberCharts = members.map((member, index) => ({
+        name: member.name,
+        chart: {
+          type: index % 5 === 0 ? "Generator" : index % 5 === 1 ? "Manifestor" : index % 5 === 2 ? "Projector" : index % 5 === 3 ? "Reflector" : "Generator",
+          gates: [1 + index, 2 + index, 3 + index],
+          centers: ["Sacral", "Throat"],
+          note: "Placeholder - Chart-Truth-Service Integration folgt"
+        }
+      }));
+
+      // 4. Penta/Gruppen-Dynamik analysieren
+      const groupDynamics = analyzePentaDynamics(memberCharts);
+
+      // 5. Penta Chart berechnen (Composite Chart aller Mitglieder)
+      const pentaChart = calculatePentaChart(memberCharts);
+
+      // 6. Update penta_readings mit Charts und Dynamics
+      await supabase
+        .schema("public")
+        .from("penta_readings")
+        .update({
+          penta_chart: pentaChart,
+          group_dynamics: groupDynamics,
+          roles: groupDynamics.roles,
+          energy_flow: groupDynamics.energy_flow,
+          communication_patterns: groupDynamics.communication_patterns,
+          collective_strengths: groupDynamics.collective_strengths
+        })
+        .eq("reading_id", readingId);
+
+      // 7. Reading erzeugen
+      const content = await generateReading({
+        agentId: 'penta',
+        template: 'penta',
+        userData: {
+          groupName,
+          groupContext,
+          members,
+          memberCharts,
+          pentaChart,
+          groupDynamics
+        }
+      });
+
+      // 8. Reading aktualisieren
+      await supabase
+        .schema("public")
+        .from("readings")
+        .update({
+          status: "completed",
+          content,
+          completed_at: new Date().toISOString()
+        })
+        .eq("id", readingId);
+
+      // 9. Job als completed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "completed",
+          progress: 100,
+          completed_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      console.log("✅ [Penta] Reading abgeschlossen:", readingId);
+    } catch (err) {
+      console.error("❌ [Penta] Fehler:", err);
+
+      // Job als failed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "failed",
+          error: err.message
+        })
+        .eq("reading_id", readingId)
+        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+
+      throw err;
+    }
+  },
+  { connection: redis }
+);
+
+pentaWorker.on("failed", (job, err) => {
+  console.error("❌ [Penta] Job failed:", job?.id, err);
+});
+
+console.log("🟢 Penta Worker aktiv (Queue: reading-queue-v4-penta)");
+
+// ======================================================
+// WORKER 5: Multi-Agent Queue (V4 - mehrere Agents)
+// ======================================================
+const multiAgentWorker = new Worker(
+  "reading-queue-v4-multi-agent",
+  async (job) => {
+    console.log("📥 [Multi-Agent] Job empfangen:", job.id);
+
+    const { readingId, agents, synthesis, birthData, focus } = job.data;
+
+    try {
+      // 1. Reading aus readings Tabelle holen
+      const { data: reading, error: readingError } = await supabase
+        .schema("public")
+        .from("readings")
+        .select("*")
+        .eq("id", readingId)
+        .single();
+
+      if (readingError) throw readingError;
+
+      // 2. Job Status auf "processing" setzen
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "processing",
+          progress: 10,
+          started_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      // 3. Alle Agents parallel ausführen
+      console.log(`🔄 [Multi-Agent] Starte ${agents.length} Agents parallel...`);
+
+      const agentPromises = agents.map(async (agentId) => {
+        console.log(`   - Agent ${agentId} startet...`);
+
+        const agentReading = await generateReading({
+          agentId,
+          template: agentId,
+          userData: {
+            client_name: birthData.name || reading.client_name,
+            birth_date: birthData.birthDate,
+            birth_time: birthData.birthTime,
+            birth_location: birthData.birthLocation,
+            focus: focus || `${agentId} Reading`
+          }
+        });
+
+        console.log(`   ✅ Agent ${agentId} fertig (${agentReading.length} Zeichen)`);
+
+        return {
+          agentId,
+          reading: agentReading,
+          insights: extractInsights(agentReading, agentId)
+        };
+      });
+
+      // Warte auf alle Agents
+      const agentResults = await Promise.all(agentPromises);
+
+      // 4. Progress Update
+      await supabase
+        .from("reading_jobs")
+        .update({ progress: 60 })
+        .eq("reading_id", readingId);
+
+      // 5. Synthesis erstellen (wenn enabled)
+      let synthesisResult = null;
+      let combinedInsights = [];
+      let crossReferences = [];
+
+      if (synthesis) {
+        console.log("🔄 [Multi-Agent] Erstelle Synthesis...");
+
+        synthesisResult = await generateMultiAgentSynthesis(
+          agentResults,
+          birthData,
+          knowledge
+        );
+
+        // Extract insights aus allen Readings
+        combinedInsights = agentResults.flatMap(r => r.insights);
+
+        // Cross-References finden (wo Agents ähnliche Punkte ansprechen)
+        crossReferences = findCrossReferences(agentResults);
+
+        console.log("✅ [Multi-Agent] Synthesis fertig");
+      }
+
+      // 6. Finales Reading zusammensetzen
+      let finalContent = "";
+
+      // Intro
+      finalContent += `# Multi-Agent Reading für ${birthData.name || reading.client_name}\n\n`;
+      finalContent += `Dieses Reading wurde von ${agents.length} spezialisierten Agents erstellt.\n\n`;
+
+      // Agent Readings
+      finalContent += `## Perspektiven der Agents\n\n`;
+      for (const result of agentResults) {
+        finalContent += `### ${result.agentId.toUpperCase()} Agent\n\n`;
+        finalContent += result.reading + "\n\n";
+      }
+
+      // Synthesis
+      if (synthesisResult) {
+        finalContent += `## Synthesis\n\n`;
+        finalContent += synthesisResult + "\n\n";
+
+        // Cross-References
+        if (crossReferences.length > 0) {
+          finalContent += `### Gemeinsame Themen\n\n`;
+          crossReferences.forEach(ref => {
+            finalContent += `- **${ref.theme}**: ${ref.agents.join(', ')}\n`;
+          });
+          finalContent += "\n";
+        }
+      }
+
+      // 7. Update multi_agent_readings mit Results
+      const agentResultsObj = {};
+      agentResults.forEach(r => {
+        agentResultsObj[r.agentId] = {
+          reading: r.reading,
+          insights: r.insights
+        };
+      });
+
+      await supabase
+        .schema("public")
+        .from("multi_agent_readings")
+        .update({
+          agent_results: agentResultsObj,
+          synthesis: synthesisResult,
+          combined_insights: combinedInsights,
+          cross_references: crossReferences
+        })
+        .eq("reading_id", readingId);
+
+      // 8. Reading aktualisieren
+      await supabase
+        .schema("public")
+        .from("readings")
+        .update({
+          status: "completed",
+          content: finalContent,
+          completed_at: new Date().toISOString()
+        })
+        .eq("id", readingId);
+
+      // 9. Job als completed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "completed",
+          progress: 100,
+          completed_at: new Date().toISOString()
+        })
+        .eq("reading_id", readingId);
+
+      console.log("✅ [Multi-Agent] Reading abgeschlossen:", readingId);
+    } catch (err) {
+      console.error("❌ [Multi-Agent] Fehler:", err);
+
+      // Job als failed markieren
+      await supabase
+        .from("reading_jobs")
+        .update({
+          status: "failed",
+          error: err.message
+        })
+        .eq("reading_id", readingId)
+        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+
+      throw err;
+    }
+  },
+  { connection: redis }
+);
+
+multiAgentWorker.on("failed", (job, err) => {
+  console.error("❌ [Multi-Agent] Job failed:", job?.id, err);
+});
+
+console.log("🟢 Multi-Agent Worker aktiv (Queue: reading-queue-v4-multi-agent)");
+
+// ======================================================
+// Job Polling System (für Connection, Penta, Multi-Agent)
+// Holt pending Jobs aus reading_jobs Tabelle
+// ======================================================
+async function pollForJobs() {
+  try {
+    // Hole alle pending Jobs (OHNE reading_id - existiert nicht in v4!)
+    const { data: pendingJobs, error } = await supabase
+      .from("reading_jobs")
+      .select("id, reading_type, payload, created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .limit(10);
+
+    if (error) {
+      console.error("❌ Job Polling Fehler:", error);
+      return;
+    }
+
+    if (!pendingJobs || pendingJobs.length === 0) {
+      return;
+    }
+
+    console.log(`📥 [Polling] ${pendingJobs.length} pending Jobs gefunden`);
+
+    // Verarbeite jeden Job
+    for (const job of pendingJobs) {
+      try {
+        // V4: Job enthält reading_type direkt, kein reading_id!
+        let reading = null;
+        let readingType = job.reading_type;
+
+        // V4: Erstelle virtuelles Reading aus Job-Daten
+        reading = {
+          id: job.id,
+          reading_type: job.reading_type,
+          client_data: job.payload,
+          status: 'processing'
+        };
+
+        if (!readingType) {
+          console.error(`❌ Job ${job.id}: Kein reading_type gefunden`);
+          continue;
+        }
+
+        console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
+
+        // Route basierend auf reading_type
+        if (readingType === 'connection') {
+          await processConnectionJob(job, reading);
+        } else if (readingType === 'penta') {
+          await processPentaJob(job, reading);
+        } else if (readingType === 'multi-agent') {
+          await processMultiAgentJob(job, reading);
+        } else if (readingType === 'human_design') {
+          await processHumanDesignJob(job, reading);
+        }
+      } catch (jobError) {
+        console.error(`❌ Fehler bei Job ${job.id}:`, jobError);
+
+
+      }
+    }
+  } catch (error) {
+    console.error("❌ Polling System Fehler:", error);
+  }
+}
+
+// Human Design Job verarbeiten (V4 ohne reading_id)
+async function processHumanDesignJob(job, reading) {
+  console.log(`🔄 [Human Design] Verarbeite Job ${job.id}`);
+
+  const { birthdate, birthtime, birthplace, name } = reading.client_data || {};
+
+  // Job Status auf processing
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  try {
+    // Reading generieren
+    const content = await generateReading({
+      agentId: 'human_design',
+      template: 'default',
+      userData: { 
+        client_name: name,
+        birth_date: birthdate,
+        birth_time: birthtime,
+        birth_location: birthplace
+      }
+    });
+
+    console.log(`✅ [Human Design] Reading generiert: ${content.substring(0, 100)}...`);
+
+    // Job completed
+    await supabase
+      .from("reading_jobs")
+      .update({ 
+        status: "completed", 
+        finished_at: new Date().toISOString() 
+      })
+      .eq("id", job.id);
+
+    console.log(`✅ [Human Design] Job ${job.id} abgeschlossen`);
+  } catch (error) {
+    console.error(`❌ [Human Design] Fehler bei Job ${job.id}:`, error);
+
+    // Job failed
+    await supabase
+      .from("reading_jobs")
+      .update({ 
+        status: "failed", 
+        error: error.message,
+        finished_at: new Date().toISOString() 
+      })
+      .eq("id", job.id);
+  }
+}
+
+// Connection Job verarbeiten
+async function processConnectionJob(job, reading) {
+  console.log(`🔄 [Connection] Verarbeite Job ${job.id}`);
+
+  const { personA, personB, connectionQuestion } = reading.client_data || {};
+
+  // Job Status auf processing
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  // Charts berechnen (placeholder)
+  const personAChart = { type: "Generator", gates: [1, 2, 3] };
+  const personBChart = { type: "Manifestor", gates: [8, 14, 60] };
+
+  // Dynamics
+  const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
+
+  // Reading generieren
+  const content = await generateReading({
+    agentId: 'connection',
+    template: 'relationship',
+    userData: { personA, personB, dynamics, connectionQuestion }
+  });
+
+  // Job completed
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "completed", finished_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  console.log(`✅ [Connection] Job ${job.id} abgeschlossen`);
+}
+
+// Penta Job verarbeiten
+async function processPentaJob(job, reading) {
+  console.log(`🔄 [Penta] Verarbeite Job ${job.id}`);
+
+  const { members, groupName, groupContext } = reading.client_data || {};
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  // Charts für alle Mitglieder (placeholder)
+  const memberCharts = members.map((m, i) => ({
+    name: m.name,
+    chart: { type: ["Generator", "Manifestor", "Projector"][i % 3], gates: [1+i, 2+i] }
+  }));
+
+  const groupDynamics = analyzePentaDynamics(memberCharts);
+  const pentaChart = calculatePentaChart(memberCharts);
+
+  const content = await generateReading({
+    agentId: 'penta',
+    template: 'relationship',
+    userData: { groupName, members, groupDynamics, pentaChart }
+  });
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "completed", finished_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  console.log(`✅ [Penta] Job ${job.id} abgeschlossen`);
+}
+
+// Multi-Agent Job verarbeiten
+async function processMultiAgentJob(job, reading) {
+  console.log(`🔄 [Multi-Agent] Verarbeite Job ${job.id}`);
+
+  const { agents, synthesis, birthData, focus } = reading.client_data || {};
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  // Alle Agents parallel
+  const agentPromises = agents.map(async (agentId) => {
+    const agentReading = await generateReading({
+      agentId,
+      template: agentId,
+      userData: birthData
+    });
+    return { agentId, reading: agentReading };
+  });
+
+  const agentResults = await Promise.all(agentPromises);
+
+  // Synthesis
+  let synthesisText = "";
+  if (synthesis) {
+    synthesisText = `Synthesis der ${agents.length} Agent-Perspektiven wird hier erstellt.`;
+  }
+
+  // Finales Reading
+  let content = `# Multi-Agent Reading\n\n`;
+  agentResults.forEach(r => {
+    content += `## ${r.agentId}\n\n${r.reading}\n\n`;
+  });
+  if (synthesisText) {
+    content += `## Synthesis\n\n${synthesisText}\n\n`;
+  }
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "completed", finished_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  console.log(`✅ [Multi-Agent] Job ${job.id} abgeschlossen`);
+}
+
+// Polling starten (alle 10 Sekunden)
+setInterval(pollForJobs, 10000);
+console.log("🔄 Job Polling System aktiv (prüft alle 10 Sekunden)");
+
+// Erster Poll sofort
+pollForJobs();
+
+// ======================================================
+// Helper: Multi-Agent Synthesis
+// ======================================================
+async function generateMultiAgentSynthesis(agentResults, birthData, knowledge) {
+  // Erstelle Synthesis Prompt
+  const agentSummaries = agentResults.map(r =>
+    `${r.agentId}: ${r.insights.slice(0, 3).join(', ')}`
+  ).join('\n');
+
+  const synthesisPrompt = `Du bist ein Meta-Analyst, der die Perspektiven mehrerer Human Design Agents integriert.
+
+Du hast ${agentResults.length} verschiedene Readings für ${birthData.name || 'die Person'} erhalten:
+
+${agentSummaries}
+
+Erstelle eine Synthesis, die:
+1. Die gemeinsamen Themen über alle Perspektiven hinweg hervorhebt
+2. Widersprüche oder Spannungen zwischen den Perspektiven aufzeigt
+3. Eine ganzheitliche Perspektive bietet
+4. Praktische Empfehlungen gibt, die alle Aspekte berücksichtigen
+
+Struktur:
+- Gemeinsame Themen
+- Spannungen & Balance
+- Ganzheitliche Perspektive
+- Integration in den Alltag
+
+Stil: Klar, präzise, nicht esoterisch.`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: "Du bist ein erfahrener Meta-Analyst für Human Design Readings." },
+      { role: "user", content: synthesisPrompt }
+    ],
+    temperature: 0.7,
+    max_tokens: 2000
+  });
+
+  return completion.choices[0].message.content.trim();
+}
+
+// Helper: Extract Insights aus Reading
+function extractInsights(readingText, agentId) {
+  // Simple Implementation: Extrahiere Sätze als Insights
+  const sentences = readingText.split(/[.!?]+/).filter(s => s.trim().length > 20);
+  return sentences.slice(0, 5).map(s => s.trim());
+}
+
+// Helper: Find Cross-References
+function findCrossReferences(agentResults) {
+  const references = [];
+  const commonThemes = [
+    { keywords: ['energie', 'power', 'kraft'], theme: 'Energie & Kraft' },
+    { keywords: ['kommunikation', 'ausdruck', 'sprechen'], theme: 'Kommunikation' },
+    { keywords: ['entscheidung', 'autorität', 'klarheit'], theme: 'Entscheidungen' },
+    { keywords: ['beziehung', 'verbindung', 'interaktion'], theme: 'Beziehungen' },
+    { keywords: ['kreativität', 'schöpfung', 'ausdruck'], theme: 'Kreativität' }
+  ];
+
+  commonThemes.forEach(({ keywords, theme }) => {
+    const agentsWithTheme = agentResults.filter(r =>
+      keywords.some(kw => r.reading.toLowerCase().includes(kw))
+    );
+
+    if (agentsWithTheme.length >= 2) {
+      references.push({
+        theme,
+        agents: agentsWithTheme.map(r => r.agentId),
+        count: agentsWithTheme.length
+      });
+    }
+  });
+
+  return references.sort((a, b) => b.count - a.count);
+}
+
+// ======================================================
+// Helper: Analyze Penta/Group Dynamics
+// ======================================================
+function analyzePentaDynamics(memberCharts) {
+  const dynamics = {
+    roles: [],
+    energy_flow: {},
+    communication_patterns: {},
+    collective_strengths: [],
+    team_challenges: []
+  };
+
+  if (!memberCharts || memberCharts.length < 3) {
+    return dynamics;
+  }
+
+  // Rollen basierend auf Types
+  const typeCounts = {};
+  memberCharts.forEach((member, index) => {
+    const type = member.chart.type;
+    typeCounts[type] = (typeCounts[type] || 0) + 1;
+
+    // Rolle zuweisen
+    if (type === 'Manifestor') {
+      dynamics.roles.push({ member: member.name, role: 'Initiator', description: 'Startet Prozesse' });
+    } else if (type === 'Generator') {
+      dynamics.roles.push({ member: member.name, role: 'Umsetzer', description: 'Liefert Energie' });
+    } else if (type === 'Projector') {
+      dynamics.roles.push({ member: member.name, role: 'Guide', description: 'Erkennt Potenziale' });
+    } else if (type === 'Reflector') {
+      dynamics.roles.push({ member: member.name, role: 'Spiegel', description: 'Reflektiert Gruppendynamik' });
+    }
+  });
+
+  // Energy Flow (welche Types dominieren)
+  dynamics.energy_flow = {
+    dominant_types: Object.entries(typeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 2)
+      .map(([type, count]) => ({ type, count })),
+    balance: calculateTypeBalance(typeCounts)
+  };
+
+  // Communication Patterns
+  const hasManifestor = typeCounts['Manifestor'] > 0;
+  const hasProjector = typeCounts['Projector'] > 0;
+
+  dynamics.communication_patterns = {
+    style: hasManifestor ? 'Direkt und initierend' : hasProjector ? 'Beratend und erkennend' : 'Responsiv',
+    recommendation: hasManifestor && hasProjector ?
+      'Manifestors initiieren, Projectors führen aus' :
+      'Gemeinsame Response nutzen'
+  };
+
+  // Collective Strengths (alle einzigartigen Gates)
+  const allGates = new Set();
+  memberCharts.forEach(member => {
+    member.chart.gates.forEach(gate => allGates.add(gate));
+  });
+  dynamics.collective_strengths = Array.from(allGates);
+
+  // Team Challenges (was fehlt)
+  if (!hasManifestor && !hasProjector) {
+    dynamics.team_challenges.push('Keine Initiatoren - Team braucht externe Impulse');
+  }
+  if (typeCounts['Generator'] === memberCharts.length) {
+    dynamics.team_challenges.push('Nur Generatoren - Warten auf externe Initiation');
+  }
+
+  return dynamics;
+}
+
+function calculateTypeBalance(typeCounts) {
+  const total = Object.values(typeCounts).reduce((a, b) => a + b, 0);
+  const balance = {};
+  for (const [type, count] of Object.entries(typeCounts)) {
+    balance[type] = Math.round((count / total) * 100) + '%';
+  }
+  return balance;
+}
+
+function calculatePentaChart(memberCharts) {
+  // Penta Chart = Composite aller individuellen Charts
+  const allGates = [];
+  const allCenters = new Set();
+
+  memberCharts.forEach(member => {
+    allGates.push(...member.chart.gates);
+    member.chart.centers.forEach(center => allCenters.add(center));
+  });
+
+  return {
+    composite_gates: [...new Set(allGates)],
+    composite_centers: Array.from(allCenters),
+    member_count: memberCharts.length,
+    note: 'Composite Chart aller Gruppenmitglieder'
+  };
+}
+
+// ======================================================
+// Helper: Analyze Connection Dynamics
+// ======================================================
+function analyzeConnectionDynamics(chartA, chartB) {
+  const dynamics = {
+    electromagnetic_channels: [],
+    complementary_gates: [],
+    similarities: [],
+    differences: [],
+    challenges: [],
+    growth_opportunities: []
+  };
+
+  if (!chartA || !chartB) {
+    return dynamics;
+  }
+
+  // Electromagnetic Channels
+  const gatesA = chartA.gates || [];
+  const gatesB = chartB.gates || [];
+
+  // Finde Gates, die zusammen Channels bilden
+  for (const gateA of gatesA) {
+    for (const gateB of gatesB) {
+      if (areConnectedGates(gateA, gateB)) {
+        dynamics.electromagnetic_channels.push({
+          personA_gate: gateA,
+          personB_gate: gateB,
+          channel: `${gateA}-${gateB}`
+        });
+      }
+    }
+  }
+
+  // Common Gates (Similarities)
+  dynamics.similarities = gatesA.filter(g => gatesB.includes(g));
+
+  // Unique Gates (Differences)
+  dynamics.differences = {
+    personA_unique: gatesA.filter(g => !gatesB.includes(g)),
+    personB_unique: gatesB.filter(g => !gatesA.includes(g))
+  };
+
+  // Type Interaction
+  if (chartA.type && chartB.type) {
+    dynamics.type_interaction = {
+      typeA: chartA.type,
+      typeB: chartB.type,
+      note: getTypeInteractionNote(chartA.type, chartB.type)
+    };
+  }
+
+  return dynamics;
+}
+
+function areConnectedGates(gate1, gate2) {
+  const channels = {
+    1: [8], 2: [14], 3: [60], 4: [63], 5: [15],
+    6: [59], 7: [31], 9: [52], 10: [20, 34, 57],
+    11: [56], 12: [22], 13: [33], 16: [48], 17: [62],
+    18: [58], 19: [49], 20: [34, 57], 21: [45], 23: [43],
+    24: [61], 25: [51], 26: [44], 27: [50], 28: [38],
+    29: [46], 30: [41], 32: [54], 35: [36], 37: [40],
+    39: [55], 42: [53], 47: [64]
+  };
+
+  return channels[gate1]?.includes(gate2) || channels[gate2]?.includes(gate1);
+}
+
+function getTypeInteractionNote(typeA, typeB) {
+  const interactions = {
+    'Generator-Manifestor': 'Generator liefert Energie, Manifestor initiiert',
+    'Generator-Generator': 'Hohe Energie, gemeinsame Response',
+    'Manifestor-Projector': 'Manifestor initiiert, Projector guided',
+    'Projector-Generator': 'Projector erkennt, Generator reagiert',
+    'Reflector-Generator': 'Reflector spiegelt Generator-Energie'
+  };
+
+  const key = `${typeA}-${typeB}`;
+  return interactions[key] || interactions[`${typeB}-${typeA}`] || 'Einzigartige Dynamik';
+}
+
+// ======================================================
+// Health-Endpoint
+// ======================================================
+app.get("/health", async (_, res) => {
+  try {
+    // Prüfe Supabase
+    const { error: dbError } = await supabase.schema("public").from("readings").select("id").limit(1);
+
+    res.json({
+      status: "ok",
+      workers: {
+        v3: workerV3.isRunning() ? "running" : "stopped",
+        v4: workerV4.isRunning() ? "running" : "stopped",
+        connection: connectionWorker.isRunning() ? "running" : "stopped",
+        penta: pentaWorker.isRunning() ? "running" : "stopped",
+        multiAgent: multiAgentWorker.isRunning() ? "running" : "stopped"
+      },
+      supabase: dbError ? "error" : "ok",
+      redis: redis.status,
+      knowledge: Object.keys(knowledge).length,
+      templates: Object.keys(templates).length
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      error: error.message
+    });
+  }
+});
+
+app.listen(4000, () => {
+  console.log("🚀 Combined Reading Worker läuft auf Port 4000");
+  console.log("   - V3 Queue: reading-queue (coach_readings in V4 DB)");
+  console.log("   - V4 Queue: reading-queue-v4 (readings + reading_jobs)");
+  console.log("   - Connection Queue: reading-queue-v4-connection (2 Personen)");
+  console.log("   - Penta Queue: reading-queue-v4-penta (3-7 Personen)");
+  console.log("   - Multi-Agent Queue: reading-queue-v4-multi-agent (parallel agents)");
+  console.log("   - Knowledge:", Object.keys(knowledge).length);
+  console.log("   - Templates:", Object.keys(templates).length);
+});

@@ -1,0 +1,31 @@
+Erstelle ein Basic Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Ein grundlegendes Reading mit den wichtigsten Informationen:
+
+## 1. Typ & Strategie
+- Dein Human Design Typ
+- Deine Strategie (wie richtig entscheiden)
+- Kurze Erklärung, was das für dich bedeutet
+
+## 2. Autorität
+- Deine innere Autorität
+- Wie du Entscheidungen treffen solltest
+- Praktische Tipps zur Anwendung
+
+## 3. Zentren (Überblick)
+- Definiert (farbig): Deine stabilen Energien
+- Undefiniert (weiß): Deine Lernbereiche
+- Kurze Erklärung der wichtigsten Zentren
+
+## 4. Basis-Insights
+- Die wichtigsten Erkenntnisse für dich
+- Häufige Fallen und wie sie vermeiden
+- Erste Schritte zur Umsetzung
+
+Sprache: Deutsch
+Stil: Klar, verständlich, motivierend, kompakt
+

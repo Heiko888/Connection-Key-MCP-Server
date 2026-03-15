@@ -1,0 +1,41 @@
+Erstelle ein Health & Wellness Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Gesundheit und Wohlbefinden:
+
+## 1. Energie-Management
+- Deine natürliche Energie
+- Wie du deine Energie optimal nutzt
+- Energie-Rhythmus und Bedürfnisse
+
+## 2. Körperliche Gesundheit
+- Zentren und Gesundheit
+- Körperliche Stärken und Schwächen
+- Gesundheitsempfehlungen basierend auf Human Design
+
+## 3. Emotionale Gesundheit
+- Emotionale Zentren und Wohlbefinden
+- Wie du mit Emotionen umgehst
+- Emotionale Balance
+
+## 4. Stress & Erschöpfung
+- Stressquellen basierend auf undefinierten Zentren
+- Wie du Stress vermeidest
+- Erholung und Regeneration
+
+## 5. Lifestyle-Empfehlungen
+- Lebensstil, der zu deinem Typ passt
+- Ernährung und Bewegung
+- Work-Life-Balance
+
+## 6. Wohlbefinden
+- Praktische Tipps für dein Wohlbefinden
+- Selbstfürsorge basierend auf Human Design
+- Langfristige Gesundheit
+
+Sprache: Deutsch
+Stil: Einfühlsam, unterstützend, praktisch, ermutigend
+

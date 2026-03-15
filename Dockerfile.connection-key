@@ -1,12 +1,14 @@
 FROM node:20-alpine
 
+RUN apk add --no-cache python3 make g++ libc-dev linux-headers py3-setuptools
+
 WORKDIR /app
 
 # Dependencies kopieren
 COPY package*.json ./
 
 # Dependencies installieren
-RUN npm ci --only=production
+RUN npm ci --only=production && npm install swisseph
 
 # Code kopieren
 COPY connection-key/ ./connection-key/

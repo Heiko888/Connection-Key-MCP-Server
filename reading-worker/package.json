@@ -1,0 +1,19 @@
+{
+  "name": "reading-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@supabase/supabase-js": "^2.39.7",
+    "bullmq": "^5.66.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "openai": "^4.28.0"
+  }
+}

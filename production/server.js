@@ -8,7 +8,7 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import dotenv from "dotenv";
 
 // ES Module __dirname
@@ -41,13 +41,13 @@ if (!fs.existsSync(LOGS_PATH)) {
 }
 
 // OpenAI Client initialisieren
-let openai = null;
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+let anthropic = null;
+if (process.env.ANTHROPIC_API_KEY) {
+  anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
   });
 } else {
-  console.error("❌ OPENAI_API_KEY nicht gesetzt!");
+  console.error("❌ ANTHROPIC_API_KEY nicht gesetzt!");
   process.exit(1);
 }
 
@@ -190,8 +190,8 @@ app.get("/health", (req, res) => {
  * Essence aus Reading extrahieren
  */
 async function generateEssence(readingText) {
-  if (!openai) {
-    throw new Error("OpenAI Client nicht initialisiert");
+  if (!anthropic) {
+    throw new Error("Anthropic Client nicht initialisiert");
   }
 
   const essenceSystemPrompt = `Du erzeugst die ESSENCE eines Readings für „The Connection Key“.
@@ -248,23 +248,19 @@ Du benennst Zustände – keine Inhalte.
 
 Gib ausschließlich den reinen Essence-Text zurück.`;
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4",
+  const completion = await anthropic.messages.create({
+    model: "claude-sonnet-4-5",
+    system: essenceSystemPrompt,
     messages: [
-      {
-        role: "system",
-        content: essenceSystemPrompt
-      },
       {
         role: "user",
         content: readingText
       }
     ],
-    temperature: 0.5, // Niedrigere Temperature für präzisere Essence
     max_tokens: 500
   });
 
-  return completion.choices[0].message.content.trim();
+  return completion.content[0].text.trim();
 }
 
 /**
@@ -476,23 +472,19 @@ Stil: ${style}
 WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas fehlt, sage es explizit. Ergänze nichts.`;
 
     // OpenAI API aufrufen
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+    const completion = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      system: systemPrompt,
       messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
         {
           role: "user",
           content: userPrompt
         }
       ],
-      temperature: 0.6, // Niedrigere Temperature für konsistentere Interpretationen
       max_tokens: 4000
     });
 
-    const reading = completion.choices[0].message.content;
+    const reading = completion.content[0].text;
     const readingId = `reading-${Date.now()}-${userId || "anonymous"}`;
 
     // Essence generieren (optional, Fehler werden ignoriert)
@@ -517,7 +509,7 @@ WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas f
       context,
       depth,
       style,
-      tokens: completion.usage.total_tokens,
+      tokens: completion.usage.input_tokens + completion.usage.output_tokens,
       timestamp: new Date().toISOString()
     });
   } catch (error) {

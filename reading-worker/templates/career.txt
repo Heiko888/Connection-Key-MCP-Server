@@ -1,0 +1,41 @@
+Erstelle ein Career Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Karriere und berufliche Entwicklung:
+
+## 1. Berufliche Talente
+- Natürliche Stärken im Beruf
+- Talente basierend auf Typ, Zentren und Channels
+- Einzigartige berufliche Fähigkeiten
+
+## 2. Ideale Arbeitsumgebung
+- Arbeitsbedingungen, die zu dir passen
+- Team-Dynamik und Zusammenarbeit
+- Arbeitsstil und Präferenzen
+
+## 3. Karriere-Empfehlungen
+- Berufsfelder, die zu deinem Typ passen
+- Rollen, die deine Talente nutzen
+- Karrierewege basierend auf Human Design
+
+## 4. Leadership & Zusammenarbeit
+- Dein natürlicher Führungsansatz (wenn zutreffend)
+- Wie du mit verschiedenen Typen arbeitest
+- Team-Kompatibilität
+
+## 5. Karriere-Strategien
+- Wie du berufliche Entscheidungen triffst
+- Strategie für beruflichen Erfolg
+- Häufige Karriere-Fallen und wie vermeiden
+
+## 6. Berufliche Entwicklung
+- Wachstumsbereiche im Beruf
+- Wie du deine Talente weiterentwickelst
+- Langfristige Karriere-Perspektiven
+
+Sprache: Deutsch
+Stil: Professionell, klar, ergebnisorientiert, motivierend
+

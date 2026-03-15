@@ -139,8 +139,9 @@ router.post('/composite', async (req, res) => {
       })
     ));
 
-    const gateSets = results.map(r => new Set(r.gates || []));
-    const allGates = [...new Set(results.flatMap(r => r.gates || []))];
+    const gateNumbers = results.map(r => (r.gates || []).map(g => typeof g === 'object' ? g.number : g));
+    const gateSets = gateNumbers.map(arr => new Set(arr));
+    const allGates = [...new Set(gateNumbers.flat())];
     const compositeChannels = [];
     const connections = { electromagnetic: [], dominance: [], companionship: [], compromise: [] };
 
@@ -183,11 +184,15 @@ router.post('/composite', async (req, res) => {
     const compositeCenters = {};
     const allCenter = new Set(allGates.map(g => GATE_CENTER[g]).filter(Boolean));
     for (const c of allCenter) compositeCenters[c] = true;
+    const allGatesWithNames = allGates.map(num => {
+      const found = results.flatMap(r => r.gates || []).find(g => (typeof g === 'object' ? g.number : g) === num);
+      return found || { number: num, name: `Gate ${num}` };
+    });
 
     res.json({
       success: true,
       persons: results,
-      composite: { gates: allGates, channels: compositeChannels, centers: compositeCenters, connections },
+      composite: { gates: allGatesWithNames, channels: compositeChannels, centers: compositeCenters, connections },
     });
   } catch (err) {
     console.error('[composite]', err);

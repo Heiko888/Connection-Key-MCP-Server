@@ -43,18 +43,13 @@ echo ""
 
 # Test 2: Reading → Mattermost
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📤 Test 2: Reading → Mattermost"
+echo "📤 Test 2: Notification → Mattermost"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
 RESPONSE2=$(curl -s -X POST https://n8n.werdemeisterdeinergedankenagent.de/webhook/reading-mattermost \
   -H "Content-Type: application/json" \
-  -d '{
-    "birthDate": "1990-01-01",
-    "birthTime": "12:00",
-    "birthPlace": "Berlin, Germany",
-    "userId": "test-user"
-  }')
+  -d '{"text": "Test-Benachrichtigung von n8n", "channel": "#tech"}')
 
 echo "Response: $RESPONSE2"
 echo ""
@@ -87,14 +82,20 @@ else
 fi
 
 if [[ "$RESPONSE2" == *"success"* ]] || [[ "$RESPONSE2" == *"Workflow was started"* ]]; then
-  echo -e "${GREEN}✅ Reading → Mattermost: FUNKTIONIERT${NC}"
+  echo -e "${GREEN}✅ Notification → Mattermost: FUNKTIONIERT${NC}"
   ((SUCCESS_COUNT++))
 else
-  echo -e "${RED}❌ Reading → Mattermost: FEHLER${NC}"
+  echo -e "${RED}❌ Notification → Mattermost: FEHLER${NC}"
 fi
 
 echo ""
 echo "Erfolgreich: $SUCCESS_COUNT von 2"
+echo ""
+echo "Optional - Logger testen:"
+echo "  curl -X POST https://n8n.werdemeisterdeinergedankenagent.de/webhook/log \\"
+echo "    -H 'Content-Type: application/json' \\"
+echo "    -d '{\"message\": \"Test-Log\", \"source\": \"test\", \"status\": \"info\"}'"
+echo ""
 
 if [ $SUCCESS_COUNT -eq 2 ]; then
   echo -e "${GREEN}🎉 Alle Mattermost Workflows funktionieren!${NC}"

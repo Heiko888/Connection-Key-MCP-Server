@@ -46,32 +46,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://mattermost.ihre-domain.de/hooks/xxxxx",
+        "url": "={{ $env.MATTERMOST_WEBHOOK_URL }}",
         "authentication": "none",
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "text",
-              "value": "=## 🤖 Agent-Antwort\n\n**Agent:** {{ $json.agentId }}\n**Anfrage:** {{ $('Webhook Trigger').item.json.message }}\n\n---\n\n{{ $json.response }}"
-            },
-            {
-              "name": "channel",
-              "value": "#general"
-            },
-            {
-              "name": "username",
-              "value": "={{ $json.agentId }} Agent"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": '## 🤖 Agent-Antwort\\n\\n**Agent:** ' + ($('Webhook Trigger').item.json.agentId || 'unknown') + '\\n**Anfrage:** ' + ($('Webhook Trigger').item.json.message || '') + '\\n\\n---\\n\\n' + ($json.response || 'Keine Antwort'), \"channel\": $env.MATTERMOST_CHANNEL || '#general', \"username\": ($('Webhook Trigger').item.json.agentId || 'agent') + ' Agent' } }}",
+        "options": {}
       },
       "id": "mattermost-webhook",
       "name": "Send to Mattermost",

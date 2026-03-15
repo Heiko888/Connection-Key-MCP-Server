@@ -37,7 +37,7 @@ FORMAT:
     const clientName = input.clientName || 'der Klient';
     const birthDate = input.birthDate || '';
     const birthTime = input.birthTime || '';
-    const focusArea = input.focusArea || 'allgemein';
+    const focusArea = input.focus || input.focusArea || 'allgemein';
 
     return `Erstelle ein Human Design Basic Reading für ${clientName}.
 

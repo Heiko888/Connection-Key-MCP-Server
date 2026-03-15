@@ -334,6 +334,57 @@ app.post('/agents/reading', async (req, res) => {
   });
 });
 
+// Agent Routes - Vereinfachte Endpoints ohne Auth für Agent Chat
+const agentRoutes = ['marketing', 'automation', 'sales', 'social-youtube', 'chart', 'ui-ux'];
+
+agentRoutes.forEach(agentId => {
+  app.post(`/agent/${agentId}`, async (req, res) => {
+    const { message, userId } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        agent: agentId,
+        message: '',
+        response: '',
+        error: 'message is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // TODO: Hier OpenAI Integration oder anderen Agent-Service aufrufen
+    // Placeholder Response
+    res.json({
+      success: true,
+      agent: agentId,
+      message: message,
+      response: `[${agentId.toUpperCase()} AGENT] Ich habe deine Nachricht erhalten: "${message}". Die vollständige Integration wird gerade implementiert.`,
+      tokens: 50,
+      model: 'gpt-4',
+      timestamp: new Date().toISOString()
+    });
+  });
+});
+
+// Reading Agent Route - Spezialfall
+app.post('/agents/reading', async (req, res) => {
+  const { readingType, clientName, readingData, agentConfig } = req.body;
+  
+  if (!readingType || !clientName) {
+    return res.status(400).json({
+      ok: false,
+      error: 'readingType and clientName are required'
+    });
+  }
+  
+  // TODO: Hier Reading-Generierung implementieren
+  // Placeholder Response
+  res.json({
+    ok: true,
+    result: `[READING AGENT] Reading für ${clientName} (Typ: ${readingType}) wird generiert. Die vollständige Integration wird gerade implementiert.`
+  });
+});
+
 // POST /agents/run
 app.post('/agents/run', authMiddleware, async (req, res) => {
   const startTime = Date.now();

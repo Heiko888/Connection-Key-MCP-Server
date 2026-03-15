@@ -8,10 +8,12 @@
 import { ReadingResponse, ReadingErrorResponse, ReadingType } from '../../api-routes/reading-response-types';
 
 export interface GenerateReadingInput {
+  name: string;
   birthDate: string;
   birthTime: string;
   birthPlace: string;
   readingType?: ReadingType;
+  focus: string;
   userId?: string;
   // Für Compatibility Reading
   birthDate2?: string;
@@ -43,13 +45,21 @@ export async function generateReading(
   input: GenerateReadingInput
 ): Promise<ReadingResponse | ReadingErrorResponse> {
   try {
-    const response = await fetch('/api/reading/generate', {
+    // Prefer V4 queue endpoint; fallback to legacy if not deployed.
+    let response = await fetch('/api/reading/generate-v4', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(input),
     });
+    if (response.status === 404) {
+      response = await fetch('/api/reading/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+    }
 
     // Prüfe Content-Type bevor JSON parsen
     const contentType = response.headers.get('content-type');
@@ -89,7 +99,8 @@ export async function generateReading(
  */
 export async function getReadingStatus(readingId: string): Promise<ReadingStatus | null> {
   try {
-    const response = await fetch(`/api/readings/${readingId}/status`);
+    // Coach-Frontend hat i.d.R. kein User-JWT → nutze public status endpoint
+    const response = await fetch(`/api/readings/${readingId}/public/status`);
     
     if (!response.ok) {
       return null;

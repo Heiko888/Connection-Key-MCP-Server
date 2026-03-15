@@ -11,8 +11,9 @@ export default function CoachDashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Sofort zur Readings-Liste weiterleiten
-    router.replace('/coach/readings-v4/list');
+    // Fallback: route muss im Frontend existieren.
+    // Die V4-Readings-List-Route liegt im Coach-Frontend (integration/frontend).
+    router.replace('/coach');
   }, [router]);
 
   return null;

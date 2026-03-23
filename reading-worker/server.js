@@ -1604,20 +1604,35 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
 // ======================================================
 async function processPentaJob(job, reading) {
   console.log(`🔄 [Penta] Verarbeite Job ${job.id}`);
-  const { members, groupName, groupContext } = reading.client_data || {};
+  const payload = reading.client_data || job.payload || {};
+  const members = payload.members || [];
+  const groupName = payload.groupName || payload.name || 'Gruppe';
+  const groupContext = payload.groupContext || '';
+  const readingId = payload.reading_id;
 
   await supabase
     .from("reading_jobs")
     .update({ status: "processing", started_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  // Echte Chart-Berechnung für alle Mitglieder
+  // Bestehende Reading-Daten laden
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from("readings").select("reading_data").eq("id", readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
+
+  if (!members.length) {
+    throw new Error(`[Penta] Keine Mitglieder im Payload für Job ${job.id}`);
+  }
+
+  // Charts für alle Mitglieder berechnen
   const memberCharts = [];
-  for (const member of (members || [])) {
-    const chart = await fetchChartData(
-      member.birthDate, member.birthTime, member.birthPlace
-    ) || { type: "Unbekannt", gates: [], centers: {} };
+  for (const member of members) {
+    const chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
+      || { type: "Unbekannt", gates: [], centers: {} };
     memberCharts.push({ name: member.name, chart });
+    console.log(`   [Penta] Chart für ${member.name}: ${chart.type}`);
   }
 
   const groupDynamics = analyzePentaDynamics(memberCharts);
@@ -1625,16 +1640,31 @@ async function processPentaJob(job, reading) {
 
   const content = await generateReading({
     agentId: 'penta',
-    template: 'relationship',
-    userData: { groupName, members, memberCharts, groupDynamics, pentaChart }
+    template: 'penta',
+    userData: { groupName, groupContext, members, memberCharts, groupDynamics, pentaChart }
   });
+
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    members: memberCharts.map(m => ({ name: m.name, chart: m.chart })),
+    group_dynamics: groupDynamics,
+    penta_chart: pentaChart,
+  };
+
+  if (readingId) {
+    await supabasePublic
+      .from("readings")
+      .update({ status: "completed", progress: 100, reading_data: newReadingData, updated_at: new Date().toISOString() })
+      .eq("id", readingId);
+  }
 
   await supabase
     .from("reading_jobs")
     .update({ status: "completed", finished_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  console.log(`✅ [Penta] Job ${job.id} abgeschlossen`);
+  console.log(`✅ [Penta] Job ${job.id} abgeschlossen (${memberCharts.length} Personen, ${content?.length} Zeichen)`);
 }
 
 // ======================================================

@@ -1,41 +1,138 @@
-Erstelle ein Relationship Human Design Reading für:
+Erstelle ein tiefgründiges Beziehungs-Reading für ZWEI PERSONEN:
 
-Geburtsdatum: {{birthDate}}
-Geburtszeit: {{birthTime}}
-Geburtsort: {{birthPlace}}
+Person A: {{personAName}}
+Person B: {{personBName}}
 
-Fokus auf Beziehungen und Partnerschaft:
+Dieses Reading beleuchtet, wie {{personAName}} und {{personBName}} in Beziehung zueinander sind – ihre Dynamiken, Kommunikationsmuster, emotionalen Welten und das Potenzial ihrer Verbindung.
 
-## 1. Beziehungsdynamik
-- Wie die Person in Beziehungen ist
-- Beziehungsstil basierend auf Typ
-- Energie in Beziehungen
+Schreibe das gesamte Reading aus der Perspektive BEIDER Personen – nie isoliert über eine Person, immer in Beziehung zueinander. Nenne beide bei ihren Namen in jeder Sektion.
 
-## 2. Kommunikationsstil
-- Wie kommuniziert wird
-- Emotionale Kommunikation
-- Bedürfnisse in der Kommunikation
+---
 
-## 3. Intimität & Nähe
-- Wie Nähe gelebt wird
-- Bedürfnisse nach Nähe und Distanz
-- Intimität basierend auf Zentren
+## 1. Wer seid ihr füreinander?
 
-## 4. Kompatibilität
-- Mit welchen Typen gut harmoniert
-- Herausforderungen mit verschiedenen Typen
-- Wie verschiedene Energien zusammenarbeiten
+- Was bringt {{personAName}} als Typ ({{typeA}}) in diese Beziehung?
+- Was bringt {{personBName}} als Typ ({{typeB}}) in diese Beziehung?
+- Welche erste, unmittelbare Energie entsteht, wenn diese zwei Menschen aufeinandertreffen?
+- Welches Beziehungsthema trägt diese Verbindung von Natur aus – Wachstum, Stabilität, Herausforderung, tiefe Vertrautheit?
+- Was sehen {{personAName}} und {{personBName}} jeweils im anderen, das sie in sich selbst noch nicht vollständig leben?
 
-## 5. Beziehungs-Empfehlungen
-- Praktische Tipps für gesunde Beziehungen
-- Wie die Strategie in Beziehungen anwenden
-- Häufige Beziehungsfallen und wie vermeiden
+---
 
-## 6. Partnerschaft
-- Was in einer Partnerschaft wichtig ist
-- Wie Entscheidungen gemeinsam treffen
-- Balance zwischen Individuum und Paar
+## 2. Beziehungsstile & Bedürfnisse
+
+Jeder Mensch liebt, bindet und verbindet sich anders – das Design zeigt, wie.
+
+**{{personAName}} in Beziehungen:**
+- Wie geht {{personAName}} auf andere zu – initiiert, wartet, lädt ein, antwortet?
+- Was braucht {{personAName}} in einer Beziehung, um sich sicher, gesehen und verbunden zu fühlen?
+- Wie drückt {{personAName}} Zuneigung, Fürsorge und Liebe aus?
+- Was sind die größten Beziehungsängste oder Konditionierungen von {{personAName}}?
+
+**{{personBName}} in Beziehungen:**
+- Wie geht {{personBName}} auf andere zu – initiiert, wartet, lädt ein, antwortet?
+- Was braucht {{personBName}} in einer Beziehung, um sich sicher, gesehen und verbunden zu fühlen?
+- Wie drückt {{personBName}} Zuneigung, Fürsorge und Liebe aus?
+- Was sind die größten Beziehungsängste oder Konditionierungen von {{personBName}}?
+
+**Das Zusammenspiel:**
+- Wo ergänzen sich diese zwei Beziehungsstile natürlich?
+- Wo stoßen sie aufeinander – und warum ist das aus dem Design heraus erklärbar?
+
+---
+
+## 3. Kommunikation: Wie ihr miteinander sprecht (und aneinander vorbeiredet)
+
+- Wie kommuniziert {{personAName}} (Autorität: {{authorityA}}, Strategie: {{strategyA}}) von Natur aus?
+- Wie kommuniziert {{personBName}} (Autorität: {{authorityB}}, Strategie: {{strategyB}}) von Natur aus?
+- Das Kehlkopf-Zentrum beider: Wer spricht, wann und wie – und was bedeutet Schweigen jeweils?
+- Typische Missverständnisse zwischen diesen zwei Kommunikationsstilen – konkret benannt
+- Was sagt {{personAName}}, wenn er/sie meint "Ich brauche Abstand" – und wie versteht es {{personBName}}?
+- Was sagt {{personBName}}, wenn er/sie meint "Ich bin verletzt" – und wie versteht es {{personAName}}?
+- Wie können beide die Sprache des anderen lernen, ohne sich selbst zu verleugnen?
+
+---
+
+## 4. Emotionale Welt & Verletzlichkeit
+
+- Wie verarbeiten {{personAName}} und {{personBName}} Emotionen jeweils?
+- Das Solarplexus-Zentrum: Ist es bei einer oder beiden Personen definiert – und welche Dynamik entsteht?
+  - Definiertes Solarplexus: Emotionale Wellen, die den anderen mitreißen können
+  - Undefiniertes Solarplexus: Feinfühligkeit für fremde Emotionen, Konditionierungsrisiko
+- Wie gehen {{personAName}} und {{personBName}} mit Konflikt um – und wie unterschiedlich?
+- Was braucht jede Person, um sich nach Streit oder Distanz wieder zu verbinden?
+- Wo entsteht echte emotionale Tiefe und Intimität in dieser Beziehung?
+- Was macht es schwer, verletzlich zu sein – und was hilft?
+
+---
+
+## 5. Nähe & Distanz: Räume in der Zweisamkeit
+
+- Wie viel Nähe braucht {{personAName}} – wie viel Raum für sich?
+- Wie viel Nähe braucht {{personBName}} – wie viel Raum für sich?
+- Wo entsteht der typische Nähe-Distanz-Konflikt in dieser Kombination?
+- Wie kann {{personAName}} Rückzugsbedarf signalisieren, ohne dass {{personBName}} es als Ablehnung erlebt?
+- Wie kann {{personBName}} Rückzugsbedarf signalisieren, ohne dass {{personAName}} es als Ablehnung erlebt?
+- Was ist die gesunde Balance zwischen Zweisamkeit und Individualität in dieser Verbindung?
+
+---
+
+## 6. Konditionierung in der Beziehung
+
+Die größte Gefahr in einer Beziehung: dass man aufhört, sich selbst zu sein, und anfängt, den anderen zu spielen.
+
+- Welche Zentren von {{personAName}} wirken auf die offenen Zentren von {{personBName}} – und umgekehrt?
+- Wo übernimmt {{personAName}} unbewusst die Energie von {{personBName}} und verliert sich dabei?
+- Wo übernimmt {{personBName}} unbewusst die Energie von {{personAName}} und verliert sich dabei?
+- Was sind die Zeichen, dass jemand aus der Konditionierung handelt statt aus dem echten Selbst?
+- Die Befreiungsfrage für beide: "Handle ich gerade als ich selbst – oder als die Version von mir, die der andere braucht?"
+
+---
+
+## 7. Vertrauen & das Fundament der Verbindung
+
+- Was ist das Fundament dieser Beziehung – was trägt sie, egal was passiert?
+- Welche gemeinsamen Werte zeigen sich in beiden Charts?
+- Wie bauen {{personAName}} und {{personBName}} Vertrauen auf – und wodurch wird es erschüttert?
+- Was braucht jede Person konkret, um wirklich zu vertrauen?
+- Gibt es Gates oder Channels, die eine tiefe seelische Verbundenheit zwischen beiden zeigen?
+
+---
+
+## 8. Wachstum: Wozu lädt diese Beziehung ein?
+
+Jede tiefe Beziehung ist ein Wachstumsspiegel.
+
+- Was spiegelt {{personBName}} für {{personAName}} – welche Seite von sich selbst begegnet {{personAName}} im anderen?
+- Was spiegelt {{personAName}} für {{personBName}} – welche Seite von sich selbst begegnet {{personBName}} im anderen?
+- Das zentrale Wachstumsthema dieser Verbindung – das Thema, das immer wieder auftaucht
+- Welche Herausforderungen dieser Beziehung sind eigentlich Einladungen zur persönlichen Reife?
+- Was werden {{personAName}} und {{personBName}} füreinander sein, wenn sie bewusst mit ihrem Design umgehen?
+
+---
+
+## 9. Stärken dieser Beziehung
+
+- Die drei tiefsten Stärken dieser spezifischen Verbindung – konkret, nicht generisch
+- Was macht {{personAName}} und {{personBName}} füreinander einzigartig wertvoll?
+- Wo ergänzen sie sich auf eine Weise, die beide größer macht?
+- Das besondere Geschenk dieser Beziehung – was sie als Paar in die Welt tragen
+
+---
+
+## 10. Empfehlungen für eine tiefe, bewusste Beziehung
+
+Konkrete Handlungsempfehlungen, direkt auf beide Charts zugeschnitten:
+
+1. **Für {{personAName}}**: Die eine Praxis, die diese Beziehung am meisten nährt
+2. **Für {{personBName}}**: Die eine Praxis, die diese Beziehung am meisten nährt
+3. **Gemeinsam**: Ein Ritual oder eine Gewohnheit, die zu beiden Typen passt
+4. **Das Muster loslassen**: Das eine Verhaltensmuster, das beide vereinbaren sollten zu unterbrechen
+5. **Ein Satz**: Die Essenz dieser Beziehung und ihr Potenzial – ihr gemeinsames Leitmotiv
+
+---
 
 Sprache: Deutsch
-Stil: Einfühlsam, klar, wertvoll, unterstützend
-
+Stil: Warm, tiefgründig, direkt – einfühlsam ohne zu beschönigen, konkret ohne zu urteilen
+Länge: Ausführlich – jede Sektion mit echter Tiefe, als würde eine erfahrene Human Design Coach beide Personen gleichzeitig begleiten
+WICHTIG: Nenne {{personAName}} und {{personBName}} in jeder Sektion bei ihren Namen. Nie allgemeine Phrasen – immer konkret auf diese zwei Menschen bezogen.

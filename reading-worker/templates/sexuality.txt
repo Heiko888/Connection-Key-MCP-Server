@@ -1,18 +1,108 @@
-Erstelle ein detailliertes Human Design Reading für:
+Erstelle eine tiefgründige Intimität & Sexualität Resonanzanalyse für ZWEI PERSONEN:
 
-Geburtsdatum: {{birthDate}}
-Geburtszeit: {{birthTime}}
-Geburtsort: {{birthPlace}}
+Person A: {{personAName}}
+Person B: {{personBName}}
 
-Das Reading soll enthalten:
-- Typ-Analyse (Generator, Manifestor, Projector, Reflector)
-- Strategie & Autorität
-- Zentren (definiert/undefiniert)
-- Channels & Gates
-- Profile
-- Inkarnationskreuz
-- Spezifische Insights und Empfehlungen
+Dies ist eine Verbindungsanalyse, die die erotische, emotionale und seelische Resonanz zwischen zwei Menschen aus der Perspektive ihrer Human Design Charts beleuchtet.
+
+Schreibe das gesamte Reading aus der Perspektive BEIDER Personen – nie nur über eine Person allein. Nenne beide bei ihren Namen in jeder Sektion.
+
+---
+
+## 1. Die erotische Grundchemie
+
+- Welche energetische Grundchemie besteht zwischen {{personAName}} und {{personBName}}?
+- Wie treffen ihre Energiefelder aufeinander – wo entsteht Anziehung, wo Spannung, wo Reibung?
+- Wie beeinflusst die Typ-Kombination ({{typeA}} und {{typeB}}) die sexuelle Dynamik?
+- Was zieht sie magnetisch zueinander – und was ist die Quelle dieser Anziehung im Chart?
+
+---
+
+## 2. Körper, Energie & Begehren
+
+- Wie erleben {{personAName}} und {{personBName}} körperliche Nähe jeweils aus ihrem Design heraus?
+- Welche Zentren sind definiert und wie beeinflussen sie das Erleben von Körperlichkeit und Sinnlichkeit?
+  - Das Sakral-Zentrum (rohe, physische Lebensenergie und sexuelle Kraft)
+  - Das Milz-Zentrum (Sicherheit, Körperintelligenz – beeinflusst Körpernähe und Vertrauen)
+  - Das Solarplexus-Zentrum (emotionale Wellen und ihr Einfluss auf Intimität)
+  - Das Herz/Ego-Zentrum (Selbstwert und was es braucht, um sich zu zeigen)
+- Wer konditioniert wen energetisch im Körperbereich – und wie wirkt sich das aus?
+- Was passiert in ihrer gemeinsamen Energie, wenn sie körperlich nahe sind?
+
+---
+
+## 3. Emotionale Intimität & Verletzlichkeit
+
+- Wie öffnen sich {{personAName}} und {{personBName}} emotional füreinander?
+- Welche emotionalen Wellen und Zyklen bringen sie jeweils mit – und wie beeinflussen diese die Intimität?
+- Wo entsteht echte emotionale Sicherheit zwischen ihnen – und wo ist Verletzlichkeit schwer?
+- Das Solarplexus-Zentrum: Wenn eine oder beide Personen emotional definiert sind – welche Dynamik entsteht?
+- Was brauchen {{personAName}} und {{personBName}} jeweils, um sich emotional wirklich sicher zu fühlen?
+
+---
+
+## 4. Elektromagnetische Gates & die Körpersprache des Designs
+
+- Welche Gates aktivieren sich elektromagnetisch zwischen beiden – und was löst das körperlich und seelisch aus?
+- Besondere Aufmerksamkeit auf Gates, die mit Intimität, Sexualität und Verbindung zusammenhängen:
+  - Gate 59 (Sexualität, Auflösung von Barrieren für Intimität)
+  - Gate 6 (Emotionale Reibung – das Tor zur Intimität, öffnet oder schließt die Verbindung)
+  - Gate 27 (Fürsorge, Nähren, der Wunsch zu pflegen)
+  - Gate 44 (Körpererinnerung, sensorische Anziehung)
+  - Gate 39/55 (emotionale Tiefe und Sehnsucht)
+  - Gate 14/2/46 (Körperbewusstsein, Erdung, Liebe zum Körper)
+- Welche Gates schaffen Resonanz – welche schaffen Spannung, die zur Anziehung wird?
+- Was entsteht zwischen ihnen, das keine der beiden Personen allein hat?
+
+---
+
+## 5. Vertrauen, Sicherheit & das Öffnen
+
+- Wie bauen {{personAName}} und {{personBName}} echtes Vertrauen füreinander auf?
+- Welche Strategien und Autoritäten ({{strategyA}}/{{authorityA}} und {{strategyB}}/{{authorityB}}) bestimmen, wie und wann sich beide öffnen?
+- Was sabotiert das Vertrauen zwischen ihnen (Konditionierungen, undefinierte Zentren, Not-Self)?
+- Was schafft den sichersten Raum für beide, um sich vollständig zu zeigen?
+
+---
+
+## 6. Kommunikation von Wünschen & Bedürfnissen
+
+- Wie kommunizieren {{personAName}} und {{personBName}} über Wünsche, Grenzen und Bedürfnisse in der Intimität?
+- Welche Rolle spielt das Kehlkopf-Zentrum beider – wie artikulieren sie sich im intimen Raum?
+- Wie können beide lernen, ihre Bedürfnisse so zu kommunizieren, dass beide sich gehört fühlen?
+
+---
+
+## 7. Schatten & Wachstum in der Intimität
+
+- Welche typischen Schatten oder Konditionierungen bringen {{personAName}} und {{personBName}} jeweils in die Intimität?
+- Wo entsteht Rückzug, Schweigen, Vermeidung oder Überflutung – und warum aus dem Design heraus?
+- Was sind die typischen Missverständnisse zwischen diesen zwei Typen in der Intimität?
+- Was ist das gemeinsame Wachstumsfeld – wohin lädt diese Verbindung beide ein?
+
+---
+
+## 8. Seele & Erotik: Die tiefere Bedeutung dieser Verbindung
+
+- Was verbindet {{personAName}} und {{personBName}} auf einer tieferen, seelischen Ebene?
+- Welche Lebensthemen bringen sie füreinander zum Ausdruck, die sie allein nicht hätten?
+- Das gemeinsame Potenzial: Was wird möglich, wenn sie sich vollständig öffnen?
+- Ein abschließendes Bild für die energetische Qualität dieser Verbindung
+
+---
+
+## 9. Empfehlungen für tiefe Resonanz
+
+Konkrete, auf beiden Charts basierende Empfehlungen:
+
+1. Wie {{personAName}} und {{personBName}} mehr Raum für echte Intimität schaffen können
+2. Welches Ritual oder welche Praxis zur Energie beider Typen passt
+3. Die wichtigste Konditionierung, die jede Person in der Intimität loslassen kann
+4. Ein Satz, der die erotisch-seelische Essenz dieser Verbindung beschreibt
+
+---
 
 Sprache: Deutsch
-Stil: Authentisch, klar, wertvoll, persönlich
-
+Stil: Tiefgründig, respektvoll, direkt – bewusst, körper- und seelenbejahend, nicht prüde
+WICHTIG: Nenne beide Personen in jeder Sektion bei ihren Namen. Keine allgemeinen Aussagen – immer beide in Beziehung zueinander.
+Länge: Ausführlich – Premium-Reading mit der Qualität einer Coaching-Session.

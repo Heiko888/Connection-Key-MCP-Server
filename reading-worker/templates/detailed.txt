@@ -1,42 +1,244 @@
-Erstelle ein detailliertes Human Design Reading für:
+Erstelle ein umfassendes, tiefgründiges Human Design Reading für:
 
+Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Das Reading soll folgende Abschnitte enthalten:
+Typ: {{type}}
+Profil: {{profile}}
+Autorität: {{authority}}
+Strategie: {{strategy}}
 
-## 1. Typ-Analyse
-- Detaillierte Erklärung des Typs
-- Strategie (wie richtig entscheiden)
-- Autorität (innerer Entscheidungsmechanismus)
-- Rolle in der Welt
+Schreibe dieses Reading direkt an {{clientName}} gerichtet – persönlich, tiefgehend, konkret. Keine generischen Human Design Erklärungen, sondern ein Spiegel des einzigartigen Designs dieser Person. Beginne jede Sektion mit dem Namen {{clientName}}.
 
-## 2. Zentren
-- Definiert (farbig): Stabile Energien und Talente
-- Undefiniert (weiß): Offenheit und Lernbereiche
-- Detaillierte Erklärung jedes Zentrums
+---
 
-## 3. Channels & Gates
-- Wichtige Channels (Verbindungen zwischen Zentren)
-- Relevante Gates (Tore in den Zentren)
-- Talente und Fähigkeiten
+## 1. Dein Energietyp: Wer du wirklich bist
 
-## 4. Profile
-- Profil-Nummern und Bedeutung
-- Wie sich die Person in der Welt bewegt
-- Lebensrolle und Verhalten
+Der Typ ist nicht das, was du bist – er ist, wie deine Energie in der Welt funktioniert. Erkläre den Typ {{type}} von {{clientName}} mit allen Nuancen:
 
-## 5. Inkarnationskreuz
-- Lebensaufgabe und höherer Zweck
-- Evolutionäre Aufgabe
+**Die Essenz des Typs:**
+- Was es bedeutet, als {{type}} geboren zu sein – nicht als Einschränkung, sondern als Superkraft
+- Wie die Energie von {{clientName}} auf andere wirkt – was Menschen spüren, wenn sie mit ihr/ihm zusammen sind
+- Der fundamentale Unterschied zwischen diesem Typ und anderen Typen im Alltag
 
-## 6. Praktische Anwendungen
-- Konkrete Empfehlungen für den Alltag
-- Wie die Strategie anwenden
-- Wie die Autorität nutzen
-- Häufige Fallen und wie sie vermeiden
+**Strategie: {{strategy}}**
+- Warum diese Strategie das wichtigste Werkzeug im Leben von {{clientName}} ist
+- Konkrete Situationen aus dem Alltag, in denen die Strategie angewendet werden kann (Entscheidungen, Beziehungen, Arbeit, Spontanität)
+- Was passiert, wenn gegen die Strategie gehandelt wird – die emotionalen und praktischen Konsequenzen im Leben
+- Wie lange es dauert, bis die Strategie sich natürlich anfühlt – der Weg vom Kopfverstehen zur Verkörperung
+
+**Die Not-Self-Emotion als Navigationssystem:**
+- Frustration (Generator), Bitterkeit (Projektor), Wut (Manifestor), Enttäuschung (Reflektor) – was diese Emotion im Leben von {{clientName}} signalisiert
+- Wie diese Emotion als Frühwarnsystem genutzt werden kann
+- Konkrete Beispiele, wann diese Not-Self-Emotion bei {{clientName}} auftaucht
+
+**Die Signatur des Typs als Zielzustand:**
+- Zufriedenheit (Generator), Erfolg (Projektor), Frieden (Manifestor), Überraschung (Reflektor) – wann {{clientName}} weiß, dass sie/er im Flow ist
+- Wie sich dieser Zustand anfühlt und wie er hervorgerufen werden kann
+
+---
+
+## 2. Die Autorität: Dein innerer Entscheidungskompass
+
+Die Autorität ist das präziseste Werkzeug für richtige Entscheidungen – wichtiger als der Verstand.
+
+**Die Autorität von {{clientName}}: {{authority}}**
+
+Erkläre diese Autorität mit voller Tiefe:
+- Wie genau sie funktioniert – die Physiologie hinter der Autorität
+- Woran {{clientName}} erkennt, dass sie/er aus der Autorität heraus entscheidet (im Vergleich zu: aus Angst, aus Druck, aus Konditionierung)
+- Die häufigsten Fallen: Wie der Verstand die Autorität überschreibt und welche Folgen das hat
+- Übungen und Praktiken, um die Autorität zu stärken und ihr zu vertrauen
+- Wie die Autorität bei großen Lebensentscheidungen (Beziehungen, Karriere, Wohnort) angewendet wird
+- Wie die Autorität bei kleinen Alltagsentscheidungen genutzt werden kann
+
+**Verstand als Kommunikator, nicht als Entscheider:**
+- Die Rolle des Verstandes im System von {{clientName}}
+- Wie der Verstand die Welt beobachtet und reflektiert, ohne die Entscheidungshoheit zu haben
+
+---
+
+## 3. Die Zentren: Deine Energiearchitektur
+
+Das Human Design Chart hat 9 Zentren. Jedes definierte Zentrum ist eine konsistente Kraft, jedes undefinierte ist ein Ort der Weisheit und Konditionierung.
+
+**Definierte Zentren von {{clientName}}:**
+
+Für jedes definierte Zentrum erkläre:
+- Die spezifische Energie, die {{clientName}} konstant ausstrahlt und in die Welt trägt
+- Das Geschenk dieses Zentrums – was es {{clientName}} ermöglicht
+- Wie andere Menschen diese Energie erleben, wenn sie mit {{clientName}} zusammen sind
+- Wie {{clientName}} dieses Zentrum bewusst einsetzen kann
+
+**Undefinierte Zentren von {{clientName}}:**
+
+Für jedes undefinierte Zentrum erkläre:
+- Welche Konditionierungen typischerweise in diesem Zentrum entstehen
+- Die Weisheit, die durch das Nicht-Fixiert-Sein in diesem Zentrum entsteht
+- Konkrete Beispiele, wie {{clientName}} in diesem Bereich konditioniert wurde oder wird
+- Wie die Frage "Ist das meine Energie oder habe ich sie aufgenommen?" das Leben verändert
+- Was das undefinierte Zentrum als Lernfeld bedeutet
+
+**Das wichtigste undefinierte Zentrum:**
+- Welches undefinierte Zentrum die stärkste Wirkung auf das Leben von {{clientName}} hat
+- Die tiefste Konditionierung und wie sie aufgelöst werden kann
+
+---
+
+## 4. Channels & Gates: Deine einzigartigen Talente
+
+Die aktivierten Channels und Gates sind das, was {{clientName}} einzigartig und unverwechselbar macht.
+
+**Die aktivierten Channels von {{clientName}}:**
+
+Für jeden vollständig aktivierten Channel erkläre:
+- Die Themenenergie dieses Channels – was er über die Person aussagt
+- Welche Talente und Fähigkeiten durch diesen Channel in die Welt gebracht werden
+- Wie diese Energie sich im Alltag von {{clientName}} zeigt
+- Die Schattenseite oder Herausforderung dieses Channels (zu viel davon, konditionierter Ausdruck)
+- Konkrete Lebensbereiche, in denen dieser Channel besonders wirksam ist
+
+**Schlüssel-Gates (aktivierte, aber nicht vollständig verbundene Gates):**
+
+Für die wichtigsten Gates erkläre:
+- Die Energie-Qualität dieses Gates – seine tiefste Bedeutung
+- Wie dieses Gate das Denken, Fühlen und Handeln von {{clientName}} beeinflusst
+- Die höchste Ausdrucksform dieses Gates (wenn es bewusst gelebt wird)
+- Die bedingte Ausdrucksform (wenn es unbewusst aus Konditionierung entsteht)
+
+**Das Solar-Tor und Erd-Tor von {{clientName}}:**
+- Persönlichkeitssonne: Das bewusste Lebensthema, der sichtbare Ausdruck
+- Persönlichkeitserde: Das, was Stabilität und Fundament gibt
+- Design-Sonne: Die unbewusste Kraft, die andere in {{clientName}} sehen
+- Design-Erde: Die tiefe Verwurzelung, oft erst im Rückblick erkennbar
+
+---
+
+## 5. Das Profil: Deine Lebensrolle
+
+Das Profil {{profile}} beschreibt, wie {{clientName}} in der Welt lebt und lernt – es ist der Kostüm, das die Seele trägt.
+
+**Die beiden Linien des Profils {{profile}}:**
+
+Erkläre beide Linien mit Tiefe:
+- Was jede Linie über die Lebensweise, das Lernmuster und die Rolle in der Welt sagt
+- Wie diese beiden Linien zusammenwirken – das Spannungsfeld und die Synergie
+- Typische Lebensmuster, die durch dieses Profil entstehen
+- Beziehungen und dieses Profil: Wie {{clientName}} in Beziehungen agiert
+- Beruf und dieses Profil: Welche Rollen natürlich entstehen
+
+**Das Profil im Detail:**
+Linie 1: Der Forscher – Fundament und Wissen sind die Basis; {{clientName}} braucht Sicherheit durch Vorbereitung
+Linie 2: Der Einsiedler – Talent wird von anderen gesehen, bevor {{clientName}} es selbst erkennt; Rückzug ist kein Fehler
+Linie 3: Der Märtyrer – Lernen durch Erfahrung und Anpassung; "Fehler" sind der Lehrmeister
+Linie 4: Der Opportunist – Netzwerke und Beziehungen sind die Lebensader; Vertrauen ist alles
+Linie 5: Der Häretiker – Praktische Lösungen für andere; Projektion der Anderen ist das Hauptthema
+Linie 6: Das Rollenmodell – Drei Lebensphasen; in der dritten Phase Weisheit und Inspiration verkörpern
+
+**Die Besonderheit des Profils {{profile}} von {{clientName}}:**
+- Was dieses spezifische Profil im Leben von {{clientName}} bewirkt
+- Die größte Stärke und die größte Herausforderung
+- Wie das Profil die Strategie und Autorität ergänzt
+
+---
+
+## 6. Das Inkarnationskreuz: Deine Lebensaufgabe
+
+Das Inkarnationskreuz ist der tiefste Kontext des Lebens – nicht ein Auftrag, den man erfüllen muss, sondern eine Energie, die durch einen hindurchfließt, wenn man sich selbst treu lebt.
+
+**Das Inkarnationskreuz von {{clientName}}:**
+- Der Name und die Essenz des Kreuzes
+- Die vier Gates, die dieses Kreuz bilden – und ihre Zusammenspiel
+- Welches übergeordnete Thema sich durch das Leben von {{clientName}} zieht
+- Wann diese Lebensaufgabe gelebt wird – und wann nicht
+- Wie das Inkarnationskreuz das tägliche Leben beeinflusst (ohne es als Druck zu erleben)
+- Die Evolution: Wie das Kreuz im Laufe des Lebens tiefer gelebt werden kann
+
+**Der tiefste Sinn:**
+- Was {{clientName}} in die Welt bringt, das kein anderer Mensch auf dieselbe Art bringen kann
+- Wie das Inkarnationskreuz mit dem Profil {{profile}} zusammenhängt
+
+---
+
+## 7. Konditionierung und Entkonditionierung
+
+Das 7-jährige Dekonditionierungsexperiment ist einer der wichtigsten Aspekte im Human Design.
+
+**Typische Konditionierungen von {{clientName}}:**
+- Welche Botschaften in der Kindheit wurden über undefinierte Zentren aufgenommen?
+- Welche gesellschaftlichen Konditionierungen widersprechen dem Design?
+- Welche Entscheidungen wurden aus dem Kopf statt aus der Autorität getroffen?
+
+**Der Weg der Entkonditionierung:**
+- Was Dekonditionierung konkret bedeutet – keine Technologie, sondern gelebte Erfahrung
+- Wie die Strategie und Autorität täglich geübt werden können
+- Was {{clientName}} loslassen muss, um sich selbst zu leben
+- Welche Umgebungen und Beziehungen die Konditionierung verstärken
+
+**Das Experiment:**
+- Warum Human Design ein Experiment ist, kein Glaubenssystem
+- Wie {{clientName}} beginnt, das eigene Design auszuprobieren – ohne Perfektionismus
+
+---
+
+## 8. Beziehungen und Human Design
+
+Das Design zeigt auch, wie {{clientName}} in Beziehungen ist.
+
+**Wie {{clientName}} in Beziehungen wirkt:**
+- Was andere in der Nähe von {{clientName}} erleben – die Energie, die ausgestrahlt wird
+- Welche Typen energetisch gut mit {{clientName}} zusammenpassen
+- Welche Konditionierungsrisiken in Beziehungen bestehen (besonders durch undefinierte Zentren)
+
+**Liebe und Partnerschaft:**
+- Wie die Strategie in romantischen Beziehungen angewendet wird
+- Was {{clientName}} in einer tiefen Beziehung braucht
+- Typische Beziehungsmuster, die durch das Design erklärt werden
+
+**Freundschaften und Familie:**
+- Wie Profilenergie die sozialen Verbindungen prägt
+- Was {{clientName}} wirklich in Freundschaften trägt
+
+---
+
+## 9. Körper, Gesundheit und Schlaf
+
+Das Bodygraph ist ein Körpersystem – Gesundheit ist eng mit dem Design verknüpft.
+
+**Energie und Gesundheit nach Typ:**
+- Wie {{clientName}} Energie verwaltet (Energietypen vs. Non-Energietypen)
+- Wann Erschöpfung ein Signal ist und was sie bedeutet
+- Schlaf-Empfehlungen nach Design (Strategie gilt auch für Schlaf)
+
+**Körperliche Sensitivitäten durch undefinierte Zentren:**
+- Welche körperlichen Bereiche durch undefinierte Zentren beeinflusst werden
+- Wie {{clientName}} lernt, den eigenen Körper als Navigationsgerät zu nutzen
+
+---
+
+## 10. Praktische Integration: So lebst du dein Design
+
+Konkrete, sofort anwendbare Empfehlungen für {{clientName}}:
+
+**Die wichtigsten Übungen für die nächsten 30 Tage:**
+1. Strategie täglich bewusst anwenden – eine konkrete Situation pro Tag
+2. Autoritäts-Praxis: Wie {{clientName}} die Autorität {{authority}} in kleinsten Entscheidungen testet
+3. Not-Self beobachten: Wann taucht die Not-Self-Emotion auf? Was war der Auslöser?
+4. Energie-Tagebuch: Wann fühlt sich der Tag energetisch stimmig an, wann nicht?
+
+**Die drei wichtigsten Erkenntnisse für {{clientName}}:**
+- Das Geschenk, das das Design mitbringt – und das oft übersehen oder bekämpft wird
+- Die größte Herausforderung – und wie sie zur Stärke wird
+- Der eine Satz, der das Design von {{clientName}} auf den Punkt bringt
+
+**Eine Einladung:**
+Schreibe abschließend eine persönliche, inspirierende Einladung an {{clientName}}, das eigene Design als Experiment anzunehmen – ohne Perfektionismus, mit Neugier und Selbstmitgefühl.
+
+---
 
 Sprache: Deutsch
-Stil: Authentisch, klar, wertvoll, persönlich, detailliert
-
+Stil: Tiefgründig, persönlich, poetisch wo angemessen, konkret wo nötig – direkt an {{clientName}} gerichtet
+Länge: Umfassend und vollständig – jede Sektion mit echter Tiefe, kein Oberflächenwissen
+WICHTIG: Nenne {{clientName}} in jeder Sektion. Kein generisches Human Design Lehrbuch – ein lebendiger Spiegel dieser einen Person.

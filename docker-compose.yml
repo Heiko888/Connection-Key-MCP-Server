@@ -75,8 +75,8 @@ services:
   # Reading Agent (vormals PM2 reading-agent)
   reading-worker:
     build:
-      context: ./production
-      dockerfile: ../reading-worker/Dockerfile
+      context: ./reading-worker
+      dockerfile: Dockerfile
     container_name: reading-worker
     
     ports:
@@ -86,6 +86,7 @@ services:
       - NODE_ENV=production
       - PORT=4000
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
 
       # Supabase
       - SUPABASE_URL=${SUPABASE_URL}
@@ -109,48 +110,8 @@ services:
     networks:
       - app-network
 
-  # V4 Reading Worker (NEW)
-  v4-reading-worker:
-    build:
-      context: ./v4/worker
-      dockerfile: Dockerfile
-    container_name: v4-reading-worker
-    environment:
-      - NODE_ENV=production
-      - PORT=5000
-      
-      # V4 Supabase
-      - V4_SUPABASE_URL=${V4_SUPABASE_URL}
-      - V4_SUPABASE_SERVICE_KEY=${V4_SUPABASE_SERVICE_KEY}
-      
-      # OpenAI
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_RPM_LIMIT=${OPENAI_RPM_LIMIT:-60}
-      
-      # Redis
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      
-      # Chart API
-      - USE_CHART_API=${USE_CHART_API:-false}
-      - CHART_API_URL=${CHART_API_URL:-}
-      - HD_APP_URL=${HD_APP_URL:-https://www.the-connection-key.de}
-      
-      # Worker Configuration
-      - MAX_CONCURRENT_JOBS=${MAX_CONCURRENT_JOBS:-5}
-      - ENABLE_PARALLEL_PROCESSING=${ENABLE_PARALLEL_PROCESSING:-true}
-    
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  # V4 Reading Worker (deaktiviert - Polling ist in reading-worker integriert)
+  # v4-reading-worker: disabled
 
   # Frontend - Next.js (Dev)
   #frontend:

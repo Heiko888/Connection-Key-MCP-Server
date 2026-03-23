@@ -282,24 +282,12 @@ function formatChartChannels(channels) {
 }
 function formatChartGates(gates) {
   if (!gates?.length) return 'Keine Daten';
-  return gates.slice(0, 15).map(g => `  - Tor ${g.number || g}: ${g.name || 'Unbekannt'}`).join('\n');
+  return gates.slice(0, 30).map(g => `  - Tor ${g.number || g}: ${g.name || 'Unbekannt'}`).join('\n');
 }
 
-async function generateReading({ agentId, template, userData, chartData }) {
-  const selectedModelId = userData?.ai_model || DEFAULT_MODEL;
-  let modelConfig = MODEL_CONFIG[selectedModelId] || MODEL_CONFIG[DEFAULT_MODEL];
-  const maxTokens = userData?.ai_config?.max_tokens || modelConfig.maxTokens;
-
-  if (modelConfig.provider === "claude" && !isClaudeAvailable()) {
-    throw new Error(`Claude (${selectedModelId}) nicht verfügbar`);
-  }
-
-  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData });
-
-  const templateContent = templates[template] || templates['default'] ||
-    "Erstelle ein Human Design Reading basierend auf den gegebenen Daten.";
-
-  const chartInfo = chartData ? `
+function buildChartInfo(chartData) {
+  if (!chartData) return '';
+  return `
 BERECHNETE CHART-DATEN (Präzise für diese Person!):
 TYP: ${chartData.type || 'Unbekannt'}
 PROFIL: ${chartData.profile || 'Unbekannt'}
@@ -316,18 +304,317 @@ TORE:
 ${formatChartGates(chartData.gates)}
 
 Nutze diese KONKRETEN Daten! Beschreibe JEDES definierte Zentrum und JEDEN Kanal ausführlich.
-` : '';
+`;
+}
+
+function buildKnowledgeText(maxEntries = 8, maxCharsPerEntry = 1000) {
+  return Object.entries(knowledge)
+    .slice(0, maxEntries)
+    .map(([key, val]) => `\n### ${key}\n${val.substring(0, maxCharsPerEntry)}`)
+    .join('\n');
+}
+
+async function generateDetailedReadingTwoParts({ userData, chartData, modelConfig }) {
+  const chartInfo = buildChartInfo(chartData);
+  const knowledgeText = buildKnowledgeText(8, 1000);
+  const personContext = `Name: ${userData.client_name || 'Unbekannt'}
+Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
+Geburtszeit: ${userData.birth_time || 'Unbekannt'}
+Geburtsort: ${userData.birth_location || 'Unbekannt'}
+${chartInfo}`;
+
+  const part1Prompt = `Du bist ein erfahrener Human Design Coach. Verwende folgendes Hintergrundwissen:
+${knowledgeText}
+
+Erstelle TEIL 1 eines tiefgründigen, persönlichen Human Design Readings für:
+${personContext}
+
+Schreibe direkt an die Person gerichtet (Du-Form), mit vollem Einsatz – wie eine 90-Minuten-Coaching-Session.
+Keine Plattitüden. Keine generischen Erklärungen. Spiegel dieser einen Person.
+
+---
+
+## 1. Dein Typ: Wer du wirklich bist
+
+Der Typ ${chartData?.type || 'unbekannt'} ist nicht das, was du bist – er ist, wie deine Energie in der Welt funktioniert. Erkläre:
+
+- Die Essenz dieses Typs und was er im Kern über diese Person aussagt
+- Wie die Energie dieser Person auf andere wirkt – was Menschen spüren, wenn sie mit ihr zusammen sind
+- Die Strategie im Detail (${chartData?.strategy || 'unbekannt'}): konkrete Alltagssituationen wo sie anzuwenden ist (Entscheidungen, Beziehungen, Arbeit, Spontanität), und was passiert wenn dagegen gehandelt wird
+- Die Not-Self-Emotion als Navigationssystem: was sie signalisiert und wie sie als Frühwarnsystem genutzt werden kann
+- Die Signatur des Typs als Zielzustand: wann diese Person weiß, dass sie im Flow ist, wie sich das anfühlt
+
+## 2. Deine Autorität: Der ehrlichste Entscheidungskompass
+
+Die Autorität ${chartData?.authority || 'unbekannt'} ist wichtiger als jeder rationale Verstand:
+
+- Wie genau diese Autorität funktioniert – die Mechanik dahinter
+- Woran die Person erkennt, dass sie aus der Autorität heraus entscheidet (vs. aus Angst, Druck, Konditionierung)
+- Die häufigsten Fallen: wie der Verstand die Autorität überschreibt und welche Lebenssituationen dadurch entstehen
+- Konkrete Übungen und Praktiken, um dieser Autorität täglich zu vertrauen
+- Wie diese Autorität bei großen Entscheidungen (Beziehungen, Karriere, Wohnort) UND bei Alltagsentscheidungen angewendet wird
+
+## 3. Deine Zentren: Die Energiearchitektur
+
+Für jedes DEFINIERTE Zentrum:
+- Die spezifische Energie, die konstant ausgestrahlt wird
+- Das Geschenk und wie andere diese Energie erleben
+- Wie dieses Zentrum bewusst eingesetzt werden kann
+- Die Schattenseite oder Überwältigungsgefahr
+
+Für jedes OFFENE Zentrum:
+- Welche Konditionierungen typischerweise dort entstehen – und welche konkreten Verhaltensmuster dadurch entstehen
+- Die Weisheit, die durch das Nicht-Fixiert-Sein entsteht
+- Die Befreiungsfrage: "Ist das meine Energie oder habe ich sie aufgenommen?"
+- Was das undefinierte Zentrum als Lernfeld bedeutet
+
+Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, tiefgründig, persönlich – kein Human-Design-Lehrbuch.`;
+
+  const part2Prompt = `Du bist ein erfahrener Human Design Coach. Verwende folgendes Hintergrundwissen:
+${knowledgeText}
+
+Erstelle TEIL 2 eines tiefgründigen, persönlichen Human Design Readings für:
+${personContext}
+
+Schreibe direkt an die Person gerichtet (Du-Form), mit vollem Einsatz – wie eine Fortsetzung einer 90-Minuten-Coaching-Session.
+Keine Plattitüden. Kein Lehrbuch. Echter Spiegel dieser einen Person.
+
+---
+
+## 4. Channels & Gates: Deine einzigartigen Talente
+
+Für jeden vollständig aktivierten Channel:
+- Die Themenenergie dieses Channels und was er über die Person aussagt
+- Welche Talente und Fähigkeiten dadurch in die Welt gebracht werden
+- Wie diese Energie sich im Alltag zeigt – konkrete Lebensmomente
+- Die Herausforderung oder Schattenseite dieses Channels
+
+Für die wichtigsten aktivierten Gates:
+- Die Energie-Qualität und tiefste Bedeutung
+- Die höchste Ausdrucksform (bewusst gelebt) vs. die bedingte Form (aus Konditionierung)
+- Wie dieses Gate das Denken, Fühlen und Handeln beeinflusst
+
+Solar- und Erd-Gates:
+- Persönlichkeitssonne: das bewusste Lebensthema
+- Persönlichkeitserde: das, was Stabilität gibt
+- Design-Sonne: die unbewusste Kraft, die andere sehen
+- Design-Erde: die tiefe Verwurzelung
+
+## 5. Das Profil: Deine Lebensrolle
+
+Das Profil ${chartData?.profile || ''} beschreibt, wie diese Person in der Welt lebt und lernt:
+
+- Die tiefe Bedeutung beider Linien des Profils – einzeln und im Zusammenspiel
+- Das Spannungsfeld und die Synergie zwischen den beiden Linien
+- Typische Lebensmuster, die durch dieses Profil entstehen
+- Beziehungen mit diesem Profil: wie diese Person in Intimität und Freundschaft agiert
+- Beruf und Berufung mit diesem Profil: welche Rollen natürlich entstehen
+- Die größte Stärke und die größte Herausforderung dieses Profils
+
+## 6. Das Inkarnationskreuz: Die Lebensaufgabe
+
+Das Inkarnationskreuz ist der tiefste Kontext – nicht ein Auftrag, den man erfüllen muss, sondern eine Energie, die durch einen hindurchfließt, wenn man sich selbst treu lebt:
+
+- Der Name und die Essenz des Kreuzes
+- Die vier Gates, die dieses Kreuz bilden – Zusammenspiel und Gesamtbild
+- Das übergeordnete Lebensthema, das sich wie ein roter Faden durch alles zieht
+- Wann diese Lebensaufgabe gelebt wird – und wann nicht (konkrete Lebensmuster)
+- Was diese Person in die Welt bringt, das kein anderer Mensch auf dieselbe Art bringen kann
+
+## 7. Konditionierung und der Weg zur Dekonditionierung
+
+- Die typischsten Konditionierungen dieser Person (basierend auf offenen Zentren und Typ)
+- Welche gesellschaftlichen Botschaften dem Design widersprechen
+- Was konkret losgelassen werden muss, um sich selbst zu leben
+- Das 7-jährige Dekonditionierungsexperiment: was es bedeutet und wie damit beginnen
+
+## 8. Praktische Integration
+
+Konkrete, sofort anwendbare Empfehlungen – spezifisch für diesen Chart:
+
+- Strategie täglich üben: 3 konkrete Situationen, in denen diese Person die Strategie morgen schon anwenden kann
+- Autoritäts-Praxis: wie die Autorität ${chartData?.authority || ''} bei der nächsten Entscheidung genutzt wird
+- Not-Self beobachten: Signale erkennen und den Unterschied spüren lernen
+- Energie-Hygiene: wie der Tag gestaltet werden sollte, damit Energie fließt
+- Die drei wichtigsten Erkenntnisse für diese Person – und wie sie im Alltag verankert werden
+
+## 9. Eine persönliche Einladung
+
+Schreibe abschließend eine tiefgründige, inspirierende Einladung an diese Person, das eigene Design als lebendiges Experiment anzunehmen – ohne Perfektionismus, mit Neugier, Mut und Selbstmitgefühl. Sprich direkt zu ihr. Nicht als Lehrer, sondern als jemand, der den Spiegel hält.
+
+Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, persönlich, tiefgründig – wo angemessen auch poetisch.`;
+
+  const modelsToTry = modelConfig.models || [];
+  let part1 = '', part2 = '';
+
+  for (const modelId of modelsToTry) {
+    try {
+      console.log(`   [Detailed 2-Pass] Versuche Claude-Modell: ${modelId}`);
+      [part1, part2] = await Promise.all([
+        generateWithClaude(part1Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 }),
+        generateWithClaude(part2Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 })
+      ]);
+      console.log(`   ✅ [Detailed 2-Pass] ${modelId} erfolgreich (${part1.length + part2.length} Zeichen gesamt)`);
+      break;
+    } catch (err) {
+      console.warn(`   ⚠️ [Detailed 2-Pass] ${modelId} fehlgeschlagen:`, err.message);
+    }
+  }
+
+  if (!part1 && !part2) throw new Error('Alle Claude-Modelle fehlgeschlagen (Detailed 2-Pass)');
+  return `${part1}\n\n---\n\n${part2}`;
+}
+
+function buildChartSummary(chart, name) {
+  if (!chart) return `${name || 'Person'}: Keine Chart-Daten`;
+  const definedCenters = Object.entries(chart.centers || {})
+    .filter(([, v]) => v).map(([k]) => k).join(', ') || 'keine';
+  return `${name ? `${name} – ` : ''}Typ: ${chart.type || 'unbekannt'}, Profil: ${chart.profile || 'unbekannt'}, Autorität: ${chart.authority || 'unbekannt'}, Definierte Zentren: ${definedCenters}, Channels: ${(chart.channels || []).slice(0, 8).map(c => c.name || c.gates?.join('-')).filter(Boolean).join(', ') || 'keine'}`;
+}
+
+async function generateReflexionsfragen(chartData, userData) {
+  if (!isClaudeAvailable()) return null;
+
+  const chartSummary = chartData
+    ? buildChartSummary(chartData, userData?.client_name)
+    : `Person: ${userData?.client_name || 'unbekannt'}`;
+
+  const prompt = `Du bist ein erfahrener Human Design Coach. Erstelle 10 tiefgründige, hochpersonalisierte Reflexionsfragen basierend auf diesem Human Design Chart:
+
+${chartSummary}
+
+Die Fragen müssen:
+- Direkt auf spezifische Chart-Elemente bezogen sein (Typ, Autorität, Profil, Channels, Gates – NICHT generisch!)
+- Wirklich zum Nachdenken einladen und innere Prozesse anstoßen
+- In der Du-Form formuliert sein
+- Eine Mischung aus verschiedenen Lebensbereichen abdecken: Alltag, Beziehungen, Arbeit/Business, innere Welt, Körper, Entscheidungen
+- Konkret genug sein, dass die Person sofort weiß, worüber sie nachdenkt
+- Die Not-Self-Themen des Typs adressieren (mindestens 2 Fragen)
+- Das Potenzial des Designs aktivieren (mindestens 2 Fragen)
+- Auf Deutsch und in einem einladenden, nicht wertenden Ton formuliert sein
+
+Antworte NUR mit einem JSON-Array mit genau 10 Strings, ohne weiteren Text:
+["Frage 1", "Frage 2", "Frage 3", "Frage 4", "Frage 5", "Frage 6", "Frage 7", "Frage 8", "Frage 9", "Frage 10"]`;
+
+  try {
+    const result = await generateWithClaude(prompt, {
+      model: 'claude-sonnet-4-6',
+      maxTokens: 1200,
+      temperature: 0.8,
+    });
+    const match = result.match(/\[[\s\S]*?\]/);
+    if (match) return JSON.parse(match[0]);
+    return null;
+  } catch (err) {
+    console.warn('⚠️ Reflexionsfragen-Generierung fehlgeschlagen:', err.message);
+    return null;
+  }
+}
+
+async function generateConnectionReflexionsfragen(personAChart, personBChart, personAName, personBName) {
+  if (!isClaudeAvailable()) return null;
+
+  const prompt = `Du bist ein erfahrener Human Design Coach. Erstelle 10 tiefgründige Reflexionsfragen für ZWEI Personen in ihrer Verbindung, basierend auf ihren Human Design Charts:
+
+${buildChartSummary(personAChart, personAName || 'Person A')}
+
+${buildChartSummary(personBChart, personBName || 'Person B')}
+
+Die Fragen müssen:
+- Die VERBINDUNG zwischen beiden Personen ansprechen (NICHT nur eine Person – immer beide!)
+- Auf konkrete Chart-Elemente beider Personen bezogen sein (Typ-Kombination, geteilte/komplementäre/elektromagnetische Gates, Konditionierungsdynamiken)
+- Zur gemeinsamen Reflexion einladen (z.B. "Wie geht ihr beide mit..." oder "Was passiert zwischen euch, wenn...")
+- Verschiedene Beziehungsbereiche abdecken: Kommunikation, Energie-Dynamik, Entscheidungen, Konflikt, Nähe/Distanz, gemeinsames Wachstum
+- In der Ihr-Form oder als gemeinsame Frage formuliert sein
+- Die typische Konditionierungsdynamik zwischen diesen Typen adressieren (mindestens 2 Fragen)
+- Das gemeinsame Potenzial dieser Verbindung aktivieren (mindestens 2 Fragen)
+- Auf Deutsch und in einem einladenden, nicht wertenden Ton formuliert sein
+
+Antworte NUR mit einem JSON-Array mit genau 10 Strings, ohne weiteren Text:
+["Frage 1", "Frage 2", "Frage 3", "Frage 4", "Frage 5", "Frage 6", "Frage 7", "Frage 8", "Frage 9", "Frage 10"]`;
+
+  try {
+    const result = await generateWithClaude(prompt, {
+      model: 'claude-sonnet-4-6',
+      maxTokens: 1200,
+      temperature: 0.8,
+    });
+    const match = result.match(/\[[\s\S]*?\]/);
+    if (match) return JSON.parse(match[0]);
+    return null;
+  } catch (err) {
+    console.warn('⚠️ Connection-Reflexionsfragen-Generierung fehlgeschlagen:', err.message);
+    return null;
+  }
+}
+
+async function generateReading({ agentId, template, userData, chartData }) {
+  const selectedModelId = userData?.ai_model || DEFAULT_MODEL;
+  let modelConfig = MODEL_CONFIG[selectedModelId] || MODEL_CONFIG[DEFAULT_MODEL];
+  const maxTokens = userData?.ai_config?.max_tokens || modelConfig.maxTokens;
+
+  if (modelConfig.provider === "claude" && !isClaudeAvailable()) {
+    throw new Error(`Claude (${selectedModelId}) nicht verfügbar`);
+  }
+
+  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData });
+
+  // Detailed readings: 2-Pass-Generierung für vollständige Ausgabe ohne Token-Kürzung
+  if (template === 'detailed') {
+    return await generateDetailedReadingTwoParts({ userData, chartData, modelConfig });
+  }
+
+  const templateContent = templates[template] || templates['default'] ||
+    "Erstelle ein Human Design Reading basierend auf den gegebenen Daten.";
 
   const systemPrompt = `Du bist ein Reading-Agent für Human Design.
 
 ${templateContent}
 
 Verwende folgendes Wissen:
-${Object.entries(knowledge).slice(0, 5).map(([key, val]) => `\n### ${key}\n${val.substring(0, 500)}`).join('\n')}
+${buildKnowledgeText(8, 1000)}
 
 Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
 
-  const userMessage = `Erstelle ein Reading für:
+  // Connection-Reading: Beide Personen mit ihren Charts übergeben
+  let userMessage;
+  if (userData.personA && userData.personB) {
+    const personAName = userData.personA?.name || 'Person A';
+    const personBName = userData.personB?.name || 'Person B';
+
+    const formatPersonChart = (chart, name) => {
+      if (!chart) return `${name}: Keine Chart-Daten`;
+      return `${name}:
+  Typ: ${chart.type || 'Unbekannt'}
+  Profil: ${chart.profile || 'Unbekannt'}
+  Autorität: ${chart.authority || 'Unbekannt'}
+  Strategie: ${chart.strategy || 'Unbekannt'}
+  Zentren: ${formatChartCenters(chart.centers)}
+  Kanäle: ${formatChartChannels(chart.channels)}
+  Tore: ${formatChartGates(chart.gates)}`;
+    };
+
+    const dynamicsText = userData.dynamics ? `
+VERBINDUNGS-DYNAMIK:
+Elektromagnetische Kanäle: ${JSON.stringify(userData.dynamics.electromagnetic_channels || [])}
+Komplementäre Gates: ${JSON.stringify(userData.dynamics.complementary_gates || [])}
+Gemeinsamkeiten: ${JSON.stringify(userData.dynamics.similarities || [])}
+Unterschiede: ${JSON.stringify(userData.dynamics.differences || [])}
+` : '';
+
+    userMessage = `Erstelle ein Connection Key Reading für:
+
+${formatPersonChart(userData.personAChart, personAName)}
+
+${formatPersonChart(userData.personBChart, personBName)}
+
+${dynamicsText}
+${userData.connectionQuestion ? `Verbindungsfrage: ${userData.connectionQuestion}` : ''}
+
+WICHTIG: Dieses Reading MUSS beide Personen (${personAName} UND ${personBName}) in jeder Sektion explizit ansprechen und ihre Charts miteinander in Beziehung setzen!`;
+  } else {
+    const chartInfo = buildChartInfo(chartData);
+    userMessage = `Erstelle ein Reading für:
 Name: ${userData.client_name || 'Unbekannt'}
 Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
 Geburtszeit: ${userData.birth_time || 'Unbekannt'}
@@ -335,6 +622,7 @@ Geburtsort: ${userData.birth_location || 'Unbekannt'}
 ${chartInfo}
 
 ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
+  }
 
   const fullPrompt = `${systemPrompt}\n\n---\n\n${userMessage}`;
 
@@ -445,22 +733,32 @@ const workerV4 = new Worker(
         .update({ progress: 30 })
         .eq("reading_id", readingId);
 
-      const content = await generateReading({
-        agentId: reading.reading_type || 'default',
-        template: reading.reading_type || 'default',
-        userData: {
-          client_name: reading.client_name,
-          birth_date: birth.date || reading.birth_date,
-          birth_time: birth.time || reading.birth_time,
-          birth_location: birth.location || reading.birth_location,
-          ...(reading.reading_data || {}),
-          ...(reading.client_data || {})
-        },
-        chartData
-      });
+      const userData = {
+        client_name: reading.client_name,
+        birth_date: birth.date || reading.birth_date,
+        birth_time: birth.time || reading.birth_time,
+        birth_location: birth.location || reading.birth_location,
+        ...(reading.reading_data || {}),
+        ...(reading.client_data || {})
+      };
+
+      const [content, reflexionsfragen] = await Promise.all([
+        generateReading({
+          agentId: reading.reading_type || 'default',
+          template: reading.reading_type || 'default',
+          userData,
+          chartData
+        }),
+        generateReflexionsfragen(chartData, userData)
+      ]);
 
       const existingData = reading.reading_data || {};
-      const newReadingData = { ...existingData, text: content, chart_data: chartData || existingData.chart_data };
+      const newReadingData = {
+        ...existingData,
+        text: content,
+        chart_data: chartData || existingData.chart_data,
+        ...(reflexionsfragen ? { reflexionsfragen } : {})
+      };
 
       const { data: updatedRow, error: updateError } = await supabasePublic
         .from("readings")
@@ -569,25 +867,36 @@ const connectionWorker = new Worker(
         })
         .eq("reading_id", readingId);
 
-      const content = await generateReading({
-        agentId: 'connection',
-        template: 'relationship',
-        userData: {
-          personA,
-          personB,
-          personAChart,
-          personBChart,
-          dynamics,
-          connectionQuestion
-        },
-        chartData: null // Chart-Daten sind in userData integriert
-      });
+      const connectionUserData = {
+        personA,
+        personB,
+        personAChart,
+        personBChart,
+        dynamics,
+        connectionQuestion,
+        client_name: `${personA?.name || ''} & ${personB?.name || ''}`
+      };
+
+      const [content, reflexionsfragen] = await Promise.all([
+        generateReading({
+          agentId: 'connection',
+          template: 'connection',
+          userData: connectionUserData,
+          chartData: null
+        }),
+        generateConnectionReflexionsfragen(personAChart, personBChart, personA?.name, personB?.name)
+      ]);
 
       await supabasePublic
         .from("readings")
         .update({
           status: "completed",
-          reading_data: { text: content, person_a_chart: personAChart, person_b_chart: personBChart },
+          reading_data: {
+            text: content,
+            person_a_chart: personAChart,
+            person_b_chart: personBChart,
+            ...(reflexionsfragen ? { reflexionsfragen } : {})
+          },
           completed_at: new Date().toISOString()
         })
         .eq("id", readingId);
@@ -680,25 +989,36 @@ const pentaWorker = new Worker(
         })
         .eq("reading_id", readingId);
 
-      const content = await generateReading({
-        agentId: 'penta',
-        template: 'relationship',
-        userData: {
-          groupName,
-          groupContext,
-          members,
-          memberCharts,
-          pentaChart,
-          groupDynamics
-        },
-        chartData: null // Chart-Daten sind in userData integriert
-      });
+      const pentaUserData = {
+        groupName,
+        groupContext,
+        members,
+        memberCharts,
+        pentaChart,
+        groupDynamics,
+        client_name: groupName || 'Gruppe'
+      };
+
+      const [content, reflexionsfragen] = await Promise.all([
+        generateReading({
+          agentId: 'penta',
+          template: 'relationship',
+          userData: pentaUserData,
+          chartData: null
+        }),
+        generateReflexionsfragen(pentaChart, { client_name: pentaUserData.client_name })
+      ]);
 
       await supabasePublic
         .from("readings")
         .update({
           status: "completed",
-          reading_data: { text: content, penta_chart: pentaChart, member_charts: memberCharts },
+          reading_data: {
+            text: content,
+            penta_chart: pentaChart,
+            member_charts: memberCharts,
+            ...(reflexionsfragen ? { reflexionsfragen } : {})
+          },
           completed_at: new Date().toISOString()
         })
         .eq("id", readingId);
@@ -845,11 +1165,17 @@ const multiAgentWorker = new Worker(
         })
         .eq("reading_id", readingId);
 
+      const reflexionsfragen = await generateReflexionsfragen(chartData, { client_name: birthData.name || reading.client_name });
+
       await supabasePublic
         .from("readings")
         .update({
           status: "completed",
-          reading_data: { text: finalContent, chart_data: chartData },
+          reading_data: {
+            text: finalContent,
+            chart_data: chartData,
+            ...(reflexionsfragen ? { reflexionsfragen } : {})
+          },
           completed_at: new Date().toISOString()
         })
         .eq("id", readingId);
@@ -923,8 +1249,11 @@ async function pollForJobs() {
 
         console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
 
-        if (readingType === 'connection') {
+        const isTwoPersonReading = ['connection', 'relationship', 'compatibility', 'composite'].includes(readingType);
+        if (isTwoPersonReading) {
           await processConnectionJob(job, reading);
+        } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
+          await processSexualityJob(job, reading);
         } else if (readingType === 'penta') {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
@@ -980,25 +1309,34 @@ async function processHumanDesignJob(job, reading) {
     .eq("id", job.id);
 
   try {
-    const content = await generateReading({
-      agentId: 'human_design',
-      template: templateName,
-      userData: {
-        client_name: name,
-        birth_date: birthdate,
-        birth_time: birthtime,
-        birth_location: birthplace,
-        ai_model,
-        ai_config
-      },
-      chartData
-    });
+    const hdUserData = {
+      client_name: name,
+      birth_date: birthdate,
+      birth_time: birthtime,
+      birth_location: birthplace,
+      ai_model,
+      ai_config
+    };
+
+    const [content, reflexionsfragen] = await Promise.all([
+      generateReading({
+        agentId: 'human_design',
+        template: templateName,
+        userData: hdUserData,
+        chartData
+      }),
+      generateReflexionsfragen(chartData, hdUserData)
+    ]);
 
     console.log(`✅ [Human Design] Reading generiert: ${content.substring(0, 100)}...`);
 
     if (readingId) {
-      // Merge: chart_data setzen/erhalten, text setzen
-      const newReadingData = { ...existingReadingData, text: content, chart_data: chartData || existingReadingData.chart_data };
+      const newReadingData = {
+        ...existingReadingData,
+        text: content,
+        chart_data: chartData || existingReadingData.chart_data,
+        ...(reflexionsfragen ? { reflexionsfragen } : {})
+      };
       const { data: updatedRow, error: updateError } = await supabasePublic
         .from("readings")
         .update({
@@ -1062,36 +1400,203 @@ async function processHumanDesignJob(job, reading) {
 // ======================================================
 async function processConnectionJob(job, reading) {
   console.log(`🔄 [Connection] Verarbeite Job ${job.id}`);
-  const { personA, personB, connectionQuestion } = reading.client_data || {};
+  const payload = reading.client_data || job.payload || {};
+
+  // Payload-Normalisierung: v4-API sendet flaches Format (birthdate/birthdate2)
+  // ältere Systeme senden verschachteltes Format (personA.birthDate)
+  const nameA = payload.name || payload.personA?.name || 'Person A';
+  const nameB = payload.name2 || payload.personB?.name || 'Person B';
+  const birthDateA = payload.birthdate || payload.personA?.birthDate;
+  const birthTimeA = payload.birthtime || payload.personA?.birthTime;
+  const birthPlaceA = payload.birthplace || payload.personA?.birthPlace;
+  const birthDateB = payload.birthdate2 || payload.personB?.birthDate;
+  const birthTimeB = payload.birthtime2 || payload.personB?.birthTime;
+  const birthPlaceB = payload.birthplace2 || payload.personB?.birthPlace;
+  const connectionQuestion = payload.connectionQuestion || payload.personA?.connectionQuestion;
+  const readingId = payload.reading_id;
+  const readingType = job.reading_type || payload.reading_type || 'connection';
 
   await supabase
     .from("reading_jobs")
     .update({ status: "processing", started_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  // Echte Chart-Berechnung
-  const personAChart = await fetchChartData(
-    personA?.birthDate, personA?.birthTime, personA?.birthPlace
-  ) || { type: "Unbekannt", gates: [], centers: {} };
+  // Bestehende Chart-Daten aus Reading laden (falls vorhanden)
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from("readings").select("reading_data").eq("id", readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
 
-  const personBChart = await fetchChartData(
-    personB?.birthDate, personB?.birthTime, personB?.birthPlace
-  ) || { type: "Unbekannt", gates: [], centers: {} };
+  // Charts berechnen
+  const personAChart = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
+    || existingReadingData.chart_data
+    || { type: "Unbekannt", gates: [], centers: {} };
+
+  const personBChart = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
+    || existingReadingData.chart_data2
+    || { type: "Unbekannt", gates: [], centers: {} };
+
+  console.log(`   [Connection] Charts: A=${personAChart.type}, B=${personBChart.type}`);
 
   const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
 
+  // Template wählen: 'compatibility' → compatibility.txt, sonst connection.txt
+  const templateName = readingType === 'compatibility' ? 'compatibility'
+    : readingType === 'relationship' ? 'relationship'
+    : 'connection';
+
   const content = await generateReading({
     agentId: 'connection',
-    template: 'relationship',
-    userData: { personA, personB, personAChart, personBChart, dynamics, connectionQuestion }
+    template: templateName,
+    userData: {
+      personA: { name: nameA },
+      personB: { name: nameB },
+      personAChart,
+      personBChart,
+      dynamics,
+      connectionQuestion,
+    }
   });
+
+  const reflexionsfragen = await generateConnectionReflexionsfragen(personAChart, personBChart, nameA, nameB);
+
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    chart_data: personAChart,
+    chart_data2: personBChart,
+    personA: { name: nameA },
+    personB: { name: nameB },
+    ...(reflexionsfragen ? { reflexionsfragen } : {}),
+  };
+
+  if (readingId) {
+    await supabasePublic
+      .from("readings")
+      .update({ status: "completed", progress: 100, reading_data: newReadingData, updated_at: new Date().toISOString() })
+      .eq("id", readingId);
+  }
 
   await supabase
     .from("reading_jobs")
     .update({ status: "completed", finished_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  console.log(`✅ [Connection] Job ${job.id} abgeschlossen`);
+  console.log(`✅ [Connection] Job ${job.id} abgeschlossen (${content?.length} Zeichen, A=${nameA}, B=${nameB})`);
+}
+
+// ======================================================
+// processSexualityJob – Intimität & Resonanz (2 Personen)
+// ======================================================
+async function processSexualityJob(job, reading) {
+  console.log(`🔄 [Sexuality] Verarbeite Job ${job.id}`);
+  const payload = reading.client_data || job.payload || {};
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  const readingId = payload.reading_id;
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from("readings").select("reading_data").eq("id", readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
+
+  const nameA = payload.name || 'Person A';
+  const nameB = payload.name2 || 'Person B';
+
+  const chartA = await fetchChartData(payload.birthdate, payload.birthtime, payload.birthplace)
+    || existingReadingData.chart_data
+    || { type: 'Unbekannt', gates: [], centers: {} };
+
+  const chartB = await fetchChartData(payload.birthdate2, payload.birthtime2, payload.birthplace2)
+    || existingReadingData.chart_data2
+    || { type: 'Unbekannt', gates: [], centers: {} };
+
+  const dynamics = analyzeConnectionDynamics(chartA, chartB);
+
+  const systemPrompt = `Du bist ein erfahrener Human Design Coach mit Expertise in Beziehungs- und Intimität-Readings.
+
+${templates['sexuality'] || 'Erstelle ein Intimität & Sexualität Reading für zwei Personen.'}
+
+Verwende folgendes Wissen:
+${buildKnowledgeText(8, 1000)}`;
+
+  const userMessage = `Erstelle ein Intimität & Sexualität Resonanz-Reading für:
+
+Person A: ${nameA}
+  Typ: ${chartA.type || 'Unbekannt'}
+  Profil: ${chartA.profile || 'Unbekannt'}
+  Autorität: ${chartA.authority || 'Unbekannt'}
+  Strategie: ${chartA.strategy || 'Unbekannt'}
+  Zentren: ${formatChartCenters(chartA.centers)}
+  Kanäle: ${formatChartChannels(chartA.channels)}
+  Tore: ${formatChartGates(chartA.gates)}
+
+Person B: ${nameB}
+  Typ: ${chartB.type || 'Unbekannt'}
+  Profil: ${chartB.profile || 'Unbekannt'}
+  Autorität: ${chartB.authority || 'Unbekannt'}
+  Strategie: ${chartB.strategy || 'Unbekannt'}
+  Zentren: ${formatChartCenters(chartB.centers)}
+  Kanäle: ${formatChartChannels(chartB.channels)}
+  Tore: ${formatChartGates(chartB.gates)}
+
+VERBINDUNGS-DYNAMIK:
+Elektromagnetische Kanäle: ${JSON.stringify(dynamics.electromagnetic_channels || [])}
+Komplementäre Gates: ${JSON.stringify(dynamics.complementary_gates || [])}
+Gemeinsamkeiten: ${JSON.stringify(dynamics.similarities || [])}
+
+WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren Namen!`;
+
+  const aiModel = payload.ai_model || DEFAULT_MODEL;
+  const modelConfig = MODEL_CONFIG[aiModel] || MODEL_CONFIG[DEFAULT_MODEL];
+  const modelsToTry = modelConfig.models || [aiModel];
+
+  let content = null;
+  for (const modelId of modelsToTry) {
+    try {
+      content = await generateWithClaude(systemPrompt + '\n\n' + userMessage, {
+        model: modelId,
+        maxTokens: 8000,
+        temperature: 0.7,
+      });
+      if (content) break;
+    } catch (err) {
+      console.warn(`   [Sexuality] Modell ${modelId} fehlgeschlagen:`, err.message);
+    }
+  }
+
+  if (!content) throw new Error('Sexuality reading generation fehlgeschlagen – kein Modell verfügbar');
+
+  const reflexionsfragen = await generateConnectionReflexionsfragen(chartA, chartB, nameA, nameB);
+
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    chart_data: chartA,
+    chart_data2: chartB,
+    personA: { name: nameA },
+    personB: { name: nameB },
+    ...(reflexionsfragen ? { reflexionsfragen } : {}),
+  };
+
+  if (readingId) {
+    await supabasePublic
+      .from("readings")
+      .update({ status: "completed", progress: 100, reading_data: newReadingData, updated_at: new Date().toISOString() })
+      .eq("id", readingId);
+  }
+
+  await supabase
+    .from("reading_jobs")
+    .update({ status: "completed", finished_at: new Date().toISOString() })
+    .eq("id", job.id);
+
+  console.log(`✅ [Sexuality] Job ${job.id} abgeschlossen (${content.length} Zeichen)`);
 }
 
 // ======================================================

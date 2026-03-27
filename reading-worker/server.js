@@ -21,6 +21,7 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
+import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 
 const app = express();
 app.use(express.json());
@@ -1250,6 +1251,12 @@ multiAgentWorker.on("failed", (job, err) => {
 console.log("🟢 Multi-Agent Worker aktiv (Queue: reading-queue-v4-multi-agent)");
 
 // ======================================================
+// W6 — Psychology Worker
+// ======================================================
+startPsychologyWorker();
+console.log("[W6] Psychology Worker gestartet");
+
+// ======================================================
 // Job Polling System
 // ======================================================
 async function pollForJobs() {
@@ -1994,6 +2001,58 @@ function getTypeInteractionNote(typeA, typeB) {
 // Live Reading Agent
 // ======================================================
 app.use("/api/live-reading", createLiveReadingRouter(supabase));
+
+// ======================================================
+// W6 — Psychology Endpoints
+// ======================================================
+app.post("/api/readings/psychology/start", async (req, res) => {
+  try {
+    const { mode, reading_id, connection_reading_id, person_a_id, person_b_id } = req.body || {};
+    if (!mode || !["single", "connection"].includes(mode)) {
+      return res.status(400).json({ success: false, error: 'mode muss "single" oder "connection" sein' });
+    }
+    if (!person_a_id) {
+      return res.status(400).json({ success: false, error: "person_a_id ist erforderlich" });
+    }
+
+    const { data, error } = await supabase
+      .schema("public")
+      .from("psychology_readings")
+      .insert({ mode, reading_id, connection_reading_id, person_a_id, person_b_id, status: "pending" })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const queue = getPsychologyQueue();
+    await queue.add("psychology", { mode, reading_id, connection_reading_id, person_a_id, person_b_id });
+
+    return res.status(202).json({ success: true, psychology_reading_id: data.id });
+  } catch (err) {
+    console.error("[Psychology] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/psychology/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .schema("public")
+      .from("psychology_readings")
+      .select("id, status, polyvagal, attachment, jungian, bigfive, synthesis, error_message, created_at")
+      .eq("id", req.params.id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[Psychology] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // ======================================================
 // Health Endpoint

@@ -2410,14 +2410,43 @@ async function getJobStatus(job_id) {
   };
 }
 
+const CONNECTION_KEY_URL = process.env.CONNECTION_KEY_URL || "http://connection-key:3000";
+
 app.post("/api/readings/transit/start", async (req, res) => {
   try {
-    const { reading_id, transit_gates, name, birthdate, birthtime, birthplace } = req.body || {};
+    let { reading_id, transit_gates, name, birthdate, birthtime, birthplace } = req.body || {};
     if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
 
-    const job_id = await startSpecialReading("transit", { reading_id, transit_gates, name, birthdate, birthtime, birthplace });
-    console.log(`✅ [Transit] Job erstellt: ${job_id}`);
-    return res.status(202).json({ success: true, job_id, status: "pending", poll_url: `/api/readings/transit/status/${job_id}` });
+    // Auto-Berechnung aktueller Transits wenn transit_gates fehlt
+    let auto_calculated = false;
+    if (!transit_gates || (Array.isArray(transit_gates) && transit_gates.length === 0)) {
+      try {
+        const transitRes = await fetch(`${CONNECTION_KEY_URL}/api/transits/current`, {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (transitRes.ok) {
+          const transitData = await transitRes.json();
+          transit_gates = transitData.transits || [];
+          auto_calculated = true;
+          console.log(`   🌍 [Transit] Auto-Transits geladen: ${transit_gates.length} Planeten`);
+        }
+      } catch (fetchErr) {
+        console.warn("[Transit] Auto-Transit-Berechnung fehlgeschlagen:", fetchErr.message);
+      }
+    }
+
+    const job_id = await startSpecialReading("transit", {
+      reading_id, transit_gates, name, birthdate, birthtime, birthplace,
+    });
+    console.log(`✅ [Transit] Job erstellt: ${job_id} (auto=${auto_calculated})`);
+    return res.status(202).json({
+      success: true,
+      job_id,
+      status: "pending",
+      auto_calculated,
+      transit_gates_count: transit_gates?.length || 0,
+      poll_url: `/api/readings/transit/status/${job_id}`,
+    });
   } catch (err) {
     console.error("[Transit] Start fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });

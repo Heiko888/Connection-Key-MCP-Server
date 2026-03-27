@@ -191,6 +191,26 @@ const supabasePublic = createClient(supabaseUrl, supabaseKey, {
 console.log("✅ Supabase (V4):", supabaseUrl.substring(0, 40) + "...");
 
 // ======================================================
+// Error Monitoring — Webhook Notification
+// ======================================================
+const ERROR_WEBHOOK_URL = process.env.ERROR_WEBHOOK_URL || null;
+
+async function notifyError(context, err) {
+  if (!ERROR_WEBHOOK_URL) return;
+  const text = `🚨 *Reading-Worker Fehler*\n*Kontext:* ${context}\n*Fehler:* ${err?.message || String(err)}\n*Zeit:* ${new Date().toISOString()}`;
+  try {
+    await fetch(ERROR_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch (webhookErr) {
+    console.warn("⚠️ Webhook-Benachrichtigung fehlgeschlagen:", webhookErr.message);
+  }
+}
+
+// ======================================================
 // Redis / BullMQ
 // ======================================================
 const redis = new IORedis({
@@ -1772,6 +1792,22 @@ console.log("🔄 Job Polling System aktiv (prüft alle 10 Sekunden)");
 pollForJobs();
 
 // ======================================================
+// Error Monitoring — zusätzliche Failed-Handler (additiv)
+// ======================================================
+[
+  { worker: workerV3, name: "V3" },
+  { worker: workerV4, name: "V4" },
+  { worker: connectionWorker, name: "Connection" },
+  { worker: pentaWorker, name: "Penta" },
+  { worker: multiAgentWorker, name: "Multi-Agent" },
+].forEach(({ worker, name }) => {
+  worker.on("failed", (job, err) => {
+    notifyError(`Worker [${name}] Job ${job?.id}`, err);
+  });
+});
+console.log("🔔 Error Monitoring aktiv (Webhook:", ERROR_WEBHOOK_URL ? "konfiguriert ✅" : "nicht gesetzt ⚠️", ")");
+
+// ======================================================
 // Hilfsfunktionen
 // ======================================================
 async function generateMultiAgentSynthesis(agentResults, birthData, knowledge) {
@@ -2144,6 +2180,133 @@ app.get("/api/readings/shadow-work/status/:job_id", async (req, res) => {
     });
   } catch (err) {
     console.error("[Shadow Work] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Transit-Reading Endpoints
+// ======================================================
+
+async function startSpecialReading(readingType, { reading_id, transit_gates, year, year_transits, name, birthdate, birthtime, birthplace }) {
+  let payload = { reading_id, reading_type: readingType };
+
+  if (name || birthdate) {
+    payload = { ...payload, name, birthdate, birthtime, birthplace };
+  } else if (reading_id) {
+    const { data: reading } = await supabasePublic
+      .from("readings")
+      .select("client_name, birth_data, reading_data")
+      .eq("id", reading_id)
+      .maybeSingle();
+    if (reading) {
+      payload = {
+        ...payload,
+        name: reading.client_name,
+        birthdate: reading.birth_data?.date || reading.reading_data?.birth_date,
+        birthtime: reading.birth_data?.time || reading.reading_data?.birth_time,
+        birthplace: reading.birth_data?.location || reading.reading_data?.birth_location,
+      };
+    }
+  }
+
+  if (transit_gates) payload.ai_config = { ...(payload.ai_config || {}), transit_gates };
+  if (year) payload.ai_config = { ...(payload.ai_config || {}), year };
+  if (year_transits) payload.ai_config = { ...(payload.ai_config || {}), year_transits };
+
+  const { data, error } = await supabase
+    .from("reading_jobs")
+    .insert({ reading_type: readingType, payload, status: "pending" })
+    .select("id")
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data.id;
+}
+
+async function getJobStatus(job_id) {
+  const { data, error } = await supabase
+    .from("reading_jobs")
+    .select("id, status, payload, error, created_at, started_at, finished_at")
+    .eq("id", job_id)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") return null;
+    throw new Error(error.message);
+  }
+
+  let result = null;
+  if (data.status === "completed" && data.payload?.reading_id) {
+    const { data: reading } = await supabasePublic
+      .from("readings")
+      .select("reading_data")
+      .eq("id", data.payload.reading_id)
+      .maybeSingle();
+    if (reading?.reading_data?.text) result = { text: reading.reading_data.text };
+  }
+
+  return {
+    success: true,
+    job_id: data.id,
+    status: data.status,
+    error: data.error || null,
+    created_at: data.created_at,
+    started_at: data.started_at || null,
+    finished_at: data.finished_at || null,
+    ...(result ? { result } : {})
+  };
+}
+
+app.post("/api/readings/transit/start", async (req, res) => {
+  try {
+    const { reading_id, transit_gates, name, birthdate, birthtime, birthplace } = req.body || {};
+    if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const job_id = await startSpecialReading("transit", { reading_id, transit_gates, name, birthdate, birthtime, birthplace });
+    console.log(`✅ [Transit] Job erstellt: ${job_id}`);
+    return res.status(202).json({ success: true, job_id, status: "pending", poll_url: `/api/readings/transit/status/${job_id}` });
+  } catch (err) {
+    console.error("[Transit] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/transit/status/:job_id", async (req, res) => {
+  try {
+    const result = await getJobStatus(req.params.job_id);
+    if (!result) return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+    return res.json(result);
+  } catch (err) {
+    console.error("[Transit] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Jahres-Reading Endpoints
+// ======================================================
+app.post("/api/readings/jahres/start", async (req, res) => {
+  try {
+    const { reading_id, year, year_transits, name, birthdate, birthtime, birthplace } = req.body || {};
+    if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const job_id = await startSpecialReading("jahres-reading", { reading_id, year: year || new Date().getFullYear(), year_transits, name, birthdate, birthtime, birthplace });
+    console.log(`✅ [Jahres] Job erstellt: ${job_id}`);
+    return res.status(202).json({ success: true, job_id, status: "pending", poll_url: `/api/readings/jahres/status/${job_id}` });
+  } catch (err) {
+    console.error("[Jahres] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/jahres/status/:job_id", async (req, res) => {
+  try {
+    const result = await getJobStatus(req.params.job_id);
+    if (!result) return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+    return res.json(result);
+  } catch (err) {
+    console.error("[Jahres] Status fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

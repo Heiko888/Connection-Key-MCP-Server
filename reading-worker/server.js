@@ -2055,6 +2055,100 @@ app.get("/api/readings/psychology/:id", async (req, res) => {
 });
 
 // ======================================================
+// Shadow Work Endpoints
+// ======================================================
+app.post("/api/readings/shadow-work/start", async (req, res) => {
+  try {
+    const { reading_id, name, birthdate, birthtime, birthplace } = req.body || {};
+    if (!reading_id) {
+      return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+    }
+
+    let payload = { reading_id, reading_type: "shadow-work" };
+
+    if (name || birthdate) {
+      payload = { ...payload, name, birthdate, birthtime, birthplace };
+    } else {
+      const { data: reading } = await supabasePublic
+        .from("readings")
+        .select("client_name, birth_data, reading_data")
+        .eq("id", reading_id)
+        .maybeSingle();
+      if (reading) {
+        payload = {
+          ...payload,
+          name: reading.client_name,
+          birthdate: reading.birth_data?.date || reading.reading_data?.birth_date,
+          birthtime: reading.birth_data?.time || reading.reading_data?.birth_time,
+          birthplace: reading.birth_data?.location || reading.reading_data?.birth_location,
+        };
+      }
+    }
+
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .insert({ reading_type: "shadow-work", payload, status: "pending" })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    console.log(`✅ [Shadow Work] Job erstellt: ${data.id}`);
+    return res.status(202).json({
+      success: true,
+      job_id: data.id,
+      status: "pending",
+      poll_url: `/api/readings/shadow-work/status/${data.id}`
+    });
+  } catch (err) {
+    console.error("[Shadow Work] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/shadow-work/status/:job_id", async (req, res) => {
+  try {
+    const { job_id } = req.params;
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .select("id, status, payload, error, created_at, started_at, finished_at")
+      .eq("id", job_id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+      throw new Error(error.message);
+    }
+
+    let result = null;
+    if (data.status === "completed" && data.payload?.reading_id) {
+      const { data: reading } = await supabasePublic
+        .from("readings")
+        .select("reading_data")
+        .eq("id", data.payload.reading_id)
+        .maybeSingle();
+      if (reading?.reading_data?.text) {
+        result = { text: reading.reading_data.text };
+      }
+    }
+
+    return res.json({
+      success: true,
+      job_id: data.id,
+      status: data.status,
+      error: data.error || null,
+      created_at: data.created_at,
+      started_at: data.started_at || null,
+      finished_at: data.finished_at || null,
+      ...(result ? { result } : {})
+    });
+  } catch (err) {
+    console.error("[Shadow Work] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
 // Health Endpoint
 // ======================================================
 app.get("/health", async (_, res) => {

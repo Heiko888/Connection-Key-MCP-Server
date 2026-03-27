@@ -63,6 +63,56 @@ async function fetchChartData(birthDate, birthTime, birthPlace) {
   }
 }
 
+/**
+ * fetchChartFromReading(personId)
+ * Lädt Chart-Daten aus public.readings (vorberechnete Daten).
+ * Fallback: Berechnung via Chart-API mit Geburtsdaten aus dem Reading.
+ */
+async function fetchChartFromReading(personId) {
+  if (!personId) return null;
+  try {
+    const { data, error } = await supabasePublic
+      .from("readings")
+      .select("chart_data, reading_data, client_name, birth_data, birth_data2")
+      .eq("id", personId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn(`   ⚠️ [Chart] Supabase-Fehler für Reading ${personId}:`, error.message);
+    }
+
+    // 1. Vorberechneter Chart in chart_data
+    if (data?.chart_data && data.chart_data.type) {
+      console.log(`   ✅ [Chart] Reading ${personId}: Chart aus DB geladen (${data.chart_data.type})`);
+      return { chart: data.chart_data, name: data.client_name };
+    }
+
+    // 2. Chart in reading_data.chart_data
+    if (data?.reading_data?.chart_data?.type) {
+      console.log(`   ✅ [Chart] Reading ${personId}: Chart aus reading_data geladen`);
+      return { chart: data.reading_data.chart_data, name: data.client_name };
+    }
+
+    // 3. Fallback: Neu berechnen mit Geburtsdaten aus birth_data (jsonb)
+    const bd = data?.birth_data || {};
+    const birthDate = bd.date;
+    const birthTime = bd.time;
+    const birthPlace = bd.location || bd.name;
+
+    if (birthDate && birthTime && birthPlace) {
+      console.log(`   📊 [Chart] Reading ${personId}: Kein vorberechneter Chart – berechne neu...`);
+      const chart = await fetchChartData(birthDate, birthTime, birthPlace);
+      return { chart, name: data?.client_name };
+    }
+
+    console.warn(`   ⚠️ [Chart] Reading ${personId}: Keine Chart-Daten und keine Geburtsdaten vorhanden`);
+    return { chart: null, name: data?.client_name };
+  } catch (err) {
+    console.warn(`   ⚠️ [Chart] fetchChartFromReading(${personId}) Fehler:`, err.message);
+    return null;
+  }
+}
+
 // Chart-Proxy Endpoint (für externe Aufrufe)
 app.post("/api/chart/calculate", async (req, res) => {
   try {
@@ -878,34 +928,62 @@ const connectionWorker = new Worker(
   "reading-queue-v4-connection",
   async (job) => {
     console.log("📥 [Connection] Job empfangen:", job.id);
-    const { readingId, personA, personB, connectionQuestion } = job.data;
+    const {
+      readingId,
+      personA, personB,
+      person_a_id, person_b_id,
+      connection_reading_id,
+      connectionQuestion
+    } = job.data;
+
     try {
-      const { data: reading, error: readingError } = await supabasePublic
-        .from("readings")
-        .select("*")
-        .eq("id", readingId)
-        .single();
-
-      if (readingError) throw readingError;
-
       await supabase
         .from("reading_jobs")
-        .update({
-          status: "processing",
-          progress: 10,
-          started_at: new Date().toISOString()
-        })
+        .update({ status: "processing", progress: 10, started_at: new Date().toISOString() })
         .eq("reading_id", readingId);
 
-      // Echte Chart-Berechnung für beide Personen
-      console.log("   📊 [Connection] Berechne Charts für Person A und B...");
-      const personAChart = await fetchChartData(
-        personA?.birthDate, personA?.birthTime, personA?.birthPlace
-      ) || { type: "Unbekannt", gates: [], centers: {}, note: "Chart-Berechnung fehlgeschlagen" };
+      // ── Chart-Daten laden ───────────────────────────────────────────────
+      // Priorität: 1) person_a_id/person_b_id aus readings-Tabelle
+      //            2) Geburtsdaten aus personA/personB Objekt (legacy)
+      let personAChart, personBChart, nameA, nameB;
 
-      const personBChart = await fetchChartData(
-        personB?.birthDate, personB?.birthTime, personB?.birthPlace
-      ) || { type: "Unbekannt", gates: [], centers: {}, note: "Chart-Berechnung fehlgeschlagen" };
+      if (person_a_id) {
+        const result = await fetchChartFromReading(person_a_id);
+        personAChart = result?.chart;
+        nameA = result?.name || personA?.name || "Person A";
+        console.log(`   ✅ [Connection] Person A aus Reading ${person_a_id}: ${personAChart?.type || "kein Chart"}`);
+      }
+      if (person_b_id) {
+        const result = await fetchChartFromReading(person_b_id);
+        personBChart = result?.chart;
+        nameB = result?.name || personB?.name || "Person B";
+        console.log(`   ✅ [Connection] Person B aus Reading ${person_b_id}: ${personBChart?.type || "kein Chart"}`);
+      }
+
+      // Fallback auf Geburtsdaten
+      if (!personAChart) {
+        personAChart = await fetchChartData(personA?.birthDate, personA?.birthTime, personA?.birthPlace);
+        nameA = nameA || personA?.name || "Person A";
+      }
+      if (!personBChart) {
+        personBChart = await fetchChartData(personB?.birthDate, personB?.birthTime, personB?.birthPlace);
+        nameB = nameB || personB?.name || "Person B";
+      }
+
+      personAChart = personAChart || { type: "Unbekannt", gates: [], centers: {} };
+      personBChart = personBChart || { type: "Unbekannt", gates: [], centers: {} };
+
+      // ── Composite-Daten aus connection_readings laden (falls vorhanden) ─
+      let compositeData = null;
+      if (connection_reading_id) {
+        const { data: connRow } = await supabasePublic
+          .schema("public")
+          .from("connection_readings")
+          .select("composite_chart, composite_analysis, dynamics")
+          .eq("id", connection_reading_id)
+          .maybeSingle();
+        compositeData = connRow?.composite_chart || connRow?.composite_analysis || null;
+      }
 
       await supabase
         .from("reading_jobs")
@@ -914,71 +992,91 @@ const connectionWorker = new Worker(
 
       const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
 
-      await supabase
-        .schema("public")
-        .from("connection_readings")
-        .update({
-          person_a_chart: personAChart,
-          person_b_chart: personBChart,
-          electromagnetic_channels: dynamics.electromagnetic_channels,
-          complementary_gates: dynamics.complementary_gates,
-          dynamics: dynamics,
-          similarities: dynamics.similarities,
-          differences: dynamics.differences
-        })
-        .eq("reading_id", readingId);
-
-      const connectionUserData = {
-        personA,
-        personB,
-        personAChart,
-        personBChart,
-        dynamics,
-        connectionQuestion,
-        client_name: `${personA?.name || ''} & ${personB?.name || ''}`
-      };
-
+      // ── Claude-Prompt: beide Charts + Composite ─────────────────────────
       const [content, reflexionsfragen] = await Promise.all([
         generateReading({
-          agentId: 'connection',
-          template: 'connection',
-          userData: connectionUserData,
-          chartData: null
+          agentId: "connection",
+          template: "connection",
+          userData: {
+            personA: { name: nameA },
+            personB: { name: nameB },
+            personAChart,
+            personBChart,
+            dynamics,
+            compositeData,
+            connectionQuestion,
+            client_name: `${nameA} & ${nameB}`
+          }
         }),
-        generateConnectionReflexionsfragen(personAChart, personBChart, personA?.name, personB?.name)
+        generateConnectionReflexionsfragen(personAChart, personBChart, nameA, nameB)
       ]);
 
-      await supabasePublic
-        .from("readings")
-        .update({
-          status: "completed",
-          reading_data: {
-            text: content,
+      // ── connection_readings aktualisieren ───────────────────────────────
+      const connUpdateTarget = connection_reading_id
+        ? { id: connection_reading_id }
+        : readingId ? { reading_id: readingId } : null;
+
+      if (connUpdateTarget) {
+        const filterKey = Object.keys(connUpdateTarget)[0];
+        const filterVal = connUpdateTarget[filterKey];
+        await supabasePublic
+          .schema("public")
+          .from("connection_readings")
+          .update({
+            chart_a: personAChart,
+            chart_b: personBChart,
             person_a_chart: personAChart,
             person_b_chart: personBChart,
-            ...(reflexionsfragen ? { reflexionsfragen } : {})
-          },
-          completed_at: new Date().toISOString()
-        })
-        .eq("id", readingId);
+            dynamics: dynamics,
+            electromagnetic_channels: dynamics.electromagnetic_channels,
+            complementary_gates: dynamics.complementary_gates,
+            similarities: dynamics.similarities,
+            differences: dynamics.differences,
+            composite_analysis: { text: content, generated_at: new Date().toISOString() },
+            updated_at: new Date().toISOString()
+          })
+          .eq(filterKey, filterVal)
+          .catch(e => console.warn("⚠️ [Connection] connection_readings Update fehlgeschlagen:", e.message));
+      }
+
+      // ── readings aktualisieren ──────────────────────────────────────────
+      if (readingId) {
+        await supabasePublic
+          .from("readings")
+          .update({
+            status: "completed",
+            reading_data: {
+              text: content,
+              chart_data: personAChart,
+              chart_data2: personBChart,
+              personA: { name: nameA },
+              personB: { name: nameB },
+              ...(reflexionsfragen ? { reflexionsfragen } : {})
+            },
+            completed_at: new Date().toISOString()
+          })
+          .eq("id", readingId);
+      }
 
       await supabase
         .from("reading_jobs")
-        .update({
-          status: "completed",
-          progress: 100,
-          completed_at: new Date().toISOString()
-        })
+        .update({ status: "completed", progress: 100, completed_at: new Date().toISOString() })
         .eq("reading_id", readingId);
 
-      console.log("✅ [Connection] Reading abgeschlossen:", readingId);
+      console.log(`✅ [Connection] Reading abgeschlossen: A=${nameA}, B=${nameB}, ${content.length} Zeichen`);
     } catch (err) {
-      console.error("❌ [Connection] Fehler:", err);
+      console.error("❌ [Connection] Fehler:", err.message);
+      if (connection_reading_id) {
+        await supabasePublic.schema("public").from("connection_readings")
+          .update({ updated_at: new Date().toISOString() })
+          .eq("id", connection_reading_id)
+          .catch(() => {});
+      }
       await supabase
         .from("reading_jobs")
         .update({ status: "failed", error: err.message })
         .eq("reading_id", readingId)
-        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e.message));
       throw err;
     }
   },
@@ -1469,10 +1567,9 @@ async function processConnectionJob(job, reading) {
   console.log(`🔄 [Connection] Verarbeite Job ${job.id}`);
   const payload = reading.client_data || job.payload || {};
 
-  // Payload-Normalisierung: v4-API sendet flaches Format (birthdate/birthdate2)
-  // ältere Systeme senden verschachteltes Format (personA.birthDate)
-  const nameA = payload.name || payload.personA?.name || 'Person A';
-  const nameB = payload.name2 || payload.personB?.name || 'Person B';
+  // Payload-Normalisierung: v4-API sendet flaches Format, ältere senden verschachteltes
+  let nameA = payload.name || payload.personA?.name || 'Person A';
+  let nameB = payload.name2 || payload.personB?.name || 'Person B';
   const birthDateA = payload.birthdate || payload.personA?.birthDate;
   const birthTimeA = payload.birthtime || payload.personA?.birthTime;
   const birthPlaceA = payload.birthplace || payload.personA?.birthPlace;
@@ -1481,6 +1578,9 @@ async function processConnectionJob(job, reading) {
   const birthPlaceB = payload.birthplace2 || payload.personB?.birthPlace;
   const connectionQuestion = payload.connectionQuestion || payload.personA?.connectionQuestion;
   const readingId = payload.reading_id;
+  const connectionReadingId = payload.connection_reading_id;
+  const personAId = payload.person_a_id;
+  const personBId = payload.person_b_id;
   const readingType = job.reading_type || payload.reading_type || 'connection';
 
   await supabase
@@ -1488,27 +1588,55 @@ async function processConnectionJob(job, reading) {
     .update({ status: "processing", started_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  // Bestehende Chart-Daten aus Reading laden (falls vorhanden)
+  // ── Chart-Daten laden ─────────────────────────────────────────────────
+  // Priorität: 1) person_a_id/person_b_id → readings-Tabelle
+  //            2) Geburtsdaten → Chart-API
+  //            3) Bestehende Daten aus reading_data
   let existingReadingData = {};
   if (readingId) {
     const { data: row } = await supabasePublic.from("readings").select("reading_data").eq("id", readingId).maybeSingle();
     if (row?.reading_data) existingReadingData = row.reading_data;
   }
 
-  // Charts berechnen
-  const personAChart = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
-    || existingReadingData.chart_data
-    || { type: "Unbekannt", gates: [], centers: {} };
+  let personAChart = null;
+  let personBChart = null;
 
-  const personBChart = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
-    || existingReadingData.chart_data2
-    || { type: "Unbekannt", gates: [], centers: {} };
+  if (personAId) {
+    const result = await fetchChartFromReading(personAId);
+    personAChart = result?.chart || null;
+    if (result?.name) nameA = result.name;
+    console.log(`   ✅ [Connection] Person A aus Reading ${personAId}: ${personAChart?.type || "kein Chart"}`);
+  }
+  if (personBId) {
+    const result = await fetchChartFromReading(personBId);
+    personBChart = result?.chart || null;
+    if (result?.name) nameB = result.name;
+    console.log(`   ✅ [Connection] Person B aus Reading ${personBId}: ${personBChart?.type || "kein Chart"}`);
+  }
 
-  console.log(`   [Connection] Charts: A=${personAChart.type}, B=${personBChart.type}`);
+  // Fallback: Geburtsdaten → Chart-API → bestehende Daten
+  if (!personAChart) personAChart = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
+    || existingReadingData.chart_data || { type: "Unbekannt", gates: [], centers: {} };
+  if (!personBChart) personBChart = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
+    || existingReadingData.chart_data2 || { type: "Unbekannt", gates: [], centers: {} };
+
+  console.log(`   [Connection] Charts: A=${personAChart.type || "?"}, B=${personBChart.type || "?"}`);
+
+  // ── Composite-Daten laden ─────────────────────────────────────────────
+  let compositeData = null;
+  if (connectionReadingId) {
+    const { data: connRow } = await supabasePublic
+      .schema("public")
+      .from("connection_readings")
+      .select("composite_chart, composite_analysis, dynamics")
+      .eq("id", connectionReadingId)
+      .maybeSingle();
+    compositeData = connRow?.composite_chart || null;
+  }
 
   const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
 
-  // Template wählen: 'compatibility' → compatibility.txt, sonst connection.txt
+  // Template wählen
   const templateName = readingType === 'compatibility' ? 'compatibility'
     : readingType === 'relationship' ? 'relationship'
     : 'connection';
@@ -1522,12 +1650,36 @@ async function processConnectionJob(job, reading) {
       personAChart,
       personBChart,
       dynamics,
+      compositeData,
       connectionQuestion,
     }
   });
 
   const reflexionsfragen = await generateConnectionReflexionsfragen(personAChart, personBChart, nameA, nameB);
 
+  // ── connection_readings aktualisieren ─────────────────────────────────
+  if (connectionReadingId) {
+    await supabasePublic
+      .schema("public")
+      .from("connection_readings")
+      .update({
+        chart_a: personAChart,
+        chart_b: personBChart,
+        person_a_chart: personAChart,
+        person_b_chart: personBChart,
+        dynamics: dynamics,
+        electromagnetic_channels: dynamics.electromagnetic_channels,
+        complementary_gates: dynamics.complementary_gates,
+        similarities: dynamics.similarities,
+        differences: dynamics.differences,
+        composite_analysis: { text: content, generated_at: new Date().toISOString() },
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", connectionReadingId)
+      .catch(e => console.warn("⚠️ [Connection] connection_readings Update fehlgeschlagen:", e.message));
+  }
+
+  // ── readings aktualisieren ────────────────────────────────────────────
   const newReadingData = {
     ...existingReadingData,
     text: content,

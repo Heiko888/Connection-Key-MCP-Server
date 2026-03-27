@@ -103,6 +103,9 @@ services:
       # Chart API
       - HD_APP_URL=${HD_APP_URL:-https://www.the-connection-key.de}
 
+      # Claude Timeout (300s für lange Readings)
+      - CLAUDE_TIMEOUT_MS=${CLAUDE_TIMEOUT_MS:-300000}
+
     depends_on:
       redis:
         condition: service_healthy

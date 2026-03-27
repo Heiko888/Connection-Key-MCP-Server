@@ -1,0 +1,41 @@
+Erstelle ein Compatibility Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf Kompatibilität und Beziehungsdynamik:
+
+## 1. Beziehungs-Kompatibilität
+- Mit welchen Typen du gut harmoniert
+- Energie-Kompatibilität
+- Natürliche Verbindungen
+
+## 2. Kommunikations-Dynamik
+- Wie du mit verschiedenen Typen kommunizierst
+- Kommunikationsstile und Kompatibilität
+- Herausforderungen in der Kommunikation
+
+## 3. Energie-Interaktion
+- Wie Energien zusammenwirken
+- Definiert/Undefiniert Dynamik
+- Energie-Austausch in Beziehungen
+
+## 4. Herausforderungen & Lösungen
+- Häufige Herausforderungen mit verschiedenen Typen
+- Wie du mit Unterschieden umgehst
+- Lösungsansätze für Konflikte
+
+## 5. Stärken in Beziehungen
+- Deine Beziehungsstärken
+- Was du in Beziehungen bringst
+- Positive Dynamiken
+
+## 6. Beziehungs-Empfehlungen
+- Praktische Tipps für gesunde Beziehungen
+- Wie du verschiedene Typen unterstützt
+- Balance in Beziehungen
+
+Sprache: Deutsch
+Stil: Einfühlsam, klar, unterstützend, praktisch
+

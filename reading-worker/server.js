@@ -20,6 +20,7 @@ import IORedis from "ioredis";
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
+import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 
 const app = express();
 app.use(express.json());
@@ -205,17 +206,17 @@ const MODEL_CONFIG = {
   "claude-sonnet": {
     provider: "claude",
     models: ["claude-sonnet-4-6", "claude-sonnet-4-5-20250929", "claude-sonnet-4-20250514"],
-    maxTokens: 8000,
+    maxTokens: 16000,
   },
   "claude-opus": {
     provider: "claude",
     models: ["claude-opus-4-6", "claude-sonnet-4-6", "claude-opus-4-5-20251101"],
-    maxTokens: 8000,
+    maxTokens: 16000,
   },
   "claude-haiku": {
     provider: "claude",
     models: ["claude-haiku-4-5-20251001", "claude-sonnet-4-6"],
-    maxTokens: 4000,
+    maxTokens: 8000,
   },
 };
 
@@ -548,8 +549,40 @@ Antworte NUR mit einem JSON-Array mit genau 10 Strings, ohne weiteren Text:
   }
 }
 
+// ======================================================
+// buildTuningInstructions()
+// Erzeugt Tuning-Anweisungen aus tone/length/audience
+// ======================================================
+function buildTuningInstructions({ tone, length, audience } = {}) {
+  const lines = [];
+  const toneMap = {
+    sachlich:    'Ton: sachlich, nüchtern, präzise – keine emotionale Färbung, keine Metaphern.',
+    empathisch:  'Ton: warm, einfühlsam, einladend – die Person fühlt sich gesehen und verstanden.',
+    spirituell:  'Ton: tiefgründig, bedeutsam, spirituell offen – verweise auf größere Zusammenhänge, ohne dogmatisch zu sein.',
+    direkt:      'Ton: direkt, klar, auf den Punkt – kein Drumherumreden, keine Abschwächungen.',
+  };
+  const lengthMap = {
+    kurz:     'Länge: Kompakt und prägnant. Jede Sektion maximal 3–5 Sätze. Gesamtlänge: ca. 400–600 Wörter.',
+    standard: 'Länge: Standard-Tiefe. Jede Sektion vollständig ausgeführt. Gesamtlänge: ca. 800–1200 Wörter.',
+    tief:     'Länge: Tiefenanalyse. Jede Sektion ausführlich mit Nuancen. Gesamtlänge: ca. 1500–2500 Wörter.',
+  };
+  const audienceMap = {
+    einsteiger:      'Zielgruppe: Einsteiger. Vermeide Fachbegriffe, erkläre HD-Konzepte kurz beim ersten Auftreten.',
+    fortgeschritten: 'Zielgruppe: Fortgeschrittene mit HD-Grundkenntnissen. Fachbegriffe können genutzt werden.',
+    profi:           'Zielgruppe: Profis / HD-Coaches. Maximale Präzision und Tiefe, keine Vereinfachungen.',
+  };
+  if (tone     && toneMap[tone])         lines.push(toneMap[tone]);
+  if (length   && lengthMap[length])     lines.push(lengthMap[length]);
+  if (audience && audienceMap[audience]) lines.push(audienceMap[audience]);
+  return lines.length > 0 ? `\n\n🎛️ TUNING-PARAMETER:\n${lines.join('\n')}` : '';
+}
+
 async function generateReading({ agentId, template, userData, chartData }) {
-  const selectedModelId = userData?.ai_model || DEFAULT_MODEL;
+  const rawModelId = userData?.ai_model || DEFAULT_MODEL;
+  // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
+  const selectedModelId = MODEL_CONFIG[rawModelId]
+    ? rawModelId
+    : Object.keys(MODEL_CONFIG).find(k => rawModelId.startsWith(k)) || DEFAULT_MODEL;
   let modelConfig = MODEL_CONFIG[selectedModelId] || MODEL_CONFIG[DEFAULT_MODEL];
   const maxTokens = userData?.ai_config?.max_tokens || modelConfig.maxTokens;
 
@@ -557,7 +590,13 @@ async function generateReading({ agentId, template, userData, chartData }) {
     throw new Error(`Claude (${selectedModelId}) nicht verfügbar`);
   }
 
-  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData });
+  // Tuning-Parameter aus userData
+  const tone     = userData?.tone     || userData?.ai_config?.tone;
+  const length   = userData?.length   || userData?.ai_config?.length;
+  const audience = userData?.audience || userData?.ai_config?.audience;
+  const tuningInstructions = buildTuningInstructions({ tone, length, audience });
+
+  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData, tone, length, audience });
 
   // Detailed readings: 2-Pass-Generierung für vollständige Ausgabe ohne Token-Kürzung
   if (template === 'detailed') {
@@ -573,6 +612,7 @@ ${templateContent}
 
 Verwende folgendes Wissen:
 ${buildKnowledgeText(8, 1000)}
+${tuningInstructions}
 
 Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
 
@@ -1949,6 +1989,11 @@ function getTypeInteractionNote(typeA, typeB) {
   const key = `${typeA}-${typeB}`;
   return interactions[key] || interactions[`${typeB}-${typeA}`] || 'Einzigartige Dynamik';
 }
+
+// ======================================================
+// Live Reading Agent
+// ======================================================
+app.use("/api/live-reading", createLiveReadingRouter(supabase));
 
 // ======================================================
 // Health Endpoint

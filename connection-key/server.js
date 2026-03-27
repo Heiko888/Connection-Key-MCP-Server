@@ -8,6 +8,7 @@ import { stripeRouter } from "./routes/stripe.js";
 import { matchingRouter } from "./routes/matching.js";
 import { userRouter } from "./routes/user.js";
 import chartRouter from "./routes/chart.js";
+import liveReadingRouter from "./routes/live-reading.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { requestLogger } from "./middleware/logger.js";
@@ -105,6 +106,7 @@ export class ConnectionKeyServer {
     apiRouter.use("/chart", chartRouter);
     apiRouter.use("/charts", chartRouter); // Alias für Frontend-Kompatibilität
     apiRouter.use("/matching", matchingRouter);
+    apiRouter.use("/live-reading", liveReadingRouter);
     apiRouter.use("/user", userRouter);
 
     this.app.use("/api", apiRouter);

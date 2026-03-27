@@ -189,6 +189,56 @@ app.get("/health", (req, res) => {
 /**
  * Essence aus Reading extrahieren
  */
+async function generateReflexionsfragen(chart) {
+  if (!anthropic || !chart) return null;
+
+  const core = chart.core || {};
+  const definedCenters = Object.entries(chart.centers || {})
+    .filter(([, v]) => v === true || v === 'defined')
+    .map(([k]) => k)
+    .join(', ') || 'keine';
+
+  const channelNames = (chart.channels || [])
+    .slice(0, 10)
+    .map(c => c.name || (c.gates ? c.gates.join('-') : ''))
+    .filter(Boolean)
+    .join(', ') || 'keine';
+
+  const prompt = `Du bist ein Human Design Coach. Erstelle 6 tiefgründige, personalisierte Reflexionsfragen basierend auf diesem Human Design Chart:
+
+Typ: ${core.type || 'unbekannt'}
+Profil: ${core.profile || 'unbekannt'}
+Autorität: ${core.authority || 'unbekannt'}
+Strategie: ${core.strategy || 'unbekannt'}
+Definierte Zentren: ${definedCenters}
+Channels: ${channelNames}
+
+Die Fragen sollen:
+- Direkt auf spezifische Chart-Elemente bezogen sein (nicht generisch!)
+- Zur Selbstreflexion und inneren Erkundung einladen
+- In der Du-Form formuliert sein
+- Konkret und umsetzbar sein
+- Auf Deutsch sein
+
+Antworte NUR mit einem JSON-Array, ohne weiteren Text:
+["Frage 1", "Frage 2", "Frage 3", "Frage 4", "Frage 5", "Frage 6"]`;
+
+  try {
+    const result = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800
+    });
+    const text = result.content[0].text;
+    const match = text.match(/\[[\s\S]*?\]/);
+    if (match) return JSON.parse(match[0]);
+    return null;
+  } catch (err) {
+    log("warn", "Reflexionsfragen-Generierung fehlgeschlagen", { error: err.message });
+    return null;
+  }
+}
+
 async function generateEssence(readingText) {
   if (!anthropic) {
     throw new Error("Anthropic Client nicht initialisiert");
@@ -471,9 +521,9 @@ Stil: ${style}
 
 WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas fehlt, sage es explizit. Ergänze nichts.`;
 
-    // OpenAI API aufrufen
+    // Reading generieren
     const completion = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       system: systemPrompt,
       messages: [
         {
@@ -481,22 +531,25 @@ WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas f
           content: userPrompt
         }
       ],
-      max_tokens: 4000
+      max_tokens: 8000
     });
 
     const reading = completion.content[0].text;
     const readingId = `reading-${Date.now()}-${userId || "anonymous"}`;
 
-    // Essence generieren (optional, Fehler werden ignoriert)
+    // Essence und Reflexionsfragen parallel generieren
     let essence = null;
+    let reflexionsfragen = null;
     try {
-      essence = await generateEssence(reading);
-    } catch (essenceError) {
-      log("error", "Essence-Generierung fehlgeschlagen", {
-        error: essenceError.message,
+      [essence, reflexionsfragen] = await Promise.all([
+        generateEssence(reading),
+        generateReflexionsfragen(chart)
+      ]);
+    } catch (parallelError) {
+      log("error", "Essence/Reflexionsfragen-Generierung fehlgeschlagen", {
+        error: parallelError.message,
         readingId
       });
-      // Essence-Fehler nicht kritisch, Reading wird trotzdem zurückgegeben
     }
 
     res.json({
@@ -504,6 +557,7 @@ WICHTIG: Interpretiere ausschließlich die vorhandenen Chart-Daten. Wenn etwas f
       readingId,
       reading,
       essence: essence,
+      reflexionsfragen: reflexionsfragen,
       chart_id: chart_id || null,
       chart_version: chart_version || null,
       context,

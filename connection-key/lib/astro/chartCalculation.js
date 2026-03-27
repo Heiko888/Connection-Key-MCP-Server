@@ -366,25 +366,79 @@ export async function calculateHumanDesignChart(input) {
   const jdP = dateToJD(birthDateObj);
   const jdD = calcDesignJD(jdP);
 
+  const PLANET_ID_TO_KEY = {
+    [SE_SUN]:       'sun',
+    [SE_MOON]:      'moon',
+    [SE_MERCURY]:   'mercury',
+    [SE_VENUS]:     'venus',
+    [SE_MARS]:      'mars',
+    [SE_JUPITER]:   'jupiter',
+    [SE_SATURN]:    'saturn',
+    [SE_URANUS]:    'uranus',
+    [SE_NEPTUNE]:   'neptune',
+    [SE_PLUTO]:     'pluto',
+    [SE_TRUE_NODE]: 'north-node',
+  };
+
   const planets = [SE_SUN, SE_MOON, SE_MERCURY, SE_VENUS, SE_MARS, SE_JUPITER, SE_SATURN, SE_URANUS, SE_NEPTUNE, SE_PLUTO, SE_TRUE_NODE];
 
   const activeGates = new Set();
+  const personalityPlanets = [];
+  const designPlanets = [];
 
   for (const planet of planets) {
     const lonP = getSwissLongitude(planet, jdP);
     const lonD = getSwissLongitude(planet, jdD);
-    if (lonP != null) { const g = gateForLongitude(lonP); if (g) activeGates.add(g); }
-    if (lonD != null) { const g = gateForLongitude(lonD); if (g) activeGates.add(g); }
+    const key = PLANET_ID_TO_KEY[planet];
+
+    if (lonP != null) {
+      const g = gateForLongitude(lonP);
+      if (g) {
+        activeGates.add(g);
+        personalityPlanets.push({ planet: key, gate: g, line: lineForLongitude(lonP) });
+      }
+    }
+    if (lonD != null) {
+      const g = gateForLongitude(lonD);
+      if (g) {
+        activeGates.add(g);
+        designPlanets.push({ planet: key, gate: g, line: lineForLongitude(lonD) });
+      }
+    }
     if (planet === SE_TRUE_NODE) {
-      if (lonP != null) { const g = gateForLongitude(norm360(lonP + 180)); if (g) activeGates.add(g); }
-      if (lonD != null) { const g = gateForLongitude(norm360(lonD + 180)); if (g) activeGates.add(g); }
+      if (lonP != null) {
+        const g = gateForLongitude(norm360(lonP + 180));
+        if (g) {
+          activeGates.add(g);
+          personalityPlanets.push({ planet: 'south-node', gate: g, line: lineForLongitude(norm360(lonP + 180)) });
+        }
+      }
+      if (lonD != null) {
+        const g = gateForLongitude(norm360(lonD + 180));
+        if (g) {
+          activeGates.add(g);
+          designPlanets.push({ planet: 'south-node', gate: g, line: lineForLongitude(norm360(lonD + 180)) });
+        }
+      }
     }
   }
 
   const sunLonP = getSwissLongitude(SE_SUN, jdP);
   const sunLonD = getSwissLongitude(SE_SUN, jdD);
-  if (sunLonP != null) { const g = gateForLongitude(norm360(sunLonP + 180)); if (g) activeGates.add(g); }
-  if (sunLonD != null) { const g = gateForLongitude(norm360(sunLonD + 180)); if (g) activeGates.add(g); }
+  if (sunLonP != null) {
+    const g = gateForLongitude(norm360(sunLonP + 180));
+    if (g) {
+      activeGates.add(g);
+      personalityPlanets.push({ planet: 'earth', gate: g, line: lineForLongitude(norm360(sunLonP + 180)) });
+    }
+  }
+  if (sunLonD != null) {
+    const g = gateForLongitude(norm360(sunLonD + 180));
+    if (g) {
+      activeGates.add(g);
+      designPlanets.push({ planet: 'earth', gate: g, line: lineForLongitude(norm360(sunLonD + 180)) });
+    }
+  }
 
   const centers = {};
   for (const c of CENTER_KEYS) centers[c] = false;
@@ -467,6 +521,10 @@ export async function calculateHumanDesignChart(input) {
     "Reflector": "Warten – einen vollen Mondzyklus (28–29 Tage)",
   };
 
+  // Sortierung nach HD-Standard-Reihenfolge
+  const PLANET_ORDER = ['sun', 'earth', 'north-node', 'south-node', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+  const sortPlanets = (arr) => arr.slice().sort((a, b) => PLANET_ORDER.indexOf(a.planet) - PLANET_ORDER.indexOf(b.planet));
+
   return {
     type,
     profile,
@@ -477,5 +535,7 @@ export async function calculateHumanDesignChart(input) {
     centers,
     channels: channelsList,
     gates: gatesList,
+    personalityPlanets: sortPlanets(personalityPlanets),
+    designPlanets: sortPlanets(designPlanets),
   };
 }

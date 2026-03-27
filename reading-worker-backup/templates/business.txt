@@ -1,0 +1,42 @@
+Erstelle ein Business Human Design Reading für:
+
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Fokus auf berufliche Aspekte:
+
+## 1. Berufliche Talente
+- Natürliche Stärken im Beruf
+- Talente basierend auf Typ, Zentren und Channels
+- Einzigartige berufliche Fähigkeiten
+
+## 2. Arbeitsumgebung
+- Ideale Arbeitsbedingungen
+- Team-Dynamik und Zusammenarbeit
+- Arbeitsstil und Präferenzen
+
+## 3. Leadership-Stil
+- Natürlicher Führungsansatz
+- Wie andere führen (wenn Projector)
+- Wie initiieren (wenn Manifestor)
+- Wie unterstützen (wenn Generator)
+
+## 4. Karriere-Empfehlungen
+- Berufsfelder, die zum Typ passen
+- Rollen, die die Talente nutzen
+- Karrierewege basierend auf Human Design
+
+## 5. Business-Strategien
+- Wie Entscheidungen im Business treffen
+- Strategie für Erfolg
+- Häufige Business-Fallen und wie vermeiden
+
+## 6. Zusammenarbeit
+- Wie mit verschiedenen Typen arbeiten
+- Team-Kompatibilität
+- Kommunikationsstil im Business
+
+Sprache: Deutsch
+Stil: Professionell, klar, ergebnisorientiert, praktisch
+

@@ -78,6 +78,8 @@ router.post("/calculate", async (req, res, next) => {
         gates: chart.gates,
         channels: chart.channels,
         centers: chart.centers,
+        personalityPlanets: chart.personalityPlanets,
+        designPlanets: chart.designPlanets,
         createdAt: chartData?.created_at
       },
       source: "astronomy-engine",

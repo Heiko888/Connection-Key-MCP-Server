@@ -482,6 +482,230 @@ app.post('/agents/run', authMiddleware, async (req, res) => {
   }
 });
 
+// ============================================
+// NEUE KI-AGENTS
+// ============================================
+
+// Gemeinsame Hilfsfunktion für alle neuen Agenten
+async function runAgent({ agentName, systemPrompt, message, maxTokens = 1500, startTime, res }) {
+  if (!message) {
+    return res.status(400).json({ success: false, agent: agentName, error: 'message is required', timestamp: new Date().toISOString() });
+  }
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.json({ success: true, agent: agentName, response: `[${agentName.toUpperCase()} - Placeholder] API Key nicht konfiguriert.`, tokens: 0, model: 'placeholder', timestamp: new Date().toISOString() });
+    }
+    const completion = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: message }]
+    });
+    const response = completion.content[0].text;
+    const tokens = completion.usage.input_tokens + completion.usage.output_tokens;
+    res.json({ success: true, agent: agentName, response, tokens, model: 'claude-sonnet-4-5', runtimeMs: Date.now() - startTime, timestamp: new Date().toISOString() });
+  } catch (error) {
+    console.error(`❌ [${agentName}] Fehler:`, error.message);
+    res.status(500).json({ success: false, agent: agentName, error: error.message, timestamp: new Date().toISOString() });
+  }
+}
+
+// --------------------------------------------
+// REFLEXIONS-AGENT
+// Stellt Folgefragen basierend auf Client-Antworten
+// POST /agent/reflection
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/reflection', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'reflection',
+    systemPrompt: `Du bist ein einfühlsamer Reflexions-Begleiter im Human Design Kontext. Deine einzige Aufgabe ist es, tiefe, offene Folgefragen zu stellen – basierend auf dem, was der Client gerade geschrieben hat.
+
+Regeln:
+- Stelle IMMER nur eine einzige Folgefrage – nie mehrere
+- Die Frage muss direkt auf das Geschriebene eingehen, nicht auf allgemeines HD-Wissen
+- Keine Ratschläge, keine Interpretationen, keine Erklärungen
+- Keine Ja/Nein-Fragen
+- Keine Bewertungen oder Bestätigungen ("Das ist toll, dass du...", "Super, du hast...")
+- Kurze Einleitung (1 Satz) die zeigt, dass du wirklich zugehört hast – dann die Frage
+- Ton: warm, präsent, neugierig${chartInfo}
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 300,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// SHADOW-WORK-AGENT
+// Begleitet Konditionierungsthemen interaktiv
+// POST /agent/shadow-work
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/shadow-work', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'shadow-work',
+    systemPrompt: `Du bist ein erfahrener Shadow-Work-Begleiter im Human Design Kontext. Du hilfst dabei, Konditionierungsmuster zu erkennen und zu benennen – ohne zu urteilen, ohne zu dramatisieren.
+
+Deine Haltung:
+- Neutral, klar, präsent – kein Mitleid, keine Dramatisierung
+- Du benennst, was du siehst – du wertest nicht
+- Du arbeitest mit dem, was der Client gerade bringt
+- Keine Ratschläge, keine Lösungen, keine Heilsversprechen
+- Wenn du ein Konditionierungsmuster erkennst: benenne es ruhig und direkt
+- Stelle eine Folgefrage, wenn das hilfreich ist – aber nicht immer
+- Kurze, präzise Antworten (3–6 Sätze) – kein langes Erklären${chartInfo}
+
+Kontext: Human Design Shadow-Work. Not-Self-Themen: Wut (Manifestor), Frustration (Generator/MG), Bitterkeit (Projektor), Enttäuschung (Reflektor). Offene Zentren als Konditionierungs-Einfallstore.
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 500,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// RELATIONSHIP-AGENT
+// Kompatibilitätsanalyse zweier Charts (Chat)
+// POST /agent/relationship
+// Body: { message, chartA?, chartB? }
+// --------------------------------------------
+app.post('/agent/relationship', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartA, chartB } = req.body;
+  const chartsInfo = (chartA || chartB) ? `\n\nChart Person A:\n${JSON.stringify(chartA || {}, null, 2)}\n\nChart Person B:\n${JSON.stringify(chartB || {}, null, 2)}` : '';
+  await runAgent({
+    agentName: 'relationship',
+    systemPrompt: `Du bist ein Human Design Relationship-Spezialist. Du analysierst die Dynamik zwischen zwei Menschen auf Basis ihrer Charts – respektvoll, differenziert, ohne Urteile.
+
+Fokus:
+- Energiedynamik zwischen den beiden Typen
+- Kommunikationsmuster aus den Autoritäten
+- Komplementäre und spannungsvolle Verbindungen (Kanäle, Zentren)
+- Nähe/Distanz-Bedürfnisse aus dem Chart
+
+Haltung: neutral, einfühlsam, direkt
+Keine Diagnosen, keine Schuldzuweisungen, keine Heilsversprechen
+Antworte in 3–6 Sätzen, präzise und konkret${chartsInfo}
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 600,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// TRANSIT-AGENT
+// Aktuelle planetarische Einflüsse (Chat)
+// POST /agent/transit
+// Body: { message, chartContext?, currentTransits? }
+// --------------------------------------------
+app.post('/agent/transit', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext, currentTransits } = req.body;
+  const context = [
+    chartContext ? `Chart:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '',
+    currentTransits ? `Aktuelle Transits:\n${typeof currentTransits === 'object' ? JSON.stringify(currentTransits, null, 2) : currentTransits}` : ''
+  ].filter(Boolean).join('\n\n');
+  await runAgent({
+    agentName: 'transit',
+    systemPrompt: `Du bist ein Human Design Transit-Spezialist. Du erklärst, wie aktuelle planetarische Konstellationen mit dem persönlichen Chart interagieren.
+
+Fokus:
+- Welche Gates aktivieren aktuelle Planeten im Chart?
+- Welche temporären Kanäle entstehen dadurch?
+- Was bedeutet das energetisch für diese Person gerade?
+- Welche Entscheidungen sollten geprüft werden?
+
+Haltung: klar, nüchtern, informativ – wie ein guter Navigator
+Keine Alarmstimmung, keine Vorhersagen, keine Heilsversprechen
+Antworte konkret und kurz (4–7 Sätze)${context ? '\n\n' + context : ''}
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 500,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// BUSINESS-HD-AGENT
+// Unternehmer-Strategien basierend auf HD-Typ (Chat)
+// POST /agent/business-hd
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/business-hd', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'business-hd',
+    systemPrompt: `Du bist ein Human Design Business Coach. Du hilfst Selbstständigen und Unternehmern dabei, ihr Business aus ihrem Design heraus aufzubauen – nicht gegen es.
+
+Fokus:
+- Entscheidungen aus Strategie und Autorität treffen
+- Energieeinsatz und Burnout-Prävention nach Typ
+- Angebote, Positionierung und Kommunikation aus dem Design
+- Zusammenarbeit und Teamdynamiken
+
+Haltung: direkt, businessorientiert, klar – kein Coaching-Jargon
+Keine Erfolgsversprechen, keine generischen Tipps
+Antworte konkret und umsetzbar (4–6 Sätze)${chartInfo}
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 600,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// EMOTIONS-AGENT
+// Emotionale Autorität und Wellenarbeit (Chat)
+// POST /agent/emotions
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/emotions', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'emotions',
+    systemPrompt: `Du bist ein Human Design Emotions-Begleiter. Dein Schwerpunkt liegt auf dem Solarplexus-Zentrum, emotionalen Wellen und dem Unterschied zwischen emotionaler Autorität und emotionaler Konditionierung.
+
+Fokus:
+- Ist das Solarplexus definiert oder offen? Das bestimmt alles.
+- Definiert: Wellenmuster erkennen, Entscheidungen verzögern, Klarheit abwarten
+- Offen: Fremde Emotionen erkennen und nicht als eigene übernehmen
+- Emotionen als Information – nicht als Problem
+- Konkrete Praxis für den Moment, in dem der Client gerade ist
+
+Haltung: warm, präsent, klar – kein Mitleid, keine Dramatisierung
+Keine Diagnosen, keine Heilsversprechen
+Antworte kurz und direkt (3–5 Sätze) – präzise für das, was gerade beschrieben wird${chartInfo}
+
+Sprache: Deutsch`,
+    message,
+    maxTokens: 400,
+    startTime,
+    res
+  });
+});
+
 // Server starten
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ MCP HTTP Gateway läuft auf Port ${PORT}`);

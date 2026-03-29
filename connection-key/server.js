@@ -12,7 +12,12 @@ import liveReadingRouter from "./routes/live-reading.js";
 import shadowWorkRouter from "./routes/shadow-work.js";
 import transitRouter from "./routes/transit.js";
 import jahresReadingRouter from "./routes/jahres-reading.js";
+import relationshipRouter from "./routes/relationship.js";
+import careerRouter from "./routes/career.js";
+import healthReadingRouter from "./routes/health-reading.js";
+import emotionsRouter from "./routes/emotions.js";
 import transitsRouter from "./routes/transits.js";
+import genericReadingsRouter from "./routes/readings-generic.js";
 import { authMiddleware } from "./middleware/auth.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { requestLogger } from "./middleware/logger.js";
@@ -114,6 +119,12 @@ export class ConnectionKeyServer {
     apiRouter.use("/readings/shadow-work", shadowWorkRouter);
     apiRouter.use("/readings/transit", transitRouter);
     apiRouter.use("/readings/jahres", jahresReadingRouter);
+    apiRouter.use("/readings/relationship", relationshipRouter);
+    apiRouter.use("/readings/career", careerRouter);
+    apiRouter.use("/readings/health", healthReadingRouter);
+    apiRouter.use("/readings/emotions", emotionsRouter);
+    // Generischer Handler für alle übrigen Reading-Typen (nach spezifischen registrieren!)
+    apiRouter.use("/readings", genericReadingsRouter);
     apiRouter.use("/transits", transitsRouter);
     apiRouter.use("/user", userRouter);
 

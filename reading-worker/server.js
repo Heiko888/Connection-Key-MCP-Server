@@ -669,8 +669,20 @@ async function generateReading({ agentId, template, userData, chartData }) {
 
   console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData, tone, length, audience });
 
+  // Template-Mapping: explizite Zuordnung reading_type → template-Datei
+  const TEMPLATE_MAP = {
+    'detailed': 'detailed',
+    'depth-analysis': 'depth-analysis',
+    'shadow-work': 'shadow-work',
+    'transit': 'transit',
+    'jahres': 'jahres-reading',
+  };
+  if (TEMPLATE_MAP[template]) {
+    template = TEMPLATE_MAP[template];
+  }
+
   // Detailed readings: 2-Pass-Generierung für vollständige Ausgabe ohne Token-Kürzung
-  if (template === 'detailed') {
+  if (template === 'detailed' || template === 'depth-analysis') {
     return await generateDetailedReadingTwoParts({ userData, chartData, modelConfig });
   }
 
@@ -725,13 +737,27 @@ ${userData.connectionQuestion ? `Verbindungsfrage: ${userData.connectionQuestion
 WICHTIG: Dieses Reading MUSS beide Personen (${personAName} UND ${personBName}) in jeder Sektion explizit ansprechen und ihre Charts miteinander in Beziehung setzen!`;
   } else {
     const chartInfo = buildChartInfo(chartData);
+
+    // ai_config-Parameter (year, transit_gates, year_transits) in Prompt einbetten
+    let aiConfigContext = '';
+    const cfg = userData.ai_config || {};
+    if (cfg.year) {
+      aiConfigContext += `\nJahr des Readings: ${cfg.year}`;
+    }
+    if (cfg.year_transits) {
+      aiConfigContext += `\nJahres-Transits:\n${JSON.stringify(cfg.year_transits, null, 2)}`;
+    }
+    if (cfg.transit_gates) {
+      aiConfigContext += `\nAktuelle Planeten-Transits:\n${JSON.stringify(cfg.transit_gates, null, 2)}`;
+    }
+
     userMessage = `Erstelle ein Reading für:
 Name: ${userData.client_name || 'Unbekannt'}
 Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
 Geburtszeit: ${userData.birth_time || 'Unbekannt'}
 Geburtsort: ${userData.birth_location || 'Unbekannt'}
 ${chartInfo}
-
+${aiConfigContext}
 ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
   }
 
@@ -1120,9 +1146,16 @@ const pentaWorker = new Worker(
       console.log(`   📊 [Penta] Berechne Charts für ${members.length} Mitglieder...`);
       const memberCharts = [];
       for (const member of members) {
-        const chart = await fetchChartData(
-          member.birthDate, member.birthTime, member.birthPlace
-        ) || { type: "Unbekannt", gates: [], centers: {}, note: "Chart-Berechnung fehlgeschlagen" };
+        let chart = null;
+        if (member.reading_id) {
+          const result = await fetchChartFromReading(member.reading_id);
+          chart = result?.chart || null;
+          console.log(`   📂 [Penta] ${member.name}: Chart aus Supabase (reading_id=${member.reading_id})`);
+        }
+        if (!chart) {
+          chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
+            || { type: "Unbekannt", gates: [], centers: {}, note: "Chart-Berechnung fehlgeschlagen" };
+        }
         memberCharts.push({ name: member.name, chart });
         console.log(`   ✅ [Penta] ${member.name}: Typ=${chart.type}`);
       }
@@ -1848,8 +1881,16 @@ async function processPentaJob(job, reading) {
   // Charts für alle Mitglieder berechnen
   const memberCharts = [];
   for (const member of members) {
-    const chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
-      || { type: "Unbekannt", gates: [], centers: {} };
+    let chart = null;
+    if (member.reading_id) {
+      const result = await fetchChartFromReading(member.reading_id);
+      chart = result?.chart || null;
+      console.log(`   [Penta] ${member.name}: Chart aus Supabase (reading_id=${member.reading_id})`);
+    }
+    if (!chart) {
+      chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
+        || { type: "Unbekannt", gates: [], centers: {} };
+    }
     memberCharts.push({ name: member.name, chart });
     console.log(`   [Penta] Chart für ${member.name}: ${chart.type}`);
   }
@@ -2340,7 +2381,7 @@ app.get("/api/readings/shadow-work/status/:job_id", async (req, res) => {
 // Transit-Reading Endpoints
 // ======================================================
 
-async function startSpecialReading(readingType, { reading_id, transit_gates, year, year_transits, name, birthdate, birthtime, birthplace }) {
+async function startSpecialReading(readingType, { reading_id, transit_gates, year, year_transits, name, birthdate, birthtime, birthplace, ai_config: extraConfig }) {
   let payload = { reading_id, reading_type: readingType };
 
   if (name || birthdate) {
@@ -2365,6 +2406,7 @@ async function startSpecialReading(readingType, { reading_id, transit_gates, yea
   if (transit_gates) payload.ai_config = { ...(payload.ai_config || {}), transit_gates };
   if (year) payload.ai_config = { ...(payload.ai_config || {}), year };
   if (year_transits) payload.ai_config = { ...(payload.ai_config || {}), year_transits };
+  if (extraConfig) payload.ai_config = { ...(payload.ai_config || {}), ...extraConfig };
 
   const { data, error } = await supabase
     .from("reading_jobs")
@@ -2488,6 +2530,57 @@ app.get("/api/readings/jahres/status/:job_id", async (req, res) => {
     return res.json(result);
   } catch (err) {
     console.error("[Jahres] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Generische Reading-Endpunkte (alle nicht-spezialisierten Typen)
+// ======================================================
+const GENERIC_READING_TYPES = new Set([
+  'basic', 'business', 'career', 'compatibility',
+  'emotions', 'health', 'life-purpose', 'parenting',
+  'reflection', 'reflection-profiles', 'spiritual',
+  'detailed', 'depth-analysis', 'default', 'sexuality',
+]);
+
+app.post("/api/readings/:type/start", async (req, res) => {
+  const { type } = req.params;
+  if (!GENERIC_READING_TYPES.has(type)) {
+    return res.status(400).json({ success: false, error: `Unbekannter Reading-Typ: ${type}` });
+  }
+  try {
+    const { reading_id, name, birthdate, birthtime, birthplace, ai_config } = req.body || {};
+    if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const job_id = await startSpecialReading(type, {
+      reading_id, name, birthdate, birthtime, birthplace, ai_config,
+    });
+    console.log(`✅ [${type}] Job erstellt: ${job_id}`);
+    return res.status(202).json({
+      success: true,
+      job_id,
+      status: "pending",
+      reading_type: type,
+      poll_url: `/api/readings/${type}/status/${job_id}`,
+    });
+  } catch (err) {
+    console.error(`[${type}] Start fehlgeschlagen:`, err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/:type/status/:job_id", async (req, res) => {
+  const { type, job_id } = req.params;
+  if (!GENERIC_READING_TYPES.has(type)) {
+    return res.status(400).json({ success: false, error: `Unbekannter Reading-Typ: ${type}` });
+  }
+  try {
+    const result = await getJobStatus(job_id);
+    if (!result) return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+    return res.json(result);
+  } catch (err) {
+    console.error(`[${type}] Status fehlgeschlagen:`, err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

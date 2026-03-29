@@ -2513,12 +2513,43 @@ app.get("/api/readings/transit/status/:job_id", async (req, res) => {
 // ======================================================
 app.post("/api/readings/jahres/start", async (req, res) => {
   try {
-    const { reading_id, year, year_transits, name, birthdate, birthtime, birthplace } = req.body || {};
+    const { reading_id, name, birthdate, birthtime, birthplace } = req.body || {};
+    let { year, year_transits } = req.body || {};
     if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
 
-    const job_id = await startSpecialReading("jahres-reading", { reading_id, year: year || new Date().getFullYear(), year_transits, name, birthdate, birthtime, birthplace });
-    console.log(`✅ [Jahres] Job erstellt: ${job_id}`);
-    return res.status(202).json({ success: true, job_id, status: "pending", poll_url: `/api/readings/jahres/status/${job_id}` });
+    year = year || new Date().getFullYear();
+
+    // Auto-Berechnung monatlicher Jahres-Transits wenn nicht mitgeliefert
+    let auto_calculated = false;
+    if (!year_transits || (Array.isArray(year_transits) && year_transits.length === 0)) {
+      try {
+        const yearRes = await fetch(`${CONNECTION_KEY_URL}/api/transits/year/${year}`, {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (yearRes.ok) {
+          const yearData = await yearRes.json();
+          year_transits = yearData.months || [];
+          auto_calculated = true;
+          console.log(`   📅 [Jahres] Auto-Transits geladen: ${year_transits.length} Monate für ${year}`);
+        }
+      } catch (fetchErr) {
+        console.warn("[Jahres] Auto-Transit-Berechnung fehlgeschlagen:", fetchErr.message);
+      }
+    }
+
+    const job_id = await startSpecialReading("jahres-reading", {
+      reading_id, year, year_transits, name, birthdate, birthtime, birthplace,
+    });
+    console.log(`✅ [Jahres] Job erstellt: ${job_id} (auto=${auto_calculated})`);
+    return res.status(202).json({
+      success: true,
+      job_id,
+      status: "pending",
+      year,
+      auto_calculated,
+      months_count: year_transits?.length || 0,
+      poll_url: `/api/readings/jahres/status/${job_id}`,
+    });
   } catch (err) {
     console.error("[Jahres] Start fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });

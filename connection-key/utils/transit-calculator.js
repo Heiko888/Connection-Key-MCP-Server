@@ -23,8 +23,11 @@ const PLANETS = [
   { id: 11, name: "Mondknoten" }, // True Node
 ];
 
-// 1-Stunden-Cache
+// 1-Stunden-Cache (aktuelle Transits)
 let cache = null;
+
+// Jahres-Cache (pro Jahr)
+const yearCache = new Map();
 
 function calcPlanetLongitude(jd, planetId) {
   try {
@@ -77,4 +80,54 @@ export async function getCurrentTransits() {
 
   cache = { timestamp: now, data: transits };
   return transits;
+}
+
+/**
+ * Berechnet monatliche Planeten-Snapshots für ein ganzes Jahr.
+ * Gibt 12 Einträge zurück (1. jedes Monats, 12:00 UTC).
+ * Gecacht pro Jahr (ändert sich nicht mehr wenn Jahr vergangen).
+ */
+export function getTransitsForYear(year) {
+  const cached = yearCache.get(year);
+  if (cached) return cached;
+
+  const MONTH_NAMES = [
+    "Januar", "Februar", "März", "April", "Mai", "Juni",
+    "Juli", "August", "September", "Oktober", "November", "Dezember",
+  ];
+
+  const months = [];
+  for (let month = 0; month < 12; month++) {
+    const date = new Date(Date.UTC(year, month, 1, 12, 0, 0));
+    const jd = dateToJD(date);
+    const planets = [];
+
+    for (const { id, name } of PLANETS) {
+      const degree = calcPlanetLongitude(jd, id);
+      if (degree === null) continue;
+      planets.push({
+        planet: name,
+        gate: gateForLongitude(degree),
+        line: lineForLongitude(degree),
+        degree: Math.round(degree * 1000) / 1000,
+      });
+    }
+
+    // Erde
+    const sunDegree = calcPlanetLongitude(jd, 0);
+    if (sunDegree !== null) {
+      const earthDegree = norm360(sunDegree + 180);
+      planets.push({
+        planet: "Erde",
+        gate: gateForLongitude(earthDegree),
+        line: lineForLongitude(earthDegree),
+        degree: Math.round(earthDegree * 1000) / 1000,
+      });
+    }
+
+    months.push({ month: MONTH_NAMES[month], date: date.toISOString().slice(0, 10), planets });
+  }
+
+  yearCache.set(year, months);
+  return months;
 }

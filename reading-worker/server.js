@@ -1447,7 +1447,9 @@ async function pollForJobs() {
 
         console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
 
-        const isTwoPersonReading = ['connection', 'relationship', 'compatibility', 'composite'].includes(readingType);
+        // relationship/compatibility sind Einzel-Person-Readings (Chart-Analyse); connection/composite benötigen 2 Personen
+        const isTwoPersonReading = ['connection', 'composite'].includes(readingType) ||
+          (['relationship', 'compatibility'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2));
         if (isTwoPersonReading) {
           await processConnectionJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
@@ -2538,7 +2540,7 @@ app.get("/api/readings/jahres/status/:job_id", async (req, res) => {
 // Generische Reading-Endpunkte (alle nicht-spezialisierten Typen)
 // ======================================================
 const GENERIC_READING_TYPES = new Set([
-  'basic', 'business', 'career', 'compatibility',
+  'basic', 'business', 'career', 'compatibility', 'relationship',
   'emotions', 'health', 'life-purpose', 'parenting',
   'reflection', 'reflection-profiles', 'spiritual',
   'detailed', 'depth-analysis', 'default', 'sexuality',

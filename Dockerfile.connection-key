@@ -1,6 +1,12 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache python3 make g++ libc-dev linux-headers py3-setuptools
+# Build-Tools (swisseph) + Chromium für Puppeteer (HTML-zu-Bild)
+RUN apk add --no-cache \
+    python3 make g++ libc-dev linux-headers py3-setuptools \
+    chromium nss freetype harfbuzz ca-certificates ttf-freefont
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /app
 

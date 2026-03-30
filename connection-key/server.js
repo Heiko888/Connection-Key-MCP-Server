@@ -17,6 +17,7 @@ import careerRouter from "./routes/career.js";
 import healthReadingRouter from "./routes/health-reading.js";
 import emotionsRouter from "./routes/emotions.js";
 import tagesimpulsRouter from "./routes/tagesimpuls.js";
+import telegramRouter from "./routes/telegram.js";
 import transitsRouter from "./routes/transits.js";
 import genericReadingsRouter from "./routes/readings-generic.js";
 import { authMiddleware } from "./middleware/auth.js";
@@ -125,6 +126,7 @@ export class ConnectionKeyServer {
     apiRouter.use("/readings/health", healthReadingRouter);
     apiRouter.use("/readings/emotions", emotionsRouter);
     apiRouter.use("/readings/tagesimpuls", tagesimpulsRouter);
+    apiRouter.use("/telegram", telegramRouter);
     // Generischer Handler für alle übrigen Reading-Typen (nach spezifischen registrieren!)
     apiRouter.use("/readings", genericReadingsRouter);
     apiRouter.use("/transits", transitsRouter);

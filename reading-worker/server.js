@@ -750,6 +750,22 @@ WICHTIG: Dieses Reading MUSS beide Personen (${personAName} UND ${personBName}) 
     if (cfg.transit_gates) {
       aiConfigContext += `\nAktuelle Planeten-Transits:\n${JSON.stringify(cfg.transit_gates, null, 2)}`;
     }
+    if (cfg.transit) {
+      const t = cfg.transit;
+      aiConfigContext += `\nTages-Transit (${t.date || 'heute'}):
+Sonne: Tor ${t.sun?.gate}.${t.sun?.line} | Erde: Tor ${t.earth?.gate}.${t.earth?.line} | Mond: Tor ${t.moon?.gate}.${t.moon?.line}
+Nordknoten: Tor ${t.northNode?.gate} | Mondphase: ${t.moonPhase || '–'}
+Aktive Transit-Kanäle: ${(t.activeChannels || []).join(', ') || 'keine'}
+Aktivierte Transit-Zentren: ${(t.definedCenters || []).join(', ') || 'keine'}`;
+    }
+    if (cfg.cross_reference?.length) {
+      aiConfigContext += `\nChart-Transit-Kreuzreferenz (Transit trifft persönliches Chart):`;
+      for (const a of cfg.cross_reference) {
+        aiConfigContext += `\n  → ${a.planet}: Transit-Tor ${a.gate}.${a.line} ist in diesem Chart definiert`;
+      }
+    }
+    if (cfg.format) aiConfigContext += `\nAusgabeformat: ${cfg.format}`;
+    if (cfg.focus_topic) aiConfigContext += `\nFokus-Thema heute: ${cfg.focus_topic}`;
 
     userMessage = `Erstelle ein Reading für:
 Name: ${userData.client_name || 'Unbekannt'}
@@ -1447,10 +1463,10 @@ async function pollForJobs() {
 
         console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
 
-        // relationship/compatibility sind Einzel-Person-Readings (Chart-Analyse); connection/composite benötigen 2 Personen
-        const isTwoPersonReading = ['connection', 'composite'].includes(readingType) ||
-          (['relationship', 'compatibility'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2));
-        if (isTwoPersonReading) {
+        if (readingType === 'tagesimpuls') {
+          await processTagesimpulsJob(job, reading);
+        } else if (['connection', 'composite'].includes(readingType) ||
+          (['relationship', 'compatibility'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2))) {
           await processConnectionJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
           await processSexualityJob(job, reading);
@@ -1467,6 +1483,106 @@ async function pollForJobs() {
     }
   } catch (error) {
     console.error("❌ Polling System Fehler:", error);
+  }
+}
+
+// ======================================================
+// processTagesimpulsJob
+// ======================================================
+function calcTransitCrossReference(transitPlanets, chartData) {
+  if (!chartData || !transitPlanets?.length) return [];
+  const clientGates = new Set((chartData.gates || []).map(g => typeof g === 'object' ? g.number : g));
+  return transitPlanets
+    .filter(p => clientGates.has(p.gate))
+    .map(p => ({ planet: p.planet, gate: p.gate, line: p.line }));
+}
+
+async function processTagesimpulsJob(job, reading) {
+  console.log(`🌅 [Tagesimpuls] Verarbeite Job ${job.id}`);
+  const payload = reading.client_data || job.payload || {};
+  const { birthdate, birthtime, birthplace, name, format, focus_topic, ai_config } = payload;
+  const readingId = job.payload?.reading_id;
+  const today = new Date().toISOString().split('T')[0];
+
+  // 1. Transit-Daten holen (Supabase → API-Fallback)
+  let transitData = null;
+  try {
+    const { data: stored } = await supabasePublic
+      .from('daily_transits').select('*').eq('date', today).maybeSingle();
+    if (stored) {
+      transitData = {
+        date: stored.date,
+        sun: { gate: stored.sun_gate, line: stored.sun_line },
+        earth: { gate: stored.earth_gate, line: stored.earth_line },
+        moon: { gate: stored.moon_gate, line: stored.moon_line },
+        northNode: { gate: stored.north_node_gate, line: stored.north_node_line },
+        allPlanets: stored.all_planets,
+        activeChannels: stored.active_channels,
+        definedCenters: stored.defined_centers,
+        moonPhase: stored.moon_phase,
+      };
+      console.log(`   📅 [Tagesimpuls] Transit aus DB geladen`);
+    } else {
+      const res = await fetch(`${CONNECTION_KEY_URL}/api/transits/today`, { signal: AbortSignal.timeout(10000) });
+      if (res.ok) { transitData = await res.json(); console.log(`   📅 [Tagesimpuls] Transit von API geladen`); }
+    }
+  } catch (e) {
+    console.warn('[Tagesimpuls] Transit-Fetch fehlgeschlagen:', e.message);
+  }
+
+  // 2. Chart-Daten laden oder berechnen
+  let chartData = null;
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from('readings').select('reading_data').eq('id', readingId).maybeSingle();
+    if (row?.reading_data) { existingReadingData = row.reading_data; chartData = row.reading_data.chart_data || null; }
+  }
+  if (!chartData && birthdate && birthtime && birthplace) {
+    chartData = await fetchChartData(birthdate, birthtime, birthplace);
+  }
+
+  // 3. Kreuzreferenz berechnen
+  const crossRef = calcTransitCrossReference(transitData?.allPlanets, chartData);
+
+  await supabase.from('reading_jobs').update({ status: 'processing', started_at: new Date().toISOString() }).eq('id', job.id);
+
+  try {
+    const hdUserData = {
+      client_name: name,
+      birth_date: birthdate,
+      birth_time: birthtime,
+      birth_location: birthplace,
+      ai_config: {
+        ...(ai_config || {}),
+        transit: transitData,
+        cross_reference: crossRef,
+        format: format || 'standard',
+        focus_topic: focus_topic || null,
+      },
+    };
+
+    const content = await generateReading({ agentId: 'tagesimpuls', template: 'tagesimpuls', userData: hdUserData, chartData });
+    console.log(`✅ [Tagesimpuls] Generiert: ${content.substring(0, 80)}...`);
+
+    if (readingId) {
+      await supabasePublic.from('readings').update({
+        status: 'completed',
+        reading_data: { ...existingReadingData, text: content, chart_data: chartData },
+        updated_at: new Date().toISOString(),
+      }).eq('id', readingId);
+    }
+
+    await supabase.from('reading_jobs').update({
+      status: 'completed',
+      result: { text: content },
+      finished_at: new Date().toISOString(),
+    }).eq('id', job.id);
+  } catch (err) {
+    console.error('[Tagesimpuls] Fehler:', err.message);
+    await supabase.from('reading_jobs').update({
+      status: 'failed', error: err.message, finished_at: new Date().toISOString(),
+    }).eq('id', job.id);
+    throw err;
   }
 }
 
@@ -2423,7 +2539,7 @@ async function startSpecialReading(readingType, { reading_id, transit_gates, yea
 async function getJobStatus(job_id) {
   const { data, error } = await supabase
     .from("reading_jobs")
-    .select("id, status, payload, error, created_at, started_at, finished_at")
+    .select("id, status, payload, result, error, created_at, started_at, finished_at")
     .eq("id", job_id)
     .single();
 
@@ -2433,13 +2549,18 @@ async function getJobStatus(job_id) {
   }
 
   let result = null;
-  if (data.status === "completed" && data.payload?.reading_id) {
-    const { data: reading } = await supabasePublic
-      .from("readings")
-      .select("reading_data")
-      .eq("id", data.payload.reading_id)
-      .maybeSingle();
-    if (reading?.reading_data?.text) result = { text: reading.reading_data.text };
+  if (data.status === "completed") {
+    // Direktes Ergebnis in reading_jobs (z.B. tagesimpuls ohne reading_id)
+    if (data.result?.text) {
+      result = data.result;
+    } else if (data.payload?.reading_id) {
+      const { data: reading } = await supabasePublic
+        .from("readings")
+        .select("reading_data")
+        .eq("id", data.payload.reading_id)
+        .maybeSingle();
+      if (reading?.reading_data?.text) result = { text: reading.reading_data.text };
+    }
   }
 
   return {
@@ -2563,6 +2684,34 @@ app.get("/api/readings/jahres/status/:job_id", async (req, res) => {
     return res.json(result);
   } catch (err) {
     console.error("[Jahres] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Tagesimpuls Endpoint
+// ======================================================
+app.post("/api/readings/tagesimpuls/start", async (req, res) => {
+  try {
+    const { reading_id, name, birthdate, birthtime, birthplace, format, focus_topic } = req.body || {};
+    const job_id = await startSpecialReading("tagesimpuls", {
+      reading_id, name, birthdate, birthtime, birthplace,
+      ai_config: { format: format || 'standard', focus_topic },
+    });
+    console.log(`✅ [Tagesimpuls] Job erstellt: ${job_id}`);
+    return res.status(202).json({ success: true, job_id, status: "pending", reading_type: "tagesimpuls", poll_url: `/api/readings/tagesimpuls/status/${job_id}` });
+  } catch (err) {
+    console.error("[Tagesimpuls] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/tagesimpuls/status/:job_id", async (req, res) => {
+  try {
+    const result = await getJobStatus(req.params.job_id);
+    if (!result) return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+    return res.json(result);
+  } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
 });

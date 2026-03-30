@@ -1,0 +1,59 @@
+# Tagesimpuls — Transit-basierte Inspiration
+
+## Was ist ein Tagesimpuls?
+Ein kurzer, personalisierter energetischer Impuls basierend auf den aktuellen Human Design Transiten
+des Tages, verknüpft mit dem individuellen Chart des Klienten.
+
+## Kernprinzip
+Die Planeten bewegen sich konstant durch die 64 Tore des I Ging. Wenn ein Transit-Tor ein Tor im
+persönlichen Chart aktiviert, entsteht ein "Kanal" – eine temporäre Verbindung, die bestimmte Energien
+verstärkt oder neue Zentren aktiviert. Das ist der Kern eines guten Tagesimpulses.
+
+## Kreuzreferenz-Logik
+- Transit-Tor trifft Chart-Tor → temporärer Kanal, Zentrum wird aktiviert
+- Transit aktiviert offenes Zentrum → Konditionierungsdruck heute höher
+- Transit aktiviert definiertes Zentrum → Energie wird verstärkt, nach außen projiziert
+- Sonne in Tor X → dieses Thema ist heute kollektiv dominant
+
+## Die Planetenbedeutungen (HD-spezifisch)
+- **Sonne**: Kollektives Tagesthema, bewegt sich ~5 Tage pro Tor
+- **Mond**: Schnellste Energie, wechselt ~alle 10 Stunden, emotionale Tönung
+- **Erde**: Gegenüber der Sonne, Erdung und Stabilisierung
+- **Merkur**: Kommunikation, wie Informationen fließen
+- **Venus**: Werte, Beziehungen, was wir anziehen
+- **Mars**: Antrieb, Willenskraft, Konfrontation
+- **Jupiter**: Expansion, Wachstum, Überzeugungen
+- **Saturn**: Struktur, Karma, Lektionen
+- **Nordknoten**: Kollektive Wachstumsrichtung (generationell)
+
+## Mondphasen-Bedeutung
+- **Neumond**: Neue Zyklen beginnen, Intention setzen
+- **Zunehmende Sichel**: Aufbau, erste Schritte
+- **Erstes Viertel**: Entscheidungen, Widerstände überwinden
+- **Zunehmender Mond**: Momentum, Sichtbarkeit
+- **Vollmond**: Höhepunkt, Klarheit, Loslassen beginnt
+- **Abnehmender Mond**: Integration, Verarbeitung
+- **Letztes Viertel**: Abschluss, Reflexion
+- **Abnehmende Sichel**: Rückzug, Vorbereitung
+
+## Gute Tagesimpuls-Beispiele
+
+**Schlecht (zu generisch):**
+"Die Sonne steht heute in Tor 12. Das ist das Tor der Vorsicht. Achte heute auf deine Kommunikation."
+
+**Gut (spezifisch + persönlich):**
+"Die Sonne aktiviert heute Tor 12 – das Tor des Vorsatzes. In deinem Chart ist Tor 22 (Gnade) definiert.
+Zusammen bilden diese beiden Tore den Kanal 12-22: deinen emotionalen Ausdruck. Heute ist dieser Kanal
+vollständig aktiviert. Deine Stimme hat heute ungewöhnlich viel Gewicht. Nutze sie mit Bedacht."
+
+## Format-Regeln
+- standard: ~150-200 Wörter, alle 4 Sektionen
+- instagram: ~80 Wörter, Hook + Kern + CTA, Emojis möglich
+- whatsapp: ~60 Wörter, direkt und persönlich
+- newsletter: ~200-250 Wörter, mehr Kontext
+
+## Was NICHT tun
+- Keine generischen Monatshoroskop-Phrasen
+- Nicht jeden Planeten erwähnen – fokussieren
+- Keine Angst-Botschaften ("Vorsicht heute wegen...")
+- Keine Heilsversprechen ("Heute ist alles möglich!")

@@ -682,7 +682,7 @@ async function generateReading({ agentId, template, userData, chartData }) {
   }
 
   // Detailed readings: 2-Pass-Generierung für vollständige Ausgabe ohne Token-Kürzung
-  if (template === 'detailed' || template === 'depth-analysis') {
+  if (template === 'detailed') {
     return await generateDetailedReadingTwoParts({ userData, chartData, modelConfig });
   }
 

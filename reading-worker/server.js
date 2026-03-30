@@ -1500,7 +1500,9 @@ function calcTransitCrossReference(transitPlanets, chartData) {
 async function processTagesimpulsJob(job, reading) {
   console.log(`🌅 [Tagesimpuls] Verarbeite Job ${job.id}`);
   const payload = reading.client_data || job.payload || {};
-  const { birthdate, birthtime, birthplace, name, format, focus_topic, ai_config } = payload;
+  const { birthdate, birthtime, birthplace, name, ai_config } = payload;
+  const format = payload.format || ai_config?.format || 'standard';
+  const focus_topic = payload.focus_topic || ai_config?.focus_topic || null;
   const readingId = job.payload?.reading_id;
   const today = new Date().toISOString().split('T')[0];
 
@@ -1561,20 +1563,39 @@ async function processTagesimpulsJob(job, reading) {
       },
     };
 
-    const content = await generateReading({ agentId: 'tagesimpuls', template: 'tagesimpuls', userData: hdUserData, chartData });
-    console.log(`✅ [Tagesimpuls] Generiert: ${content.substring(0, 80)}...`);
+    const isReel = (format || 'standard') === 'reel';
+    const usedTemplate = isReel ? 'tagesimpuls-reel' : 'tagesimpuls';
+    const rawContent = await generateReading({ agentId: 'tagesimpuls', template: usedTemplate, userData: hdUserData, chartData });
+    console.log(`✅ [Tagesimpuls] Generiert (${usedTemplate}): ${rawContent.substring(0, 80)}...`);
+
+    // Reel: JSON parsen
+    let resultPayload;
+    if (isReel) {
+      try {
+        // Entferne optionale Markdown-Blöcke falls Claude sie trotzdem erzeugt
+        const cleaned = rawContent.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+        const parsed = JSON.parse(cleaned);
+        resultPayload = { format: 'reel', reel: parsed };
+        console.log(`🎬 [Tagesimpuls] Reel-JSON geparst: hook="${parsed.hook?.substring(0, 40)}..."`);
+      } catch (parseErr) {
+        console.warn('[Tagesimpuls] Reel-JSON-Parse fehlgeschlagen, speichere als Text:', parseErr.message);
+        resultPayload = { format: 'reel', text: rawContent, parse_error: parseErr.message };
+      }
+    } else {
+      resultPayload = { text: rawContent };
+    }
 
     if (readingId) {
       await supabasePublic.from('readings').update({
         status: 'completed',
-        reading_data: { ...existingReadingData, text: content, chart_data: chartData },
+        reading_data: { ...existingReadingData, ...resultPayload, chart_data: chartData },
         updated_at: new Date().toISOString(),
       }).eq('id', readingId);
     }
 
     await supabase.from('reading_jobs').update({
       status: 'completed',
-      result: { text: content },
+      result: resultPayload,
       finished_at: new Date().toISOString(),
     }).eq('id', job.id);
   } catch (err) {
@@ -2551,7 +2572,7 @@ async function getJobStatus(job_id) {
   let result = null;
   if (data.status === "completed") {
     // Direktes Ergebnis in reading_jobs (z.B. tagesimpuls ohne reading_id)
-    if (data.result?.text) {
+    if (data.result?.text || data.result?.reel || data.result?.format) {
       result = data.result;
     } else if (data.payload?.reading_id) {
       const { data: reading } = await supabasePublic

@@ -22,6 +22,7 @@ import fs from "fs";
 import path from "path";
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
+import { calculateCrossReference } from "./lib/transitCrossReference.js";
 
 const app = express();
 app.use(express.json());
@@ -386,6 +387,27 @@ function buildKnowledgeText(maxEntries = 8, maxCharsPerEntry = 1000) {
     .join('\n');
 }
 
+// Dediziertes Knowledge-Bundle für Tagesimpuls — lädt die 3 Personalisierungs-Files vollständig
+function buildTagesimpulsKnowledge() {
+  const TAGESIMPULS_KEYS = [
+    'type-specific-impulse-rules',
+    'authority-specific-impulse-rules',
+    'profile-specific-impulse-rules',
+    'transit-impulse-instructions',
+  ];
+  const parts = [];
+  for (const key of TAGESIMPULS_KEYS) {
+    if (knowledge[key]) {
+      parts.push(`\n### ${key}\n${knowledge[key]}`); // kein substring — volle Länge
+    }
+  }
+  // Fallback: allgemeines HD-Wissen wenn ein Key fehlt
+  if (parts.length === 0) {
+    return buildKnowledgeText(8, 1000);
+  }
+  return parts.join('\n');
+}
+
 async function generateDetailedReadingTwoParts({ userData, chartData, modelConfig }) {
   const chartInfo = buildChartInfo(chartData);
   const knowledgeText = buildKnowledgeText(8, 1000);
@@ -689,12 +711,16 @@ async function generateReading({ agentId, template, userData, chartData }) {
   const templateContent = templates[template] || templates['default'] ||
     "Erstelle ein Human Design Reading basierend auf den gegebenen Daten.";
 
+  const knowledgeText = agentId === 'tagesimpuls'
+    ? buildTagesimpulsKnowledge()
+    : buildKnowledgeText(8, 1000);
+
   const systemPrompt = `Du bist ein Reading-Agent für Human Design.
 
 ${templateContent}
 
 Verwende folgendes Wissen:
-${buildKnowledgeText(8, 1000)}
+${knowledgeText}
 ${tuningInstructions}
 
 Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
@@ -766,6 +792,17 @@ Aktivierte Transit-Zentren: ${(t.definedCenters || []).join(', ') || 'keine'}`;
     }
     if (cfg.format) aiConfigContext += `\nAusgabeformat: ${cfg.format}`;
     if (cfg.focus_topic) aiConfigContext += `\nFokus-Thema heute: ${cfg.focus_topic}`;
+
+    // Tagesimpuls — 5 Personalisierungsschichten
+    if (cfg.client_type) aiConfigContext += `\n\n## KLIENT — Schicht 1: Typ\n${cfg.client_type}`;
+    if (cfg.client_authority) aiConfigContext += `\n## KLIENT — Schicht 2: Autorität\n${cfg.client_authority}`;
+    if (cfg.client_profile) aiConfigContext += `\n## KLIENT — Schicht 3: Profil\n${cfg.client_profile}`;
+    if (cfg.cross_reference_full) aiConfigContext += `\n## KLIENT — Schicht 4: Kreuzreferenz\n${cfg.cross_reference_full}`;
+    if (cfg.client_definition || cfg.client_open_centers) {
+      aiConfigContext += `\n## KLIENT — Schicht 5: Definition & offene Zentren`;
+      if (cfg.client_definition) aiConfigContext += `\nDefinition: ${cfg.client_definition}`;
+      if (cfg.client_open_centers) aiConfigContext += `\nOffene Zentren: ${cfg.client_open_centers}`;
+    }
 
     userMessage = `Erstelle ein Reading für:
 Name: ${userData.client_name || 'Unbekannt'}
@@ -1543,8 +1580,25 @@ async function processTagesimpulsJob(job, reading) {
     chartData = await fetchChartData(birthdate, birthtime, birthplace);
   }
 
-  // 3. Kreuzreferenz berechnen
-  const crossRef = calcTransitCrossReference(transitData?.allPlanets, chartData);
+  // 3. Kreuzreferenz berechnen (vollständig mit Typ/Autorität/Profil-Kontext)
+  const clientCtx = payload.client_context || {};
+  // Merge: client_context hat Vorrang vor chartData für HD-Metadaten
+  const chartForCrossRef = {
+    gates: clientCtx.gates || chartData?.gates || [],
+    centers: clientCtx.centers || chartData?.centers || {},
+    type: clientCtx.type || chartData?.type,
+    authority: clientCtx.authority || chartData?.authority,
+    profile: clientCtx.profile || chartData?.profile,
+    definition: clientCtx.definition || chartData?.definition,
+    channels: clientCtx.channels || chartData?.channels || [],
+  };
+  const crossRefFull = calculateCrossReference(transitData, chartForCrossRef);
+
+  // Offene Zentren für Prompt ermitteln
+  const openCentersText = Object.entries(chartForCrossRef.centers || {})
+    .filter(([, v]) => typeof v === 'boolean' ? !v : (typeof v === 'object' ? !v?.defined : false))
+    .map(([k]) => k)
+    .join(', ') || 'keine';
 
   await supabase.from('reading_jobs').update({ status: 'processing', started_at: new Date().toISOString() }).eq('id', job.id);
 
@@ -1557,9 +1611,19 @@ async function processTagesimpulsJob(job, reading) {
       ai_config: {
         ...(ai_config || {}),
         transit: transitData,
-        cross_reference: crossRef,
+        // Vollständige Kreuzreferenz (ersetzt die einfache Version)
+        cross_reference: crossRefFull.activatedGates.map(g => ({
+          planet: g.planet, gate: g.gate, line: g.line,
+        })),
+        cross_reference_full: crossRefFull.compact,
         format: format || 'standard',
         focus_topic: focus_topic || null,
+        // 5 Personalisierungsschichten
+        client_type: chartForCrossRef.type || null,
+        client_authority: chartForCrossRef.authority || null,
+        client_profile: chartForCrossRef.profile || null,
+        client_definition: chartForCrossRef.definition || null,
+        client_open_centers: openCentersText,
       },
     };
 

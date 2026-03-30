@@ -15,6 +15,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-https://n8n.werdemeisterdeinergedankenagent.de}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       # Internal service URLs (Docker network)
       - BACKEND_URL=http://connection-key:3000
       - READING_WORKER_URL=http://reading-worker:4000

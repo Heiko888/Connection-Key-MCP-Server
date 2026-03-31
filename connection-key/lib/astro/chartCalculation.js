@@ -7,6 +7,13 @@
 import swisseph from "swisseph";
 import { find } from "geo-tz";
 import { DateTime } from "luxon";
+import { createRequire } from "module";
+import path from "path";
+
+// Ephemeris-Pfad setzen damit Chiron (seas_18.se1) und andere Asteroiden-Daten gefunden werden
+const require = createRequire(import.meta.url);
+const swissephPath = path.dirname(require.resolve("swisseph/package.json"));
+swisseph.swe_set_ephe_path(path.join(swissephPath, "ephe"));
 
 const GATE_SPANS = [
   { gate: 25, start: 358.25, span: 5.625 }, { gate: 17, start: 3.875, span: 5.625 }, { gate: 21, start: 9.5, span: 5.625 },
@@ -124,6 +131,8 @@ const SE_URANUS    = 7;
 const SE_NEPTUNE   = 8;
 const SE_PLUTO     = 9;
 const SE_TRUE_NODE = 11;
+const SE_MEAN_APOG = 12;  // Mean Black Moon Lilith
+const SE_CHIRON    = 15;
 const SEFLG_SWIEPH = 2;
 
 function getIncarnationCross(sunLonP, sunLonD, profile) {
@@ -378,9 +387,11 @@ export async function calculateHumanDesignChart(input) {
     [SE_NEPTUNE]:   'neptune',
     [SE_PLUTO]:     'pluto',
     [SE_TRUE_NODE]: 'north-node',
+    [SE_MEAN_APOG]: 'lilith',
+    [SE_CHIRON]:    'chiron',
   };
 
-  const planets = [SE_SUN, SE_MOON, SE_MERCURY, SE_VENUS, SE_MARS, SE_JUPITER, SE_SATURN, SE_URANUS, SE_NEPTUNE, SE_PLUTO, SE_TRUE_NODE];
+  const planets = [SE_SUN, SE_MOON, SE_MERCURY, SE_VENUS, SE_MARS, SE_JUPITER, SE_SATURN, SE_URANUS, SE_NEPTUNE, SE_PLUTO, SE_TRUE_NODE, SE_MEAN_APOG, SE_CHIRON];
 
   const activeGates = new Set();
   const personalityPlanets = [];
@@ -522,8 +533,16 @@ export async function calculateHumanDesignChart(input) {
   };
 
   // Sortierung nach HD-Standard-Reihenfolge
-  const PLANET_ORDER = ['sun', 'earth', 'north-node', 'south-node', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+  const PLANET_ORDER = ['sun', 'earth', 'north-node', 'south-node', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron', 'lilith'];
   const sortPlanets = (arr) => arr.slice().sort((a, b) => PLANET_ORDER.indexOf(a.planet) - PLANET_ORDER.indexOf(b.planet));
+
+  // Objekt-Format mit Underscores (für Frontend-Kompatibilität)
+  const toObjectMap = (arr) => Object.fromEntries(
+    arr.map(({ planet, gate, line }) => [planet.replace(/-/g, '_'), { gate, line }])
+  );
+
+  const sortedP = sortPlanets(personalityPlanets);
+  const sortedD = sortPlanets(designPlanets);
 
   return {
     type,
@@ -535,7 +554,11 @@ export async function calculateHumanDesignChart(input) {
     centers,
     channels: channelsList,
     gates: gatesList,
-    personalityPlanets: sortPlanets(personalityPlanets),
-    designPlanets: sortPlanets(designPlanets),
+    // Objekt-Format (Frontend erwartet personality.planets.sun etc.)
+    personality: { planets: toObjectMap(sortedP) },
+    design: { planets: toObjectMap(sortedD) },
+    // Array-Format (Backward-Kompatibilität)
+    personalityPlanets: sortedP,
+    designPlanets: sortedD,
   };
 }

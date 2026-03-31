@@ -78,12 +78,16 @@ router.post("/calculate", async (req, res, next) => {
         gates: chart.gates,
         channels: chart.channels,
         centers: chart.centers,
+        // Objekt-Format (personality.planets.sun etc.)
+        personality: chart.personality,
+        design: chart.design,
+        // Array-Format (Backward-Kompatibilität)
         personalityPlanets: chart.personalityPlanets,
         designPlanets: chart.designPlanets,
         createdAt: chartData?.created_at
       },
-      source: "astronomy-engine",
-      version: "1.0.0"
+      source: "swiss-ephemeris",
+      version: "2.0.0"
     });
   } catch (error) {
     console.error("[Chart] Calculation failed:", error?.message);

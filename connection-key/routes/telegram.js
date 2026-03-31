@@ -13,6 +13,20 @@ try {
   console.warn("⚠️  Supabase nicht verfügbar in telegram.js");
 }
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
+
+// Interne Hilfsfunktion: sendet eine Telegram-Nachricht (plain Markdown)
+async function sendBotMessage(chatId, text) {
+  try {
+    await fetch(`${TELEGRAM_API}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch (err) {
+    console.error("[Telegram] sendBotMessage Fehler:", err.message);
+  }
+}
 const N8N_WEBHOOK_URL = process.env.N8N_BASE_URL
   ? `${process.env.N8N_BASE_URL}/webhook/telegram-impulse`
   : null;
@@ -149,6 +163,100 @@ router.post("/send-raw", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
+});
+
+// POST /api/telegram/webhook
+// Telegram ruft diesen Endpoint bei jeder Nachricht an den Bot auf
+router.post("/webhook", async (req, res) => {
+  // Telegram erwartet immer 200, sonst wiederholt es den Request
+  res.sendStatus(200);
+
+  const message = req.body?.message;
+  if (!message?.text) return;
+
+  const chatId = message.chat.id;
+  const text = message.text.trim();
+  const firstName = message.from?.first_name || "du";
+
+  if (!supabase) {
+    console.error("[Telegram] Webhook: Supabase nicht verfügbar");
+    return;
+  }
+
+  if (text.startsWith("/start")) {
+    const code = text.split(" ")[1] || null;
+
+    if (!code) {
+      await sendBotMessage(chatId,
+        `Willkommen bei The Connection Key ✨\n\n` +
+        `Um deinen persönlichen Tagesimpuls zu erhalten, ` +
+        `brauche ich einen Verbindungscode von deinem Coach.\n\n` +
+        `Frag deinen Coach nach dem Telegram-Link.`
+      );
+      return;
+    }
+
+    // Code in Supabase nachschlagen
+    const { data: codeEntry, error } = await supabase
+      .from("telegram_codes")
+      .select("*")
+      .eq("code", code)
+      .is("used_at", null)
+      .single();
+
+    if (error || !codeEntry) {
+      await sendBotMessage(chatId,
+        `Dieser Code ist ungültig oder bereits verwendet.\n` +
+        `Bitte frag deinen Coach nach einem neuen Link.`
+      );
+      return;
+    }
+
+    if (new Date(codeEntry.expires_at) < new Date()) {
+      await sendBotMessage(chatId,
+        `Dieser Code ist abgelaufen.\n` +
+        `Bitte frag deinen Coach nach einem neuen Link.`
+      );
+      return;
+    }
+
+    // telegram_chat_id in profiles speichern
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ telegram_chat_id: String(chatId) })
+      .eq("id", codeEntry.user_id);
+
+    if (updateError) {
+      console.error("[Telegram] Profil-Update fehlgeschlagen:", updateError.message);
+      await sendBotMessage(chatId,
+        `Es gab ein Problem bei der Verknüpfung. Bitte versuch es nochmal.`
+      );
+      return;
+    }
+
+    // Code als benutzt markieren
+    await supabase
+      .from("telegram_codes")
+      .update({ used_at: new Date().toISOString(), telegram_chat_id: chatId })
+      .eq("id", codeEntry.id);
+
+    console.log(`✅ [Telegram] Klient ${codeEntry.user_id} verbunden (chat_id=${chatId})`);
+
+    await sendBotMessage(chatId,
+      `Verbunden ✨\n\n` +
+      `Hallo ${firstName}! Dein Profil ist jetzt mit Telegram verknüpft.\n\n` +
+      `Du erhältst ab jetzt deinen persönlichen Tagesimpuls direkt hier.\n\n` +
+      `_The Connection Key_`
+    );
+    return;
+  }
+
+  // Alle anderen Nachrichten
+  await sendBotMessage(chatId,
+    `Ich bin der Connection Key Bot ✨\n\n` +
+    `Ich sende dir deinen täglichen Tagesimpuls, ` +
+    `sobald dein Coach die Verbindung eingerichtet hat.`
+  );
 });
 
 // POST /api/telegram/generate-code

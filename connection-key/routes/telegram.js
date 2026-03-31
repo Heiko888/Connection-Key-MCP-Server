@@ -1,7 +1,17 @@
 import express from "express";
+import crypto from "crypto";
 import { formatImpulseForTelegram, formatReelForTelegram, escapeMarkdownV2 } from "../lib/telegramFormatter.js";
 
 const router = express.Router();
+
+// Supabase Client
+let supabase = null;
+try {
+  const supabaseModule = await import("../config-with-supabase.js");
+  supabase = supabaseModule.supabase;
+} catch {
+  console.warn("⚠️  Supabase nicht verfügbar in telegram.js");
+}
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
 const N8N_WEBHOOK_URL = process.env.N8N_BASE_URL
   ? `${process.env.N8N_BASE_URL}/webhook/telegram-impulse`
@@ -139,6 +149,73 @@ router.post("/send-raw", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
+});
+
+// POST /api/telegram/generate-code
+// Body: { userId, coachId? }
+router.post("/generate-code", async (req, res) => {
+  const { userId, coachId } = req.body || {};
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId required" });
+  }
+  if (!supabase) {
+    return res.status(503).json({ error: "Datenbank nicht verfügbar" });
+  }
+
+  // Prüfe ob der Klient schon verbunden ist
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("telegram_chat_id")
+    .eq("id", userId)
+    .single();
+
+  if (profile?.telegram_chat_id) {
+    return res.json({
+      alreadyConnected: true,
+      message: "Klient ist bereits mit Telegram verbunden.",
+    });
+  }
+
+  // Bestehenden ungenutzten Code wiederverwenden
+  const { data: existingCode } = await supabase
+    .from("telegram_codes")
+    .select("code, expires_at")
+    .eq("user_id", userId)
+    .is("used_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (existingCode) {
+    return res.json({
+      code: existingCode.code,
+      link: `https://t.me/theconnectionkey_bot?start=${existingCode.code}`,
+      expiresAt: existingCode.expires_at,
+      reused: true,
+    });
+  }
+
+  // Neuen Code generieren (8 Zeichen, URL-safe)
+  const code = crypto.randomBytes(4).toString("base64url").slice(0, 8);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await supabase
+    .from("telegram_codes")
+    .insert({ code, user_id: userId, coach_id: coachId || null, expires_at: expiresAt });
+
+  if (error) {
+    console.error("[Telegram] generate-code Fehler:", error.message);
+    return res.status(500).json({ error: "Code konnte nicht erstellt werden" });
+  }
+
+  return res.json({
+    code,
+    link: `https://t.me/theconnectionkey_bot?start=${code}`,
+    expiresAt,
+    reused: false,
+  });
 });
 
 export default router;

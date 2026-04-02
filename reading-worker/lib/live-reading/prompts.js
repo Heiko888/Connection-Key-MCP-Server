@@ -1,5 +1,9 @@
 /**
  * Live Reading Agent — Prompt-Builder
+ * FIXES (2026-03-31):
+ * - centers: boolean + object Format Support
+ * - channels: gates-Array Fallback
+ * - highlightElements aus echten Chart-Daten
  */
 
 const BASE_SYSTEM_PROMPT = `Du bist ein erfahrener Human Design Experte und Coach-Assistent. Du generierst Talking Points für einen Coach, der gerade ein Live-Reading mit einem Client durchführt.
@@ -63,11 +67,6 @@ Antworte NUR mit einem JSON-Objekt in diesem Format (kein Markdown, kein Text da
       "keyInsight": "string (ein Satz)"
     }
   ],
-  "highlightElements": {
-    "centers": ["center_id"],
-    "channels": ["gate1-gate2"],
-    "gates": [number]
-  },
   "transitionPrompt": "string (Überleitung zum nächsten Step)"
 }`;
 }
@@ -98,13 +97,57 @@ Antworte NUR mit diesem JSON (kein Markdown):
   return { system, user };
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+export function buildHighlightElements(stepId, chartData) {
+  const person1 = chartData.person1;
+  const { defined, open } = parseCenters(person1.centers);
+  const channels = formatChannelIds(person1.channels);
+  const gates = (person1.gates || []).map((g) => g.number);
+
+  switch (stepId) {
+    case 'type_strategy':
+      return { centers: defined, channels: [], gates: [] };
+    case 'authority':
+      return { centers: getAuthorityCenters(person1.authority, defined), channels: [], gates: [] };
+    case 'profile':
+      return { centers: [], channels: [], gates: [] };
+    case 'defined_centers':
+      return { centers: defined, channels, gates };
+    case 'open_centers':
+      return { centers: open, channels: [], gates: [] };
+    case 'channels':
+      return { centers: defined, channels, gates };
+    default:
+      return { centers: defined, channels, gates };
+  }
+}
+
+function parseCenters(centers) {
+  const entries = Object.entries(centers || {});
+  const defined = entries
+    .filter(([, v]) => typeof v === 'boolean' ? v : v?.defined)
+    .map(([k]) => k);
+  const open = entries
+    .filter(([, v]) => typeof v === 'boolean' ? !v : !v?.defined)
+    .map(([k]) => k);
+  return { defined, open };
+}
+
+function formatChannelId(channel) {
+  if (channel.id) return channel.id;
+  if (channel.gates && Array.isArray(channel.gates)) return channel.gates.join('-');
+  return '?';
+}
+
+function formatChannelIds(channels) {
+  return (channels || []).map((c) => formatChannelId(c));
+}
+
+function formatChannelDisplay(channel) {
+  return `${formatChannelId(channel)} (${channel.name || '?'})`;
+}
 
 function formatPersonSummary(person) {
-  const defined = Object.entries(person.centers || {})
-    .filter(([, v]) => v.defined).map(([k]) => k);
-  const open = Object.entries(person.centers || {})
-    .filter(([, v]) => !v.defined).map(([k]) => k);
+  const { defined, open } = parseCenters(person.centers);
 
   return [
     `Name: ${person.name}`,
@@ -113,9 +156,9 @@ function formatPersonSummary(person) {
     `Autorität: ${person.authority}`,
     `Profil: ${person.profile}`,
     `Inkarnationskreuz: ${person.incarnationCross}`,
-    `Definierte Zentren: ${defined.join(', ') || '—'}`,
-    `Offene Zentren: ${open.join(', ') || '—'}`,
-    `Channels: ${(person.channels || []).map((c) => `${c.id} (${c.name})`).join(', ') || '—'}`,
+    `Definierte Zentren (feste Energie, konsistent): ${defined.join(', ') || '— (vollständig offen = Reflektor)'}`,
+    `Offene Zentren (konditionierbar, Weisheitspotenzial): ${open.join(', ') || '— (alle definiert)'}`,
+    `Channels: ${(person.channels || []).map((c) => formatChannelDisplay(c)).join(', ') || '—'}`,
     `Gates: ${(person.gates || []).map((g) => `${g.number}.${g.line}`).join(', ') || '—'}`,
   ].join('\n');
 }
@@ -132,12 +175,32 @@ function buildPreviousContext(completedSteps) {
   }).join('\n\n');
 }
 
+function getAuthorityCenters(authority, definedCenters) {
+  const lowerAuth = (authority || '').toLowerCase();
+  const map = {
+    'emotional': ['solar-plexus'],
+    'sakral': ['sacral'],
+    'sacral': ['sacral'],
+    'milz': ['spleen'],
+    'spleen': ['spleen'],
+    'ego': ['heart'],
+    'heart': ['heart'],
+    'selbst': ['g'],
+    'self': ['g', 'throat'],
+    'mental': ['ajna', 'head'],
+    'lunar': [],
+  };
+  for (const [key, centers] of Object.entries(map)) {
+    if (lowerAuth.includes(key)) return centers.filter((c) => definedCenters.includes(c));
+  }
+  return definedCenters;
+}
+
 function getStepFocus(stepId, person1, person2) {
-  const defined = Object.entries(person1.centers || {})
-    .filter(([, v]) => v.defined).map(([k]) => k).join(', ') || '—';
-  const open = Object.entries(person1.centers || {})
-    .filter(([, v]) => !v.defined).map(([k]) => k).join(', ') || '—';
-  const channels = (person1.channels || []).map((c) => `${c.id} (${c.name})`).join(', ') || '—';
+  const { defined, open } = parseCenters(person1.centers);
+  const definedStr = defined.join(', ') || '— (keine)';
+  const openStr = open.join(', ') || '— (keine)';
+  const channels = (person1.channels || []).map((c) => formatChannelDisplay(c)).join(', ') || '—';
 
   switch (stepId) {
     case 'type_strategy':
@@ -155,17 +218,22 @@ Gib dem Coach konkrete Fragen und Beispiele die die ${person1.authority}-Autorit
 Was sagen die Linien über die bewusste und unbewusste Seite von ${person1.name}? Wie lernt diese Person? Wie interagiert sie mit der Welt?`;
 
     case 'defined_centers':
-      return `Fokus: Definierte Zentren (${defined}).
-Was sind die fixen Energien von ${person1.name}? Wie wirken sie auf andere? Wo ist der Client konsistent?
-Erkläre für jedes definierte Zentrum die konkrete Auswirkung im Alltag.`;
+      return `Fokus: DEFINIERTE Zentren von ${person1.name}: ${definedStr}.
+WICHTIG: Nur diese Zentren sind definiert (= feste, konsistente Energie).
+Was sind die fixen Energien? Wie wirken sie auf andere? Wo ist der Client konsistent?
+Erkläre für JEDES der definierten Zentren (${definedStr}) die konkrete Auswirkung im Alltag.
+Verwechsle NICHT definierte mit offenen Zentren.`;
 
     case 'open_centers':
-      return `Fokus: Offene/Undefinierte Zentren (${open}).
-Wo nimmt ${person1.name} Energie von außen auf? Welche Not-Self-Themen gibt es? Wo liegt Weisheitspotenzial?`;
+      return `Fokus: OFFENE/Undefinierte Zentren von ${person1.name}: ${openStr}.
+WICHTIG: Nur diese Zentren sind offen (= konditionierbar, nehmen Energie von außen auf).
+Wo nimmt ${person1.name} Energie von außen auf? Welche Not-Self-Themen gibt es? Wo liegt Weisheitspotenzial?
+Erkläre für JEDES der offenen Zentren (${openStr}) die spezifische Konditionierung und das Weisheitspotenzial.`;
 
     case 'channels':
-      return `Fokus: Channels (${channels}).
-Welche Lebensthemen und Talente zeigen die Channels von ${person1.name}? Wie drücken sie sich im Alltag aus?`;
+      return `Fokus: Channels von ${person1.name}: ${channels}.
+WICHTIG: Verwende NUR die oben genannten Channel-IDs. Erfinde KEINE Channel-Nummern.
+Welche Lebensthemen und Talente zeigen diese Channels? Wie drücken sie sich im Alltag aus?`;
 
     case 'composite':
       if (!person2) return `Fokus: Composite-Chart. (Kein Person-2-Chart vorhanden — überspringe diesen Step.)`;

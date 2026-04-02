@@ -24,7 +24,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SER
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 const N8N_TELEGRAM_WEBHOOK = process.env.N8N_BASE_URL
-  ? `${process.env.N8N_BASE_URL}/webhook/telegram-impulse`
+  ? `${process.env.N8N_BASE_URL}/webhook/CFF5P8ZC5YTq6M6R/webhook/telegram-impulse`
   : null;
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
 const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID;
@@ -135,6 +135,7 @@ router.post("/dispatch", async (req, res) => {
   const {
     impulseId,
     impulseData,
+    impulseText,
     channels = [],
     telegram_chat_id,
     channel_post = true,
@@ -143,13 +144,17 @@ router.post("/dispatch", async (req, res) => {
   if (!channels.length) {
     return res.status(400).json({ success: false, error: "channels Array ist leer" });
   }
-  if (!impulseId && !impulseData) {
-    return res.status(400).json({ success: false, error: "impulseId oder impulseData erforderlich" });
+  if (!impulseId && !impulseData && !impulseText) {
+    return res.status(400).json({ success: false, error: "impulseId, impulseData oder impulseText erforderlich" });
   }
 
   let data;
   try {
-    data = impulseData || await loadImpulseFromDb(impulseId);
+    if (impulseText) {
+      data = { text: impulseText, date: new Date().toISOString().split("T")[0] };
+    } else {
+      data = impulseData || await loadImpulseFromDb(impulseId);
+    }
   } catch (err) {
     return res.status(404).json({ success: false, error: err.message });
   }

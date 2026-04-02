@@ -28,7 +28,7 @@ async function sendBotMessage(chatId, text) {
   }
 }
 const N8N_WEBHOOK_URL = process.env.N8N_BASE_URL
-  ? `${process.env.N8N_BASE_URL}/webhook/telegram-impulse`
+  ? `${process.env.N8N_BASE_URL}/webhook/CFF5P8ZC5YTq6M6R/webhook/telegram-impulse`
   : null;
 
 /**
@@ -171,12 +171,21 @@ router.post("/webhook", async (req, res) => {
   // Telegram erwartet immer 200, sonst wiederholt es den Request
   res.sendStatus(200);
 
-  const message = req.body?.message;
-  if (!message?.text) return;
+  const body = req.body || {};
+  // Logge alle Update-Typen für Debugging
+  const updateType = body.message ? "message" : body.callback_query ? "callback_query" : Object.keys(body).filter(k => k !== "update_id").join(",") || "unknown";
+  console.log(`[Telegram] Update #${body.update_id} type=${updateType} from=${body.message?.from?.username || body.message?.from?.id || "?"}`);
+
+  const message = body.message;
+  if (!message?.text) {
+    if (updateType !== "message") console.log(`[Telegram] Ignoriere Update-Typ: ${updateType}`);
+    return;
+  }
 
   const chatId = message.chat.id;
   const text = message.text.trim();
   const firstName = message.from?.first_name || "du";
+  console.log(`[Telegram] Nachricht von ${chatId}: ${text.substring(0, 50)}`);
 
   if (!supabase) {
     console.error("[Telegram] Webhook: Supabase nicht verfügbar");
@@ -257,6 +266,70 @@ router.post("/webhook", async (req, res) => {
     `Ich sende dir deinen täglichen Tagesimpuls, ` +
     `sobald dein Coach die Verbindung eingerichtet hat.`
   );
+});
+
+// GET /api/telegram/status/:userId
+// Gibt zurück ob der Klient mit Telegram verbunden ist, ggf. ausstehenden Code.
+// userId kann eine Reading-UUID oder eine Profil-UUID sein.
+router.get("/status/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!supabase) {
+    return res.status(503).json({ connected: false, error: "Datenbank nicht verfügbar" });
+  }
+
+  // 1. Prüfe telegram_codes: bereits genutzter Code mit chat_id?
+  const { data: usedCode } = await supabase
+    .from("telegram_codes")
+    .select("telegram_chat_id")
+    .eq("user_id", userId)
+    .not("telegram_chat_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (usedCode?.telegram_chat_id) {
+    return res.json({
+      connected: true,
+      chatId: String(usedCode.telegram_chat_id),
+    });
+  }
+
+  // 2. Fallback: Prüfe profiles (für registrierte Nutzer)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("telegram_chat_id")
+    .eq("id", userId)
+    .single();
+
+  if (profile?.telegram_chat_id) {
+    return res.json({
+      connected: true,
+      chatId: profile.telegram_chat_id,
+    });
+  }
+
+  // 3. Prüfe ob ein ausstehender Code vorhanden ist
+  const { data: pendingCode } = await supabase
+    .from("telegram_codes")
+    .select("code, expires_at")
+    .eq("user_id", userId)
+    .is("used_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (pendingCode) {
+    return res.json({
+      connected: false,
+      pendingCode: pendingCode.code,
+      link: `https://t.me/theconnectionkey_bot?start=${pendingCode.code}`,
+      expiresAt: pendingCode.expires_at,
+    });
+  }
+
+  return res.json({ connected: false });
 });
 
 // POST /api/telegram/generate-code

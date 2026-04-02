@@ -1,14 +1,13 @@
 /**
  * Live Reading Agent — Anthropic API Calls
+ * FIX (2026-03-31): highlightElements aus echten Chart-Daten
  */
 
 import Anthropic from '@anthropic-ai/sdk';
-import { buildSystemPrompt, buildStepUserPrompt, buildSummaryPrompt } from './prompts.js';
+import { buildSystemPrompt, buildStepUserPrompt, buildSummaryPrompt, buildHighlightElements } from './prompts.js';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = 'claude-sonnet-4-5';
-
-// ─── Step Generation ──────────────────────────────────────────────────────────
 
 export async function generateStepContent(session, stepId, coachNotes, readingType) {
   const systemPrompt = buildSystemPrompt(
@@ -30,15 +29,15 @@ export async function generateStepContent(session, stepId, coachNotes, readingTy
   const raw = response.content[0]?.text || '{}';
   const parsed = parseJSON(raw);
 
+  const highlightElements = buildHighlightElements(stepId, session.chart_data);
+
   return {
     talkingPoints: Array.isArray(parsed.talkingPoints) ? parsed.talkingPoints : [],
-    highlightElements: parsed.highlightElements ?? { centers: [], channels: [], gates: [] },
+    highlightElements,
     transitionPrompt: parsed.transitionPrompt ?? '',
     generatedAt: new Date().toISOString(),
   };
 }
-
-// ─── Summary Generation ───────────────────────────────────────────────────────
 
 export async function generateSessionSummary(session) {
   const completedEntries = Object.entries(session.completed_steps || {});
@@ -70,8 +69,6 @@ export async function generateSessionSummary(session) {
 
   return { keyInsights, nextSteps, sessionDuration, stepsCompleted };
 }
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
 
 function parseJSON(raw) {
   try {

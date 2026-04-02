@@ -1,0 +1,214 @@
+Erstelle eine tiefenpsychologische Human Design Analyse für:
+
+Name: {{clientName}}
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+Typ: {{type}}
+Profil: {{profile}}
+Autorität: {{authority}}
+Strategie: {{strategy}}
+
+Schreibe diese Analyse direkt an {{clientName}} gerichtet – als psychologischer Spiegel, nicht als Lehrbuch. Jede Sektion beginnt mit dem Namen {{clientName}}. Keine generischen Erklärungen – konkrete Einblicke in das einzigartige Konditionierungsmuster und Transformationspotenzial dieser Person.
+
+---
+
+## 1. Die offenen Zentren als Konditionierungsfelder
+
+Offene Zentren sind keine Schwächen – sie sind die Orte, an denen {{clientName}} am stärksten konditioniert wurde und wird. Gleichzeitig tragen sie die tiefste Weisheit.
+
+**Analyse der offenen Zentren von {{clientName}}:**
+
+Für jedes offene Zentrum:
+
+*Das Konditionierungsfeld:*
+- Welche fremde Energie wird hier aufgenommen und verstärkt?
+- Welche Glaubenssätze und Überzeugungen haben sich in diesem Zentrum festgesetzt – aus Kindheit, Schule, Familie, Gesellschaft?
+- Welche Verhaltensweisen entstehen, wenn {{clientName}} aus der Konditionierung dieses Zentrums handelt?
+- Die typische Frage der Konditionierung in diesem Zentrum: Was wird gesucht, um die gefühlte Leere zu füllen?
+
+*Der konditionierte Schatten:*
+- Wie zeigt sich das Nicht-Selbst aus diesem Zentrum im Alltag von {{clientName}}?
+- In welchen Situationen wird die Konditionierung besonders stark aktiviert?
+- Welche Beziehungen oder Umgebungen verstärken die Konditionierung?
+
+*Die Weisheit des offenen Zentrums:*
+- Was {{clientName}} über dieses Thema versteht wie kaum jemand sonst – durch das Erleben der ganzen Bandbreite
+- Die Frage, die aus diesem Zentrum gelebt werden kann: "Ist das meine Energie oder habe ich sie aufgenommen?"
+- Wie das offene Zentrum zur Superkraft wird, wenn es bewusst genutzt wird
+
+---
+
+## 2. Die Nicht-Selbst-Strategie: Erkennen und Loslassen
+
+Das Nicht-Selbst von {{clientName}} ist der innere Autopilot, der aus Konditionierung heraus handelt – nicht aus dem echten Design.
+
+**Das Nicht-Selbst-Muster von {{clientName}} als {{type}}:**
+
+*Die typischen Nicht-Selbst-Entscheidungen:*
+- In welchen Bereichen trifft {{clientName}} typischerweise Entscheidungen aus dem Kopf statt aus der Autorität {{authority}}?
+- Welche wiederkehrenden Lebensmuster entstehen dadurch – in Beziehungen, Arbeit, Gesundheit?
+- Der Moment, in dem die Nicht-Selbst-Entscheidung getroffen wird: Wie fühlt er sich an?
+
+*Die Not-Self-Emotion als Kompass:*
+- Die spezifische Not-Self-Emotion des Typs {{type}} als präzises Warnsignal
+- Wann sie bei {{clientName}} auftaucht – die konkreten Trigger
+- Was diese Emotion wirklich bedeutet: nicht Versagen, sondern Kurskorrektur
+- Der Unterschied zwischen: "Ich stecke in der Not-Self-Emotion fest" und "Ich nutze sie als Navigation"
+
+*Der Unterschied: Strategie gelebt vs. nicht gelebt:*
+- Zwei konkrete Lebensbereiche, in denen die Strategie {{strategy}} einen direkten Unterschied macht
+- Wie das Leben von {{clientName}} aussieht, wenn die Strategie 90 Tage konsequent gelebt wird
+- Der häufigste Widerstand gegen die Strategie – und was dahintersteckt
+
+**Der Weg zurück zum Selbst:**
+- Das erste Signal, dass {{clientName}} wieder im Design ist
+- Die Körpersensation der Rückkehr zur Autorität
+- Ein konkretes tägliches Ritual, das {{clientName}} hilft, die Konditionierung zu unterbrechen
+
+---
+
+## 3. Profil-Wunden und Wachstumspotenziale
+
+Das Profil {{profile}} ist nicht nur eine Rolle – es ist ein spezifisches Lernprogramm, das durch bestimmte Wunden und Durchbrüche geprägt wird.
+
+**Die Wunden des Profils {{profile}}:**
+
+Für jede Linie des Profils:
+
+*Die erste Linie ({{profile}} – erste Zahl):*
+- Die spezifische Wunde dieser Linie: Was entsteht, wenn sie nicht gelebt wird?
+- Typische Kindheitsmuster, die diese Linienwunde prägen
+- Wie diese Wunde sich in Beziehungen, Arbeit und Selbstbild von {{clientName}} manifestiert
+- Der Triggerpunkt: In welchen Situationen taucht diese Wunde heute noch auf?
+
+*Die zweite Linie ({{profile}} – zweite Zahl):*
+- Die spezifische Wunde dieser Linie: Was entsteht, wenn sie nicht gelebt wird?
+- Typische Konditionierungsmuster und gesellschaftliche Botschaften, die dieser Linie widersprechen
+- Wie {{clientName}} diese Linienwunde kompensiert – was als Schutz entwickelt wurde
+- Der versteckte Schmerz dieser Linie und sein Transformationspotenzial
+
+**Das Spannungsfeld des Profils:**
+- Die innere Spannung zwischen den beiden Linien von {{clientName}}
+- Wann diese Spannung produktiv wird – und wann sie lähmt
+- Die typischen Lebensphasen, in denen dieses Profil seine größten Durchbrüche erlebt
+
+**Die Wachstumspotenziale:**
+- Was aus jeder Linienwunde werden kann, wenn sie bewusst durchlebt wird
+- Die Stärken, die sich nur durch die Wunden entwickeln können
+- Der Punkt, an dem {{clientName}} vom Überleben zum Verkörpern wechselt
+- Welche spezifischen Erfahrungen das Profil {{profile}} noch braucht, um vollständig zu reifen
+
+---
+
+## 4. Tiefenpsychologie der definierten Zentren
+
+Die definierten Zentren von {{clientName}} sind nicht nur Stärken – sie sind auch Orte möglicher Starrheit und Projektion.
+
+**Für jedes definierte Zentrum:**
+
+*Die Licht-Seite:*
+- Die konstante Energie, die {{clientName}} in die Welt bringt
+- Das Geschenk für andere – was Menschen in der Nähe von {{clientName}} erfahren
+- Die höchste Ausdrucksform dieses Zentrums
+
+*Die Schatten-Seite:*
+- Wie {{clientName}} andere durch dieses definierte Zentrum unbewusst konditioniert
+- Die Starrheit: Wo wird diese Energie zur fixen Überzeugung oder blinden Energie?
+- Wie dieses Zentrum in Konflikten oder unter Druck reagiert
+
+*Die Integration:*
+- Wie {{clientName}} die Energie dieses Zentrums bewusst und verantwortungsvoll einsetzen kann
+- Der Unterschied zwischen: Energie ausstrahlen vs. Energie aufzwingen
+
+---
+
+## 5. Konkrete Transformationsschritte
+
+Transformation im Human Design ist kein mentales Projekt – es ist ein verkörperter Prozess. Für {{clientName}} bedeutet das:
+
+**Phase 1: Erkennen (Wochen 1-4)**
+
+*Beobachtungsübungen:*
+- Täglich eine Situation notieren, in der die Not-Self-Emotion auftauchte: Was war der Auslöser? Was war die Reaktion?
+- Alle Entscheidungen der Woche überprüfen: Wurden sie aus der Autorität {{authority}} getroffen oder aus dem Kopf?
+- Ein offenes Zentrum wählen und drei Wochen lang beobachten: "Wessen Energie ist das gerade?"
+
+*Erste Entkonditionierungsschritte:*
+- Eine Entscheidung bewusst aus der Autorität {{authority}} treffen – auch wenn sie sich "falsch" anfühlt
+- Eine Konditionierung aus den offenen Zentren benennen und ihr einen Namen geben
+- Einen Bereich identifizieren, in dem {{clientName}} gegen die Strategie {{strategy}} handelt
+
+**Phase 2: Unterbrechen (Wochen 5-12)**
+
+*Strategiepraxis:*
+- Die Strategie {{strategy}} in drei konkreten Lebensbereichen konsequent anwenden
+- Ein tägliches "Autorität-Check-In": 5 Minuten, in denen {{clientName}} in die Autorität {{authority}} eincheckt
+- Einen Mentor, Coach oder Freund einbeziehen, der dabei hilft, Nicht-Selbst-Muster zu spiegeln
+
+*Körperarbeit:*
+- Den Körper als Navigationssystem etablieren: Vor jeder wichtigen Entscheidung kurz in den Körper gehen
+- Schlafrhythmus anpassen – das Aura-System braucht Erholung
+- Bewegung oder Stille, die dem Typ {{type}} entspricht
+
+**Phase 3: Verkörpern (Monate 4-12+)**
+
+*Vertiefung:*
+- Regelmäßige Reflexion: Wann habe ich in den letzten 30 Tagen mein Design gelebt – und wann nicht?
+- Beziehungen und Umfelder analysieren: Welche konditionieren, welche ermöglichen das echte Design?
+- Das Profil {{profile}} als Lebensweisheit: Welche Erfahrungen braucht {{clientName}} noch?
+
+*Integration:*
+- Die Signatur des Typs {{type}} als Kompass: Wie oft ist dieser Zustand präsent?
+- Das Inkarnationskreuz beginnt sich zu entfalten – nicht als Auftrag, sondern als Fluss
+- Die offenen Zentren werden zur Weisheit statt zur Wunde
+
+**Die drei wichtigsten Transformationsschlüssel für {{clientName}}:**
+1. Der spezifischste Schritt, der sofort begonnen werden kann
+2. Das größte Hindernis und wie es überwunden werden kann
+3. Das Zeichen, dass die Transformation sich entfaltet
+
+---
+
+## 6. Das Profil als Lebensarchitektur
+
+Das Profil {{profile}} bestimmt nicht nur die Rolle – es bestimmt, wie {{clientName}} lernt, liebt, wächst und sich in der Welt bewegt.
+
+**Lebensthemen des Profils {{profile}}:**
+- Welche Themen kehren im Leben von {{clientName}} immer wieder – nicht als Zufall, sondern als Programm?
+- Welche Begegnungen sind "zufällig" und welche sind Profil-Programm?
+- Wie lange dauern typischerweise die Lebenskapitel von {{clientName}}?
+
+**Profil in Beziehungen:**
+- Wie {{clientName}} Nähe sucht und Distanz braucht – das Rhythmusmuster des Profils
+- Die häufigste Beziehungswunde dieses Profils
+- Was {{clientName}} in tiefen Verbindungen wirklich braucht – jenseits des Offensichtlichen
+
+**Profil in Beruf und Berufung:**
+- Welche Arbeitsstile dem Profil entsprechen
+- Die natürlichen Rollen, die {{clientName}} durch das Profil einnimmt
+- Wann Arbeit erfüllend ist – und wann das Profil verletzt wird
+
+---
+
+## 7. Die Seele hinter dem Design
+
+Jenseits aller Mechaniken ist {{clientName}} eine Seele mit einem spezifischen Beitrag zur Welt.
+
+**Was {{clientName}} in die Welt bringt:**
+- Die einzigartige Kombination aus Typ {{type}}, Profil {{profile}}, Autorität {{authority}} und den aktivierten Kanälen
+- Was Menschen in der Welt durch {{clientName}} erfahren können, das sie sonst nirgends finden
+- Die tiefste Stärke, die noch nicht vollständig gesehen wird
+
+**Das Versprechen des Designs:**
+- Was möglich wird, wenn {{clientName}} das eigene Design vollständig lebt
+- Die Version von {{clientName}}, die in diesem Design angelegt ist
+- Eine persönliche, direkte Einladung: Das Experiment anzunehmen – nicht als Pflicht, sondern als Rückkehr zu sich selbst
+
+---
+
+Sprache: Deutsch
+Stil: Tiefenpsychologisch, direkt, ehrlich – kein esoterisches Blumenbett, kein Schönreden, keine Verurteilung. {{clientName}} soll sich gesehen fühlen, nicht analysiert.
+Länge: Umfassend – jede Sektion verdient echte Tiefe. Lieber zu viel als zu wenig.
+WICHTIG: Nenne {{clientName}} in jeder Sektion beim Namen. Verwende die konkreten Chart-Daten (Typ, Profil, Autorität, Zentren, Gates) – kein generisches Human Design Wissen, sondern ein lebendiger Spiegel dieser einen Person.

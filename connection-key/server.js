@@ -137,6 +137,64 @@ export class ConnectionKeyServer {
     apiRouter.use("/user", userRouter);
 
     this.app.use("/api", apiRouter);
+
+    // ── Subscriber-Onboarding (Mailchimp/n8n Webhook) ────────────────────────
+    // POST /api/new-subscriber
+    // Erwartet: { email, firstname, lastname, source, birthdate?, birthtime?, birthplace? }
+    this.app.post("/api/new-subscriber", async (req, res) => {
+      const { email, firstname, lastname, source, birthdate, birthtime, birthplace } = req.body || {};
+      if (!email) return res.status(400).json({ success: false, error: 'email erforderlich' });
+
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+        const name = [firstname, lastname].filter(Boolean).join(' ') || email.split('@')[0];
+
+        // Profil anlegen / aktualisieren
+        await sb.from('profiles').upsert({
+          email,
+          full_name: name,
+          source: source || 'mailchimp',
+          subscribed_at: new Date().toISOString(),
+          ...(birthdate && { birth_date: birthdate }),
+          ...(birthtime && { birth_time: birthtime }),
+          ...(birthplace && { birth_place: birthplace }),
+        }, { onConflict: 'email' });
+
+        // Welcome-Reading wenn Geburtsdaten vorhanden
+        if (birthdate && birthplace) {
+          const readingWorker = process.env.READING_AGENT_URL || 'http://reading-worker:4000';
+          fetch(`${readingWorker}/api/readings/generic`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reading_type: 'basic',
+              name,
+              birthdate,
+              birthtime: birthtime || '12:00',
+              birthplace,
+              auto_generated: true,
+            }),
+          }).catch(e => console.warn('[new-subscriber] Reading-Trigger Fehler:', e.message));
+        }
+
+        // Mattermost-Benachrichtigung
+        const mmUrl = process.env.MATTERMOST_WEBHOOK_READINGS || process.env.MATTERMOST_WEBHOOK_URL;
+        if (mmUrl) {
+          fetch(mmUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: `📧 **Neuer Subscriber** | ${name} | ${email} | Quelle: ${source || 'mailchimp'}` }),
+          }).catch(() => {});
+        }
+
+        console.log(`[new-subscriber] ${email} (${source || 'mailchimp'}) onboarded`);
+        res.json({ success: true, name, email });
+      } catch (err) {
+        console.error('[new-subscriber] Fehler:', err.message);
+        res.status(500).json({ success: false, error: err.message });
+      }
+    });
   }
 
   setupErrorHandling() {

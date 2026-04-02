@@ -1,7 +1,71 @@
 import express from 'express';
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 const router = express.Router();
+
+// Supabase für Onboarding-Updates
+const supabase = process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY
+  ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+  : null;
+
+// Mattermost-Benachrichtigung
+async function notifyMattermost(text, type = 'readings') {
+  const urls = {
+    readings: process.env.MATTERMOST_WEBHOOK_READINGS || process.env.MATTERMOST_WEBHOOK_URL,
+    errors:   process.env.MATTERMOST_WEBHOOK_ERRORS   || process.env.MATTERMOST_WEBHOOK_URL,
+  };
+  const url = urls[type];
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+      signal: AbortSignal.timeout(6000),
+    });
+  } catch (e) {
+    console.warn('[Mattermost] Fehler:', e.message);
+  }
+}
+
+// Trigger: Willkommens-Reading nach Zahlung
+async function triggerWelcomeReading(userId, packageId, email) {
+  const readingAgentUrl = process.env.READING_AGENT_URL || 'http://reading-worker:4000';
+  try {
+    // Nutzerdaten aus Supabase laden
+    const { data: profile } = supabase
+      ? await supabase.from('profiles').select('birth_date, birth_time, birth_place, full_name').eq('id', userId).single()
+      : { data: null };
+
+    if (!profile?.birth_date || !profile?.birth_place) {
+      console.log(`[Onboarding] Kein Geburtsdaten für ${userId} — kein Auto-Reading`);
+      return null;
+    }
+
+    const readingType = packageId?.includes('business') ? 'business' : 'basic';
+    const res = await fetch(`${readingAgentUrl}/api/readings/generic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reading_type: readingType,
+        name: profile.full_name || email || 'Neuer Klient',
+        birthdate: profile.birth_date,
+        birthtime: profile.birth_time || '12:00',
+        birthplace: profile.birth_place,
+        auto_generated: true,
+        user_id: userId,
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    const data = await res.json();
+    console.log(`[Onboarding] Welcome-Reading gestartet: ${data.job_id || data.id}`);
+    return data.job_id || data.id;
+  } catch (e) {
+    console.warn('[Onboarding] Welcome-Reading Fehler:', e.message);
+    return null;
+  }
+}
 
 // Stripe Client initialisieren
 const getStripeClient = () => {
@@ -124,39 +188,94 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
     // Event Handler
     switch (event.type) {
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const session = event.data.object;
-        console.log(`??? Checkout Session completed: ${session.id}`, session.metadata);
-        // TODO: Update Supabase Subscription
-        break;
+        const { userId, packageId, bookingType } = session.metadata || {};
+        const amount = session.amount_total ? `${(session.amount_total / 100).toFixed(2)} ${session.currency?.toUpperCase()}` : '—';
+        const email = session.customer_details?.email || '—';
+        console.log(`✅ Checkout Session completed: ${session.id} | ${packageId} | ${amount}`);
 
-      case 'customer.subscription.created':
-        const subscriptionCreated = event.data.object;
-        console.log(`??? Subscription created: ${subscriptionCreated.id}`);
-        break;
+        // Supabase: Subscription-Status aktualisieren
+        if (supabase && userId) {
+          await supabase.from('profiles').upsert({
+            id: userId,
+            subscription_status: 'active',
+            subscription_package: packageId,
+            subscription_updated_at: new Date().toISOString(),
+          }, { onConflict: 'id' }).catch(e => console.warn('[Stripe] Supabase Update:', e.message));
+        }
 
-      case 'customer.subscription.updated':
-        const subscriptionUpdated = event.data.object;
-        console.log(`??? Subscription updated: ${subscriptionUpdated.id} - Status: ${subscriptionUpdated.status}`);
-        break;
+        // Welcome-Reading triggern
+        if (userId) {
+          triggerWelcomeReading(userId, packageId, email);
+        }
 
-      case 'customer.subscription.deleted':
-        const subscriptionDeleted = event.data.object;
-        console.log(`??? Subscription deleted: ${subscriptionDeleted.id}`);
+        notifyMattermost(
+          `💳 **Neue Zahlung** | ${packageId || bookingType} | ${amount}\n**E-Mail:** ${email}\n**Session:** \`${session.id}\``,
+          'readings'
+        );
         break;
+      }
 
-      case 'invoice.payment_succeeded':
-        const invoiceSucceeded = event.data.object;
-        console.log(`??? Payment succeeded: ${invoiceSucceeded.id}`);
+      case 'customer.subscription.created': {
+        const sub = event.data.object;
+        const amount = sub.items?.data?.[0]?.price?.unit_amount
+          ? `${(sub.items.data[0].price.unit_amount / 100).toFixed(2)} ${sub.currency?.toUpperCase()}/Monat`
+          : '—';
+        console.log(`🔔 Subscription created: ${sub.id} | Status: ${sub.status}`);
+        notifyMattermost(
+          `🟢 **Neues Abo** | ${sub.status} | ${amount}\nAbo-ID: \`${sub.id}\``,
+          'readings'
+        );
         break;
+      }
 
-      case 'invoice.payment_failed':
-        const invoiceFailed = event.data.object;
-        console.log(`??? Payment failed: ${invoiceFailed.id}`);
+      case 'customer.subscription.updated': {
+        const sub = event.data.object;
+        console.log(`🔄 Subscription updated: ${sub.id} - Status: ${sub.status}`);
+        if (['canceled', 'unpaid', 'past_due'].includes(sub.status)) {
+          notifyMattermost(
+            `⚠️ **Abo-Problem** | Status: ${sub.status}\nAbo-ID: \`${sub.id}\``,
+            'errors'
+          );
+        }
         break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        console.log(`❌ Subscription deleted: ${sub.id}`);
+        notifyMattermost(
+          `🔴 **Abo gekündigt** | Abo-ID: \`${sub.id}\``,
+          'readings'
+        );
+        break;
+      }
+
+      case 'invoice.payment_succeeded': {
+        const inv = event.data.object;
+        const amount = inv.amount_paid ? `${(inv.amount_paid / 100).toFixed(2)} ${inv.currency?.toUpperCase()}` : '—';
+        console.log(`💰 Payment succeeded: ${inv.id} | ${amount}`);
+        // Nur bei Erstzahlung notifizieren (nicht bei wiederkehrenden)
+        if (inv.billing_reason === 'subscription_create') {
+          notifyMattermost(`💰 **Erste Zahlung eingegangen** | ${amount}`, 'readings');
+        }
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const inv = event.data.object;
+        const amount = inv.amount_due ? `${(inv.amount_due / 100).toFixed(2)} ${inv.currency?.toUpperCase()}` : '—';
+        console.log(`❌ Payment failed: ${inv.id} | ${amount}`);
+        notifyMattermost(
+          `❌ **Zahlung fehlgeschlagen** | ${amount}\nKunde: ${inv.customer_email || '—'}\nRechnung: \`${inv.id}\``,
+          'errors'
+        );
+        break;
+      }
 
       default:
-        console.log(`?????? Unhandled event type: ${event.type}`);
+        console.log(`⚪ Unhandled event type: ${event.type}`);
     }
 
     res.json({ received: true });

@@ -3660,6 +3660,256 @@ app.post('/api/channel/post-hd-wissen', async (req, res) => {
 });
 
 // ======================================================
+// AUTOMATIONS: Social/YouTube, Video, Transit-Ausblick, Business-Tipp
+// ======================================================
+
+const MCP_GATEWAY_URL = process.env.MCP_SERVER_URL || 'http://mcp-gateway:7000';
+
+/**
+ * Ruft einen MCP-Agenten auf und gibt den Text zurück.
+ */
+async function callMcpAgent(endpoint, body) {
+  const res = await fetch(`${MCP_GATEWAY_URL}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.AGENT_SECRET || ''}` },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!res.ok) throw new Error(`MCP ${endpoint} Fehler: ${res.status}`);
+  const data = await res.json();
+  return data.response || data.text || data.content || JSON.stringify(data);
+}
+
+/**
+ * #1 Social/YouTube: Nach jedem Channel-Tagesimpuls Reel-Skript + YouTube-Short generieren.
+ * Wird direkt nach postChannelTagesimpuls aufgerufen (nicht standalone).
+ */
+async function generateSocialContent(telegramText, transitInfo) {
+  if (!TELEGRAM_CHANNEL_ID) return;
+  console.log('🎬 [Social] Generiere Reel-Skript + YouTube-Short...');
+  try {
+    const prompt = `Basierend auf diesem Tagesimpuls-Text:
+
+---
+${telegramText}
+---
+
+${transitInfo ? `Aktuelle Transite: ${transitInfo}` : ''}
+
+Erstelle:
+
+1. REEL-SKRIPT (15-30 Sekunden, Hook → Kern → CTA):
+Hook: [1 Satz, maximal provokant]
+Kern: [2-3 Sätze, die wichtigste Erkenntnis]
+CTA: [1 Satz Einladung zur Reflexion]
+
+2. YOUTUBE-SHORT-BESCHREIBUNG (für Video-Upload):
+Titel: [max 60 Zeichen, SEO-optimiert für Human Design]
+Beschreibung: [2-3 Sätze + 5 Hashtags]
+
+Sprache: Deutsch. Kein Markdown, klare Trennung mit Überschriften.`;
+
+    const text = await generateWithClaude(prompt, { maxTokens: 600, temperature: 0.9 });
+
+    if (supabasePublic) {
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        await supabasePublic.from('channel_posts').upsert({
+          date: today,
+          type: 'social-content',
+          topic: 'Reel + YouTube',
+          telegram_text: telegramText,
+          instagram_caption: text.trim(),
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'date,type' });
+      } catch (e) {
+        console.warn('[Social] Supabase-Save Fehler:', e.message);
+      }
+    }
+    console.log(`🎬 [Social] Reel-Skript + YouTube gespeichert (${text.length} Zeichen)`);
+  } catch (err) {
+    console.error('[Social] Fehler:', err.message);
+  }
+}
+
+/**
+ * #2 Video Creation: Wöchentlich montags ein Video-Konzept basierend auf aktuellen Transiten.
+ */
+async function postWeeklyVideoConcept(force = false) {
+  const day = new Date().getUTCDay();
+  if (!force && day !== 1) {
+    console.log('[Video] Kein Montag — überspringe Weekly Video Concept');
+    return;
+  }
+  if (!TELEGRAM_CHANNEL_ID) return;
+  console.log('🎥 [Video] Generiere wöchentliches Video-Konzept...');
+  try {
+    const transit = await loadTodayTransit();
+    const sunGate = transit?.sun?.gate || '?';
+    const moonGate = transit?.moon?.gate || '?';
+    const weekStart = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' });
+
+    const prompt = `Du bist ein Human Design Content-Stratege. Erstelle ein Video-Konzept für die Woche ab ${weekStart}.
+
+Aktuelle Transit-Energie:
+- Sonne: Tor ${sunGate}
+- Mond: Tor ${moonGate}
+
+Erstelle ein komplettes Video-Konzept:
+
+TITEL: [1 starker YouTube-Titel, max 60 Zeichen]
+HOOK (erste 5 Sekunden): [Was den Zuschauer sofort fesselt]
+STRUKTUR:
+  - Intro (30 Sek): [Kernversprechen]
+  - Teil 1 (2-3 Min): [Hauptthema mit HD-Bezug]
+  - Teil 2 (2-3 Min): [Praktische Anwendung]
+  - Outro (30 Sek): [CTA + Reflexionsfrage]
+THUMBNAIL-IDEE: [Kurzbeschreibung was drauf sein soll]
+ZIELGRUPPE: [Wer profitiert am meisten]
+HASHTAGS: [5-7 YouTube-Hashtags]
+
+Sprache: Deutsch. Praxisnah, kein Esoterik-Jargon.`;
+
+    const text = await generateWithClaude(prompt, { maxTokens: 700, temperature: 0.85 });
+
+    if (supabasePublic) {
+      try {
+        await supabasePublic.from('channel_posts').upsert({
+          date: new Date().toISOString().split('T')[0],
+          type: 'video-concept',
+          topic: `Video-Konzept KW ${weekStart}`,
+          telegram_text: text.trim(),
+          instagram_caption: null,
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'date,type' });
+      } catch (e) {
+        console.warn('[Video] Supabase-Save Fehler:', e.message);
+      }
+    }
+    console.log(`🎥 [Video] Wöchentliches Video-Konzept gespeichert (${text.length} Zeichen)`);
+  } catch (err) {
+    console.error('[Video] Fehler:', err.message);
+  }
+}
+
+/**
+ * #3 Transit-Wochenausblick: Montags eine Übersicht der Wochenenergie posten.
+ */
+async function postWeeklyTransitOutlook(force = false) {
+  const day = new Date().getUTCDay();
+  if (!force && day !== 1) return;
+  if (!TELEGRAM_CHANNEL_ID) return;
+  console.log('🌍 [Transit] Generiere Wochen-Transit-Ausblick...');
+  try {
+    const transit = await loadTodayTransit();
+    const weekStart = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    const prompt = `Du bist ein Human Design Transit-Spezialist. Erstelle einen öffentlichen Wochen-Ausblick für Telegram.
+
+Aktuelle Transit-Positionen:
+- Sonne: Tor ${transit?.sun?.gate || '?'}.${transit?.sun?.line || '?'}
+- Erde: Tor ${transit?.earth?.gate || '?'}.${transit?.earth?.line || '?'}
+- Mond: Tor ${transit?.moon?.gate || '?'}.${transit?.moon?.line || '?'}
+${transit?.moonPhase ? `- Mondphase: ${transit.moonPhase}` : ''}
+${transit?.activeChannels?.length ? `- Aktive Kanäle: ${transit.activeChannels.join(', ')}` : ''}
+
+Erstelle einen Wochen-Ausblick (150-200 Wörter):
+1. Kollektive Wochenenergie (2-3 Sätze): Was bewegt sich diese Woche?
+2. Für jeden Typ ein Satz (Generator, Projektor, Manifestor, Reflektor): Was ist die Einladung?
+3. Eine Frage für die Woche.
+4. 3-4 Hashtags.
+
+Kein Markdown. Reiner Text mit Zeilenumbrüchen.`;
+
+    const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.85 });
+
+    const header = `🌍 <b>Wochen-Transit — ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' })}</b>\n\n`;
+    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'HTML');
+    generateAndSaveInstagramCaption(text.trim(), 'transit-ausblick', `Woche ${weekStart}`);
+    console.log(`🌍 [Transit] Wochen-Ausblick gepostet`);
+  } catch (err) {
+    console.error('[Transit] Fehler:', err.message);
+  }
+}
+
+/**
+ * #4 Business-Tipp: Montags ein HD-Business-Tipp für den Channel.
+ */
+async function postWeeklyBusinessTip(force = false) {
+  const day = new Date().getUTCDay();
+  if (!force && day !== 1) return;
+  if (!TELEGRAM_CHANNEL_ID) return;
+  console.log('💼 [Business] Generiere wöchentlichen Business-Tipp...');
+  try {
+    const BUSINESS_TOPICS = [
+      'Wie jeder HD-Typ Angebote kommunizieren sollte',
+      'Preise setzen nach deiner Strategie und Autorität',
+      'Burnout-Prävention für Selbstständige nach HD-Typ',
+      'Sichtbarkeit im Business — wie jeder Typ gefunden wird',
+      'Teamdynamiken im Human Design: wer macht was?',
+      'Verkaufsgespräche nach Authorität führen',
+      'Content-Erstellung nach HD-Typ — was fließt, was kostet Energie',
+      'Nein sagen im Business — Grenzen nach HD-Design',
+      'Kundenkommunikation: wie jeder Typ am besten kommuniziert',
+      'Business-Entscheidungen: wann ist der richtige Zeitpunkt?',
+    ];
+    const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+    const topic = BUSINESS_TOPICS[dayOfYear % BUSINESS_TOPICS.length];
+
+    const prompt = `Du bist ein Human Design Business Coach. Schreibe einen kurzen Business-Tipp für den öffentlichen Telegram-Kanal.
+
+Thema diese Woche: ${topic}
+
+Struktur (120-150 Wörter):
+1. Eine provozierende Eröffnungsaussage (kein Emoji, direkt)
+2. 3-4 Sätze: Warum das für HD-Typen unterschiedlich ist
+3. Je 1 Satz für Generator, Projektor, Manifestor, Reflektor — konkret und direkt
+4. 1 Abschlussfrage
+5. 3-4 Hashtags (#HumanDesign #Business #Selbstständig etc.)
+
+Kein Markdown. Kein "Liebe Community". Direkte Sprache.`;
+
+    const text = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.88 });
+
+    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+    generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic);
+    console.log(`💼 [Business] Business-Tipp gepostet: ${topic}`);
+  } catch (err) {
+    console.error('[Business] Fehler:', err.message);
+  }
+}
+
+// Hilfsfunktion für HTML-Escaping (global verwendbar)
+function escHtmlGlobal(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Montags 08:00 UTC (10:00 CEST): Transit-Ausblick + Business-Tipp + Video-Konzept
+scheduleDailyAt(8, 0, postWeeklyTransitOutlook);
+scheduleDailyAt(8, 15, postWeeklyBusinessTip);
+scheduleDailyAt(8, 30, postWeeklyVideoConcept);
+
+// Manuelle Trigger
+app.post('/api/channel/post-transit-ausblick', async (req, res) => {
+  res.json({ success: true, message: 'Transit-Ausblick gestartet' });
+  postWeeklyTransitOutlook(true);
+});
+app.post('/api/channel/post-business-tipp', async (req, res) => {
+  res.json({ success: true, message: 'Business-Tipp gestartet' });
+  postWeeklyBusinessTip(true);
+});
+app.post('/api/channel/post-video-concept', async (req, res) => {
+  res.json({ success: true, message: 'Video-Konzept gestartet' });
+  postWeeklyVideoConcept(true);
+});
+app.post('/api/channel/post-social-content', async (req, res) => {
+  const { text } = req.body || {};
+  if (!text) return res.status(400).json({ error: 'text erforderlich' });
+  res.json({ success: true, message: 'Social-Content gestartet' });
+  generateSocialContent(text);
+});
+
+// ======================================================
 // Server starten
 // ======================================================
 app.listen(4000, () => {

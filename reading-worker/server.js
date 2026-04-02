@@ -3107,6 +3107,7 @@ const GENERIC_READING_TYPES = new Set([
   'emotions', 'health', 'life-purpose', 'parenting',
   'reflection', 'reflection-profiles', 'spiritual',
   'detailed', 'depth-analysis', 'default', 'sexuality',
+  'geld-ueberfluss', 'kinder', 'trauma', 'variable-phs',
 ]);
 
 app.post("/api/readings/:type/start", async (req, res) => {
@@ -3235,6 +3236,89 @@ scheduleDailyAt(5, 2, dispatchSubscriberImpulses);
 app.post('/api/readings/tagesimpuls/dispatch-subscribers', async (req, res) => {
   res.json({ success: true, message: 'Dispatch gestartet' });
   dispatchSubscriberImpulses();
+});
+
+// ======================================================
+// MARKETING AUTOMATION: Instagram-Captions aus Channel-Posts
+// ======================================================
+
+/**
+ * Generiert eine Instagram-Caption aus einem Channel-Post-Text und speichert sie in Supabase.
+ */
+async function generateAndSaveInstagramCaption(text, type, topic = null) {
+  try {
+    const prompt = `Du bist ein Social-Media-Experte für Human Design Coaches.
+
+Erstelle eine Instagram-Caption basierend auf diesem Telegram-Post:
+
+---
+${text}
+---
+
+REGELN:
+- Maximal 150 Wörter
+- Hook in der ersten Zeile (kein Emoji am Anfang — nur Text)
+- 1–2 Emojis sparsam eingesetzt
+- Natürliche Sprache, kein Corporate-Speak
+- Am Ende: 5–8 relevante Hashtags (Mix aus groß und nischig)
+- Hashtags auf einer eigenen Zeile
+- Kein "Link in Bio" oder Call-to-Action für Produkte
+- Sprache: Deutsch
+
+Antworte NUR mit der Caption, kein Kommentar davor/danach.`;
+
+    const caption = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.85 });
+
+    // In Supabase speichern
+    if (supabasePublic) {
+      const today = new Date().toISOString().split('T')[0];
+      try {
+        await supabasePublic.from('channel_posts').upsert({
+          date: today,
+          type,
+          topic: topic || type,
+          telegram_text: text,
+          instagram_caption: caption.trim(),
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'date,type' });
+      } catch (dbErr) {
+        console.warn('[Marketing] Supabase-Save Fehler:', dbErr.message);
+      }
+    }
+
+    console.log(`📸 [Marketing] Instagram-Caption gespeichert (${type}, ${caption.length} Zeichen)`);
+    return caption.trim();
+  } catch (err) {
+    console.warn('[Marketing] Instagram-Caption Fehler:', err.message);
+    return null;
+  }
+}
+
+// GET /api/channel/content/today — alle heutigen Posts + Instagram-Captions
+app.get('/api/channel/content/today', async (req, res) => {
+  if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
+  const today = new Date().toISOString().split('T')[0];
+  const { data, error } = await supabasePublic
+    .from('channel_posts')
+    .select('*')
+    .eq('date', today)
+    .order('created_at', { ascending: true });
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json({ date: today, posts: data || [] });
+});
+
+// GET /api/channel/content?days=7 — Content der letzten N Tage
+app.get('/api/channel/content', async (req, res) => {
+  if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
+  const days = Math.min(parseInt(req.query.days || '7'), 30);
+  const since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
+  const { data, error } = await supabasePublic
+    .from('channel_posts')
+    .select('*')
+    .gte('date', since)
+    .order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json({ since, posts: data || [] });
 });
 
 // ======================================================
@@ -3432,6 +3516,7 @@ async function postChannelTagesimpuls() {
     const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
     console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
+    generateAndSaveInstagramCaption(text.trim(), 'tagesimpuls');
   } catch (err) {
     console.error('[Channel] Tagesimpuls Fehler:', err.message);
   }
@@ -3493,6 +3578,7 @@ async function postChannelBeziehung() {
 
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
     console.log(`💞 [Channel] Beziehung gepostet: ${topic} (${text.length} Zeichen)`);
+    generateAndSaveInstagramCaption(text.trim(), 'beziehung', topic);
   } catch (err) {
     console.error('[Channel] Beziehung Fehler:', err.message);
   }
@@ -3528,6 +3614,7 @@ async function postChannelHDWissen() {
 
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
     console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen)`);
+    generateAndSaveInstagramCaption(text.trim(), 'hd-wissen', topic);
   } catch (err) {
     console.error('[Channel] HD-Wissen Fehler:', err.message);
   }

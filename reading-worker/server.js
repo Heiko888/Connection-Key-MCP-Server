@@ -59,6 +59,39 @@ async function sendTelegramMessage(chatId, text, parseMode = 'MarkdownV2') {
   }
 }
 
+// ── Mattermost Integration ────────────────────────────────────────────────────
+// Webhook-URLs per Kanal — Fallback auf MATTERMOST_WEBHOOK_URL
+const MM_WEBHOOKS = {
+  readings: process.env.MATTERMOST_WEBHOOK_READINGS || process.env.MATTERMOST_WEBHOOK_URL || '',
+  channel:  process.env.MATTERMOST_WEBHOOK_CHANNEL  || process.env.MATTERMOST_WEBHOOK_URL || '',
+  business: process.env.MATTERMOST_WEBHOOK_BUSINESS || process.env.MATTERMOST_WEBHOOK_URL || '',
+  errors:   process.env.MATTERMOST_WEBHOOK_ERRORS   || process.env.MATTERMOST_WEBHOOK_URL || '',
+};
+
+/**
+ * Sendet eine Nachricht an Mattermost.
+ * @param {string} text   - Markdown-Text
+ * @param {'readings'|'channel'|'business'|'errors'} type - Kanal-Routing
+ */
+async function sendMattermost(text, type = 'readings') {
+  const url = MM_WEBHOOKS[type] || MM_WEBHOOKS.readings;
+  if (!url) return; // nicht konfiguriert — still ignorieren
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.warn(`[Mattermost] Fehler (${res.status}): ${body.substring(0, 100)}`);
+    }
+  } catch (e) {
+    console.warn('[Mattermost] sendMessage error:', e.message);
+  }
+}
+
 /**
  * fetchChartData() – Zentrale Hilfsfunktion
  * Ruft connection-key:3000/api/chart/calculate auf und gibt Chart-Daten zurück.
@@ -1532,6 +1565,7 @@ async function pollForJobs() {
 
         console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
 
+        const jobStart = Date.now();
         if (readingType === 'tagesimpuls') {
           await processTagesimpulsJob(job, reading);
         } else if (['connection', 'composite'].includes(readingType) ||
@@ -1546,8 +1580,24 @@ async function pollForJobs() {
         } else {
           await processHumanDesignJob(job, reading);
         }
+
+        // ── Mattermost: Reading fertig ──────────────────────────
+        const elapsed = Math.round((Date.now() - jobStart) / 1000);
+        const clientName = job.payload?.name || job.payload?.personA?.name || 'Unbekannt';
+        const readingId = job.payload?.reading_id;
+        const readingLink = readingId ? `https://coach.the-connection-key.de/readings-v4/${readingId}` : null;
+        sendMattermost(
+          `✅ **Reading fertig** | \`${readingType}\` | ${clientName} | ${elapsed}s${readingLink ? `\n[→ Reading öffnen](${readingLink})` : ''}`,
+          'readings'
+        );
       } catch (jobError) {
         console.error(`❌ Fehler bei Job ${job.id}:`, jobError);
+        // ── Mattermost: Job-Fehler ──────────────────────────────
+        const clientName = job.payload?.name || job.payload?.personA?.name || 'Unbekannt';
+        sendMattermost(
+          `❌ **Reading-Fehler** | \`${job.reading_type}\` | ${clientName} | Job \`${job.id}\`\n\`\`\`\n${jobError?.message || String(jobError)}\n\`\`\``,
+          'errors'
+        );
       }
     }
   } catch (error) {
@@ -3517,8 +3567,11 @@ async function postChannelTagesimpuls() {
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
     console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
     generateAndSaveInstagramCaption(text.trim(), 'tagesimpuls');
+    sendMattermost(`✨ **Tagesimpuls gepostet** | ☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}\n${text.trim().substring(0, 200)}...`, 'channel');
+    generateSocialContent(text.trim(), `Sonne Tor ${sunGate}, Mond Tor ${moonGate}`);
   } catch (err) {
     console.error('[Channel] Tagesimpuls Fehler:', err.message);
+    sendMattermost(`❌ **Tagesimpuls-Fehler**: ${err.message}`, 'errors');
   }
 }
 
@@ -3579,8 +3632,10 @@ async function postChannelBeziehung() {
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
     console.log(`💞 [Channel] Beziehung gepostet: ${topic} (${text.length} Zeichen)`);
     generateAndSaveInstagramCaption(text.trim(), 'beziehung', topic);
+    sendMattermost(`💞 **Beziehung & Resonanz gepostet** | ${topic}`, 'channel');
   } catch (err) {
     console.error('[Channel] Beziehung Fehler:', err.message);
+    sendMattermost(`❌ **Beziehung-Fehler**: ${err.message}`, 'errors');
   }
 }
 
@@ -3615,8 +3670,10 @@ async function postChannelHDWissen() {
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
     console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen)`);
     generateAndSaveInstagramCaption(text.trim(), 'hd-wissen', topic);
+    sendMattermost(`📚 **HD-Wissen gepostet** | ${topic}`, 'channel');
   } catch (err) {
     console.error('[Channel] HD-Wissen Fehler:', err.message);
+    sendMattermost(`❌ **HD-Wissen-Fehler**: ${err.message}`, 'errors');
   }
 }
 
@@ -3787,8 +3844,10 @@ Sprache: Deutsch. Praxisnah, kein Esoterik-Jargon.`;
       }
     }
     console.log(`🎥 [Video] Wöchentliches Video-Konzept gespeichert (${text.length} Zeichen)`);
+    sendMattermost(`🎥 **Video-Konzept gespeichert** | KW ab ${weekStart}\n[→ Channel-Content](https://coach.the-connection-key.de/channel-content)`, 'business');
   } catch (err) {
     console.error('[Video] Fehler:', err.message);
+    sendMattermost(`❌ **Video-Konzept-Fehler**: ${err.message}`, 'errors');
   }
 }
 
@@ -3827,8 +3886,10 @@ Kein Markdown. Reiner Text mit Zeilenumbrüchen.`;
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'HTML');
     generateAndSaveInstagramCaption(text.trim(), 'transit-ausblick', `Woche ${weekStart}`);
     console.log(`🌍 [Transit] Wochen-Ausblick gepostet`);
+    sendMattermost(`🌍 **Wochen-Transit-Ausblick gepostet** | Woche ab ${weekStart}\n${text.trim().substring(0, 300)}...`, 'business');
   } catch (err) {
     console.error('[Transit] Fehler:', err.message);
+    sendMattermost(`❌ **Transit-Ausblick-Fehler**: ${err.message}`, 'errors');
   }
 }
 
@@ -3874,8 +3935,10 @@ Kein Markdown. Kein "Liebe Community". Direkte Sprache.`;
     await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
     generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic);
     console.log(`💼 [Business] Business-Tipp gepostet: ${topic}`);
+    sendMattermost(`💼 **Business-Tipp gepostet** | ${topic}`, 'business');
   } catch (err) {
     console.error('[Business] Fehler:', err.message);
+    sendMattermost(`❌ **Business-Tipp-Fehler**: ${err.message}`, 'errors');
   }
 }
 

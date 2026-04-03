@@ -3352,6 +3352,9 @@ Antworte NUR mit der Caption, kein Kommentar davor/danach.`;
           topic: topic || type,
           telegram_text: text,
           instagram_caption: caption.trim(),
+          telegram_sent: true,
+          sent_at: new Date().toISOString(),
+          status: 'published',
           created_at: new Date().toISOString(),
         }, { onConflict: 'date,type' });
       } catch (dbErr) {
@@ -3380,18 +3383,78 @@ app.get('/api/channel/content/today', async (req, res) => {
   return res.json({ date: today, posts: data || [] });
 });
 
-// GET /api/channel/content?days=7 — Content der letzten N Tage
+// GET /api/channel/content?days=7&type=tagesimpuls&q=search — Content mit Filtern
 app.get('/api/channel/content', async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
-  const days = Math.min(parseInt(req.query.days || '7'), 30);
-  const since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
-  const { data, error } = await supabasePublic
-    .from('channel_posts')
-    .select('*')
-    .gte('date', since)
-    .order('created_at', { ascending: false });
+  const days = req.query.days ? parseInt(req.query.days) : 7;
+  const month = req.query.month; // Format: "2026-04" für Monatsansicht
+  const typeFilter = req.query.type;
+  const searchQuery = req.query.q;
+
+  let query = supabasePublic.from('channel_posts').select('*');
+
+  if (month) {
+    // Monatsansicht: exakt diesen Monat
+    const [year, mon] = month.split('-');
+    const firstDay = `${year}-${mon}-01`;
+    const lastDay = new Date(parseInt(year), parseInt(mon), 0).toISOString().split('T')[0];
+    query = query.gte('date', firstDay).lte('date', lastDay);
+  } else if (days > 0) {
+    const since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
+    query = query.gte('date', since);
+  }
+
+  if (typeFilter) query = query.eq('type', typeFilter);
+
+  const { data, error } = await query.order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
-  return res.json({ since, posts: data || [] });
+
+  let posts = data || [];
+  // Volltextsuche (einfache clientseitige Filterung)
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    posts = posts.filter(p =>
+      (p.telegram_text || '').toLowerCase().includes(q) ||
+      (p.instagram_caption || '').toLowerCase().includes(q) ||
+      (p.topic || '').toLowerCase().includes(q)
+    );
+  }
+
+  return res.json({ posts, total: posts.length });
+});
+
+// PATCH /api/channel/content/:id — Post bearbeiten
+app.patch('/api/channel/content/:id', async (req, res) => {
+  if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
+  const { id } = req.params;
+  const { telegram_text, instagram_caption } = req.body;
+  const updates = { edited: true };
+  if (telegram_text !== undefined) updates.telegram_text = telegram_text;
+  if (instagram_caption !== undefined) updates.instagram_caption = instagram_caption;
+  const { data, error } = await supabasePublic
+    .from('channel_posts').update(updates).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json({ success: true, post: data });
+});
+
+// POST /api/channel/content/:id/send-telegram — manuell zu Telegram senden
+app.post('/api/channel/content/:id/send-telegram', async (req, res) => {
+  if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
+  const { id } = req.params;
+  const { data: post, error: fetchErr } = await supabasePublic
+    .from('channel_posts').select('*').eq('id', id).single();
+  if (fetchErr || !post) return res.status(404).json({ error: 'Post nicht gefunden' });
+  if (!TELEGRAM_CHANNEL_ID) return res.status(503).json({ error: 'TELEGRAM_CHANNEL_ID fehlt' });
+  try {
+    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, post.telegram_text, '');
+    await supabasePublic.from('channel_posts').update({
+      telegram_sent: true, sent_at: new Date().toISOString(), status: 'published',
+    }).eq('id', id);
+    console.log(`📤 [Channel] Post ${id} manuell zu Telegram gesendet`);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 // ======================================================
@@ -3800,6 +3863,8 @@ Sprache: Deutsch. Kein Markdown, klare Trennung mit Überschriften.`;
           topic: 'Reel + YouTube',
           telegram_text: telegramText,
           instagram_caption: text.trim(),
+          telegram_sent: false,
+          status: 'published',
           created_at: new Date().toISOString(),
         }, { onConflict: 'date,type' });
       } catch (e) {
@@ -3860,8 +3925,13 @@ Sprache: Deutsch. Praxisnah, kein Esoterik-Jargon.`;
           topic: `Video-Konzept KW ${weekStart}`,
           telegram_text: text.trim(),
           instagram_caption: null,
+          telegram_sent: true,
+          sent_at: new Date().toISOString(),
+          status: 'published',
           created_at: new Date().toISOString(),
         }, { onConflict: 'date,type' });
+        // Instagram-Caption für Video-Konzept nachträglich generieren
+        generateAndSaveInstagramCaption(text.trim(), 'video-concept', `Video-Konzept KW ${weekStart}`);
       } catch (e) {
         console.warn('[Video] Supabase-Save Fehler:', e.message);
       }

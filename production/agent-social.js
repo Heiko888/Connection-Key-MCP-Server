@@ -40,6 +40,10 @@ Antworte immer auf Deutsch.`;
 async function handleSocialAgent(req, res) {
   try {
     const { message, canva_access_token, platform, conversation_history = [] } = req.body;
+    const chartContext = req.body.chartContext;
+    const chartInfo = chartContext
+      ? `\n\n---\nKlienten-Chart Kontext:\nName: ${chartContext.clientName || ''}\nTyp: ${chartContext.hdType || ''}\nProfil: ${chartContext.profile || ''}\nAutorität: ${chartContext.authority || ''}\nStrategie: ${chartContext.strategy || ''}\nDefinition: ${chartContext.definition || ''}${chartContext.definedCenters ? `\nDefinierte Zentren: ${Array.isArray(chartContext.definedCenters) ? chartContext.definedCenters.join(', ') : chartContext.definedCenters}` : ''}${chartContext.channels ? `\nAktive Kanäle: ${Array.isArray(chartContext.channels) ? chartContext.channels.join(', ') : chartContext.channels}` : ''}${chartContext.incarnationCross ? `\nInkarnationskreuz: ${chartContext.incarnationCross}` : ''}\n---`
+      : '';
     if (!message) return res.status(400).json({ error: 'message is required' });
 
     const platformHint = platform ? `\n\nAktueller Fokus: ${platform}` : '';
@@ -49,7 +53,7 @@ async function handleSocialAgent(req, res) {
     const requestConfig = {
       model: MODEL,
       max_tokens: 4096,
-      system: SOCIAL_SYSTEM_PROMPT + platformHint + (hasCanaToken
+      system: SOCIAL_SYSTEM_PROMPT + platformHint + chartInfo + (hasCanaToken
         ? '\n\nCanva ist verbunden. Erstelle Social Media Grafiken direkt in Canva wenn der User einen Post, Thumbnail oder eine Story benötigt.'
         : ''),
       messages,

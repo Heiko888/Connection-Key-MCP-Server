@@ -57,6 +57,10 @@ Antworte immer auf Deutsch.`;
 async function handleDesignAgent(req, res) {
   try {
     const { message, canva_access_token, figma_access_token, conversation_history = [] } = req.body;
+    const chartContext = req.body.chartContext;
+    const chartInfo = chartContext
+      ? `\n\n---\nKlienten-Chart Kontext:\nName: ${chartContext.clientName || ''}\nTyp: ${chartContext.hdType || ''}\nProfil: ${chartContext.profile || ''}\nAutorität: ${chartContext.authority || ''}\nStrategie: ${chartContext.strategy || ''}\nDefinition: ${chartContext.definition || ''}${chartContext.definedCenters ? `\nDefinierte Zentren: ${Array.isArray(chartContext.definedCenters) ? chartContext.definedCenters.join(', ') : chartContext.definedCenters}` : ''}${chartContext.channels ? `\nAktive Kanäle: ${Array.isArray(chartContext.channels) ? chartContext.channels.join(', ') : chartContext.channels}` : ''}${chartContext.incarnationCross ? `\nInkarnationskreuz: ${chartContext.incarnationCross}` : ''}\n---`
+      : '';
     if (!message) return res.status(400).json({ error: 'message is required' });
 
     const hasCanva = !!canva_access_token;
@@ -78,7 +82,7 @@ async function handleDesignAgent(req, res) {
     const requestConfig = {
       model: MODEL,
       max_tokens: 4096,
-      system: DESIGN_SYSTEM_PROMPT + toolStatus,
+      system: DESIGN_SYSTEM_PROMPT + toolStatus + chartInfo,
       messages,
       ...(mcpServers.length > 0 && { mcp_servers: mcpServers }),
     };

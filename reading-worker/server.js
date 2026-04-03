@@ -755,6 +755,7 @@ async function generateReading({ agentId, template, userData, chartData }) {
   const TEMPLATE_MAP = {
     'detailed': 'detailed',
     'depth-analysis': 'depth-analysis',
+    'channel-analysis': 'channel-analysis',
     'shadow-work': 'shadow-work',
     'transit': 'transit',
     'jahres': 'jahres-reading',
@@ -1571,6 +1572,8 @@ async function pollForJobs() {
         } else if (['connection', 'composite'].includes(readingType) ||
           (['relationship', 'compatibility'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2))) {
           await processConnectionJob(job, reading);
+        } else if (readingType === 'channel-analysis') {
+          await processChannelAnalysisJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
           await processSexualityJob(job, reading);
         } else if (readingType === 'penta') {
@@ -2175,6 +2178,152 @@ async function processConnectionJob(job, reading) {
     .eq("id", job.id);
 
   console.log(`✅ [Connection] Job ${job.id} abgeschlossen (${content?.length} Zeichen, A=${nameA}, B=${nameB})`);
+}
+
+
+// ======================================================
+// processChannelAnalysisJob – Kanal-Analyse (1 oder 2 Personen)
+// ======================================================
+async function processChannelAnalysisJob(job, reading) {
+  console.log(`🔄 [ChannelAnalysis] Verarbeite Job ${job.id}`);
+  const payload = reading.client_data || job.payload || {};
+
+  const nameA = payload.name || 'Klient';
+  const nameB = payload.name2 || null;
+  const birthDateA = payload.birthdate;
+  const birthTimeA = payload.birthtime;
+  const birthPlaceA = payload.birthplace;
+  const birthDateB = payload.birthdate2 || null;
+  const birthTimeB = payload.birthtime2 || null;
+  const birthPlaceB = payload.birthplace2 || null;
+  const readingId = payload.reading_id;
+  const hasPartner = !!(birthDateB && birthTimeB && birthPlaceB);
+
+  await supabase
+    .from('reading_jobs')
+    .update({ status: 'processing', started_at: new Date().toISOString() })
+    .eq('id', job.id);
+
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from('readings').select('reading_data').eq('id', readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
+
+  const chartA = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
+    || existingReadingData.chart_data
+    || { type: 'Unbekannt', gates: [], channels: [], centers: {} };
+
+  let chartB = null;
+  let dynamics = { electromagnetic_channels: [] };
+  if (hasPartner) {
+    chartB = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
+      || existingReadingData.chart_data2
+      || { type: 'Unbekannt', gates: [], channels: [], centers: {} };
+    dynamics = analyzeConnectionDynamics(chartA, chartB);
+    console.log(`   [ChannelAnalysis] Elektromagnetische Kanäle: ${dynamics.electromagnetic_channels?.length || 0}`);
+  }
+
+  const CHANNEL_NAMES_MAP = {
+    '1-8':'Inspiration','2-14':'Schlüssel-Schloss','3-60':'Mutation',
+    '4-63':'Logik','5-15':'Rhythmus','6-59':'Mating',
+    '7-31':'Der Alpha','9-52':'Konzentration','10-20':'Erwachen',
+    '10-34':'Forschung','10-57':'Vollkommenheit','11-56':'Neugier',
+    '12-22':'Offenheit','13-33':'Der Zeuge','16-48':'Wellenlänge',
+    '17-62':'Akzeptanz','18-58':'Urteil','19-49':'Synthese',
+    '20-34':'Charisma','20-57':'Hirnwellen','21-45':'Das Geldlinie',
+    '23-43':'Strukturierung','24-61':'Bewusstsein','25-51':'Initiative',
+    '26-44':'Übertragung','27-50':'Bewahrung','28-38':'Kampf',
+    '29-46':'Entdeckung','30-41':'Erkenntnis','32-54':'Transformation',
+    '35-36':'Transitorium','37-40':'Gemeinschaft','39-55':'Emotionale Tiefe',
+    '42-53':'Reifung','47-64':'Abstraktion',
+  };
+  const getChName = (g1, g2) => {
+    const k = `${Math.min(g1,g2)}-${Math.max(g1,g2)}`;
+    return CHANNEL_NAMES_MAP[k] || CHANNEL_NAMES_MAP[`${g1}-${g2}`] || `${g1}-${g2}`;
+  };
+
+  const emText = hasPartner && dynamics.electromagnetic_channels?.length > 0
+    ? dynamics.electromagnetic_channels.map(ec =>
+        `  - Kanal ${ec.channel} (${getChName(ec.personA_gate, ec.personB_gate)}): Tor ${ec.personA_gate} von ${nameA} + Tor ${ec.personB_gate} von ${nameB}`
+      ).join('\n')
+    : hasPartner ? '  Keine elektromagnetischen Kanäle zwischen diesen Personen.' : '';
+
+  const sectionNum = hasPartner ? 7 : 6;
+
+  const systemPrompt = `Du bist ein Human Design Experte mit tiefem Verständnis der 36 Kanäle, ihrer Circuit-Zugehörigkeit und ihrer Wirkung im Alltag. Dieses Reading ist ein professionelles Coach-Tool.\n\n${templates['channel-analysis'] || ''}`;
+
+  const partnerBlock = hasPartner ? `
+---
+VERBINDUNGS-PARTNER: ${nameB}
+Typ: ${chartB.type || 'Unbekannt'}
+Profil: ${chartB.profile || 'Unbekannt'}
+Aktive Gates von ${nameB}: ${(chartB.gates || []).slice(0,30).map(g => g.number || g).join(', ')}
+
+ELEKTROMAGNETISCHE KANÄLE (entstehen nur durch diese Verbindung):
+${emText}
+
+Sektion 6 (Elektromagnetische Verbindung) mit den obigen Daten einschließen.
+` : '\nKein Partner — Sektion 6 weglassen.';
+
+  const userMessage = `Erstelle eine vollständige Kanal-Analyse für:
+
+Name: ${nameA}
+Typ: ${chartA.type || 'Unbekannt'}
+Profil: ${chartA.profile || 'Unbekannt'}
+Autorität: ${chartA.authority || 'Unbekannt'}
+Strategie: ${chartA.strategy || 'Unbekannt'}
+Definition: ${chartA.definition || 'Unbekannt'}
+
+AKTIVE KANÄLE:
+${formatChartChannels(chartA.channels)}
+
+AKTIVE GATES:
+${formatChartGates(chartA.gates)}
+
+ZENTREN:
+${formatChartCenters(chartA.centers)}
+${partnerBlock}
+Letzte Sektion (Coach-Werkzeugkasten) = Sektion ${sectionNum}.
+Nur angegebene Kanäle/Gates verwenden. ${nameA} in jeder Sektion beim Namen nennen.`;
+
+  const aiModel = payload.ai_model || DEFAULT_MODEL;
+  const modelConfig = MODEL_CONFIG[aiModel] || MODEL_CONFIG[DEFAULT_MODEL];
+  const modelsToTry = modelConfig.models || [aiModel];
+
+  let content = null;
+  for (const modelId of modelsToTry) {
+    try {
+      content = await generateWithClaude(systemPrompt + '\n\n' + userMessage, {
+        model: modelId, maxTokens: 10000, temperature: 0.7,
+      });
+      if (content) break;
+    } catch (err) {
+      console.warn(`   [ChannelAnalysis] Modell ${modelId} fehlgeschlagen:`, err.message);
+    }
+  }
+  if (!content) throw new Error('[ChannelAnalysis] Keine Antwort von Claude');
+
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    chart_data: chartA,
+    ...(chartB ? { chart_data2: chartB } : {}),
+    ...(hasPartner ? { electromagnetic_channels: dynamics.electromagnetic_channels, partner_name: nameB } : {}),
+  };
+
+  if (readingId) {
+    await supabasePublic
+      .from('readings')
+      .update({ status: 'completed', progress: 100, reading_data: newReadingData, updated_at: new Date().toISOString() })
+      .eq('id', readingId);
+  }
+  await supabase
+    .from('reading_jobs')
+    .update({ status: 'completed', finished_at: new Date().toISOString() })
+    .eq('id', job.id);
+
+  console.log(`✅ [ChannelAnalysis] Job ${job.id} abgeschlossen (${content?.length} Zeichen, Partner: ${hasPartner})`);
 }
 
 // ======================================================

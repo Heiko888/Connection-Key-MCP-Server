@@ -45,6 +45,10 @@ Antworte immer auf Deutsch.`;
 async function handleVideoAgent(req, res) {
   try {
     const { message, canva_access_token, video_type, conversation_history = [] } = req.body;
+    const chartContext = req.body.chartContext;
+    const chartInfo = chartContext
+      ? `\n\n---\nKlienten-Chart Kontext:\nName: ${chartContext.clientName || ''}\nTyp: ${chartContext.hdType || ''}\nProfil: ${chartContext.profile || ''}\nAutorität: ${chartContext.authority || ''}\nStrategie: ${chartContext.strategy || ''}\nDefinition: ${chartContext.definition || ''}${chartContext.definedCenters ? `\nDefinierte Zentren: ${Array.isArray(chartContext.definedCenters) ? chartContext.definedCenters.join(', ') : chartContext.definedCenters}` : ''}${chartContext.channels ? `\nAktive Kanäle: ${Array.isArray(chartContext.channels) ? chartContext.channels.join(', ') : chartContext.channels}` : ''}${chartContext.incarnationCross ? `\nInkarnationskreuz: ${chartContext.incarnationCross}` : ''}\n---`
+      : '';
     if (!message) return res.status(400).json({ error: 'message is required' });
 
     const videoHint = video_type ? `\n\nVideo-Typ: ${video_type}` : '';
@@ -54,7 +58,7 @@ async function handleVideoAgent(req, res) {
     const requestConfig = {
       model: MODEL,
       max_tokens: 4096,
-      system: VIDEO_SYSTEM_PROMPT + videoHint + (hasCanaToken
+      system: VIDEO_SYSTEM_PROMPT + videoHint + chartInfo + (hasCanaToken
         ? '\n\nCanva ist verbunden. Erstelle Thumbnails, Intro-Designs und Video-Grafiken direkt in Canva.'
         : ''),
       messages,

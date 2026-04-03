@@ -33,6 +33,10 @@ Antworte immer auf Deutsch.`;
 async function handleMarketingAgent(req, res) {
   try {
     const { message, canva_access_token, conversation_history = [] } = req.body;
+    const chartContext = req.body.chartContext;
+    const chartInfo = chartContext
+      ? `\n\n---\nKlienten-Chart Kontext:\nName: ${chartContext.clientName || ''}\nTyp: ${chartContext.hdType || ''}\nProfil: ${chartContext.profile || ''}\nAutorität: ${chartContext.authority || ''}\nStrategie: ${chartContext.strategy || ''}\nDefinition: ${chartContext.definition || ''}${chartContext.definedCenters ? `\nDefinierte Zentren: ${Array.isArray(chartContext.definedCenters) ? chartContext.definedCenters.join(', ') : chartContext.definedCenters}` : ''}${chartContext.channels ? `\nAktive Kanäle: ${Array.isArray(chartContext.channels) ? chartContext.channels.join(', ') : chartContext.channels}` : ''}${chartContext.incarnationCross ? `\nInkarnationskreuz: ${chartContext.incarnationCross}` : ''}\n---`
+      : '';
     if (!message) return res.status(400).json({ error: 'message is required' });
 
     const messages = [...conversation_history, { role: 'user', content: message }];
@@ -41,7 +45,7 @@ async function handleMarketingAgent(req, res) {
     const requestConfig = {
       model: MODEL,
       max_tokens: 4096,
-      system: MARKETING_SYSTEM_PROMPT + (hasCanaToken
+      system: MARKETING_SYSTEM_PROMPT + chartInfo + (hasCanaToken
         ? '\n\nCanva ist verbunden. Erstelle Designs und Grafiken direkt in Canva wenn sinnvoll.'
         : ''),
       messages,

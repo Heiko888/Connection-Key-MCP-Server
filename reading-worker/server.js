@@ -480,6 +480,8 @@ ${chartInfo}`;
   const part1Prompt = `Du bist ein erfahrener Human Design Coach. Verwende folgendes Hintergrundwissen:
 ${knowledgeText}
 
+WICHTIGE ANWEISUNG: Die Chart-Daten wurden präzise via Swiss Ephemeris berechnet und sind vollständig im Prompt enthalten. Füge KEINEN Disclaimer ein, dass du kein Berechnungstool hast. Beginne das Reading direkt ohne Vorbemerkungen.
+
 Erstelle TEIL 1 eines tiefgründigen, persönlichen Human Design Readings für:
 ${personContext}
 
@@ -526,6 +528,8 @@ Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, ti
 
   const part2Prompt = `Du bist ein erfahrener Human Design Coach. Verwende folgendes Hintergrundwissen:
 ${knowledgeText}
+
+WICHTIGE ANWEISUNG: Die Chart-Daten wurden präzise via Swiss Ephemeris berechnet und sind vollständig im Prompt enthalten. Füge KEINEN Disclaimer ein, dass du kein Berechnungstool hast. Beginne direkt ohne Vorbemerkungen.
 
 Erstelle TEIL 2 eines tiefgründigen, persönlichen Human Design Readings für:
 ${personContext}
@@ -769,8 +773,18 @@ async function generateReading({ agentId, template, userData, chartData }) {
     return await generateDetailedReadingTwoParts({ userData, chartData, modelConfig });
   }
 
-  const templateContent = templates[template] || templates['default'] ||
+  let templateContent = templates[template] || templates['default'] ||
     "Erstelle ein Human Design Reading basierend auf den gegebenen Daten.";
+
+  // Penta-Template: {{placeholders}} ersetzen
+  if (userData.members && userData.memberCharts) {
+    const memberCount = userData.members.length;
+    const memberNames = userData.members.map(m => m.name).join(', ');
+    templateContent = templateContent
+      .replace(/\{\{memberCount\}\}/g, String(memberCount))
+      .replace(/\{\{groupName\}\}/g, userData.groupName || 'Gruppe')
+      .replace(/\{\{memberNames\}\}/g, memberNames);
+  }
 
   const knowledgeText = agentId === 'tagesimpuls'
     ? buildTagesimpulsKnowledge()
@@ -784,11 +798,58 @@ Verwende folgendes Wissen:
 ${knowledgeText}
 ${tuningInstructions}
 
+WICHTIGE ANWEISUNG: Dir werden vollständig berechnete Chart-Daten (via Swiss Ephemeris) direkt im Prompt übergeben. Nutze NUR diese Daten. Füge KEINEN Disclaimer, KEINE Einleitung und KEINE Anmerkung ein, die besagt, dass du kein Berechnungstool hast oder die Daten ableitest. Die Daten sind präzise und vollständig — beginne das Reading direkt.
+
 Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
 
   // Connection-Reading: Beide Personen mit ihren Charts übergeben
   let userMessage;
-  if (userData.personA && userData.personB) {
+  if (userData.members && userData.memberCharts) {
+    // Penta-Reading: Gruppenfeld mit allen Mitgliedern aufbauen
+    const memberDetails = userData.memberCharts.map((mc, idx) => {
+      const member = userData.members[idx] || {};
+      const chart = mc.chart || {};
+      return `**${mc.name}:**
+Geburtsdatum: ${member.birthDate || 'Unbekannt'}
+Geburtszeit: ${member.birthTime || 'Unbekannt'}
+Geburtsort: ${member.birthPlace || 'Unbekannt'}
+Typ: ${chart.type || 'Unbekannt'}
+Profil: ${chart.profile || 'Unbekannt'}
+Autorität: ${chart.authority || 'Unbekannt'}
+Strategie: ${chart.strategy || 'Unbekannt'}
+Zentren:
+${formatChartCenters(chart.centers)}
+Kanäle:
+${formatChartChannels(chart.channels)}
+Tore:
+${formatChartGates(chart.gates)}`;
+    }).join('\n\n---\n\n');
+
+    const pentaChart = userData.pentaChart || {};
+    const groupDynamics = userData.groupDynamics || {};
+
+    userMessage = `Erstelle ein Penta Human Design Reading für die Gruppe "${userData.groupName || 'Gruppe'}" (${userData.members.length} Personen):
+
+Kontext: ${userData.groupContext || 'Gruppe'}
+
+=== MITGLIEDER & CHARTS ===
+
+${memberDetails}
+
+=== PENTA-CHART (Kombinationsfeld) ===
+Aktivierte Kanäle:
+${formatChartChannels(pentaChart.channels)}
+Aktivierte Zentren:
+${formatChartCenters(pentaChart.centers)}
+
+${groupDynamics.roles ? `=== GRUPPEN-DYNAMIK ===
+Rollen: ${JSON.stringify(groupDynamics.roles)}
+Energiefluss: ${JSON.stringify(groupDynamics.energy_flow || [])}
+Kommunikationsmuster: ${JSON.stringify(groupDynamics.communication_patterns || [])}
+Kollektive Stärken: ${JSON.stringify(groupDynamics.collective_strengths || [])}` : ''}
+
+WICHTIG: Nenne alle ${userData.members.length} Personen bei ihren echten Namen (${userData.members.map(m => m.name).join(', ')}) in jeder Sektion! Dies ist ein Gruppenfeld-Reading, kein Sammlung von Einzel-Readings.`;
+  } else if (userData.personA && userData.personB) {
     const personAName = userData.personA?.name || 'Person A';
     const personBName = userData.personB?.name || 'Person B';
 
@@ -1313,7 +1374,7 @@ const pentaWorker = new Worker(
       const [content, reflexionsfragen] = await Promise.all([
         generateReading({
           agentId: 'penta',
-          template: 'relationship',
+          template: 'penta',
           userData: pentaUserData,
           chartData: null
         }),
@@ -1579,7 +1640,9 @@ async function pollForJobs() {
         } else if (readingType === 'penta') {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
-          await processMultiAgentJob(job, reading);
+          console.warn('🚫 [Multi-Agent] Gesperrt — Job abgelehnt:', job.id);
+          await supabase.from('reading_jobs').update({ status: 'failed' }).eq('id', job.id).throwOnError();
+          return;
         } else {
           await processHumanDesignJob(job, reading);
         }
@@ -2670,14 +2733,13 @@ async function recoverStaleJobs() {
   try {
     const { data, error } = await supabase
       .from("reading_jobs")
-      .update({ status: "pending" })
+      .update({ status: "failed" })
       .eq("status", "processing")
       .lt("created_at", new Date(Date.now() - 20 * 60 * 1000).toISOString())
-      .select("id, reading_type");
+      .select("id");
     if (error) { console.warn("⚠️ [Recovery] Fehler:", error.message); return; }
     if (data && data.length > 0) {
-      console.log(`🔁 [Recovery] ${data.length} stale Job(s) zurück auf pending: ${data.map(j => j.id).join(', ')}`);
-      sendMattermost(`🔁 **Stale Job Recovery** | ${data.length} Job(s) zurückgesetzt\n${data.map(j => `\`${j.reading_type}\``).join(', ')}`, 'errors');
+      console.log(`🛑 [Recovery] ${data.length} stale Job(s) als failed markiert: ${data.map(j => j.id).join(', ')}`);
     }
   } catch (e) {
     console.warn("⚠️ [Recovery] Exception:", e.message);

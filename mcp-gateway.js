@@ -107,6 +107,7 @@ app.post('/agent/marketing',      handleMarketingAgent);
 app.post('/agent/sales',          handleSalesAgent);
 app.post('/agent/social-youtube', handleSocialAgent);
 app.post('/agent/video',          handleVideoAgent);
+app.post('/agent/video-creation', handleVideoAgent);
 app.post('/agent/ui-ux',          handleDesignAgent);
 
 
@@ -701,6 +702,45 @@ Antworte kurz und direkt (3–5 Sätze) – präzise für das, was gerade beschr
 Sprache: Deutsch`,
     message,
     maxTokens: 400,
+    startTime,
+    res
+  });
+});
+
+
+// --------------------------------------------
+// HEALTH & WELLNESS AGENT (inkl. Variable/PHS)
+// POST /agent/health
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/health', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'health',
+    systemPrompt: `Du bist der Health & Wellness Agent von The Connection Key. Du analysierst Gesundheitsmuster auf Basis von Human Design: Zentren, Typ & Strategie, Variables/PHS, relevante Kanäle und Tore (Kanal 25-51, Tor 57, Tor 34). Stil: klar, ruhig, präzise, praxisnah. Keine Diagnosen, keine Esoterik-Floskeln. Format: Markdown, für Coaching-Sessions und PDF-Exports.${chartInfo}`,
+    message,
+    maxTokens: 500,
+    startTime,
+    res
+  });
+});
+
+// --------------------------------------------
+// GELD & ÜBERFLUSS AGENT
+// POST /agent/abundance
+// Body: { message, chartContext? }
+// --------------------------------------------
+app.post('/agent/abundance', async (req, res) => {
+  const startTime = Date.now();
+  const { message, chartContext } = req.body;
+  const chartInfo = chartContext ? `\n\nChart-Kontext:\n${typeof chartContext === 'object' ? JSON.stringify(chartContext, null, 2) : chartContext}` : '';
+  await runAgent({
+    agentName: 'abundance',
+    systemPrompt: `Du bist der Abundance & Prosperity Agent von The Connection Key. Du analysierst Überfluss-Muster auf Basis von Human Design: HD-Typ und Ressourcen-Anziehung, Strategie & Autorität bei finanziellen Entscheidungen, Zentren (Ego, Sakral, Wurzel, G-Zentrum), Kanäle und Tore (Kanal 21-45, Kanal 37-40, Tor 14, Tor 2). Stil: klar, strategisch, kein Law-of-Attraction-Jargon, keine Finanzberatung. Format: Markdown, für Business Readings und PDF-Exports.${chartInfo}`,
+    message,
+    maxTokens: 500,
     startTime,
     res
   });

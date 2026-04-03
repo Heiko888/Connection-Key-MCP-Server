@@ -748,12 +748,13 @@ async function generateReading({ agentId, template, userData, chartData }) {
   }
 
   // Tuning-Parameter aus userData
-  const tone     = userData?.tone     || userData?.ai_config?.tone;
-  const length   = userData?.length   || userData?.ai_config?.length;
-  const audience = userData?.audience || userData?.ai_config?.audience;
+  const tone     = userData?.tone     || userData?.ai_config?.tone     || userData?.reading_options?.tone;
+  const length   = userData?.length   || userData?.ai_config?.length   || userData?.reading_options?.length;
+  const audience = userData?.audience || userData?.ai_config?.audience || userData?.reading_options?.audience;
+  const language = userData?.language || userData?.ai_config?.language || userData?.reading_options?.language || 'de';
   const tuningInstructions = buildTuningInstructions({ tone, length, audience });
 
-  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData, tone, length, audience });
+  console.log("🤖 Generiere Reading:", { agentId, template, model: selectedModelId, provider: modelConfig.provider, hasChart: !!chartData, tone, length, audience, language });
 
   // Template-Mapping: explizite Zuordnung reading_type → template-Datei
   const TEMPLATE_MAP = {
@@ -790,13 +791,17 @@ async function generateReading({ agentId, template, userData, chartData }) {
     ? buildTagesimpulsKnowledge()
     : buildKnowledgeText(8, 1000);
 
+  const languageInstruction = language === 'en'
+    ? '\n\nLANGUAGE: Write the entire reading in English. Use professional, empathetic language.'
+    : '';
+
   const systemPrompt = `Du bist ein Reading-Agent für Human Design.
 
 ${templateContent}
 
 Verwende folgendes Wissen:
 ${knowledgeText}
-${tuningInstructions}
+${tuningInstructions}${languageInstruction}
 
 WICHTIGE ANWEISUNG: Dir werden vollständig berechnete Chart-Daten (via Swiss Ephemeris) direkt im Prompt übergeben. Nutze NUR diese Daten. Füge KEINEN Disclaimer, KEINE Einleitung und KEINE Anmerkung ein, die besagt, dass du kein Berechnungstool hast oder die Daten ableitest. Die Daten sind präzise und vollständig — beginne das Reading direkt.
 

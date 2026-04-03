@@ -2514,6 +2514,29 @@ setInterval(pollForJobs, 10000);
 console.log("🔄 Job Polling System aktiv (prüft alle 10 Sekunden)");
 pollForJobs();
 
+// ── Stale-Job-Recovery ────────────────────────────────────────────────────
+// Jobs die länger als 20 Minuten auf "processing" hängen (z.B. nach Worker-Neustart)
+// werden zurück auf "pending" gesetzt damit der Poller sie erneut verarbeitet.
+async function recoverStaleJobs() {
+  try {
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .update({ status: "pending" })
+      .eq("status", "processing")
+      .lt("created_at", new Date(Date.now() - 20 * 60 * 1000).toISOString())
+      .select("id, reading_type");
+    if (error) { console.warn("⚠️ [Recovery] Fehler:", error.message); return; }
+    if (data && data.length > 0) {
+      console.log(`🔁 [Recovery] ${data.length} stale Job(s) zurück auf pending: ${data.map(j => j.id).join(', ')}`);
+      sendMattermost(`🔁 **Stale Job Recovery** | ${data.length} Job(s) zurückgesetzt\n${data.map(j => `\`${j.reading_type}\``).join(', ')}`, 'errors');
+    }
+  } catch (e) {
+    console.warn("⚠️ [Recovery] Exception:", e.message);
+  }
+}
+setInterval(recoverStaleJobs, 5 * 60 * 1000); // alle 5 Minuten
+recoverStaleJobs(); // direkt beim Start (nach Worker-Neustart sofort recovern)
+
 // ======================================================
 // Error Monitoring — zusätzliche Failed-Handler (additiv)
 // ======================================================

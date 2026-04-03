@@ -159,6 +159,22 @@ services:
    # networks:
     #  - app-network
 
+  # Sync Reading Service (synchrone Readings für Chat)
+  sync-reading-service:
+    build:
+      context: ./sync-reading-service
+      dockerfile: Dockerfile
+    container_name: sync-reading-service
+    ports:
+      - "7001:7001"
+    environment:
+      - NODE_ENV=production
+      - PORT=7001
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
+    networks:
+      - app-network
+
   # Redis
   redis:
     image: redis:7-alpine

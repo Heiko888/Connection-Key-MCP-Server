@@ -391,7 +391,10 @@ export async function calculateHumanDesignChart(input) {
     [SE_CHIRON]:    'chiron',
   };
 
-  const planets = [SE_SUN, SE_MOON, SE_MERCURY, SE_VENUS, SE_MARS, SE_JUPITER, SE_SATURN, SE_URANUS, SE_NEPTUNE, SE_PLUTO, SE_TRUE_NODE, SE_MEAN_APOG, SE_CHIRON];
+  // Chiron & Lilith sind "stille Flüsterer": werden berechnet und angezeigt,
+  // beeinflussen aber NICHT activeGates, Kanäle, Zentren, Typ oder Autorität.
+  const planets = [SE_SUN, SE_MOON, SE_MERCURY, SE_VENUS, SE_MARS, SE_JUPITER, SE_SATURN, SE_URANUS, SE_NEPTUNE, SE_PLUTO, SE_TRUE_NODE];
+  const silentPlanets = [SE_MEAN_APOG, SE_CHIRON];
 
   const activeGates = new Set();
   const personalityPlanets = [];
@@ -448,6 +451,21 @@ export async function calculateHumanDesignChart(input) {
     if (g) {
       activeGates.add(g);
       designPlanets.push({ planet: 'earth', gate: g, line: lineForLongitude(norm360(sunLonD + 180)) });
+    }
+  }
+
+  // Stille Flüsterer: Chiron & Lilith — nur anzeigen, kein Einfluss auf activeGates
+  for (const planet of silentPlanets) {
+    const lonP = getSwissLongitude(planet, jdP);
+    const lonD = getSwissLongitude(planet, jdD);
+    const key = PLANET_ID_TO_KEY[planet];
+    if (lonP != null) {
+      const g = gateForLongitude(lonP);
+      if (g) personalityPlanets.push({ planet: key, gate: g, line: lineForLongitude(lonP), silent: true });
+    }
+    if (lonD != null) {
+      const g = gateForLongitude(lonD);
+      if (g) designPlanets.push({ planet: key, gate: g, line: lineForLongitude(lonD), silent: true });
     }
   }
 

@@ -131,3 +131,65 @@ export function getTransitsForYear(year) {
   yearCache.set(year, months);
   return months;
 }
+
+// Monats-Cache: "YYYY-MM" → Array täglicher Snapshots
+const monthCache = new Map();
+
+/**
+ * Berechnet tägliche Planeten-Snapshots für einen Monat.
+ * Gibt einen Eintrag pro Tag zurück (12:00 UTC, Sonne+Mond fokussiert).
+ * Cache: bleibt bis Server-Restart (vergangene Monate ändern sich nicht).
+ */
+export function getTransitsForMonth(year, month) {
+  const cacheKey = `${year}-${String(month).padStart(2, '0')}`;
+  if (monthCache.has(cacheKey)) return monthCache.get(cacheKey);
+
+  const days = [];
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate(); // month=1-12 → 0=last day prev month trick
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+    const jd = dateToJD(date);
+
+    const sunDegree   = calcPlanetLongitude(jd, 0);
+    const moonDegree  = calcPlanetLongitude(jd, 1);
+    const marsDegree  = calcPlanetLongitude(jd, 4);
+    const mercuryDeg  = calcPlanetLongitude(jd, 2);
+
+    const earthDegree = sunDegree !== null ? norm360(sunDegree + 180) : null;
+
+    // Mondphase
+    const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+    const lunarCycle = 29.53058867;
+    const daysSince = (date - knownNewMoon) / 86400000;
+    const phase = ((daysSince % lunarCycle) + lunarCycle) % lunarCycle;
+    let moonPhase = 'Zunehmend';
+    if (phase < 1.85)  moonPhase = '🌑 Neumond';
+    else if (phase < 7.38)  moonPhase = '🌒 Sichel';
+    else if (phase < 9.22)  moonPhase = '🌓 Erstes Viertel';
+    else if (phase < 14.76) moonPhase = '🌔 Zunehmend';
+    else if (phase < 16.61) moonPhase = '🌕 Vollmond';
+    else if (phase < 22.15) moonPhase = '🌖 Abnehmend';
+    else if (phase < 24.00) moonPhase = '🌗 Letztes Viertel';
+    else moonPhase = '🌘 Sichel';
+
+    days.push({
+      date: date.toISOString().slice(0, 10),
+      day,
+      sun:     sunDegree    !== null ? { gate: gateForLongitude(sunDegree),    line: lineForLongitude(sunDegree)    } : null,
+      earth:   earthDegree  !== null ? { gate: gateForLongitude(earthDegree),  line: lineForLongitude(earthDegree)  } : null,
+      moon:    moonDegree   !== null ? { gate: gateForLongitude(moonDegree),   line: lineForLongitude(moonDegree)   } : null,
+      mercury: mercuryDeg   !== null ? { gate: gateForLongitude(mercuryDeg),   line: lineForLongitude(mercuryDeg)   } : null,
+      mars:    marsDegree   !== null ? { gate: gateForLongitude(marsDegree),   line: lineForLongitude(marsDegree)   } : null,
+      moonPhase,
+    });
+  }
+
+  // Vergangene Monate cachen (ändern sich nicht)
+  const now = new Date();
+  if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) {
+    monthCache.set(cacheKey, days);
+  }
+
+  return days;
+}

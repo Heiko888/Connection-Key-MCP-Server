@@ -1,6 +1,6 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
-import { getCurrentTransits, getTransitsForYear } from "../utils/transit-calculator.js";
+import { getCurrentTransits, getTransitsForYear, getTransitsForMonth } from "../utils/transit-calculator.js";
 import { calculateHumanDesignChart } from "../lib/astro/chartCalculation.js";
 
 const router = express.Router();
@@ -149,6 +149,29 @@ router.get("/today", async (req, res) => {
     res.json({ ...transit, cached: false });
   } catch (err) {
     console.error('[Transits/Today] Fehler:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/transits/month/:year/:month
+ * Tägliche Planeten-Snapshots für einen Monat (Sonne, Mond, Erde, Merkur, Mars + Mondphase).
+ * Optimiert für Kalender-Darstellung.
+ */
+router.get("/month/:year/:month", (req, res) => {
+  const year  = parseInt(req.params.year,  10);
+  const month = parseInt(req.params.month, 10);
+  if (isNaN(year) || year < 1900 || year > 2100) {
+    return res.status(400).json({ success: false, error: "Ungültiges Jahr (1900–2100)" });
+  }
+  if (isNaN(month) || month < 1 || month > 12) {
+    return res.status(400).json({ success: false, error: "Ungültiger Monat (1–12)" });
+  }
+  try {
+    const days = getTransitsForMonth(year, month);
+    res.json({ success: true, year, month, days });
+  } catch (err) {
+    console.error("[Transits/Month] Fehler:", err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

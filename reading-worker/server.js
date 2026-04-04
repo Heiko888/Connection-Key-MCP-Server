@@ -4292,6 +4292,78 @@ app.post('/api/channel/post-social-content', async (req, res) => {
   generateSocialContent(text);
 });
 
+// POST /api/channel/custom-post — Custom Post zu einem freien Thema generieren
+app.post('/api/channel/custom-post', async (req, res) => {
+  const { topic, type = 'custom', send_telegram = false } = req.body || {};
+  if (!topic) return res.status(400).json({ error: 'topic erforderlich' });
+  try {
+    const transit = await loadTodayTransit();
+    const today_de = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const transitBlock = transit?.sun?.gate
+      ? `\nAktuelle Transite: ☀️ Tor ${transit.sun.gate}.${transit.sun.line} · 🌍 Tor ${transit.earth.gate}.${transit.earth.line} · 🌙 Tor ${transit.moon.gate}.${transit.moon.line}\n`
+      : '';
+
+    const prompt = `Du bist ein erfahrener Human Design Coach und Content Creator.
+
+Erstelle einen Telegram-Post für den Human Design Kanal "The Connection Key".
+Datum: ${today_de}
+Thema: ${topic}
+${transitBlock}
+REGELN:
+- 150–250 Wörter
+- Inspirierend, tiefgehend, praktisch anwendbar
+- Kein Corporate-Speak, persönliche Sprache
+- Kein Hashtag im Telegram-Text
+- Auf Deutsch
+
+Antworte NUR mit dem Post-Text, kein Kommentar davor/danach.`;
+
+    const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.85 });
+
+    const instagramCaption = await generateAndSaveInstagramCaption(text.trim(), type, topic);
+
+    const today = new Date().toISOString().split('T')[0];
+    let savedId = null;
+    if (supabasePublic) {
+      const { data } = await supabasePublic.from('channel_posts').insert({
+        date: today,
+        type,
+        topic,
+        telegram_text: text.trim(),
+        instagram_caption: instagramCaption || null,
+        telegram_sent: false,
+        status: 'draft',
+        created_at: new Date().toISOString(),
+      }).select('id').single();
+      savedId = data?.id || null;
+    }
+
+    if (send_telegram && TELEGRAM_CHANNEL_ID) {
+      const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, escHtml(text.trim()), 'HTML');
+      if (savedId && supabasePublic) {
+        await supabasePublic.from('channel_posts').update({ telegram_sent: true, sent_at: new Date().toISOString(), status: 'published' }).eq('id', savedId);
+      }
+    }
+
+    console.log(`✏️ [Custom] Post generiert: "${topic}" (${text.length} Zeichen)`);
+    return res.json({ success: true, id: savedId, text: text.trim(), instagram_caption: instagramCaption, topic, type });
+  } catch (err) {
+    console.error('[Custom] Fehler:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/channel/content/:id — Post löschen
+app.delete('/api/channel/content/:id', async (req, res) => {
+  if (!supabasePublic) return res.status(503).json({ error: 'DB nicht verfügbar' });
+  const { id } = req.params;
+  const { error } = await supabasePublic.from('channel_posts').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json({ success: true });
+});
+
 // ======================================================
 // Server starten
 // ======================================================

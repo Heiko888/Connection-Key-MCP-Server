@@ -1721,7 +1721,10 @@ async function processTagesimpulsJob(job, reading) {
       };
       console.log(`   📅 [Tagesimpuls] Transit aus DB geladen`);
     } else {
-      const res = await fetch(`${CONNECTION_KEY_URL}/api/transits/today`, { signal: AbortSignal.timeout(10000) });
+      const res = await fetch(`${CONNECTION_KEY_URL}/api/transits/today`, {
+        signal: AbortSignal.timeout(10000),
+        headers: { 'x-api-key': process.env.API_KEY || '' },
+      });
       if (res.ok) { transitData = await res.json(); console.log(`   📅 [Tagesimpuls] Transit von API geladen`); }
     }
   } catch (e) {
@@ -3806,7 +3809,10 @@ async function loadTodayTransit() {
         activeChannels: stored.active_channels,
       };
     }
-    const res = await fetch(`${CONNECTION_KEY_URL}/api/transits/today`, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(`${CONNECTION_KEY_URL}/api/transits/today`, {
+      signal: AbortSignal.timeout(10000),
+      headers: { 'x-api-key': process.env.API_KEY || '' },
+    });
     if (res.ok) return await res.json();
   } catch (e) {
     console.warn('[Channel] Transit-Fetch fehlgeschlagen:', e.message);

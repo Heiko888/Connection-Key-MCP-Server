@@ -76,7 +76,6 @@ const CHANNELS = [
   { gates: [42, 53], centers: ["sacral", "root"] },
   { gates: [43, 23], centers: ["ajna", "throat"] },
   { gates: [47, 64], centers: ["ajna", "head"] },
-  { gates: [59, 6], centers: ["sacral", "solar-plexus"] },
   { gates: [61, 24], centers: ["head", "ajna"] },
 ];
 
@@ -116,7 +115,7 @@ const CHANNEL_NAMES = {
   "21-45": "Money", "25-51": "Initiation", "26-44": "Surrender", "27-50": "Preservation",
   "28-38": "Struggle", "29-46": "Discovery", "30-41": "Recognition", "32-54": "Transformation",
   "34-57": "Power", "35-36": "Transitoriness", "37-40": "Community", "39-55": "Emoting",
-  "42-53": "Maturation", "23-43": "Structuring", "47-64": "Abstraction", "6-59": "Intimacy",
+  "42-53": "Maturation", "23-43": "Structuring", "47-64": "Abstraction",
   "24-61": "Awareness",
 };
 
@@ -498,11 +497,36 @@ export async function calculateHumanDesignChart(input) {
   const g = centers["g"];
   const allUndefined = Object.values(centers).every((v) => !v);
 
+  function isSacralConnectedToThroat(channels) {
+    const adj = {};
+    for (const ch of channels) {
+      const [a, b] = ch.centers;
+      if (!adj[a]) adj[a] = [];
+      if (!adj[b]) adj[b] = [];
+      adj[a].push(b);
+      adj[b].push(a);
+    }
+    const visited = new Set();
+    const queue = ["sacral"];
+    visited.add("sacral");
+    while (queue.length > 0) {
+      const node = queue.shift();
+      if (node === "throat") return true;
+      for (const neighbor of (adj[node] || [])) {
+        if (!visited.has(neighbor)) {
+          visited.add(neighbor);
+          queue.push(neighbor);
+        }
+      }
+    }
+    return false;
+  }
+
   let type;
   if (allUndefined) {
     type = "Reflector";
   } else if (sacral) {
-    type = throat ? "Manifesting Generator" : "Generator";
+    type = isSacralConnectedToThroat(activeChannels) ? "Manifesting Generator" : "Generator";
   } else if (throat) {
     type = (sp || heart) ? "Manifestor" : "Projector";
   } else {
@@ -518,11 +542,44 @@ export async function calculateHumanDesignChart(input) {
   else if (g && throat) authority = "Self-Projected";
   else authority = "Mental";
 
-  const definedCount = Object.values(centers).filter(Boolean).length;
+  function countConnectedComponents(channels) {
+    if (channels.length === 0) return 0;
+    const adj = {};
+    for (const ch of channels) {
+      const [a, b] = ch.centers;
+      if (!adj[a]) adj[a] = [];
+      if (!adj[b]) adj[b] = [];
+      adj[a].push(b);
+      adj[b].push(a);
+    }
+    const nodes = Object.keys(adj);
+    const visited = new Set();
+    let components = 0;
+    for (const start of nodes) {
+      if (visited.has(start)) continue;
+      components++;
+      const queue = [start];
+      visited.add(start);
+      while (queue.length > 0) {
+        const node = queue.shift();
+        for (const neighbor of adj[node]) {
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push(neighbor);
+          }
+        }
+      }
+    }
+    return components;
+  }
+
+  const components = countConnectedComponents(activeChannels);
   let definition;
-  if (definedCount === 0) definition = "None";
-  else if (activeChannels.length <= 1) definition = "Single";
-  else definition = "Split Definition";
+  if (components === 0) definition = "None";
+  else if (components === 1) definition = "Single";
+  else if (components === 2) definition = "Split Definition";
+  else if (components === 3) definition = "Triple Split";
+  else definition = "Quadruple Split";
 
   const gatesList = Array.from(activeGates).map((num) => {
     const gateInfo = GATES.find((gi) => gi.number === num);
@@ -556,7 +613,7 @@ export async function calculateHumanDesignChart(input) {
 
   // Objekt-Format mit Underscores (für Frontend-Kompatibilität)
   const toObjectMap = (arr) => Object.fromEntries(
-    arr.map(({ planet, gate, line }) => [planet.replace(/-/g, '_'), { gate, line }])
+    arr.map(({ planet, gate, line, silent }) => [planet.replace(/-/g, '_'), { gate, line, ...(silent && { silent: true }) }])
   );
 
   const sortedP = sortPlanets(personalityPlanets);

@@ -3799,7 +3799,8 @@ async function loadTodayTransit() {
   try {
     const { data: stored } = await supabasePublic
       .from('daily_transits').select('*').eq('date', today).maybeSingle();
-    if (stored) {
+    if (stored?.sun_gate) {
+      console.log(`   📅 [Channel] Transit aus Supabase: ☀️ ${stored.sun_gate} 🌍 ${stored.earth_gate} 🌙 ${stored.moon_gate}`);
       return {
         date: stored.date,
         sun: { gate: stored.sun_gate, line: stored.sun_line },
@@ -3813,7 +3814,11 @@ async function loadTodayTransit() {
       signal: AbortSignal.timeout(10000),
       headers: { 'x-api-key': process.env.API_KEY || '' },
     });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      console.log(`   📅 [Channel] Transit von API: ☀️ ${data.sun?.gate} 🌍 ${data.earth?.gate} 🌙 ${data.moon?.gate}`);
+      return data;
+    }
   } catch (e) {
     console.warn('[Channel] Transit-Fetch fehlgeschlagen:', e.message);
   }

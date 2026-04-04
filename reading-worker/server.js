@@ -106,7 +106,7 @@ async function fetchChartData(birthDate, birthTime, birthPlace) {
     console.log(`   📊 [Chart] Berechne Chart für ${birthPlace} (${birthDate} ${birthTime})...`);
     const chartRes = await fetch(CHART_SERVICE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": process.env.API_KEY || "" },
       body: JSON.stringify({ birthDate, birthTime, birthPlace }),
       signal: AbortSignal.timeout(15000),
     });
@@ -383,22 +383,43 @@ async function generateWithClaude(prompt, options = {}) {
   const temperature = options.temperature ?? 0.8;
 
   console.log(`   [Claude] Start ${model}, max_tokens=${maxTokens}, timeout=${CLAUDE_TIMEOUT_MS / 1000}s`);
-  const apiCall = anthropicClient.messages.create({
-    model,
-    max_tokens: maxTokens,
-    temperature,
-    messages: [{ role: "user", content: prompt }],
-  });
 
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error(`Claude Timeout nach ${CLAUDE_TIMEOUT_MS / 1000}s`)), CLAUDE_TIMEOUT_MS);
-  });
+  const messages = [{ role: "user", content: prompt }];
+  let fullContent = "";
+  let totalOutputTokens = 0;
+  const MAX_CONTINUATIONS = 3;
 
-  const response = await Promise.race([apiCall, timeoutPromise]);
-  console.log(`   [Claude] Antwort erhalten (${(response.content[0]?.text || "").length} Zeichen)`);
-  const content = response.content[0]?.text || "";
-  if (!content) throw new Error("Claude lieferte leere Antwort");
-  return content;
+  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+    const apiCall = anthropicClient.messages.create({
+      model,
+      max_tokens: maxTokens,
+      temperature,
+      messages,
+    });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Claude Timeout nach ${CLAUDE_TIMEOUT_MS / 1000}s`)), CLAUDE_TIMEOUT_MS);
+    });
+
+    const response = await Promise.race([apiCall, timeoutPromise]);
+    const chunk = response.content[0]?.text || "";
+    const stopReason = response.stop_reason;
+    totalOutputTokens += response.usage?.output_tokens || 0;
+    fullContent += chunk;
+
+    console.log(`   [Claude] Antwort erhalten (${chunk.length} Zeichen, stop_reason=${stopReason}, output_tokens=${response.usage?.output_tokens})`);
+
+    if (stopReason !== "max_tokens" || attempt >= MAX_CONTINUATIONS) break;
+
+    // Fortsetzung: bisherige Antwort als Assistent-Turn + neues "Weiter"-Request
+    console.log(`   [Claude] ⚠️  max_tokens erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
+    messages.push({ role: "assistant", content: chunk });
+    messages.push({ role: "user", content: "Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie 'Ich fahre fort' — einfach weiterschreiben." });
+  }
+
+  if (!fullContent) throw new Error("Claude lieferte leere Antwort");
+  if (totalOutputTokens > 0) console.log(`   [Claude] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} output_tokens`);
+  return fullContent;
 }
 
 // ======================================================
@@ -815,9 +836,9 @@ Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
       const member = userData.members[idx] || {};
       const chart = mc.chart || {};
       return `**${mc.name}:**
-Geburtsdatum: ${member.birthDate || 'Unbekannt'}
-Geburtszeit: ${member.birthTime || 'Unbekannt'}
-Geburtsort: ${member.birthPlace || 'Unbekannt'}
+Geburtsdatum: ${member.birthDate || member.birth_date || member.date || 'Unbekannt'}
+Geburtszeit: ${member.birthTime || member.birth_time || member.time || 'Unbekannt'}
+Geburtsort: ${member.birthPlace || member.birth_place || member.location || 'Unbekannt'}
 Typ: ${chart.type || 'Unbekannt'}
 Profil: ${chart.profile || 'Unbekannt'}
 Autorität: ${chart.authority || 'Unbekannt'}
@@ -1308,15 +1329,29 @@ const pentaWorker = new Worker(
   "reading-queue-v4-penta",
   async (job) => {
     console.log("📥 [Penta] Job empfangen:", job.id);
-    const { readingId, groupName, groupContext, members } = job.data;
+    const { readingId, groupName: jobGroupName, groupContext, members: jobMembers } = job.data;
     try {
       const { data: reading, error: readingError } = await supabasePublic
         .from("readings")
-        .select("*")
+        .select("*, penta_persons")
         .eq("id", readingId)
         .single();
 
       if (readingError) throw readingError;
+
+      // penta_persons aus DB hat Vorrang vor job.data.members
+      const rawMembers = reading.penta_persons?.length ? reading.penta_persons : (jobMembers || []);
+      const groupName = jobGroupName || reading.client_name || 'Gruppe';
+
+      // Normalisiere Felder: penta_persons nutzt date/time/location/coords
+      const members = rawMembers.map(m => ({
+        name:       m.name,
+        birthDate:  m.birthDate  || m.birth_date  || m.date     || null,
+        birthTime:  m.birthTime  || m.birth_time  || m.time     || '12:00',
+        birthPlace: m.birthPlace || m.birth_place || m.location || null,
+        coords:     m.coords     || null,
+        reading_id: m.reading_id || null,
+      }));
 
       await supabase
         .from("reading_jobs")
@@ -1328,7 +1363,7 @@ const pentaWorker = new Worker(
         .eq("reading_id", readingId);
 
       // Echte Chart-Berechnung für alle Mitglieder
-      console.log(`   📊 [Penta] Berechne Charts für ${members.length} Mitglieder...`);
+      console.log(`   📊 [Penta] Berechne Charts für ${members.length} Mitglieder: ${members.map(m => m.name).join(', ')}`);
       const memberCharts = [];
       for (const member of members) {
         let chart = null;
@@ -1338,7 +1373,10 @@ const pentaWorker = new Worker(
           console.log(`   📂 [Penta] ${member.name}: Chart aus Supabase (reading_id=${member.reading_id})`);
         }
         if (!chart) {
-          chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
+          const birthPlace = member.coords
+            ? { lat: member.coords.lat, lon: member.coords.lon }
+            : member.birthPlace;
+          chart = await fetchChartData(member.birthDate, member.birthTime, birthPlace)
             || { type: "Unbekannt", gates: [], centers: {}, note: "Chart-Berechnung fehlgeschlagen" };
         }
         memberCharts.push({ name: member.name, chart });
@@ -2516,26 +2554,45 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
 async function processPentaJob(job, reading) {
   console.log(`🔄 [Penta] Verarbeite Job ${job.id}`);
   const payload = reading.client_data || job.payload || {};
-  const members = payload.members || [];
-  const groupName = payload.groupName || payload.name || 'Gruppe';
-  const groupContext = payload.groupContext || '';
   const readingId = payload.reading_id;
+  const groupName = payload.groupName || payload.group_name || payload.name || 'Gruppe';
+  const groupContext = payload.groupContext || payload.group_context || '';
 
   await supabase
     .from("reading_jobs")
     .update({ status: "processing", started_at: new Date().toISOString() })
     .eq("id", job.id);
 
-  // Bestehende Reading-Daten laden
+  // Lade readings-Zeile für penta_persons + bestehende reading_data
   let existingReadingData = {};
+  let rawMembers = payload.members || payload.persons || [];
   if (readingId) {
-    const { data: row } = await supabasePublic.from("readings").select("reading_data").eq("id", readingId).maybeSingle();
+    const { data: row } = await supabasePublic
+      .from("readings")
+      .select("reading_data, penta_persons, client_name")
+      .eq("id", readingId)
+      .maybeSingle();
     if (row?.reading_data) existingReadingData = row.reading_data;
+    // penta_persons aus der DB hat Vorrang vor payload.members
+    if (row?.penta_persons?.length) rawMembers = row.penta_persons;
   }
 
+  // Normalisiere Member-Felder: penta_persons nutzt date/time/location/coords,
+  // der restliche Code erwartet birthDate/birthTime/birthPlace
+  const members = rawMembers.map(m => ({
+    name:       m.name,
+    birthDate:  m.birthDate  || m.birth_date  || m.date     || null,
+    birthTime:  m.birthTime  || m.birth_time  || m.time     || '12:00',
+    birthPlace: m.birthPlace || m.birth_place || m.location || null,
+    coords:     m.coords     || null,
+    reading_id: m.reading_id || null,
+  }));
+
   if (!members.length) {
-    throw new Error(`[Penta] Keine Mitglieder im Payload für Job ${job.id}`);
+    throw new Error(`[Penta] Keine Mitglieder für Job ${job.id} (payload.members/persons/penta_persons alle leer)`);
   }
+
+  console.log(`   [Penta] ${members.length} Mitglieder: ${members.map(m => m.name).join(', ')}`);
 
   // Charts für alle Mitglieder berechnen
   const memberCharts = [];
@@ -2547,7 +2604,11 @@ async function processPentaJob(job, reading) {
       console.log(`   [Penta] ${member.name}: Chart aus Supabase (reading_id=${member.reading_id})`);
     }
     if (!chart) {
-      chart = await fetchChartData(member.birthDate, member.birthTime, member.birthPlace)
+      // coords bevorzugt für maximale Präzision
+      const birthPlace = member.coords
+        ? { lat: member.coords.lat, lon: member.coords.lon }
+        : member.birthPlace;
+      chart = await fetchChartData(member.birthDate, member.birthTime, birthPlace)
         || { type: "Unbekannt", gates: [], centers: {} };
     }
     memberCharts.push({ name: member.name, chart });

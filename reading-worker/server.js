@@ -23,6 +23,7 @@ import path from "path";
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
+import { runReadingPipeline } from "./reading-pipeline.js";
 
 const app = express();
 app.use(express.json());
@@ -892,11 +893,23 @@ WICHTIG: Nenne alle ${userData.members.length} Personen bei ihren echten Namen (
     };
 
     const dynamicsText = userData.dynamics ? `
-VERBINDUNGS-DYNAMIK:
-Elektromagnetische Kanäle: ${JSON.stringify(userData.dynamics.electromagnetic_channels || [])}
-Komplementäre Gates: ${JSON.stringify(userData.dynamics.complementary_gates || [])}
-Gemeinsamkeiten: ${JSON.stringify(userData.dynamics.similarities || [])}
-Unterschiede: ${JSON.stringify(userData.dynamics.differences || [])}
+VERBINDUNGS-DYNAMIK — AKTIVIERTE KANÄLE:
+${JSON.stringify(userData.dynamics.activatedChannels || [], null, 2)}
+
+KANAL-TYPEN ERKLÄRUNG (PFLICHT — NIEMALS alle Kanäle pauschal als "elektromagnetisch" bezeichnen!):
+- "EM" (Elektromagnetische Verbindung): Jede Person trägt genau eine Seite des Kanals. → Im Reading kennzeichnen als "Elektromagnetische Verbindung (EM)" | carriedBy: "niemand allein"
+- "Goldader": Eine Person trägt den kompletten Kanal allein (beide Gates). → Im Reading kennzeichnen als "Goldader" | "Wer trägt: [Name aus carriedBy]"
+- "Stabile Parallelenergie": Beide Personen haben den kompletten Kanal unabhängig voneinander. → Im Reading kennzeichnen als "Stabile Parallelenergie" | carriedBy: "beide"
+
+ANWEISUNGEN FÜR KANAL-DARSTELLUNG:
+1. Für jeden Kanal in activatedChannels den Typ korrekt aus dem "type"-Feld übernehmen
+2. Bei Goldader explizit "Wer trägt: ${personAName}" oder "Wer trägt: ${personBName}" angeben
+3. Bei EM explizit "Wer trägt: Niemand allein — ${personAName} & ${personBName} ergänzen sich"
+4. Bei Stabile Parallelenergie "Beide tragen diesen Kanal unabhängig voneinander"
+5. NIEMALS alle Kanäle als "elektromagnetisch" bezeichnen — jeden Kanal nach seinem type-Feld einordnen
+
+Gemeinsamkeiten (gleiche Gates): ${JSON.stringify(userData.dynamics.similarities || [])}
+Unterschiede: ${JSON.stringify(userData.dynamics.differences || {})}
 ` : '';
 
     userMessage = `Erstelle ein Connection Key Reading für:
@@ -1085,7 +1098,7 @@ const workerV4 = new Worker(
         ...(reading.client_data || {})
       };
 
-      const [content, reflexionsfragen] = await Promise.all([
+      const [rawContent, reflexionsfragen] = await Promise.all([
         generateReading({
           agentId: reading.reading_type || 'default',
           template: reading.reading_type || 'default',
@@ -1095,12 +1108,28 @@ const workerV4 = new Worker(
         generateReflexionsfragen(chartData, userData)
       ]);
 
+      // ── Pipeline: Validierung & Korrektur ──────────────────────────────────
+      let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };
+      let content = rawContent;
+      try {
+        const pipeline = await runReadingPipeline(rawContent, chartData);
+        content = pipeline.text;
+        pipelineInfo = {
+          validated: pipeline.validated,
+          corrected: pipeline.corrected,
+          errorCount: pipeline.errorCount,
+        };
+      } catch (pipelineErr) {
+        console.warn("[Pipeline] [V4] Fehler — Fallback auf Original:", pipelineErr.message);
+      }
+
       const existingData = reading.reading_data || {};
       const newReadingData = {
         ...existingData,
         text: content,
         chart_data: chartData || existingData.chart_data,
-        ...(reflexionsfragen ? { reflexionsfragen } : {})
+        ...(reflexionsfragen ? { reflexionsfragen } : {}),
+        _pipeline: pipelineInfo,
       };
 
       const { data: updatedRow, error: updateError } = await supabasePublic
@@ -1222,7 +1251,7 @@ const connectionWorker = new Worker(
         .update({ progress: 30 })
         .eq("reading_id", readingId);
 
-      const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
+      const dynamics = analyzeConnectionDynamics(personAChart, personBChart, nameA, nameB);
 
       // ── Claude-Prompt: beide Charts + Composite ─────────────────────────
       const [content, reflexionsfragen] = await Promise.all([
@@ -1637,7 +1666,7 @@ async function pollForJobs() {
   try {
     const { data: pendingJobs, error } = await supabase
       .from("reading_jobs")
-      .select("id, reading_type, payload, created_at")
+      .select("id, reading_type, payload, created_at, attempts, max_attempts")
       .eq("status", "pending")
       .order("created_at", { ascending: true })
       .limit(10);
@@ -1670,6 +1699,33 @@ async function pollForJobs() {
 
         console.log(`🔄 Processing job ${job.id} (type: ${readingType}, version: V4)`);
 
+        // ── Retry-Limit prüfen ─────────────────────────────────
+        const attempts = job.attempts ?? 0;
+        const maxAttempts = job.max_attempts ?? 3;
+        if (attempts >= maxAttempts) {
+          console.warn(`🚫 [Polling] Job ${job.id} max_attempts (${maxAttempts}) erreicht — permanent failed`);
+          const readingId = job.payload?.reading_id;
+          const errMsg = `Max Versuche (${maxAttempts}) erreicht`;
+          await supabase.from('reading_jobs')
+            .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
+            .eq('id', job.id).catch(() => {});
+          if (readingId) {
+            await supabasePublic.from('readings')
+              .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
+              .eq('id', readingId).catch(() => {});
+          }
+          sendMattermost(
+            `🚫 **Reading abgebrochen** | \`${readingType}\` | Job \`${job.id}\` | ${errMsg}`,
+            'errors'
+          );
+          continue;
+        }
+
+        // Versuch hochzählen + als processing markieren
+        await supabase.from('reading_jobs')
+          .update({ attempts: attempts + 1, status: 'processing', started_at: new Date().toISOString() })
+          .eq('id', job.id).catch(e => console.warn('⚠️ attempts-Update fehlgeschlagen:', e.message));
+
         const jobStart = Date.now();
         if (readingType === 'tagesimpuls') {
           await processTagesimpulsJob(job, reading);
@@ -1684,8 +1740,16 @@ async function pollForJobs() {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
           console.warn('🚫 [Multi-Agent] Gesperrt — Job abgelehnt:', job.id);
-          await supabase.from('reading_jobs').update({ status: 'failed' }).eq('id', job.id).throwOnError();
-          return;
+          const maReadingId = job.payload?.reading_id;
+          await supabase.from('reading_jobs')
+            .update({ status: 'failed', error: 'Multi-Agent nicht verfügbar', finished_at: new Date().toISOString() })
+            .eq('id', job.id).catch(() => {});
+          if (maReadingId) {
+            await supabasePublic.from('readings')
+              .update({ status: 'failed', error: 'Multi-Agent nicht verfügbar', updated_at: new Date().toISOString() })
+              .eq('id', maReadingId).catch(() => {});
+          }
+          continue;
         } else {
           await processHumanDesignJob(job, reading);
         }
@@ -1701,10 +1765,23 @@ async function pollForJobs() {
         );
       } catch (jobError) {
         console.error(`❌ Fehler bei Job ${job.id}:`, jobError);
+        // ── DB-Updates: Job + public.readings auf failed ────────
+        const failedReadingId = job.payload?.reading_id;
+        const errMsg = jobError?.message || String(jobError);
+        await supabase.from('reading_jobs')
+          .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
+          .eq('id', job.id)
+          .catch(e => console.warn('⚠️ reading_jobs failed-Update fehlgeschlagen:', e.message));
+        if (failedReadingId) {
+          await supabasePublic.from('readings')
+            .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
+            .eq('id', failedReadingId)
+            .catch(e => console.warn('⚠️ public.readings failed-Update fehlgeschlagen:', e.message));
+        }
         // ── Mattermost: Job-Fehler ──────────────────────────────
         const clientName = job.payload?.name || job.payload?.personA?.name || 'Unbekannt';
         sendMattermost(
-          `❌ **Reading-Fehler** | \`${job.reading_type}\` | ${clientName} | Job \`${job.id}\`\n\`\`\`\n${jobError?.message || String(jobError)}\n\`\`\``,
+          `❌ **Reading-Fehler** | \`${job.reading_type}\` | ${clientName} | Job \`${job.id}\`\n\`\`\`\n${errMsg}\n\`\`\``,
           'errors'
         );
       }
@@ -2067,7 +2144,7 @@ async function processHumanDesignJob(job, reading) {
       ai_config
     };
 
-    const [content, reflexionsfragen] = await Promise.all([
+    const [rawContent, reflexionsfragen] = await Promise.all([
       generateReading({
         agentId: 'human_design',
         template: templateName,
@@ -2077,14 +2154,30 @@ async function processHumanDesignJob(job, reading) {
       generateReflexionsfragen(chartData, hdUserData)
     ]);
 
-    console.log(`✅ [Human Design] Reading generiert: ${content.substring(0, 100)}...`);
+    console.log(`✅ [Human Design] Reading generiert: ${rawContent.substring(0, 100)}...`);
+
+    // ── Pipeline: Validierung & Korrektur ──────────────────────────────────
+    let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };
+    let content = rawContent;
+    try {
+      const pipeline = await runReadingPipeline(rawContent, chartData);
+      content = pipeline.text;
+      pipelineInfo = {
+        validated: pipeline.validated,
+        corrected: pipeline.corrected,
+        errorCount: pipeline.errorCount,
+      };
+    } catch (pipelineErr) {
+      console.warn("[Pipeline] [HumanDesign] Fehler — Fallback auf Original:", pipelineErr.message);
+    }
 
     if (readingId) {
       const newReadingData = {
         ...existingReadingData,
         text: content,
         chart_data: chartData || existingReadingData.chart_data,
-        ...(reflexionsfragen ? { reflexionsfragen } : {})
+        ...(reflexionsfragen ? { reflexionsfragen } : {}),
+        _pipeline: pipelineInfo,
       };
       const { data: updatedRow, error: updateError } = await supabasePublic
         .from("readings")
@@ -2218,7 +2311,7 @@ async function processConnectionJob(job, reading) {
     compositeData = connRow?.composite_chart || null;
   }
 
-  const dynamics = analyzeConnectionDynamics(personAChart, personBChart);
+  const dynamics = analyzeConnectionDynamics(personAChart, personBChart, nameA, nameB);
 
   // Template wählen
   const templateName = readingType === 'compatibility' ? 'compatibility'
@@ -2329,8 +2422,8 @@ async function processChannelAnalysisJob(job, reading) {
     chartB = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
       || existingReadingData.chart_data2
       || { type: 'Unbekannt', gates: [], channels: [], centers: {} };
-    dynamics = analyzeConnectionDynamics(chartA, chartB);
-    console.log(`   [ChannelAnalysis] Elektromagnetische Kanäle: ${dynamics.electromagnetic_channels?.length || 0}`);
+    dynamics = analyzeConnectionDynamics(chartA, chartB, nameA, nameB);
+    console.log(`   [ChannelAnalysis] Aktivierte Kanäle: ${dynamics.activatedChannels?.length || 0} (EM: ${dynamics.electromagnetic_channels?.length || 0}, Goldader: ${dynamics.dominanz_channels?.length || 0}, Parallel: ${dynamics.kompromiss_channels?.length || 0})`);
   }
 
   const CHANNEL_NAMES_MAP = {
@@ -2465,7 +2558,7 @@ async function processSexualityJob(job, reading) {
     || existingReadingData.chart_data2
     || { type: 'Unbekannt', gates: [], centers: {} };
 
-  const dynamics = analyzeConnectionDynamics(chartA, chartB);
+  const dynamics = analyzeConnectionDynamics(chartA, chartB, nameA, nameB);
 
   const systemPrompt = `Du bist ein erfahrener Human Design Coach mit Expertise in Beziehungs- und Intimität-Readings.
 
@@ -2802,13 +2895,23 @@ async function recoverStaleJobs() {
   try {
     const { data, error } = await supabase
       .from("reading_jobs")
-      .update({ status: "failed" })
+      .update({ status: "pending" })
       .eq("status", "processing")
-      .lt("created_at", new Date(Date.now() - 20 * 60 * 1000).toISOString())
-      .select("id");
+      .lt("started_at", new Date(Date.now() - 20 * 60 * 1000).toISOString())
+      .select("id, payload");
     if (error) { console.warn("⚠️ [Recovery] Fehler:", error.message); return; }
     if (data && data.length > 0) {
-      console.log(`🛑 [Recovery] ${data.length} stale Job(s) als failed markiert: ${data.map(j => j.id).join(', ')}`);
+      console.log(`🔄 [Recovery] ${data.length} stale Job(s) zurück auf pending: ${data.map(j => j.id).join(', ')}`);
+      // public.readings ebenfalls zurücksetzen
+      for (const job of data) {
+        const readingId = job.payload?.reading_id;
+        if (readingId) {
+          await supabasePublic.schema("public").from("readings")
+            .update({ status: "pending" })
+            .eq("id", readingId)
+            .eq("status", "processing");
+        }
+      }
     }
   } catch (e) {
     console.warn("⚠️ [Recovery] Exception:", e.message);
@@ -2990,9 +3093,50 @@ function calculatePentaChart(memberCharts) {
   };
 }
 
-function analyzeConnectionDynamics(chartA, chartB) {
+// Vollständige Gate→Zentrum Zuordnung (alle 64 Tore)
+const GATE_TO_CENTER = {
+  64:'head', 61:'head', 63:'head',
+  47:'ajna', 24:'ajna', 4:'ajna', 17:'ajna', 43:'ajna', 11:'ajna',
+  62:'throat', 23:'throat', 56:'throat', 35:'throat', 12:'throat',
+  45:'throat', 33:'throat', 8:'throat', 20:'throat', 31:'throat', 16:'throat',
+  1:'g', 13:'g', 25:'g', 46:'g', 2:'g', 15:'g', 10:'g', 7:'g',
+  26:'heart', 51:'heart', 21:'heart', 40:'heart',
+  5:'sacral', 14:'sacral', 29:'sacral', 59:'sacral', 9:'sacral',
+  3:'sacral', 42:'sacral', 27:'sacral', 34:'sacral',
+  53:'root', 60:'root', 52:'root', 19:'root', 39:'root',
+  41:'root', 58:'root', 38:'root', 54:'root',
+  48:'spleen', 57:'spleen', 44:'spleen', 50:'spleen', 32:'spleen', 28:'spleen', 18:'spleen',
+  36:'solar-plexus', 22:'solar-plexus', 37:'solar-plexus', 6:'solar-plexus',
+  49:'solar-plexus', 55:'solar-plexus', 30:'solar-plexus'
+};
+const CENTER_NAMES_DE = {
+  head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'Selbst',
+  heart: 'Herz', sacral: 'Sakral', root: 'Wurzel',
+  spleen: 'Milz', 'solar-plexus': 'Solarplexus'
+};
+
+// Klassifiziert einen aktivierten Kanal nach TCK-Typ:
+// EM (Elektromagnetische Verbindung) = jede Person hat genau eine Seite
+// Goldader                           = eine Person trägt den kompletten Kanal allein
+// Stabile Parallelenergie            = beide Personen haben den kompletten Kanal
+function classifyChannel(gate1, gate2, gatesA, gatesB) {
+  const aHas1 = gatesA.includes(gate1), aHas2 = gatesA.includes(gate2);
+  const bHas1 = gatesB.includes(gate1), bHas2 = gatesB.includes(gate2);
+  const aFull = aHas1 && aHas2;
+  const bFull = bHas1 && bHas2;
+  if (aFull && bFull) return 'Stabile Parallelenergie';
+  if (aFull || bFull) return 'Goldader';
+  return 'EM';
+}
+
+function analyzeConnectionDynamics(chartA, chartB, nameA, nameB) {
+  const labelA = nameA || 'Person A';
+  const labelB = nameB || 'Person B';
   const dynamics = {
-    electromagnetic_channels: [],
+    activatedChannels: [],
+    electromagnetic_channels: [],   // rückwärtskompatibel
+    dominanz_channels: [],
+    kompromiss_channels: [],
     complementary_gates: [],
     similarities: [],
     differences: [],
@@ -3006,16 +3150,59 @@ function analyzeConnectionDynamics(chartA, chartB) {
   const normalizeGates = (gates) => (gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
   const gatesA = normalizeGates(chartA.gates);
   const gatesB = normalizeGates(chartB.gates);
+  const centersA = chartA.centers || {};
+  const centersB = chartB.centers || {};
 
-  for (const gateA of gatesA) {
-    for (const gateB of gatesB) {
-      if (areConnectedGates(gateA, gateB)) {
-        dynamics.electromagnetic_channels.push({
-          personA_gate: gateA,
-          personB_gate: gateB,
-          channel: `${gateA}-${gateB}`
-        });
-      }
+  const gateInfo = (gate, centers) => {
+    const centerKey = GATE_TO_CENTER[gate];
+    return {
+      gate,
+      center: CENTER_NAMES_DE[centerKey] || centerKey || 'Unbekannt',
+      defined: centerKey ? (centers[centerKey] === true) : false
+    };
+  };
+
+  // Alle Kanäle durchgehen und klassifizieren
+  const channelMap = {
+    1: [8], 2: [14], 3: [60], 4: [63], 5: [15],
+    6: [59], 7: [31], 9: [52], 10: [20, 34, 57],
+    11: [56], 12: [22], 13: [33], 16: [48], 17: [62],
+    18: [58], 19: [49], 20: [34, 57], 21: [45], 23: [43],
+    24: [61], 25: [51], 26: [44], 27: [50], 28: [38],
+    29: [46], 30: [41], 32: [54], 35: [36], 37: [40],
+    39: [55], 42: [53], 47: [64]
+  };
+  const seenChannels = new Set();
+  for (const [g1str, partners] of Object.entries(channelMap)) {
+    const g1 = parseInt(g1str);
+    for (const g2 of partners) {
+      const key = `${Math.min(g1, g2)}-${Math.max(g1, g2)}`;
+      if (seenChannels.has(key)) continue;
+      const aHas1 = gatesA.includes(g1), aHas2 = gatesA.includes(g2);
+      const bHas1 = gatesB.includes(g1), bHas2 = gatesB.includes(g2);
+      // Kanal ist aktiviert wenn zusammen beide Seiten abgedeckt sind
+      if (!(aHas1 || bHas1) || !(aHas2 || bHas2)) continue;
+      seenChannels.add(key);
+      const type = classifyChannel(g1, g2, gatesA, gatesB);
+      let carriedBy;
+      if (type === 'EM') carriedBy = 'niemand allein';
+      else if (type === 'Stabile Parallelenergie') carriedBy = 'beide';
+      else carriedBy = (gatesA.includes(g1) && gatesA.includes(g2)) ? labelA : labelB;
+
+      // personAGate/personBGate: immer gate1→A, gate2→B (zeigt Zentrum + ob definiert)
+      const entry = {
+        channelId: key,
+        type,
+        carriedBy,
+        personAGate: gateInfo(g1, centersA),
+        personBGate: gateInfo(g2, centersB)
+      };
+      dynamics.activatedChannels.push(entry);
+      // rückwärtskompatible Felder
+      const legacyEntry = { gate1: g1, gate2: g2, channel: key, type };
+      if (type === 'EM') dynamics.electromagnetic_channels.push(legacyEntry);
+      else if (type === 'Goldader') dynamics.dominanz_channels.push(legacyEntry);
+      else dynamics.kompromiss_channels.push(legacyEntry);
     }
   }
   dynamics.similarities = gatesA.filter(g => gatesB.includes(g));

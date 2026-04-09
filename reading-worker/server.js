@@ -442,13 +442,39 @@ function formatChartGates(gates) {
 
 function buildChartInfo(chartData) {
   if (!chartData) return '';
+
+  // Inkarnationskreuz — name + gates aus allen möglichen Strukturen lesen
+  const cross = chartData.incarnationCross || chartData.incarnation_cross || {};
+  const crossName = cross.name || chartData.cross?.name || chartData.cross || '';
+  const cg = cross.gates || {};
+
+  // Solar/Erd-Gates: incarnationCross.gates hat Vorrang, dann personality.planets.*
+  const pSunGate  = cg.personalitySun  ?? chartData.personality?.planets?.sun?.gate   ?? chartData.personalitySun?.gate  ?? null;
+  const pEarthGate= cg.personalityEarth?? chartData.personality?.planets?.earth?.gate ?? chartData.personalityEarth?.gate ?? null;
+  const dSunGate  = cg.designSun       ?? chartData.design?.planets?.sun?.gate        ?? chartData.designSun?.gate       ?? null;
+  const dEarthGate= cg.designEarth     ?? chartData.design?.planets?.earth?.gate      ?? chartData.designEarth?.gate     ?? null;
+
+  const crossBlock = crossName ? `
+SOLAR- UND ERD-GATES (VERBINDLICH — exakt diese Werte im Inkarnationskreuz-Abschnitt verwenden):
+  Persönlichkeitssonne = Tor ${pSunGate ?? '?'}
+  Persönlichkeitserde  = Tor ${pEarthGate ?? '?'}
+  Design-Sonne         = Tor ${dSunGate ?? '?'}
+  Design-Erde          = Tor ${dEarthGate ?? '?'}
+
+INKARNATIONSKREUZ: ${crossName}
+  Persönlichkeitssonne: Tor ${pSunGate ?? '?'}
+  Persönlichkeitserde:  Tor ${pEarthGate ?? '?'}
+  Design-Sonne:         Tor ${dSunGate ?? '?'}
+  Design-Erde:          Tor ${dEarthGate ?? '?'}
+` : '';
+
   return `
 BERECHNETE CHART-DATEN (Präzise für diese Person!):
 TYP: ${chartData.type || 'Unbekannt'}
 PROFIL: ${chartData.profile || 'Unbekannt'}
 AUTORITÄT: ${chartData.authority || 'Unbekannt'}
 STRATEGIE: ${chartData.strategy || 'Unbekannt'}
-
+${crossBlock}
 ZENTREN:
 ${formatChartCenters(chartData.centers)}
 
@@ -1164,11 +1190,11 @@ const workerV4 = new Worker(
       console.log("✅ [V4] Reading abgeschlossen:", readingId);
     } catch (err) {
       console.error("❌ [V4] Fehler:", err);
-      await supabase
+      const { error: v4FailErr } = await supabase
         .from("reading_jobs")
         .update({ status: "failed", error: err.message })
-        .eq("reading_id", readingId)
-        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+        .eq("reading_id", readingId);
+      if (v4FailErr) console.warn("⚠️ Konnte Job nicht als failed markieren:", v4FailErr);
       throw err;
     }
   },
@@ -1296,8 +1322,7 @@ const connectionWorker = new Worker(
             composite_analysis: { text: content, generated_at: new Date().toISOString() },
             updated_at: new Date().toISOString()
           })
-          .eq(filterKey, filterVal)
-          .catch(e => console.warn("⚠️ [Connection] connection_readings Update fehlgeschlagen:", e.message));
+          .eq(filterKey, filterVal);
       }
 
       // ── readings aktualisieren ──────────────────────────────────────────
@@ -1330,14 +1355,13 @@ const connectionWorker = new Worker(
       if (connection_reading_id) {
         await supabasePublic.schema("public").from("connection_readings")
           .update({ updated_at: new Date().toISOString() })
-          .eq("id", connection_reading_id)
-          .catch(() => {});
+          .eq("id", connection_reading_id);
       }
-      await supabase
+      const { error: connFailErr } = await supabase
         .from("reading_jobs")
         .update({ status: "failed", error: err.message })
-        .eq("reading_id", readingId)
-        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e.message));
+        .eq("reading_id", readingId);
+      if (connFailErr) console.warn("⚠️ Konnte Job nicht als failed markieren:", connFailErr.message);
       throw err;
     }
   },
@@ -1479,11 +1503,11 @@ const pentaWorker = new Worker(
       console.log("✅ [Penta] Reading abgeschlossen:", readingId);
     } catch (err) {
       console.error("❌ [Penta] Fehler:", err);
-      await supabase
+      const { error: pentaFailErr } = await supabase
         .from("reading_jobs")
         .update({ status: "failed", error: err.message })
-        .eq("reading_id", readingId)
-        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+        .eq("reading_id", readingId);
+      if (pentaFailErr) console.warn("⚠️ Konnte Job nicht als failed markieren:", pentaFailErr);
       throw err;
     }
   },
@@ -1636,11 +1660,11 @@ const multiAgentWorker = new Worker(
       console.log("✅ [Multi-Agent] Reading abgeschlossen:", readingId);
     } catch (err) {
       console.error("❌ [Multi-Agent] Fehler:", err);
-      await supabase
+      const { error: maFailErr } = await supabase
         .from("reading_jobs")
         .update({ status: "failed", error: err.message })
-        .eq("reading_id", readingId)
-        .catch(e => console.warn("⚠️ Konnte Job nicht als failed markieren:", e));
+        .eq("reading_id", readingId);
+      if (maFailErr) console.warn("⚠️ Konnte Job nicht als failed markieren:", maFailErr);
       throw err;
     }
   },
@@ -1708,11 +1732,11 @@ async function pollForJobs() {
           const errMsg = `Max Versuche (${maxAttempts}) erreicht`;
           await supabase.from('reading_jobs')
             .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
-            .eq('id', job.id).catch(() => {});
+            .eq('id', job.id);
           if (readingId) {
             await supabasePublic.from('readings')
               .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
-              .eq('id', readingId).catch(() => {});
+              .eq('id', readingId);
           }
           sendMattermost(
             `🚫 **Reading abgebrochen** | \`${readingType}\` | Job \`${job.id}\` | ${errMsg}`,
@@ -1722,9 +1746,10 @@ async function pollForJobs() {
         }
 
         // Versuch hochzählen + als processing markieren
-        await supabase.from('reading_jobs')
+        const { error: attemptsErr } = await supabase.from('reading_jobs')
           .update({ attempts: attempts + 1, status: 'processing', started_at: new Date().toISOString() })
-          .eq('id', job.id).catch(e => console.warn('⚠️ attempts-Update fehlgeschlagen:', e.message));
+          .eq('id', job.id);
+        if (attemptsErr) console.warn('⚠️ attempts-Update fehlgeschlagen:', attemptsErr.message);
 
         const jobStart = Date.now();
         if (readingType === 'tagesimpuls') {
@@ -1743,11 +1768,11 @@ async function pollForJobs() {
           const maReadingId = job.payload?.reading_id;
           await supabase.from('reading_jobs')
             .update({ status: 'failed', error: 'Multi-Agent nicht verfügbar', finished_at: new Date().toISOString() })
-            .eq('id', job.id).catch(() => {});
+            .eq('id', job.id);
           if (maReadingId) {
             await supabasePublic.from('readings')
               .update({ status: 'failed', error: 'Multi-Agent nicht verfügbar', updated_at: new Date().toISOString() })
-              .eq('id', maReadingId).catch(() => {});
+              .eq('id', maReadingId);
           }
           continue;
         } else {
@@ -1768,15 +1793,15 @@ async function pollForJobs() {
         // ── DB-Updates: Job + public.readings auf failed ────────
         const failedReadingId = job.payload?.reading_id;
         const errMsg = jobError?.message || String(jobError);
-        await supabase.from('reading_jobs')
+        const { error: jobUpdateErr } = await supabase.from('reading_jobs')
           .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
-          .eq('id', job.id)
-          .catch(e => console.warn('⚠️ reading_jobs failed-Update fehlgeschlagen:', e.message));
+          .eq('id', job.id);
+        if (jobUpdateErr) console.warn('⚠️ reading_jobs failed-Update fehlgeschlagen:', jobUpdateErr.message);
         if (failedReadingId) {
-          await supabasePublic.from('readings')
+          const { error: readingsUpdateErr } = await supabasePublic.from('readings')
             .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
-            .eq('id', failedReadingId)
-            .catch(e => console.warn('⚠️ public.readings failed-Update fehlgeschlagen:', e.message));
+            .eq('id', failedReadingId);
+          if (readingsUpdateErr) console.warn('⚠️ public.readings failed-Update fehlgeschlagen:', readingsUpdateErr.message);
         }
         // ── Mattermost: Job-Fehler ──────────────────────────────
         const clientName = job.payload?.name || job.payload?.personA?.name || 'Unbekannt';
@@ -2352,8 +2377,7 @@ async function processConnectionJob(job, reading) {
         composite_analysis: { text: content, generated_at: new Date().toISOString() },
         updated_at: new Date().toISOString()
       })
-      .eq("id", connectionReadingId)
-      .catch(e => console.warn("⚠️ [Connection] connection_readings Update fehlgeschlagen:", e.message));
+      .eq("id", connectionReadingId);
   }
 
   // ── readings aktualisieren ────────────────────────────────────────────
@@ -2752,11 +2776,11 @@ async function processMultiAgentJob(job, reading) {
     console.error(`❌ [Multi-Agent] Job ${job.id} fehlgeschlagen:`, err?.message || err);
     await supabase.from("reading_jobs")
       .update({ status: "failed", error: err?.message || String(err), finished_at: new Date().toISOString() })
-      .eq("id", job.id).catch(() => {});
+      .eq("id", job.id);
     if (readingId) {
       await supabasePublic.from("readings")
         .update({ status: "error", error: err?.message || String(err), completed_at: new Date().toISOString() })
-        .eq("id", readingId).catch(() => {});
+        .eq("id", readingId);
     }
   };
 

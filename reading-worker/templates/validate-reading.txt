@@ -37,14 +37,15 @@ CHECK 3 – TOR-MAPPING (Kanäle)
 - Fehler: Falsch genannte Gegentore oder falsche Zentren-Zuordnungen.
 
 CHECK 4 – INKARNATIONSKREUZ
-- Extrahiere aus chartData: Name des Kreuzes + die 4 Tore (Persönlichkeitssonne, Persönlichkeitserde, Design-Sonne, Design-Erde).
+- Die korrekten Gate-Werte stehen im chartData-Block unter "SOLAR- UND ERD-GATES".
+  Lies die 4 Werte von dort: Persönlichkeitssonne, Persönlichkeitserde, Design-Sonne, Design-Erde.
 - Prüfe im Reading: Wird das korrekte Kreuz beschrieben? Werden die richtigen 4 Tore genannt?
 - Fehler: Wenn das Reading ein anderes Kreuz oder andere Tore beschreibt.
 - KRITISCH: Prüfe ob Design-Sonne und Design-Erde NICHT vertauscht wurden.
   Design-Sonne ≠ Persönlichkeitssonne. Design-Erde ≠ Persönlichkeitserde.
-  Wenn im Reading z.B. "Tor X" als Inkarnationskreuz-Tor steht, prüfe ob X tatsächlich
-  Persönlichkeitssonne, Persönlichkeitserde, Design-Sonne oder Design-Erde ist (laut chartData).
-  Fehler melden wenn ein Gate verwendet wird das keinem dieser 4 Felder entspricht.
+  Häufiger Fehler: Das Reading nennt Tor X als "Design-Sonne", aber laut chartData
+  ist Tor X die "Persönlichkeitssonne". Prüfe jeden der 4 Gate-Werte einzeln.
+  Fehler melden wenn ein Gate-Wert im Reading nicht exakt dem entsprechenden Feld in chartData entspricht.
 
 CHECK 5 – TOR-VOLLSTÄNDIGKEIT
 - Extrahiere alle aktivierten Tore aus chartData.

@@ -45,11 +45,11 @@ Passe nur die konkreten Tor-Nummern und Zentren-Namen an, nicht den Beschreibung
 
 REGEL 5 – INKARNATIONSKREUZ KORRIGIEREN
 Wenn das falsche Kreuz oder falsche Tore beschrieben werden: Ersetze den gesamten Inkarnationskreuz-Abschnitt.
-Verwende AUSSCHLIESSLICH die 4 Tore aus chartData:
-  - Persönlichkeitssonne (≠ Design-Sonne!)
-  - Persönlichkeitserde  (≠ Design-Erde!)
-  - Design-Sonne         (≠ Persönlichkeitssonne!)
-  - Design-Erde          (≠ Persönlichkeitserde!)
+Die korrekten Werte stehen im chartData-Block unter "SOLAR- UND ERD-GATES":
+  Persönlichkeitssonne = Tor X  ← dieser Wert gehört zur Persönlichkeitssonne, NICHT zur Design-Sonne
+  Persönlichkeitserde  = Tor X  ← dieser Wert gehört zur Persönlichkeitserde
+  Design-Sonne         = Tor X  ← dieser Wert gehört zur Design-Sonne, NICHT zur Persönlichkeitssonne
+  Design-Erde          = Tor X  ← dieser Wert gehört zur Design-Erde
 KRITISCH: Design-Sonne und Persönlichkeitssonne sind VERSCHIEDENE Tore — verwechsle sie nicht.
 Behalte Länge und Tiefe des ursprünglichen Abschnitts bei.
 

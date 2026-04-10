@@ -149,77 +149,72 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
   else                      crossType = "Left Angle";
 
   const KNOWN_CROSSES = {
-    "1-2-7-13":   "Sphinx",
-    "2-1-13-7":   "Sphinx",
-    "7-13-1-2":   "Sphinx",
-    "13-7-2-1":   "Sphinx",
-    "3-50-60-56": "Vessel of Love",
-    "50-3-56-60": "Vessel of Love",
-    "60-56-3-50": "Vessel of Love",
-    "56-60-50-3": "Vessel of Love",
-    "10-15-25-46": "Vessel of Love",
-    "25-46-10-15": "Vessel of Love",
-    "4-49-8-14":  "Contagion",
-    "49-4-14-8":  "Contagion",
-    "8-14-4-49":  "Contagion",
-    "14-8-49-4":  "Contagion",
-    "34-20-40-37": "Maya",
-    "20-34-37-40": "Maya",
-    "40-37-34-20": "Maya",
-    "37-40-20-34": "Maya",
-    "5-35-15-10": "Contagion",
-    "35-5-10-15": "Contagion",
-    "21-45-26-44": "Rulership",
-    "45-21-44-26": "Rulership",
-    "26-44-21-45": "Rulership",
-    "44-26-45-21": "Rulership",
-    "38-39-28-55": "Tension",
-    "39-38-55-28": "Tension",
-    "28-55-38-39": "Tension",
-    "55-28-39-38": "Tension",
-    "11-12-36-6":  "Eden",
-    "12-11-6-36":  "Eden",
-    "36-6-11-12":  "Eden",
-    "6-36-12-11":  "Eden",
-    "47-22-64-63": "Sleeping Phoenix",
-    "22-47-63-64": "Sleeping Phoenix",
-    "64-63-47-22": "Sleeping Phoenix",
-    "63-64-22-47": "Sleeping Phoenix",
-    "24-44-19-33": "Thinking",
-    "19-33-24-44": "Thinking",
-    "33-19-44-24": "Thinking",
-    "44-24-33-19": "Thinking",
-    "17-18-58-52": "Service",
-    "18-17-52-58": "Service",
-    "58-52-17-18": "Service",
-    "52-58-18-17": "Service",
-    "29-46-43-23": "Explanation",
-    "46-29-23-43": "Explanation",
-    "43-23-29-46": "Explanation",
-    "23-43-46-29": "Explanation",
-    "31-41-24-61": "Articulation",
-    "41-31-61-24": "Articulation",
-    "61-24-31-41": "Articulation",
-    "24-61-41-31": "Articulation",
-    "42-32-53-54": "Cycles",
-    "32-42-54-53": "Cycles",
-    "53-54-42-32": "Cycles",
-    "54-53-32-42": "Cycles",
-    "9-16-52-58":  "Determination",
-    "16-9-58-52":  "Determination",
-    "30-29-27-50": "Contagion",
-    "27-28-41-42": "Migration",
-    "37-40-9-16":  "Community",
-    "40-37-16-9":  "Community",
-    "51-57-25-10": "Penetration",
-    "57-51-10-25": "Penetration",
-    "62-61-17-18": "Contagion",
-    "48-21-45-26": "Contagion",
-    "59-55-6-36":  "Contagion",
-    "5-35-47-22":  "Separation",
-    "35-5-22-47":  "Separation",
-    "47-22-5-35":  "Separation",
-    "22-47-35-5":  "Separation",
+    // Sphinx: 1/2 | 7/13
+    "1-2-7-13":   "Sphinx", "2-1-13-7":  "Sphinx", "7-13-1-2":  "Sphinx", "13-7-2-1":  "Sphinx",
+    // Duality: 1/2 | 49/4
+    "1-2-49-4":   "Duality", "2-1-4-49":  "Duality", "49-4-1-2":  "Duality", "4-49-2-1":  "Duality",
+    // Vessel of Love: 3/50 | 60/56
+    "3-50-60-56": "Vessel of Love", "50-3-56-60": "Vessel of Love", "60-56-3-50": "Vessel of Love", "56-60-50-3": "Vessel of Love",
+    // Vessel of Love: 10/15 | 25/46
+    "10-15-25-46": "Vessel of Love", "15-10-46-25": "Vessel of Love", "25-46-10-15": "Vessel of Love", "46-25-15-10": "Vessel of Love",
+    // Four Ways: 10/15 | 18/17
+    "10-15-18-17": "Four Ways", "15-10-17-18": "Four Ways", "18-17-10-15": "Four Ways", "17-18-15-10": "Four Ways",
+    // Contagion: 4/49 | 8/14
+    "4-49-8-14":  "Contagion", "49-4-14-8":  "Contagion", "8-14-4-49":  "Contagion", "14-8-49-4":  "Contagion",
+    // Maya: 34/20 | 40/37
+    "34-20-40-37": "Maya", "20-34-37-40": "Maya", "40-37-34-20": "Maya", "37-40-20-34": "Maya",
+    // Living Now: 20/34 | 10/15
+    "20-34-10-15": "Living Now", "34-20-15-10": "Living Now", "10-15-20-34": "Living Now", "15-10-34-20": "Living Now",
+    // Rulership: 21/45 | 26/44
+    "21-45-26-44": "Rulership", "45-21-44-26": "Rulership", "26-44-21-45": "Rulership", "44-26-45-21": "Rulership",
+    // Tension: 38/39 | 28/55
+    "38-39-28-55": "Tension", "39-38-55-28": "Tension", "28-55-38-39": "Tension", "55-28-39-38": "Tension",
+    // Eden: 11/12 | 36/6
+    "11-12-36-6":  "Eden", "12-11-6-36":  "Eden", "36-6-11-12":  "Eden", "6-36-12-11":  "Eden",
+    // Sleeping Phoenix: 47/22 | 64/63
+    "47-22-64-63": "Sleeping Phoenix", "22-47-63-64": "Sleeping Phoenix", "64-63-47-22": "Sleeping Phoenix", "63-64-22-47": "Sleeping Phoenix",
+    // Consciousness: 35/5 | 63/64
+    "35-5-63-64":  "Consciousness", "5-35-64-63":  "Consciousness", "63-64-35-5":  "Consciousness", "64-63-5-35":  "Consciousness",
+    // Thinking: 24/44 | 19/33
+    "24-44-19-33": "Thinking", "44-24-33-19": "Thinking", "19-33-24-44": "Thinking", "33-19-44-24": "Thinking",
+    // Service: 17/18 | 58/52
+    "17-18-58-52": "Service", "18-17-52-58": "Service", "58-52-17-18": "Service", "52-58-18-17": "Service",
+    // Explanation: 29/46 | 43/23
+    "29-46-43-23": "Explanation", "46-29-23-43": "Explanation", "43-23-29-46": "Explanation", "23-43-46-29": "Explanation",
+    // Alpha: 29/46 | 7/13
+    "29-46-7-13":  "Alpha", "46-29-13-7":  "Alpha", "7-13-29-46":  "Alpha", "13-7-46-29":  "Alpha",
+    // Articulation: 31/41 | 24/61
+    "31-41-24-61": "Articulation", "41-31-61-24": "Articulation", "61-24-31-41": "Articulation", "24-61-41-31": "Articulation",
+    // Cycles: 42/32 | 53/54
+    "42-32-53-54": "Cycles", "32-42-54-53": "Cycles", "53-54-42-32": "Cycles", "54-53-32-42": "Cycles",
+    // Determination: 9/16 | 52/58
+    "9-16-52-58":  "Determination", "16-9-58-52":  "Determination", "52-58-9-16":  "Determination", "58-52-16-9":  "Determination",
+    // Migration: 27/28 | 41/42
+    "27-28-41-42": "Migration", "28-27-42-41": "Migration", "41-42-27-28": "Migration", "42-41-28-27": "Migration",
+    // Community: 37/40 | 9/16
+    "37-40-9-16":  "Community", "40-37-16-9":  "Community", "9-16-37-40":  "Community", "16-9-40-37":  "Community",
+    // Penetration: 51/57 | 25/10
+    "51-57-25-10": "Penetration", "57-51-10-25": "Penetration", "25-10-51-57": "Penetration", "10-25-57-51": "Penetration",
+    // Clarion: 62/61 | 56/60
+    "62-61-56-60": "Clarion", "61-62-60-56": "Clarion", "56-60-62-61": "Clarion", "60-56-61-62": "Clarion",
+    // Separation: 5/35 | 47/22
+    "5-35-47-22":  "Separation", "35-5-22-47":  "Separation", "47-22-5-35":  "Separation", "22-47-35-5":  "Separation",
+    // Unexpected: 51/57 | 39/38
+    "51-57-39-38": "Unexpected", "57-51-38-39": "Unexpected", "39-38-51-57": "Unexpected", "38-39-57-51": "Unexpected",
+    // Confrontation: 38/39 | 57/51
+    "38-39-57-51": "Confrontation", "39-38-51-57": "Confrontation", "57-51-38-39": "Confrontation", "51-57-39-38": "Confrontation",
+    // Individualism: 8/14 | 1/2
+    "8-14-1-2":    "Individualism", "14-8-2-1":    "Individualism", "1-2-8-14":    "Individualism", "2-1-14-8":    "Individualism",
+    // Dedication: 29/46 | 13/7
+    "29-46-13-7":  "Dedication", "46-29-7-13":  "Dedication", "13-7-29-46":  "Dedication", "7-13-46-29":  "Dedication",
+    // Refinement: 33/19 | 2/1
+    "33-19-2-1":   "Refinement", "19-33-1-2":   "Refinement", "2-1-33-19":   "Refinement", "1-2-19-33":   "Refinement",
+    // Revolution: 49/4 | 30/29
+    "49-4-30-29":  "Revolution", "4-49-29-30":  "Revolution", "30-29-49-4":  "Revolution", "29-30-4-49":  "Revolution",
+    // Stillness: 52/58 | 62/61
+    "52-58-62-61": "Stillness", "58-52-61-62": "Stillness", "62-61-52-58": "Stillness", "61-62-58-52": "Stillness",
+    // Incarnation: 53/54 | 42/32
+    "53-54-42-32": "Incarnation", "54-53-32-42": "Incarnation", "42-32-53-54": "Incarnation", "32-42-54-53": "Incarnation",
   };
 
   const crossKey = `${pSunGate}-${pEarthGate}-${dSunGate}-${dEarthGate}`;

@@ -433,11 +433,24 @@ function formatChartCenters(centers) {
 }
 function formatChartChannels(channels) {
   if (!channels?.length) return 'Keine Daten';
-  return channels.map(c => `  - ${c.name || c.gates?.join('-')}: ${(c.gates || []).join(', ')}`).join('\n');
+  const centerDE = { head: 'Kopf', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz', spleen: 'Milz', 'solar-plexus': 'Solar Plexus', sacral: 'Sakral', root: 'Wurzel' };
+  return channels.map(c => {
+    const gates = c.gates || [];
+    const label = c.name || gates.join('-');
+    const centers = gates.map(g => centerDE[GATE_TO_CENTER[g]] || '?').filter((v,i,a) => a.indexOf(v) === i);
+    const centerInfo = centers.length ? ` (${centers.join(' ↔ ')})` : '';
+    return `  - ${label}${centerInfo}: Tore ${gates.join(', ')}`;
+  }).join('\n');
 }
 function formatChartGates(gates) {
   if (!gates?.length) return 'Keine Daten';
-  return gates.slice(0, 30).map(g => `  - Tor ${g.number || g}: ${g.name || 'Unbekannt'}`).join('\n');
+  const centerDE = { head: 'Kopf', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz', spleen: 'Milz', 'solar-plexus': 'Solar Plexus', sacral: 'Sakral', root: 'Wurzel' };
+  return gates.slice(0, 30).map(g => {
+    const num = g.number || g;
+    const center = GATE_TO_CENTER[num];
+    const centerLabel = center ? ` [${centerDE[center] || center}]` : '';
+    return `  - Tor ${num}${centerLabel}: ${g.name || 'Unbekannt'}`;
+  }).join('\n');
 }
 
 function buildChartInfo(chartData) {

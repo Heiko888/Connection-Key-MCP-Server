@@ -1109,7 +1109,8 @@ const workerV4 = new Worker(
       }
 
       // Chart-Daten: Aus Reading laden oder neu berechnen
-      let chartData = reading.reading_data?.chart_data || null;
+      // Prüfe alle möglichen Speicherpfade (reading_data.chart_data oder chart_data Top-Level)
+      let chartData = reading.reading_data?.chart_data || reading.chart_data || null;
       const birth = reading.birth_data || {};
 
       if (!chartData) {
@@ -1121,6 +1122,9 @@ const workerV4 = new Worker(
         );
       } else {
         console.log(`   📊 [V4] Chart-Daten vorhanden: Typ=${chartData.type}, Profil=${chartData.profile}`);
+        if (!chartData.incarnationCross && !chartData.incarnation_cross) {
+          console.warn(`   ⚠️ [V4] incarnationCross fehlt in Chart-Daten — wird im Reading fehlen!`);
+        }
       }
 
       await supabase
@@ -1888,8 +1892,8 @@ async function processTagesimpulsJob(job, reading) {
   let chartData = null;
   let existingReadingData = {};
   if (readingId) {
-    const { data: row } = await supabasePublic.from('readings').select('reading_data').eq('id', readingId).maybeSingle();
-    if (row?.reading_data) { existingReadingData = row.reading_data; chartData = row.reading_data.chart_data || null; }
+    const { data: row } = await supabasePublic.from('readings').select('reading_data, chart_data').eq('id', readingId).maybeSingle();
+    if (row?.reading_data) { existingReadingData = row.reading_data; chartData = row.reading_data.chart_data || row.chart_data || null; }
   }
   if (!chartData && birthdate && birthtime && birthplace) {
     chartData = await fetchChartData(birthdate, birthtime, birthplace);
@@ -2151,13 +2155,18 @@ async function processHumanDesignJob(job, reading) {
   if (readingId) {
     const { data: readingRow } = await supabasePublic
       .from("readings")
-      .select("reading_data")
+      .select("reading_data, chart_data")
       .eq("id", readingId)
       .maybeSingle();
     if (readingRow?.reading_data) {
       existingReadingData = readingRow.reading_data;
-      chartData = existingReadingData.chart_data || null;
-      if (chartData) console.log(`   📊 Chart-Daten aus DB geladen: Typ=${chartData.type}, Profil=${chartData.profile}`);
+      chartData = existingReadingData.chart_data || readingRow.chart_data || null;
+      if (chartData) {
+        console.log(`   📊 Chart-Daten aus DB geladen: Typ=${chartData.type}, Profil=${chartData.profile}`);
+        if (!chartData.incarnationCross && !chartData.incarnation_cross) {
+          console.warn(`   ⚠️ incarnationCross fehlt in Chart-Daten — wird im Reading fehlen!`);
+        }
+      }
     }
   }
 

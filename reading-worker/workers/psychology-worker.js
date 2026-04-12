@@ -43,7 +43,7 @@ function createClients() {
 async function fetchReadingData(supabasePublic, readingId) {
   const { data, error } = await supabasePublic
     .from("readings")
-    .select("type, profile, authority, strategy, defined_centers, undefined_centers, not_self_theme, gates, channels, client_name, reading_data")
+    .select("reading_type, profile, authority, strategy, defined_centers, undefined_centers, not_self_theme, gates, channels, client_name, reading_data")
     .eq("id", readingId)
     .single();
   if (error) throw new Error(`Reading ${readingId} nicht gefunden: ${error.message}`);
@@ -111,7 +111,7 @@ async function claudeText(anthropic, system, user) {
 
 function chartSummary(reading) {
   return [
-    `HD-Typ: ${reading.type || "—"}`,
+    `HD-Typ: ${reading.reading_type || reading.type || "—"}`,
     `Strategie: ${reading.strategy || "—"}`,
     `Autorität: ${reading.authority || "—"}`,
     `Profil: ${reading.profile || "—"}`,

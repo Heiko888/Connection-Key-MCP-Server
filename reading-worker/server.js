@@ -4364,7 +4364,7 @@ app.post('/api/readings/stream', async (req, res) => {
     return res.status(503).json({ error: 'Claude nicht verfügbar' });
   }
 
-  const { reading_type, name, birth_date, birth_time, birth_location, chart_data, reading_id, language } = req.body || {};
+  const { reading_type, name, birth_date, birth_time, birth_location, chart_data, reading_id, language, focus } = req.body || {};
   if (!reading_type) return res.status(400).json({ error: 'reading_type erforderlich' });
 
   // SSE-Header setzen
@@ -4405,7 +4405,7 @@ Name: ${name || 'Unbekannt'}
 Geburtsdatum: ${birth_date || 'Unbekannt'}
 Geburtszeit: ${birth_time || 'Unbekannt'}
 Geburtsort: ${birth_location || 'Unbekannt'}
-${chartInfo}`;
+${chartInfo}${focus ? `\n\nBESONDERER FOKUS FÜR DIESES READING:\n${focus}` : ''}`;
 
     send({ type: 'status', text: 'Reading wird generiert…' });
 

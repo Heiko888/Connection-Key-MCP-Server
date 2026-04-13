@@ -23,6 +23,7 @@ import path from "path";
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
+import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline } from "./reading-pipeline.js";
 
 const app = express();
@@ -429,7 +430,13 @@ async function generateWithClaude(prompt, options = {}) {
 function formatChartCenters(centers) {
   if (!centers) return 'Keine Daten';
   const names = { head: 'Kopf', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz', spleen: 'Milz', 'solar-plexus': 'Solar Plexus', sacral: 'Sakral', root: 'Wurzel' };
-  return Object.entries(centers).map(([k, v]) => `  - ${names[k] || k}: ${v ? 'DEFINIERT' : 'offen'}`).join('\n');
+  const defined = [], open = [];
+  Object.entries(centers).forEach(([k, v]) => {
+    const label = names[k] || k;
+    if (v) defined.push(`  - ${label}: DEFINIERT`);
+    else open.push(`  - ${label}: offen → Konditionierungsfeld`);
+  });
+  return [...defined, ...(open.length ? ['\n  Offene Zentren (Konditionierung beachten!):'] : []), ...open].join('\n');
 }
 function formatChartChannels(channels) {
   if (!channels?.length) return 'Keine Daten';
@@ -447,10 +454,35 @@ function formatChartGates(gates) {
   const centerDE = { head: 'Kopf', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz', spleen: 'Milz', 'solar-plexus': 'Solar Plexus', sacral: 'Sakral', root: 'Wurzel' };
   return gates.slice(0, 30).map(g => {
     const num = g.number || g;
+    const line = g.line ? `.${g.line}` : '';
     const center = GATE_TO_CENTER[num];
     const centerLabel = center ? ` [${centerDE[center] || center}]` : '';
-    return `  - Tor ${num}${centerLabel}: ${g.name || 'Unbekannt'}`;
+    const src = g.isPersonality === false ? ' (Design/Rot)' : g.isPersonality === true ? ' (Persönlichkeit/Schwarz)' : '';
+    return `  - Tor ${num}${line}${centerLabel}${src}: ${g.name || 'Unbekannt'}`;
   }).join('\n');
+}
+
+// ── Planeten-Aktivierungen für tiefe Chart-Analyse ────────────────────────────
+function formatPlanetActivations(chartData) {
+  const PLANET_NAMES = {
+    sun: 'Sonne', earth: 'Erde', moon: 'Mond', north_node: 'Nordknoten',
+    south_node: 'Südknoten', mercury: 'Merkur', venus: 'Venus', mars: 'Mars',
+    jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto'
+  };
+  const personality = chartData?.personality?.planets || {};
+  const design = chartData?.design?.planets || {};
+  const allPlanets = Object.keys({ ...personality, ...design });
+  if (!allPlanets.length) return '';
+  const lines = [];
+  for (const planet of allPlanets) {
+    const p = personality[planet];
+    const d = design[planet];
+    const parts = [];
+    if (p?.gate) parts.push(`Persönlichkeit: Tor ${p.gate}${p.line ? '.' + p.line : ''}`);
+    if (d?.gate) parts.push(`Design: Tor ${d.gate}${d.line ? '.' + d.line : ''}`);
+    if (parts.length) lines.push(`  - ${PLANET_NAMES[planet] || planet}: ${parts.join(' | ')}`);
+  }
+  return lines.join('\n');
 }
 
 function buildChartInfo(chartData) {
@@ -467,37 +499,39 @@ function buildChartInfo(chartData) {
   const dSunGate  = cg.designSun       ?? chartData.design?.planets?.sun?.gate        ?? chartData.designSun?.gate       ?? null;
   const dEarthGate= cg.designEarth     ?? chartData.design?.planets?.earth?.gate      ?? chartData.designEarth?.gate     ?? null;
 
-  const crossBlock = crossName ? `
-SOLAR- UND ERD-GATES (VERBINDLICH — exakt diese Werte im Inkarnationskreuz-Abschnitt verwenden):
-  Persönlichkeitssonne = Tor ${pSunGate ?? '?'}
-  Persönlichkeitserde  = Tor ${pEarthGate ?? '?'}
-  Design-Sonne         = Tor ${dSunGate ?? '?'}
-  Design-Erde          = Tor ${dEarthGate ?? '?'}
+  const crossBlock = (pSunGate && pEarthGate && dSunGate && dEarthGate)
+    ? buildCrossPromptFragment({incarnationCross:{type:cross.type||'',personalitySun:pSunGate,personalityEarth:pEarthGate,designSun:dSunGate,designEarth:dEarthGate}}, 'gates')
+    : crossName ? `INKARNATIONSKREUZ: ${crossName}` : '';
 
-INKARNATIONSKREUZ: ${crossName}
-  Persönlichkeitssonne: Tor ${pSunGate ?? '?'}
-  Persönlichkeitserde:  Tor ${pEarthGate ?? '?'}
-  Design-Sonne:         Tor ${dSunGate ?? '?'}
-  Design-Erde:          Tor ${dEarthGate ?? '?'}
-` : '';
+  // Splits / Definitionen
+  const splitInfo = chartData.definition
+    ? `DEFINITION: ${chartData.definition}${chartData.splits ? ` (${chartData.splits} Split${chartData.splits > 1 ? 's' : ''})` : ''}`
+    : '';
+
+  // Planeten-Aktivierungen (Linien-Level)
+  const planetBlock = formatPlanetActivations(chartData);
+
+  // Variable / PHS (Pfeile)
+  const variableBlock = formatVariablePHS(chartData);
 
   return `
-BERECHNETE CHART-DATEN (Präzise für diese Person!):
+BERECHNETE CHART-DATEN (Präzise für diese Person — via Swiss Ephemeris):
 TYP: ${chartData.type || 'Unbekannt'}
 PROFIL: ${chartData.profile || 'Unbekannt'}
 AUTORITÄT: ${chartData.authority || 'Unbekannt'}
 STRATEGIE: ${chartData.strategy || 'Unbekannt'}
-${crossBlock}
-ZENTREN:
+${splitInfo ? splitInfo + '\n' : ''}${crossBlock}
+
+ZENTREN (definiert = konstante Energie; offen = Konditionierungsfeld):
 ${formatChartCenters(chartData.centers)}
 
-KANÄLE:
+KANÄLE (alle definierten Lebensthemen):
 ${formatChartChannels(chartData.channels)}
 
-TORE:
+TORE mit Linie und Quelle (Persönlichkeit = bewusst; Design = unbewusst/körperlich):
 ${formatChartGates(chartData.gates)}
-
-Nutze diese KONKRETEN Daten! Beschreibe JEDES definierte Zentrum und JEDEN Kanal ausführlich.
+${planetBlock ? `\nPLANETEN-AKTIVIERUNGEN (Gate.Linie für jeden Planeten):\n${planetBlock}` : ''}${variableBlock ? `\nVARIABLE / PHS (Pfeile):\n${variableBlock}` : ''}
+PFLICHT: Beschreibe JEDES definierte Zentrum, JEDEN Kanal und JEDE offene Zentrum-Konditionierung konkret für diese Person. Keine generischen Erklärungen.
 `;
 }
 
@@ -508,35 +542,231 @@ function buildKnowledgeText(maxEntries = 8, maxCharsPerEntry = 1000) {
     .join('\n');
 }
 
+// ── Variable / PHS aus Chart-Daten ───────────────────────────────────────────
+function formatVariablePHS(chartData) {
+  if (!chartData) return '';
+  // Swiss Ephemeris liefert Pfeile als arrows-Objekt oder als vier separate Felder
+  const arrows = chartData.arrows || chartData.variable || {};
+  const phs = chartData.phs || {};
+
+  const lines = [];
+
+  // Pfeile (digestion, environment, perspective, motivation)
+  if (arrows.digestion || phs.digestion) {
+    lines.push(`  - Ernährung/Verdauung: ${arrows.digestion || phs.digestion}`);
+  }
+  if (arrows.environment || phs.environment) {
+    lines.push(`  - Umgebung: ${arrows.environment || phs.environment}`);
+  }
+  if (arrows.perspective || phs.perspective) {
+    lines.push(`  - Perspektive/Bewusstsein: ${arrows.perspective || phs.perspective}`);
+  }
+  if (arrows.motivation || phs.motivation) {
+    lines.push(`  - Motivation/Antrieb: ${arrows.motivation || phs.motivation}`);
+  }
+
+  // Rohwerte: color/tone/base falls verfügbar
+  const raw = [];
+  if (chartData.color) raw.push(`Farbe: ${chartData.color}`);
+  if (chartData.tone)  raw.push(`Ton: ${chartData.tone}`);
+  if (chartData.base)  raw.push(`Basis: ${chartData.base}`);
+  if (raw.length) lines.push(`  - Rohwerte: ${raw.join(', ')}`);
+
+  // Pfeilrichtungen direkt (left/right up/down)
+  const arrowRaw = chartData.arrowsRaw || chartData.arrows_raw || chartData.fourArrows;
+  if (arrowRaw && typeof arrowRaw === 'string') lines.push(`  - Pfeile (roh): ${arrowRaw}`);
+
+  return lines.length ? lines.join('\n') : '';
+}
+
+// ── Aktuelle Transite holen (Supabase → API-Fallback) ─────────────────────────
+let _cachedTransit = null;
+let _cachedTransitDate = null;
+
+async function fetchCurrentTransits() {
+  const today = new Date().toISOString().split('T')[0];
+  if (_cachedTransitDate === today && _cachedTransit) return _cachedTransit;
+
+  try {
+    // 1. Supabase daily_transits
+    const { data: stored } = await supabasePublic
+      .from('daily_transits').select('*').eq('date', today).maybeSingle();
+    if (stored) {
+      _cachedTransit = {
+        date: stored.date,
+        sun: { gate: stored.sun_gate, line: stored.sun_line },
+        earth: { gate: stored.earth_gate, line: stored.earth_line },
+        moon: { gate: stored.moon_gate, line: stored.moon_line },
+        allPlanets: stored.all_planets || [],
+        activeChannels: stored.active_channels || [],
+        moonPhase: stored.moon_phase || '',
+      };
+      _cachedTransitDate = today;
+      return _cachedTransit;
+    }
+    // 2. API-Fallback
+    const CK_URL = process.env.CONNECTION_KEY_URL || 'http://connection-key:3000';
+    const res = await fetch(`${CK_URL}/api/transits/today`, { signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      _cachedTransit = await res.json();
+      _cachedTransitDate = today;
+      return _cachedTransit;
+    }
+  } catch (e) {
+    console.warn('[Transit-Overlay] Fetch fehlgeschlagen:', e.message);
+  }
+  return null;
+}
+
+// ── Transit-Overlay Block für Prompt ─────────────────────────────────────────
+// Fügt einen kompakten "Jetzt-Moment" Abschnitt an — nur für nicht-transit-spezifische Readings.
+const TRANSIT_SKIP_TYPES = new Set(['transit', 'jahres-reading', 'tagesimpuls']);
+
+function buildTransitOverlay(transitData, chartData) {
+  if (!transitData || !chartData) return '';
+
+  const today = transitData.date || new Date().toISOString().split('T')[0];
+  const sun   = transitData.sun   ? `Sonne: Tor ${transitData.sun.gate}.${transitData.sun.line || '?'}` : '';
+  const earth = transitData.earth ? `Erde: Tor ${transitData.earth.gate}.${transitData.earth.line || '?'}` : '';
+  const moon  = transitData.moon  ? `Mond: Tor ${transitData.moon.gate}.${transitData.moon.line || '?'}` : '';
+
+  // Persönliche Aktivierungen: welche Transit-Gates treffen den Chart?
+  const personalGates = new Set((chartData.gates || []).map(g => g.number || g));
+  const hits = (transitData.allPlanets || [])
+    .filter(p => personalGates.has(p.gate))
+    .map(p => `Tor ${p.gate} (${p.planet || '?'}) — im persönlichen Chart!`);
+
+  const phaseInfo = transitData.moonPhase ? `Mondphase: ${transitData.moonPhase}` : '';
+
+  return `AKTUELLER TRANSIT-KONTEXT (${today}):
+${[sun, earth, moon, phaseInfo].filter(Boolean).join(' | ')}
+${hits.length ? `Persönliche Transit-Aktivierungen: ${hits.join(', ')}` : 'Keine direkten Kanal-Aktivierungen heute.'}
+→ Integriere einen kurzen "Jetzt-Moment" Abschnitt am Ende des Readings: Was ist heute energetisch aktiviert? Wie trifft der aktuelle Transit diesen Chart konkret?`;
+}
+
+// ── Vorherige Readings für Delta-Kontext ─────────────────────────────────────
+async function fetchPreviousReadings(birthDate, clientName, currentReadingId, limit = 2) {
+  if (!birthDate && !clientName) return [];
+  try {
+    let query = supabasePublic
+      .from('readings')
+      .select('id, reading_type, created_at, reading_data')
+      .eq('status', 'completed')
+      .order('created_at', { ascending: false })
+      .limit(limit + 1); // +1 wegen evtl. aktuellem Reading
+
+    if (birthDate) {
+      // birth_data ist JSONB — filter über ->> Operator via .filter()
+      query = query.filter('birth_data->>date', 'ilike', `%${birthDate}%`);
+    }
+
+    const { data, error } = await query;
+    if (error || !data) return [];
+
+    return data
+      .filter(r => r.id !== currentReadingId && r.reading_data?.text)
+      .slice(0, limit)
+      .map(r => ({
+        id: r.id,
+        type: r.reading_type,
+        date: r.created_at?.split('T')[0],
+        // Nur die ersten 800 Zeichen des Texts als Kontext-Zusammenfassung
+        summary: r.reading_data.text.substring(0, 800).replace(/\n+/g, ' '),
+      }));
+  } catch (e) {
+    console.warn('[Delta-Reading] Fehler beim Laden vorheriger Readings:', e.message);
+    return [];
+  }
+}
+
+function buildDeltaContext(previousReadings) {
+  if (!previousReadings?.length) return '';
+  const entries = previousReadings.map(r =>
+    `Reading vom ${r.date} (Typ: ${r.type}): ${r.summary}…`
+  ).join('\n\n');
+  return `KONTEXT AUS VORHERIGEN READINGS (für Evolution & Tiefe):
+${entries}
+→ Beziehe dich auf diese früheren Erkenntnisse wenn relevant. Zeige Entwicklung und Vertiefung — nicht Wiederholung.`;
+}
+
+// ── Typen-spezifisches Knowledge-Bundle ──────────────────────────────────────
+// Jeder Reading-Typ bekommt gezielt die relevanten Knowledge-Files — vollständig,
+// keine Substring-Kürzung bei Kern-Files. Fallback auf generisches Bundle.
+const KNOWLEDGE_MAP = {
+  // Kern-Reading-Typen
+  'detailed':         ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'channels-gates', 'profiles-detailed', 'incarnation-cross'],
+  'basic':            ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed'],
+  'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
+  'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
+  'life-purpose':     ['human-design-basics', 'types-detailed', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'authority-detailed'],
+  // Connection / Beziehungs-Typen
+  'connection':       ['connection-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed', 'authority-detailed', 'profiles-detailed'],
+  'relationship':     ['connection-knowledge', 'channels-gates', 'types-detailed', 'authority-detailed', 'centers-detailed'],
+  'compatibility':    ['connection-knowledge', 'channels-gates', 'types-detailed', 'centers-detailed'],
+  // Penta
+  'penta':            ['penta-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed'],
+  // Psychologie / Tiefe
+  'depth-analysis':   ['channels-gates', 'centers-detailed', 'splits-detailed', 'authority-detailed', 'profiles-detailed', 'incarnation-cross'],
+  'shadow-work':      ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'strategy-authority'],
+  'psychology':       ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'channels-gates'],
+  'reflection':       ['strategy-authority', 'authority-detailed', 'profiles-detailed', 'types-detailed', 'centers-detailed'],
+  'reflection-profiles': ['profiles-detailed', 'strategy-authority', 'types-detailed', 'authority-detailed'],
+  'emotions':         ['authority-detailed', 'strategy-authority', 'centers-detailed', 'types-detailed'],
+  // Körper / Gesundheit
+  'health':           ['human-design-basics', 'arrows-detailed', 'centers-detailed', 'types-detailed', 'authority-detailed'],
+  'sexuality':        ['centers-detailed', 'channels-gates', 'types-detailed', 'authority-detailed'],
+  'spiritual':        ['incarnation-cross', 'profiles-detailed', 'channels-gates', 'centers-detailed', 'arrows-detailed'],
+  // Zeit / Transit
+  'transit':          ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority'],
+  'jahres-reading':   ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority', 'incarnation-cross'],
+  // Tagesimpuls
+  'tagesimpuls':      ['type-specific-impulse-rules', 'authority-specific-impulse-rules', 'profile-specific-impulse-rules', 'transit-impulse-instructions'],
+  // Familie
+  'parenting':        ['types-detailed', 'authority-detailed', 'profiles-detailed', 'centers-detailed', 'strategy-authority'],
+  'kinder':           ['types-detailed', 'authority-detailed', 'profiles-detailed', 'centers-detailed'],
+  // Weitere
+  'correct-reading':  ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority'],
+};
+
+function buildReadingKnowledge(readingType) {
+  const keys = KNOWLEDGE_MAP[readingType];
+  if (!keys) {
+    // Fallback: generisches Bundle mit den wichtigsten Kern-Files
+    const FALLBACK_KEYS = ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'profiles-detailed'];
+    return FALLBACK_KEYS
+      .filter(k => knowledge[k])
+      .map(k => `\n### ${k}\n${knowledge[k]}`)
+      .join('\n');
+  }
+  return keys
+    .filter(k => knowledge[k])
+    .map(k => `\n### ${k}\n${knowledge[k]}`)
+    .join('\n');
+}
+
 // Dediziertes Knowledge-Bundle für Tagesimpuls — lädt die 3 Personalisierungs-Files vollständig
 function buildTagesimpulsKnowledge() {
-  const TAGESIMPULS_KEYS = [
-    'type-specific-impulse-rules',
-    'authority-specific-impulse-rules',
-    'profile-specific-impulse-rules',
-    'transit-impulse-instructions',
-  ];
-  const parts = [];
-  for (const key of TAGESIMPULS_KEYS) {
-    if (knowledge[key]) {
-      parts.push(`\n### ${key}\n${knowledge[key]}`); // kein substring — volle Länge
-    }
-  }
-  // Fallback: allgemeines HD-Wissen wenn ein Key fehlt
-  if (parts.length === 0) {
-    return buildKnowledgeText(8, 1000);
-  }
-  return parts.join('\n');
+  return buildReadingKnowledge('tagesimpuls') || buildKnowledgeText(8, 1000);
 }
 
 async function generateDetailedReadingTwoParts({ userData, chartData, modelConfig }) {
   const chartInfo = buildChartInfo(chartData);
-  const knowledgeText = buildKnowledgeText(8, 1000);
+  const knowledgeText = buildReadingKnowledge('detailed');
+
+  const [transitData, previousReadings] = await Promise.all([
+    fetchCurrentTransits(),
+    fetchPreviousReadings(userData.birth_date, userData.client_name, userData.reading_id, 2),
+  ]);
+  const transitOverlay = buildTransitOverlay(transitData, chartData);
+  const deltaContext = buildDeltaContext(previousReadings);
+
   const personContext = `Name: ${userData.client_name || 'Unbekannt'}
 Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
 Geburtszeit: ${userData.birth_time || 'Unbekannt'}
 Geburtsort: ${userData.birth_location || 'Unbekannt'}
-${chartInfo}`;
+${chartInfo}
+${transitOverlay}
+${deltaContext}`;
 
   const part1Prompt = `Du bist ein erfahrener Human Design Coach. Verwende folgendes Hintergrundwissen:
 ${knowledgeText}
@@ -682,6 +912,276 @@ Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, pe
 
   if (!part1 && !part2) throw new Error('Alle Claude-Modelle fehlgeschlagen (Detailed 2-Pass)');
   return `${part1}\n\n---\n\n${part2}`;
+}
+
+// ── Generische 2-Pass-Generierung ────────────────────────────────────────────
+// Nutzbar für alle Reading-Typen die mehr als ~4000 Tokens Inhalt brauchen.
+// part1Prompt / part2Prompt: fertige Prompt-Strings
+// modelConfig: { models: [...], maxTokens: N }
+async function generateTwoParts({ readingType, part1Prompt, part2Prompt, modelConfig, tokensPerPart = 8000 }) {
+  const models = (modelConfig?.models || ['claude-sonnet-4-6']);
+  let part1 = '', part2 = '';
+  for (const modelId of models) {
+    try {
+      console.log(`   [2-Pass:${readingType}] Versuche ${modelId}`);
+      [part1, part2] = await Promise.all([
+        generateWithClaude(part1Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
+        generateWithClaude(part2Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
+      ]);
+      console.log(`   ✅ [2-Pass:${readingType}] ${modelId} — ${part1.length + part2.length} Zeichen`);
+      break;
+    } catch (err) {
+      console.warn(`   ⚠️ [2-Pass:${readingType}] ${modelId} fehlgeschlagen:`, err.message);
+    }
+  }
+  if (!part1 && !part2) throw new Error(`2-Pass fehlgeschlagen (${readingType})`);
+  return `${part1}\n\n---\n\n${part2}`;
+}
+
+// ── 2-Pass: Connection / Relationship / Compatibility ────────────────────────
+async function generateConnectionReadingTwoParts({ userData, personAChart, personBChart, modelConfig, templateName }) {
+  const knowledgeText = buildReadingKnowledge('connection');
+  const nameA = userData.personA?.name || 'Person A';
+  const nameB = userData.personB?.name || 'Person B';
+  const dynamics = userData.dynamics || {};
+  const dynamicsText = dynamics.activatedChannels?.length
+    ? `\nAKTIVIERTE VERBINDUNGS-KANÄLE: ${dynamics.activatedChannels.map(c => `${c.name || c.gates?.join('-')} (${c.type || '?'})`).join(', ')}`
+    : '';
+
+  const chartA = `${nameA}:\n${buildChartInfo(personAChart)}`;
+  const chartB = `${nameB}:\n${buildChartInfo(personBChart)}`;
+  const connectionQuestion = userData.connectionQuestion ? `\nVerbindungsfrage: ${userData.connectionQuestion}` : '';
+
+  const [transitData, prevA, prevB] = await Promise.all([
+    fetchCurrentTransits(),
+    fetchPreviousReadings(userData.personA?.birthDate, nameA, null, 1),
+    fetchPreviousReadings(userData.personB?.birthDate, nameB, null, 1),
+  ]);
+  const transitOverlay = buildTransitOverlay(transitData, personAChart);
+  const deltaContextA = buildDeltaContext(prevA);
+  const deltaContextB = buildDeltaContext(prevB);
+  const connectionDelta = [deltaContextA ? `${nameA}: ${deltaContextA}` : '', deltaContextB ? `${nameB}: ${deltaContextB}` : ''].filter(Boolean).join('\n');
+
+  const baseSystem = `Du bist ein erfahrener Human Design Coach mit Expertise in Beziehungs-Readings.
+
+${(templates[templateName] || templates['connection'] || '')}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+${transitOverlay ? '\n' + transitOverlay : ''}${connectionDelta ? '\n\n' + connectionDelta : ''}
+ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Disclaimer ein. Beginne direkt.
+PFLICHT: Nenne BEIDE Personen (${nameA} UND ${nameB}) in JEDER Sektion explizit!`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 des Connection Key Readings für ${nameA} & ${nameB}.
+${chartA}
+
+${chartB}
+${dynamicsText}${connectionQuestion}
+
+---
+
+# 1. Die Verbindung im Überblick
+Beschreibe die energetische Qualität dieser Verbindung. Was macht sie einzigartig? Wie erleben ${nameA} und ${nameB} sich gegenseitig? Welches übergeordnete Thema verbindet sie?
+
+# 2. Konditionierungsdynamik
+Wie konditioniert ${nameA} ${nameB} durch ihre/seine offenen Zentren — und umgekehrt? Welche Muster entstehen dadurch? Wie können beide diese Dynamik bewusst nutzen?
+
+# 3. Kommunikation & Entscheidungsfindung
+Wie unterscheiden sich die Autoritäten (${personAChart?.authority || '?'} vs. ${personBChart?.authority || '?'})? Was bedeutet das konkret, wenn wichtige Entscheidungen gemeinsam getroffen werden müssen? Praktische Empfehlungen.
+
+# 4. Aktivierte Kanäle & elektromagnetische Verbindungen
+Analysiere jeden aktivierten Verbindungskanal einzeln. Typ (EM / Goldader / Stabile Parallelenergie), wer trägt was, was das für die Verbindung bedeutet.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du/Ihr-Form, tiefgründig und konkret.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Connection Key Readings für ${nameA} & ${nameB}.
+${chartA}
+
+${chartB}
+${dynamicsText}${connectionQuestion}
+
+Schreibe direkt weiter als Fortsetzung. Kein neuer Titel, keine Wiederholung.
+
+---
+
+# 5. Herausforderungen & Wachstumsfelder
+Wo entstehen die größten Reibungspunkte zwischen diesen beiden Designs? Was sind die typischen Konflikte und wie können sie transformiert werden?
+
+# 6. Strategien im Zusammenspiel
+Wie müssen ${nameA} (${personAChart?.strategy || '?'}) und ${nameB} (${personBChart?.strategy || '?'}) ihre Strategien im Miteinander leben? Konkrete Alltagssituationen.
+
+# 7. Das Potenzial dieser Verbindung
+Was kann NUR diese Verbindung erschaffen — weder ${nameA} noch ${nameB} allein? Welches gemeinsame Feld öffnet sich, wenn beide ihr Design leben?
+
+# 8. Praktische Integration
+Konkrete, sofort umsetzbare Empfehlungen für beide:
+- Kommunikationsrituale passend zu den Autoritäten
+- Energie-Hygiene für diese Verbindung
+- Die drei wichtigsten Erkenntnisse und wie sie im Alltag verankert werden
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du/Ihr-Form, tiefgründig und konkret.`;
+
+  return generateTwoParts({ readingType: 'connection', part1Prompt, part2Prompt, modelConfig });
+}
+
+// ── 2-Pass: Business / Career / Life-Purpose ─────────────────────────────────
+async function generateBusinessReadingTwoParts({ readingType, userData, chartData, modelConfig }) {
+  const knowledgeText = buildReadingKnowledge(readingType);
+  const chartInfo = buildChartInfo(chartData);
+
+  const [transitData, previousReadings] = await Promise.all([
+    fetchCurrentTransits(),
+    fetchPreviousReadings(userData.birth_date, userData.client_name, userData.reading_id, 2),
+  ]);
+  const transitOverlay = buildTransitOverlay(transitData, chartData);
+  const deltaContext = buildDeltaContext(previousReadings);
+
+  const personContext = `Name: ${userData.client_name || 'Unbekannt'}
+Geburtsdatum: ${userData.birth_date || 'Unbekannt'}
+Geburtsort: ${userData.birth_location || 'Unbekannt'}
+${chartInfo}
+${transitOverlay}
+${deltaContext}`;
+  const templateContent = templates[readingType] || templates['business'] || '';
+
+  const baseSystem = `Du bist ein erfahrener Human Design Business Coach.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Disclaimer ein. Beginne direkt.`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines tiefgründigen Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Kein Lehrbuch — echter Spiegel für diese eine Person.
+
+---
+
+## 1. Dein energetisches Business-Fundament
+Wie wirkt der Typ ${chartData?.type || '?'} mit Strategie ${chartData?.strategy || '?'} im Business-Kontext? Was ist das natürliche Energie-Muster dieser Person bei der Arbeit? Wo entstehen die typischen Business-Fallen?
+
+## 2. Deine Entscheidungsautorität im Business
+Die Autorität ${chartData?.authority || '?'} im Geschäftsleben: Wie trifft diese Person ihre besten Business-Entscheidungen? Konkrete Situationen (Angebote annehmen/ablehnen, Kooperationen, Investitionen, Pricing).
+
+## 3. Dein natürlicher Business-Stil (Profil ${chartData?.profile || '?'})
+Wie lernt und wächst dieses Profil im Business? Welche Rollen liegen natürlich? Was sind die Stärken und Fallen im Unternehmerischen?
+
+## 4. Deine Business-Zentren
+Für jedes definierte Zentrum: Wie zeigt sich diese Energie konkret im Business-Alltag?
+Für jedes offene Zentrum: Welche Business-Konditionierungen entstehen dort typischerweise (z.B. offenes Sakral → Überarbeitung)?
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret und direkt.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+${personContext}
+
+Schreibe direkt als Fortsetzung. Kein neuer Titel, keine Wiederholung von Teil 1.
+
+---
+
+## 5. Deine Business-Kanäle & Kernkompetenzen
+Für jeden aktivierten Kanal: Was ist die spezifische Business-Kompetenz, die dieser Kanal mitbringt? Wie kann sie im Markt positioniert werden?
+
+## 6. Marketing & Sichtbarkeit nach deinem Design
+Wie positioniert sich diese Person authentisch? Welche Kommunikationsstile und Kanäle passen zum Design? Was passiert wenn sie gegen ihr Design marketed?
+
+## 7. Business-Modell & Angebots-Struktur
+Welche Angebotsstruktur (1:1, Gruppen, Produkte, Lizenzen) passt zum Typ? Welches Pricing-Modell ist authentisch? Welche Kollaborationsformen funktionieren?
+
+## 8. Deine Lebensaufgabe im Business-Kontext
+Wie manifestiert sich das Inkarnationskreuz in der beruflichen Mission? Was kann nur diese Person auf diese Art in die Welt bringen?
+
+## 9. Konkrete nächste Schritte
+3-5 sofort umsetzbare Empfehlungen, spezifisch für diesen Chart. Keine generischen Ratschläge.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret und direkt.`;
+
+  return generateTwoParts({ readingType, part1Prompt, part2Prompt, modelConfig });
+}
+
+// ── 2-Pass: Shadow-Work ───────────────────────────────────────────────────────
+async function generateShadowWorkTwoParts({ userData, chartData, modelConfig }) {
+  const knowledgeText = buildReadingKnowledge('shadow-work');
+  const chartInfo = buildChartInfo(chartData);
+
+  const previousReadings = await fetchPreviousReadings(userData.birth_date, userData.client_name, userData.reading_id, 2);
+  const deltaContext = buildDeltaContext(previousReadings);
+
+  const personContext = `Name: ${userData.client_name || 'Unbekannt'}
+${chartInfo}
+${deltaContext}`;
+  const templateContent = templates['shadow-work'] || '';
+
+  const baseSystem = `Du bist ein erfahrener Human Design Coach mit Fokus auf Schattenarbeit und Dekonditionierung.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Beginne direkt. Kein Disclaimer.`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines tiefgründigen Shadow-Work Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Klar, direkt, mitfühlend — kein Weichzeichner.
+
+---
+
+## 1. Deine zentralen Konditionierungsfelder
+Analysiere die offenen Zentren als Konditionierungsräume. Für jedes: Welche spezifische gesellschaftliche oder familiäre Botschaft hat dort Wurzeln geschlagen? Wie zeigt sich das in konkreten Verhaltensmustern, Glaubenssätzen, Entscheidungen?
+
+## 2. Typ-Schatten: Das Not-Self-Muster
+Der Schatten des Typs ${chartData?.type || '?'} — was passiert wenn diese Person nicht ihre Strategie lebt? Konkrete Lebensmuster, Beziehungsdynamiken, Arbeitssituationen die aus dem Not-Self entstehen.
+
+## 3. Autoritäts-Schatten
+Wann übergeht diese Person (Autorität: ${chartData?.authority || '?'}) ihre innere Autorität zugunsten von Verstand, Erwartungen anderer, oder Angst? Welche Entscheidungen entstehen daraus? Was kostet das?
+
+## 4. Profil-Schatten (Profil ${chartData?.profile || '?'})
+Das Profil trägt eigene Schattenmuster. Was sind die typischen Fallen, die Menschen mit diesem Profil immer wieder in dieselben Situationen führen?
+
+Schreibe mindestens 2000 Wörter. Direkt, tief, ohne Weichzeichner. Deutsch, Du-Form.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Shadow-Work Readings für:
+${personContext}
+
+Direkte Fortsetzung — kein Rückblick auf Teil 1.
+
+---
+
+## 5. Kanal-Schatten
+Für jeden definierten Kanal: Wie manifestiert sich die Energie dieses Kanals in seiner konditionierten, ängstlichen Form? Was wäre die befreite Ausdrucksform?
+
+## 6. Die tiefen Glaubenssätze
+Basierend auf Typ, offenen Zentren und Profil: Welche Glaubenssätze haben sich im Laufe des Lebens gebildet? Formuliere sie konkret (z.B. "Ich muss..." / "Ich darf nicht..." / "Ich bin nur wertvoll wenn...").
+
+## 7. Integrations-Arbeit
+Konkrete Shadow-Work-Praktiken spezifisch für diesen Chart:
+- Täglich: Was beobachten, was wahrnehmen?
+- Bei Entscheidungen: Welche innere Stimme ist die Autorität — welche ist Konditionierung?
+- In Beziehungen: Welche Dynamiken signalisieren Not-Self?
+
+## 8. Die Einladung zur Dekonditionierung
+Was bedeutet das 7-jährige Dekonditionierungs-Experiment für diese Person konkret? Was fällt weg? Was entsteht? Eine persönliche Einladung — direkt, ehrlich, mitfühlend.
+
+Schreibe mindestens 2000 Wörter. Direkt, tief. Deutsch, Du-Form.`;
+
+  return generateTwoParts({ readingType: 'shadow-work', part1Prompt, part2Prompt, modelConfig });
 }
 
 function buildChartSummary(chart, name) {
@@ -830,9 +1330,15 @@ async function generateReading({ agentId, template, userData, chartData }) {
     template = TEMPLATE_MAP[template];
   }
 
-  // Detailed readings: 2-Pass-Generierung für vollständige Ausgabe ohne Token-Kürzung
+  // 2-Pass-Generierung für alle langen Reading-Typen
   if (template === 'detailed') {
     return await generateDetailedReadingTwoParts({ userData, chartData, modelConfig });
+  }
+  if (['business', 'career', 'life-purpose'].includes(template)) {
+    return await generateBusinessReadingTwoParts({ readingType: template, userData, chartData, modelConfig });
+  }
+  if (template === 'shadow-work') {
+    return await generateShadowWorkTwoParts({ userData, chartData, modelConfig });
   }
 
   let templateContent = templates[template] || templates['default'] ||
@@ -848,9 +1354,23 @@ async function generateReading({ agentId, template, userData, chartData }) {
       .replace(/\{\{memberNames\}\}/g, memberNames);
   }
 
-  const knowledgeText = agentId === 'tagesimpuls'
-    ? buildTagesimpulsKnowledge()
-    : buildKnowledgeText(8, 1000);
+  const knowledgeText = buildReadingKnowledge(agentId);
+
+  // ── Transit-Overlay (für alle nicht-transit-spezifischen Readings) ───────
+  let transitOverlay = '';
+  if (!TRANSIT_SKIP_TYPES.has(agentId)) {
+    const transitData = await fetchCurrentTransits();
+    transitOverlay = buildTransitOverlay(transitData, chartData);
+  }
+
+  // ── Delta-Reading: vorherige Readings als Kontext ─────────────────────────
+  let deltaContext = '';
+  const birthDate = userData.birth_date || userData.birthdate || userData.birthDate;
+  const readingId = userData.reading_id;
+  if (birthDate && readingId) {
+    const prev = await fetchPreviousReadings(birthDate, userData.client_name, readingId, 2);
+    deltaContext = buildDeltaContext(prev);
+  }
 
   const languageInstruction = language === 'en'
     ? '\n\nLANGUAGE: Write the entire reading in English. Use professional, empathetic language.'
@@ -865,7 +1385,7 @@ ${knowledgeText}
 ${tuningInstructions}${languageInstruction}
 
 WICHTIGE ANWEISUNG: Dir werden vollständig berechnete Chart-Daten (via Swiss Ephemeris) direkt im Prompt übergeben. Nutze NUR diese Daten. Füge KEINEN Disclaimer, KEINE Einleitung und KEINE Anmerkung ein, die besagt, dass du kein Berechnungstool hast oder die Daten ableitest. Die Daten sind präzise und vollständig — beginne das Reading direkt.
-
+${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}
 Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
 
   // Connection-Reading: Beide Personen mit ihren Charts übergeben
@@ -2365,9 +2885,8 @@ async function processConnectionJob(job, reading) {
     : readingType === 'relationship' ? 'relationship'
     : 'connection';
 
-  const content = await generateReading({
-    agentId: 'connection',
-    template: templateName,
+  // Connection: immer 2-Pass für vollständige Qualität
+  const rawContent = await generateConnectionReadingTwoParts({
     userData: {
       personA: { name: nameA },
       personB: { name: nameB },
@@ -2376,8 +2895,23 @@ async function processConnectionJob(job, reading) {
       dynamics,
       compositeData,
       connectionQuestion,
-    }
+    },
+    personAChart,
+    personBChart,
+    modelConfig: MODEL_CONFIG[DEFAULT_MODEL],
+    templateName,
   });
+
+  // ── Pipeline: Validierung & Korrektur ─────────────────────────────────
+  let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };
+  let content = rawContent;
+  try {
+    const pipeline = await runReadingPipeline(rawContent, personAChart);
+    content = pipeline.text;
+    pipelineInfo = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pipelineErr) {
+    console.warn('[Pipeline] [Connection] Fehler — Fallback auf Original:', pipelineErr.message);
+  }
 
   const reflexionsfragen = await generateConnectionReflexionsfragen(personAChart, personBChart, nameA, nameB);
 
@@ -2411,6 +2945,7 @@ async function processConnectionJob(job, reading) {
     personA: { name: nameA },
     personB: { name: nameB },
     ...(reflexionsfragen ? { reflexionsfragen } : {}),
+    _pipeline: pipelineInfo,
   };
 
   if (readingId) {
@@ -2552,12 +3087,21 @@ Nur angegebene Kanäle/Gates verwenden. ${nameA} in jeder Sektion beim Namen nen
   }
   if (!content) throw new Error('[ChannelAnalysis] Keine Antwort von Claude');
 
+  // ── Pipeline: Validierung & Korrektur ─────────────────────────────────
+  let pipelineInfoCA = { validated: false, corrected: false, errorCount: 0 };
+  try {
+    const pipeline = await runReadingPipeline(content, chartA);
+    content = pipeline.text;
+    pipelineInfoCA = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pErr) { console.warn('[Pipeline] [ChannelAnalysis] Fehler:', pErr.message); }
+
   const newReadingData = {
     ...existingReadingData,
     text: content,
     chart_data: chartA,
     ...(chartB ? { chart_data2: chartB } : {}),
     ...(hasPartner ? { electromagnetic_channels: dynamics.electromagnetic_channels, partner_name: nameB } : {}),
+    _pipeline: pipelineInfoCA,
   };
 
   if (readingId) {
@@ -2611,7 +3155,7 @@ async function processSexualityJob(job, reading) {
 ${templates['sexuality'] || 'Erstelle ein Intimität & Sexualität Reading für zwei Personen.'}
 
 Verwende folgendes Wissen:
-${buildKnowledgeText(8, 1000)}`;
+${buildReadingKnowledge('sexuality')}`;
 
   const userMessage = `Erstelle ein Intimität & Sexualität Resonanz-Reading für:
 
@@ -2660,6 +3204,14 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
 
   if (!content) throw new Error('Sexuality reading generation fehlgeschlagen – kein Modell verfügbar');
 
+  // ── Pipeline: Validierung & Korrektur ─────────────────────────────────
+  let pipelineInfoSex = { validated: false, corrected: false, errorCount: 0 };
+  try {
+    const pipeline = await runReadingPipeline(content, chartA);
+    content = pipeline.text;
+    pipelineInfoSex = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pErr) { console.warn('[Pipeline] [Sexuality] Fehler:', pErr.message); }
+
   const reflexionsfragen = await generateConnectionReflexionsfragen(chartA, chartB, nameA, nameB);
 
   const newReadingData = {
@@ -2670,6 +3222,7 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
     personA: { name: nameA },
     personB: { name: nameB },
     ...(reflexionsfragen ? { reflexionsfragen } : {}),
+    _pipeline: pipelineInfoSex,
   };
 
   if (readingId) {
@@ -2757,11 +3310,20 @@ async function processPentaJob(job, reading) {
   const groupDynamics = analyzePentaDynamics(memberCharts);
   const pentaChart = calculatePentaChart(memberCharts);
 
-  const content = await generateReading({
+  const rawPentaContent = await generateReading({
     agentId: 'penta',
     template: 'penta',
     userData: { groupName, groupContext, members, memberCharts, groupDynamics, pentaChart }
   });
+
+  // ── Pipeline: Validierung & Korrektur ─────────────────────────────────
+  let pipelineInfoPenta = { validated: false, corrected: false, errorCount: 0 };
+  let content = rawPentaContent;
+  try {
+    const pipeline = await runReadingPipeline(rawPentaContent, memberCharts[0]?.chart);
+    content = pipeline.text;
+    pipelineInfoPenta = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pErr) { console.warn('[Pipeline] [Penta] Fehler:', pErr.message); }
 
   const newReadingData = {
     ...existingReadingData,
@@ -2769,6 +3331,7 @@ async function processPentaJob(job, reading) {
     members: memberCharts.map(m => ({ name: m.name, chart: m.chart })),
     group_dynamics: groupDynamics,
     penta_chart: pentaChart,
+    _pipeline: pipelineInfoPenta,
   };
 
   if (readingId) {
@@ -3734,6 +4297,146 @@ app.get("/api/readings/:type/status/:job_id", async (req, res) => {
   } catch (err) {
     console.error(`[${type}] Status fehlgeschlagen:`, err.message);
     return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Reading-Chat Endpoint — Interaktive Vertiefung mit Reading-Kontext
+// POST /api/readings/:readingId/chat
+// Body: { message, userId? }
+// Lädt das Reading + Chart und antwortet als HD-Coach mit vollem Kontext
+// ======================================================
+app.post('/api/readings/:readingId/chat', async (req, res) => {
+  if (!isClaudeAvailable()) return res.status(503).json({ error: 'Claude nicht verfügbar' });
+
+  const { readingId } = req.params;
+  const { message, userId } = req.body || {};
+  if (!message) return res.status(400).json({ error: 'message erforderlich' });
+
+  try {
+    // Reading + Chart laden
+    const { data: reading, error } = await supabasePublic
+      .from('readings')
+      .select('reading_data, chart_data, reading_type, client_name, birth_data')
+      .eq('id', readingId)
+      .maybeSingle();
+
+    if (error || !reading) return res.status(404).json({ error: 'Reading nicht gefunden' });
+
+    const readingText = reading.reading_data?.text || '';
+    const chartData = reading.chart_data || reading.reading_data?.chart_data || {};
+    const clientName = reading.client_name || 'Klient';
+    const chartInfo = buildChartInfo(chartData);
+
+    const systemPrompt = `Du bist ein erfahrener Human Design Coach. Der Klient heißt ${clientName}.
+
+CHART-DATEN:
+${chartInfo}
+
+VORLIEGENDES READING (erstellt am ${new Date().toLocaleDateString('de-DE')}):
+${readingText.substring(0, 6000)}
+
+Antworte als Coach direkt auf Fragen und Vertiefungsanfragen zum Reading. Sei konkret, warm und auf diesen spezifischen Chart bezogen. Maximal 400 Wörter pro Antwort.`;
+
+    // generateWithClaude hat kein systemPrompt-Param — System + User zusammenführen
+    const fullPrompt = `${systemPrompt}\n\n---\n\nFrage des Klienten: ${message}`;
+    const responseText = await generateWithClaude(
+      fullPrompt,
+      { model: 'claude-sonnet-4-6', maxTokens: 1500, temperature: 0.7 }
+    );
+
+    res.json({ success: true, response: responseText, readingId, clientName });
+  } catch (err) {
+    console.error('[Reading-Chat] Fehler:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ======================================================
+// Streaming SSE Endpoint — direkte Generierung ohne Queue
+// POST /api/readings/stream
+// Body: { reading_type, name, birth_date, birth_time, birth_location, chart_data?, reading_id? }
+// Response: text/event-stream  →  data: {"type":"chunk","text":"..."}\n\n
+//                                  data: {"type":"done","length":N}\n\n
+// ======================================================
+app.post('/api/readings/stream', async (req, res) => {
+  if (!isClaudeAvailable()) {
+    return res.status(503).json({ error: 'Claude nicht verfügbar' });
+  }
+
+  const { reading_type, name, birth_date, birth_time, birth_location, chart_data, reading_id, language } = req.body || {};
+  if (!reading_type) return res.status(400).json({ error: 'reading_type erforderlich' });
+
+  // SSE-Header setzen
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  const send = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+  try {
+    // Chart-Daten laden oder berechnen
+    let chartData = chart_data;
+    if (!chartData && birth_date) {
+      send({ type: 'status', text: 'Chart wird berechnet…' });
+      chartData = await fetchChartData(birth_date, birth_time, birth_location) || {};
+    }
+
+    // Transit + Delta parallel
+    send({ type: 'status', text: 'Kontext wird aufgebaut…' });
+    const [transitData, previousReadings] = await Promise.all([
+      TRANSIT_SKIP_TYPES.has(reading_type) ? Promise.resolve(null) : fetchCurrentTransits(),
+      reading_id ? fetchPreviousReadings(birth_date, name, reading_id, 2) : Promise.resolve([]),
+    ]);
+
+    const chartInfo = buildChartInfo(chartData);
+    const knowledgeText = buildReadingKnowledge(reading_type);
+    const transitOverlay = buildTransitOverlay(transitData, chartData);
+    const deltaContext = buildDeltaContext(previousReadings);
+    const templateContent = templates[reading_type] || templates['default'] || '';
+    const langInstruction = language === 'en' ? '\n\nLANGUAGE: Write in English.' : '';
+
+    const systemPrompt = `Du bist ein Reading-Agent für Human Design.\n\n${templateContent}\n\nVerwende folgendes Wissen:\n${knowledgeText}\n${langInstruction}\n${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}\n\nANWEISUNG: Keine Disclaimer. Beginne direkt.`;
+
+    const userMessage = `Erstelle ein ${reading_type} Reading für:
+Name: ${name || 'Unbekannt'}
+Geburtsdatum: ${birth_date || 'Unbekannt'}
+Geburtszeit: ${birth_time || 'Unbekannt'}
+Geburtsort: ${birth_location || 'Unbekannt'}
+${chartInfo}`;
+
+    send({ type: 'status', text: 'Reading wird generiert…' });
+
+    // Claude streaming
+    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+    const Anthropic = (await import('@anthropic-ai/sdk')).default;
+    const client = new Anthropic({ apiKey });
+
+    let totalText = '';
+    const stream = await client.messages.stream({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      temperature: 0.7,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+
+    for await (const chunk of stream) {
+      if (chunk.type === 'content_block_delta' && chunk.delta?.type === 'text_delta') {
+        const text = chunk.delta.text;
+        totalText += text;
+        send({ type: 'chunk', text });
+      }
+    }
+
+    send({ type: 'done', length: totalText.length });
+  } catch (err) {
+    console.error('[SSE Stream] Fehler:', err.message);
+    send({ type: 'error', message: err.message });
+  } finally {
+    res.end();
   }
 });
 

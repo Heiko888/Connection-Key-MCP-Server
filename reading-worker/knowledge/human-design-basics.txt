@@ -1,56 +1,231 @@
-# Human Design Grundlagen
+# Human Design Grundlagen — Vollständige Referenz
 
-## Die 4 Typen
+Human Design ist ein Synthesesystem aus I Ging, Kabbalah (Lebensbaum), Astrologie, Chakrensystem und moderner Genetik/Biochemie. Es beschreibt die energetische Blaupause eines Menschen — wie Energie fließt, wie Entscheidungen getroffen werden und welche Rolle jemand im Leben spielt.
 
-### 1. Generator (70% der Bevölkerung)
-- **Strategie:** Auf die innere Autorität warten und dann auf das reagieren, was kommt
-- **Autorität:** Meistens sakrale Autorität (Bauchgefühl)
-- **Energie:** Konstante, nachhaltige Energie
-- **Rolle:** Die Macher und Erbauer der Welt
+---
 
-### 2. Manifestor (8% der Bevölkerung)
-- **Strategie:** Informieren, bevor man handelt
-- **Autorität:** Emotionale oder andere definierte Autorität
-- **Energie:** Spontane, kraftvolle Energie
-- **Rolle:** Die Initiatoren und Pioniere
+## DIE 5 TYPEN
 
-### 3. Projector (20% der Bevölkerung)
-- **Strategie:** Auf die Einladung warten
-- **Autorität:** Emotionale, sakrale oder andere definierte Autorität
-- **Energie:** Keine konstante Energie, braucht Pausen
-- **Rolle:** Die Führer und Berater
+### 1. Generator (~37% der Bevölkerung)
+- **Strategie:** Warten und auf externe Impulse reagieren — nicht initiieren
+- **Innere Autorität:** Sakral (meistens), selten Emotional, Milz, Ego, Selbst-projiziert
+- **Signatur:** Zufriedenheit
+- **Not-Self:** Frustration
+- **Energie:** Definiertes Sakralzentrum — konstante, nachhaltige Lebensenergie
+- **Rolle:** Die Erbauer und Erschaffer der Welt. Ihre Energie trägt die Menschheit.
+- **Entscheidung:** Körperreaktionen des Sakralzentrums ("Uh-huh" = Ja / "Unh-unh" = Nein)
+- **Kernthema:** Nur das tun, worauf das Sakral wirklich antwortet — alles andere erschöpft
 
-### 4. Reflector (1% der Bevölkerung)
-- **Strategie:** Einen Mondzyklus (28 Tage) warten, bevor man wichtige Entscheidungen trifft
-- **Autorität:** Mondzyklus
-- **Energie:** Spiegelt die Energie der Umgebung
-- **Rolle:** Die Spiegel der Gemeinschaft
+### 2. Manifesting Generator (MG) (~33% der Bevölkerung)
+- **Strategie:** Warten und reagieren (wie Generator) + Informieren vor dem Handeln
+- **Innere Autorität:** Sakral (meistens), selten Emotional
+- **Signatur:** Zufriedenheit und Frieden
+- **Not-Self:** Frustration und/oder Wut
+- **Energie:** Definiertes Sakralzentrum + direkte Motor-Kehlkopf-Verbindung — schnell, multi-dimensional, vielseitig
+- **Rolle:** Schnelle Macher mit Initiativkraft. Vielseitig, springen Schritte über, verfolgen mehrere Projekte gleichzeitig.
+- **Entscheidung:** Sakral-Reaktion abwarten, dann schnell handeln und informieren
+- **Kernthema:** Vielfalt zulassen, informieren statt fragen, Schritte überspringen ist Design kein Fehler
 
-## Die 9 Zentren
+### 3. Projektor (~20% der Bevölkerung)
+- **Strategie:** Warten auf echte Einladung (mit Anerkennung)
+- **Innere Autorität:** Emotional, Milz, Ego, Selbst-projiziert, Mental (kein Sakral)
+- **Signatur:** Erfolg
+- **Not-Self:** Bitterkeit
+- **Energie:** Kein definiertes Sakralzentrum — keine konstante Energie, begrenzte Ausdauer, braucht regelmäßige Erholung
+- **Rolle:** Natürliche Guides, Berater und Systemdenker. Sehen andere Menschen tiefer als diese sich selbst sehen.
+- **Entscheidung:** Auf echte Einladung mit Anerkennung warten — dann erst handeln
+- **Kernthema:** Nicht ungefragt beraten. Expertise sichtbar machen. Auf echte Anerkennung warten.
 
-### Definiert (farbig)
-- Stabile, konsistente Energie
-- Stärke und Talent
-- Kann nicht "ausgeschaltet" werden
+### 4. Manifestor (~9% der Bevölkerung)
+- **Strategie:** Informieren bevor gehandelt wird
+- **Innere Autorität:** Emotional, Ego, Milz (kein Sakral)
+- **Signatur:** Frieden
+- **Not-Self:** Wut
+- **Energie:** Kein Sakral, aber Motor direkt mit Kehlkopf verbunden — kraftvolle Initiativenergie in Wellen
+- **Rolle:** Die einzigen echten Initiatoren. Bringen Neues in die Welt aus inneren Impulsen heraus.
+- **Entscheidung:** Inneren Impuls spüren, relevante Menschen informieren (keine Erlaubnis!), dann handeln
+- **Kernthema:** Informieren schafft Frieden statt Widerstand. Autonomie ist existenziell.
 
-### Undefiniert (weiß)
-- Offen für Konditionierung
-- Weisheit durch Erfahrung
-- Kann lernen und sich anpassen
+### 5. Reflektor (~1% der Bevölkerung)
+- **Strategie:** 28-Tage-Mondzyklus abwarten für wichtige Entscheidungen
+- **Innere Autorität:** Mond — Entscheidung über einen vollen Mondzyklus beobachten
+- **Signatur:** Überraschung und Freude
+- **Not-Self:** Enttäuschung
+- **Energie:** Alle Zentren offen — spiegelt die Energie der Umgebung. Täglich unterschiedlich je nach Transiten und Umfeld.
+- **Rolle:** Spiegel der Gemeinschaft. Kann die Gesundheit und Energie einer Gruppe wie niemand sonst wahrnehmen.
+- **Entscheidung:** Voller 28-Tage-Zyklus. Mit vertrauten Menschen über die Entscheidung sprechen.
+- **Kernthema:** Umfeld ist alles. Ohne das richtige Umfeld keine Erfüllung.
 
-## Profile
+---
 
-Die Profile zeigen, wie wir uns in der Welt bewegen:
-- 1/3: Der Forscher/Entdecker
-- 1/4: Der Forscher/Freund
-- 2/4: Der Hermit/Freund
-- 2/5: Der Hermit/Heretiker
-- 3/5: Der Märtyrer/Heretiker
-- 3/6: Der Märtyrer/Role Model
-- 4/6: Der Opportunist/Role Model
-- 4/1: Der Opportunist/Forscher
-- 5/1: Der Heretiker/Forscher
-- 5/2: Der Heretiker/Hermit
-- 6/2: Der Role Model/Hermit
-- 6/3: Der Role Model/Märtyrer
+## DIE 9 ZENTREN
 
+Die 9 Zentren sind die energetischen Knotenpunkte im Bodygraph. Jedes Zentrum hat spezifische Themen und Energien.
+
+| Zentrum | Thema | Definiert = | Offen = |
+|---|---|---|---|
+| Kopf | Inspiration, mentaler Druck | Konstante eigene Inspiration | Empfängt Inspiration von außen |
+| Ajna | Konzepte, Überzeugungen | Stabiles, konstantes Denken | Variables, flexibles Denken |
+| Kehlkopf | Ausdruck, Manifestation | Konstante Ausdruckskraft | Situativer, zeitgebundener Ausdruck |
+| G-Zentrum | Identität, Liebe, Richtung | Feste Identität und Richtung | Variable Identität, Umfeld-abhängig |
+| Wille/Herz/Ego | Willenskraft, Selbstwert | Stabile Willenskraft | Variable Willenskraft |
+| Solarplexus | Emotionen, Gefühle | Eigene emotionale Welle | Empfängt Emotionen anderer |
+| Milz | Instinkt, Immunsystem | Verlässliche Körperintuition | Situative Intuition |
+| Sakral | Lebensenergie, Arbeitskraft | Konstante Lebensenergie (Generator-Typen) | Keine eigene Dauerenergie (Non-Generator) |
+| Wurzel | Stress, Antrieb, Druck | Konstanter innerer Antrieb | Empfängt Stress/Druck von außen |
+
+### Definiert (farbig im Bodygraph)
+- Stabile, konstante Energie in diesem Bereich
+- Strahlt diese Energie in die Welt aus
+- Konditioniert offene Zentren bei anderen
+- Stärke, Talent, verlässlicher Ausdruck
+
+### Offen (weiß im Bodygraph)
+- Empfängt und verstärkt die Energie anderer in diesem Bereich
+- Potenzielle Konditionierungsquelle (Not-Self)
+- Weisheitsquelle wenn bewusst gelebt
+- Flexibel, anpassungsfähig
+
+### Die goldene Frage für offene Zentren
+Jedes offene Zentrum hat eine Befreiungsfrage:
+- Offener Kopf: "Muss ich alle Fragen beantworten?"
+- Offenes Ajna: "Bin ich sicher in meiner Unsicherheit?"
+- Offener Kehlkopf: "Muss ich jetzt sprechen?"
+- Offenes G-Zentrum: "Ist dieses Umfeld das Richtige für mich?"
+- Offenes Ego/Wille: "Muss ich mir oder anderen etwas beweisen?"
+- Offener Solarplexus: "Ist das mein Gefühl?"
+- Offene Milz: "Halte ich fest, weil es gut ist — oder weil es sich vertraut anfühlt?"
+- Offenes Sakral: "Weiß ich, wann es genug ist?"
+- Offene Wurzel: "Bin ich unter Druck, weil es wirklich dringend ist?"
+
+---
+
+## DIE INNEREN AUTORITÄTEN
+
+Die Autorität ist der persönliche Entscheidungskompass — wichtiger als Logik, Meinung anderer oder gesellschaftliche Erwartungen.
+
+### Sakrale Autorität (Generator & MG)
+Entscheidungen durch direkte Sakral-Reaktion: körperliches Ja ("Uh-huh") oder Nein ("Unh-unh"). Kommt vor dem Denken. Wird durch Ja/Nein-Fragen aktiviert.
+
+### Emotionale Autorität / Solarplexus
+Kein spontaner Entscheid — Klarheit entsteht durch Zeit und das Durchlaufen der emotionalen Welle. "Schlaf eine Nacht darüber." Gilt für alle Typen die ein definiertes Solarplexus-Zentrum haben.
+
+### Milz-Autorität
+Spontane, körperbasierte Intuition im gegenwärtigen Moment. Spricht einmal, leise — muss sofort gehört werden. Kein Wiederholen.
+
+### Ego/Wille-Autorität
+"Was will ich wirklich?" — Entscheidungen aus echtem Willen und Eigeninteresse. Selten. Manifestoren und manche Projektoren.
+
+### Selbst-projizierte Autorität
+Entscheidung durch das Aussprechen — hören, was aus dem eigenen Mund kommt. Nur für Projektoren mit Verbindung G → Kehlkopf.
+
+### Mental/Außen-Autorität (Keine innere Autorität)
+Für Projektoren und Reflektoren ohne innere Autorität: Entscheidungen durch Gespräch mit vertrauten, neutralen Menschen. Die eigene Stimme im Gespräch hören — nicht die Meinungen der anderen.
+
+### Mond-Autorität (Reflektor)
+28-Tage-Zyklus. Die Entscheidung über einen vollen Mondzyklus beobachten. Mit verschiedenen vertrauten Menschen sprechen. Am Ende des Zyklus ist die Antwort klar.
+
+---
+
+## DIE 12 PROFILE
+
+Das Profil zeigt die Lebensrolle — wie jemand seinen Weg durch die Welt geht. Es besteht aus zwei Linien (bewusste Linie / unbewusste Linie), basierend auf den Linien der Persönlichkeits- und Design-Sonne.
+
+### Die 6 Grundlinien
+
+| Linie | Name | Kernthema |
+|---|---|---|
+| Linie 1 | Der Forscher/Fundament | Sicherheit durch Wissen und Vorbereitung |
+| Linie 2 | Der Eremit/Natürliches Talent | Natürliche Gaben, braucht Rückzug und wird hervorgerufen |
+| Linie 3 | Der Märtyrer/Experimentator | Lernt durch Versuch und Irrtum — Fehler als Weisheit |
+| Linie 4 | Der Opportunist/Netzwerker | Wirkt durch festes Netzwerk und persönliche Verbindungen |
+| Linie 5 | Der Herausgeber/Herausgeforderter | Wird von anderen als Lösung gesehen — Projektionsfeld |
+| Linie 6 | Das Rollenmodell/Lebenslehrer | Drei Phasen: Erfahren (0-30), Rückzug (30-50), Weisheit (50+) |
+
+### Die 12 Profile im Überblick
+
+**1/3 — Forscher/Märtyrer** (Persönlich, Rechter Winkel)
+Fundament durch Wissen + Lernen durch Ausprobieren. Braucht solides Fundament bevor es handelt. Stabilität durch Forschung, Weisheit durch Fehlschläge.
+
+**1/4 — Forscher/Opportunist** (Persönlich, Rechter Winkel)
+Fundament durch Wissen + Netzwerk als Wirkungsfeld. Teilt Wissen nur im vertrauten Netzwerk. Sicherheit durch tiefes Fundament und stabile Beziehungen.
+
+**2/4 — Eremit/Opportunist** (Persönlich, Rechter Winkel)
+Natürliches Talent + Wirkung durch Netzwerk. Braucht Rückzug zum Aufladen. Wird vom Netzwerk für natürliche Gaben hervorgerufen.
+
+**2/5 — Eremit/Herausgeber** (Transpersonal, Rechter Winkel)
+Natürliches Talent + Projektionsfeld. Andere projizieren Lösungen auf diese Person. Braucht Rückzug und gesunde Grenzen gegenüber Erwartungen anderer.
+
+**3/5 — Märtyrer/Herausgeber** (Transpersonal, Rechter Winkel)
+Lernen durch Fehler + Projektionsfeld. Tiefe Weisheit aus vielen Erfahrungen. Wird als praktische Lösung für Probleme anderer gesehen.
+
+**3/6 — Märtyrer/Rollenmodell** (Transpersonal, Rechter Winkel)
+Lernen durch Fehler + Weisheit als Vorbild. Drei Lebensphasen. Aus Erfahrung entsteht echte Weisheit als Lebenslehrer.
+
+**4/6 — Opportunist/Rollenmodell** (Transpersonal, Linker Winkel)
+Netzwerk + Rollenmodell-Reife. Transpersonaler Auftrag. Vertrauensvolle Beziehungen sind das Fundament für die spätere Rolle als Vorbild.
+
+**4/1 — Opportunist/Forscher** (Juxtaposition — fixiert)
+Das fixierte Kreuz. Netzwerk + Wissen als festes Schicksal. Unveränderliche Lebensrolle, die vollständig angenommen werden will.
+
+**5/1 — Herausgeber/Forscher** (Transpersonal, Linker Winkel)
+Projektionsfeld + solides Fundament. Wird von anderen als Retter und Problemlöser gesehen. Tiefes Fachwissen schützt vor übertriebenen Erwartungen.
+
+**5/2 — Herausgeber/Eremit** (Transpersonal, Linker Winkel)
+Projektionsfeld + natürliches Talent. Wird hervorgerufen und als Lösung wahrgenommen. Braucht klare Grenzen und regelmäßigen Rückzug.
+
+**6/2 — Rollenmodell/Eremit** (Transpersonal, Linker Winkel)
+Weisheit als Vorbild + natürliches Talent. Drei Lebensphasen. Wird nach der Reifephase als authentisches Vorbild für das gelebt, was es selbst erfahren hat.
+
+**6/3 — Rollenmodell/Märtyrer** (Transpersonal, Linker Winkel)
+Weisheit + Erfahrung aus Fehlern. Drei Lebensphasen mit tiefer Erfahrungsweisheit. Lebenslehrer durch das eigene Durchleben von Höhen und Tiefen.
+
+---
+
+## DEFINITIONEN
+
+Die Definition zeigt, wie die definierten Zentren miteinander verbunden sind.
+
+**Single Definition:** Alle definierten Zentren direkt verbunden. Konstante, in sich geschlossene Energie. Unabhängig von anderen zur Energie-Vervollständigung.
+
+**Split Definition:** Zwei getrennte Gruppen definierter Zentren. Braucht bestimmte Menschen oder Transiten als "Brücke". Diese Brücken-Verbindungen fühlen sich magnetisch an.
+
+**Triple Split:** Drei getrennte Gruppen. Braucht Vielfalt im sozialen Umfeld. Profitiert von Zeit in der Gemeinschaft.
+
+**Quadruple Split:** Seltenste Form. Vier getrennte Gruppen. Braucht sehr viel soziale Interaktion um alle Aspekte zu integrieren.
+
+**Keine Definition (Reflektor):** Alles offen. Vollständige Spiegelung der Umgebung.
+
+---
+
+## NOT-SELF — SCHNELLREFERENZ
+
+| Typ | Not-Self-Emotion | Signal bedeutet |
+|---|---|---|
+| Generator | Frustration | "Ich tue etwas ohne echtes Sakral-Ja" |
+| Manifesting Generator | Frustration / Wut | "Kein Sakral-Ja" / "Nicht informiert, Widerstand" |
+| Projektor | Bitterkeit | "Ich gebe ohne anerkannt zu sein" |
+| Manifestor | Wut | "Ich werde kontrolliert" / "Ich unterdrücke meinen Impuls" |
+| Reflektor | Enttäuschung | "Mein Umfeld stimmt nicht" / "Zu schnell entschieden" |
+
+---
+
+## SCHALTKREISE (CIRCUITS)
+
+Die Gates und Kanäle sind in Schaltkreise organisiert, die zeigen, wie Energie durch den Körper fließt.
+
+**Individueller Schaltkreis:** Mutative, einzigartige Energie. Nicht für die Masse. Verändert durch das Sein, nicht durch Absicht. Thema: Einzigartigkeit.
+
+**Kollektiver Schaltkreis — Logik/Verstehen:** Zukunftsorientiert, musterbasiert, beweisbar. Dient dem Kollektiv durch logische Verbesserung. Thema: Fortschritt.
+
+**Kollektiver Schaltkreis — Abstrakt/Erleben:** Vergangenheitsorientiert, erfahrungsbasiert, narrativ. Dient dem Kollektiv durch geteilte Erfahrungen. Thema: Weisheit aus Erlebnissen.
+
+**Stammesschaltkreis:** Konkret, bindend, gemeinschaftsorientiert. Schützt und versorgt die Gruppe. Thema: Überleben und Fürsorge.
+
+**Integrations-Schaltkreis:** Körperbasierte Selbsterhaltung. Individuelle, private Energie. Nicht für andere. Thema: Überleben des Individuums.
+
+---
+
+## TRANSITEN
+
+Planeten bewegen sich täglich durch die 64 Gates des Rade. Diese Transiten aktivieren vorübergehend Gates und können definierte oder offene Zentren beeinflussen. Für Reflektoren sind Transiten besonders bedeutsam — ihr gesamtes Design wird täglich durch Transiten und die Mondposition geformt.

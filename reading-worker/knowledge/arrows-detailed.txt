@@ -1,120 +1,264 @@
-﻿# Praxisaufgaben Pfeile
+# Pfeile & Variable — Das PHS-System (Primary Health System)
 
-Diese Datei wurde automatisch aus dem Ordner "Praxisaufgaben Pfeile" importiert.
+Die vier Pfeile um den Kopfbereich des Bodygraphs zeigen das Variable-System — auch PHS (Primary Health System) genannt. Es ist die tiefste Ebene der Individualisierung im Human Design: Es zeigt, wie du dich ernährst, in welcher Umgebung du aufblühst, wie dein Geist arbeitet und was dich wirklich antreibt.
+
+**Wichtig:** Das Variable-System geht über Typ/Strategie/Autorität hinaus — es ist fortgeschrittenes Human Design für die körperliche und geistige Optimierung.
+
+---
+
+## Die vier Pfeile — Übersicht
+
+```
+←  [Kopf]  →         Pfeil 1 (links) = Ernährung/Digestion   (Design/unbewusst)
+←  [Ajna]  →         Pfeil 2 (rechts) = Perspektive/Cognition (Persönlichkeit/bewusst)
+←  [Hals]  →         Pfeil 3 (links) = Umgebung/Environment  (Design/unbewusst)
+←  [Sakral]→         Pfeil 4 (rechts) = Motivation           (Persönlichkeit/bewusst)
+```
+
+Jeder Pfeil zeigt entweder:
+- **Links (←)** = Passiv / Empfangend / Rechtsseitig im Körper
+- **Rechts (→)** = Aktiv / Ausdrückend / Linksseitig im Körper
 
 ---
 
+## Pfeil 1: Ernährung / Digestion (Oberer linker Pfeil)
+**Design/Unbewusst — Körper-Intelligenz**
 
-## Praxisaufgaben_Pfeile.pdf
+Zeigt, WIE und WANN du Nahrung aufnimmst — nicht nur Essen, sondern alle Arten von Nahrungsaufnahme (Information, Erfahrungen, Eindrücke). Dies ist die physische Basis deiner Gesundheit.
 
-Wenn du deine Pfeile nicht in der natürlichen Ausrichtung lebst, kann das zu einem Gefühl von 
-Frustration, Unwohlsein oder ständiger Überforderung führen. Jedes Pfeilthema betrifft bestimmte 
-Lebensbereiche und zeigt Symptome, wenn es nicht im Einklang mit seiner natürlichen Richtung 
-gelebt wird. Hier sind detaillierte Erklärungen und Aufgaben für jeden Pfeil, um dich zu 
-unterstützen, falls du in die entgegengesetzte Richtung lebst. 
-1. Pfeil oben links: Verdauung und Informationsaufnahme (unbewusst) 
-• Symptome, dass du rechtsgerichtet bist, aber links lebst: Dein natürlicher Ansatz ist spontan 
-und intuitiv. Du profitierst von Flexibilität beim Essen und Lernen. Wenn du dich jedoch an feste 
-Pläne und strikte Routinen hältst, könntest du das Gefühl haben, unter ständiger Spannung zu 
-stehen, schwer abschalten zu können oder dich geistig müde zu fühlen. Oft verspürst du den 
-Drang nach Freiheit und Abwechslung, hast aber Schwierigkeiten, diese in deinem Alltag 
-zuzulassen. 
-• Aufgabe: 
-• Intuitives Essen: Versuche, die festen Mahlzeiten und Ernährungspläne für einige Tage zu 
-lockern. Iss, wann du Hunger verspürst, und wähle Lebensmittel, die dich spontan anziehen. Achte 
-auf deine Bedürfnisse, ohne dir Gedanken über Kalorien oder Zeit zu machen. 
-• Freies Lernen: Nimm dir ein Thema, das dich interessiert, und lasse dich „treiben“. Folge deiner 
-Neugier ohne Lernplan und vertraue darauf, dass du dir die Informationen aneignest, die für dich 
-wichtig sind. 
-• Beobachtungsaufgabe: Notiere über eine Woche, wie sich deine Energie und geistige Klarheit 
-verändern, wenn du flexibler und intuitiver vorgehst. 
-• Symptome, dass du linksgerichtet bist, aber rechts lebst: Dein natürlicher Zustand ist 
-strukturiert und systematisch. Wenn du jedoch alles spontan angehst und deine Routinen zu locker 
-hältst, kannst du dich ziellos und rastlos fühlen. Dies kann dazu führen, dass du dich überfordert 
-fühlst, oft gestresst bist oder den Eindruck hast, deine Vorhaben nicht wirklich zu erreichen. 
-• Aufgabe: 
-• Strukturierte Mahlzeiten: Plane feste Mahlzeiten und versuche, immer zur gleichen Zeit zu 
-essen. Beobachte, ob dir diese Struktur Ruhe und mehr Energie gibt. 
-• Geplantes Lernen: Erstelle einen Plan, der bestimmte Lernzeiten umfasst, und folge ihm strikt. 
-Setze dir klare Lernziele und halte dich an ein strukturiertes Vorgehen. 
-• Reflektion: Notiere am Ende der Woche, ob sich diese feste Routine positiv auf deine Energie 
-und deinen Fokus auswirkt. 
-2. Pfeil unten links: Umgebung (unbewusst) 
-• Symptome, dass du rechtsgerichtet bist, aber links lebst: Du bevorzugst wechselnde, 
-dynamische Umgebungen, doch wenn du dich stets in stabilen und gleichbleibenden Orten 
-aufhältst, kann das zu einem Gefühl der Eingeschränktheit und Langeweile führen. Oft hast du 
-dann das Bedürfnis, „auszubrechen“, bist gereizt oder fühlst dich in deiner Kreativität blockiert. 
-• Aufgabe: 
-• Ortswechsel: Nimm dir vor, jeden Tag in einer anderen Umgebung zu arbeiten, zu lesen oder 
-dich zu entspannen. Verbringe einen Tag im Café, den nächsten draußen im Park oder in einem 
-anderen Raum. Die Veränderung der Umgebung kann dir neue Energie und Ideen bringen. 
-• Experimentelle Räume: Gestalte regelmäßig deine Arbeits- oder Wohnbereiche um, bringe 
-neue Dekorationen hinzu oder nutze ein wechselndes Farbschema, um Frische und Dynamik zu 
-spüren. 
-• Achtsamkeit: Notiere am Ende jeder Woche, wie dir die dynamischere Umgebung geholfen hat, 
-dich lebendiger und inspirierter zu fühlen. 
-• Symptome, dass du linksgerichtet bist, aber rechts lebst: Du fühlst dich natürlicherweise in 
-stabilen, ruhigen Umgebungen am wohlsten. Wenn du jedoch ständig die Umgebung wechselst, 
-kannst du dich zerstreut und gestresst fühlen. Es fällt dir schwer, zur Ruhe zu kommen, und du bist 
-vielleicht häufig erschöpft oder nervös. 
-• Aufgabe: 
-• Stabiler Raum: Richte dir einen festen Arbeitsplatz oder Rückzugsort ein, an dem du täglich zur 
-gleichen Zeit verweilst. Halte diesen Raum aufgeräumt und vermeide unnötige Veränderungen. 
-• Wohlfühlplatz: Erschaffe eine Umgebung, die dich erdet und dich ruhig und sicher fühlen lässt, 
-z.B. mit vertrauten Gegenständen, Lieblingsfarben oder Pflanzen. 
-• Selbstbeobachtung: Beobachte über einen Zeitraum von zwei Wochen, ob du durch diesen 
-stabilen Ort mehr Ruhe und Gelassenheit findest. 
-3. Pfeil unten rechts: Perspektive (bewusst) 
-• Symptome, dass du rechtsgerichtet bist, aber links lebst: Deine natürliche Perspektive ist 
-offen und peripher, aber wenn du dich auf Details und strategische Ansätze fokussierst, kann es 
-sein, dass du dich gestresst und eingeengt fühlst. Du könntest auch das Gefühl haben, dass dir die 
-großen Zusammenhänge entgehen oder du im Detail verlierst. 
-• Aufgabe: 
-• Offenes Wahrnehmen: Lass Details für einen Moment beiseite und versuche, Situationen im 
-„Gesamtbild“ zu betrachten. Konzentriere dich darauf, den Raum um dich herum wahrzunehmen, 
-anstatt spezifische Objekte oder Personen. 
-• Panoramablick: Gehe nach draußen und übe, die Umgebung als Ganzes wahrzunehmen. 
-Betrachte alles um dich herum, ohne den Fokus auf etwas Bestimmtes zu richten. 
-• Meditation: Setze dich für ein paar Minuten hin und lasse Gedanken frei fließen, ohne sie zu 
-analysieren oder zu beurteilen. Notiere am Ende der Woche, wie du dich fühlst, wenn du auf die 
-großen Zusammenhänge schaust. 
-• Symptome, dass du linksgerichtet bist, aber rechts lebst: Du bist detailorientiert und 
-strategisch veranlagt. Wenn du jedoch alles locker und ohne Planung angehst, könntest du dich 
-ziellos und unruhig fühlen, was oft zu Frustration führt, weil du das Gefühl hast, deine Potenziale 
-nicht zu nutzen. 
-• Aufgabe: 
-• Fokussiertes Arbeiten: Setze dir klare Ziele und achte auf Details, die du normalerweise 
-vernachlässigen würdest. Plane konkrete Schritte und verfolge diese zielgerichtet. 
-• Strukturiertes Denken: Widme dich jedem Projekt oder Problem schrittweise und notiere 
-präzise, was du erreichen möchtest und wie du vorgehen wirst. 
-• Reflektion: Beobachte über einen Zeitraum von zwei Wochen, ob dich dieses detaillierte 
-Arbeiten erfolgreicher und zufriedener macht. 
-4. Pfeil oben rechts: Bewusstsein (bewusst) 
-• Symptome, dass du rechtsgerichtet bist, aber links lebst: Dein Bewusstsein ist 
-natürlicherweise offen und intuitiv. Wenn du jedoch analytisch und strategisch vorgehst, kann es 
-sein, dass du dich überfordert fühlst, deine Intuition blockiert ist und du wenig Vertrauen in deinen 
-eigenen Weg hast. 
-• Aufgabe: 
-• Empfängliche Haltung: Übe dich in einer ziel-losen Meditation, in der du einfach beobachtest, 
-ohne etwas erreichen zu wollen. Lass Gedanken und Gefühle kommen und gehen. 
-• Intuitive Entscheidungen: Nimm dir vor, Entscheidungen intuitiv zu treffen und nicht alles zu 
-durchdenken. Vertraue auf dein Gefühl und beobachte, wie es sich anfühlt, spontaner zu handeln. 
-• Tagebuch führen: Schreibe regelmäßig deine spontanen Gedanken und Ideen auf, ohne sie zu 
-analysieren oder zu planen. Notiere, wie sich diese intuitive Herangehensweise auf dein 
-Wohlbefinden auswirkt. 
-• Symptome, dass du linksgerichtet bist, aber rechts lebst: Du bist strategisch und analytisch, 
-aber wenn du dich zu sehr auf Spontaneität verlässt, könnte dir eine klare Ausrichtung fehlen. Dies 
-kann zu Gefühlen von Unsicherheit und Ineffizienz führen, da du möglicherweise das Gefühl hast, 
-dass dir ein klarer Plan fehlt. 
-• Aufgabe: 
-• Zielgerichtete Meditation: Führe eine strukturierte Meditation durch, bei der du dich gezielt auf 
-ein Thema konzentrierst, das du besser verstehen möchtest. 
-• Strategie entwickeln: Notiere dir klare Ziele und plane deine nächsten Schritte strategisch, um 
-deine Intuition mit der logischen Ausrichtung zu kombinieren. 
-• Selbstreflektion: Am Ende jeder Woche überprüfe, ob du dich mit einer klareren Planung und 
-Struktur mehr im Einklang fühlst. 
-Diese detaillierten Ansätze und Aufgaben helfen dir, wieder in deine natürliche Ausrichtung zu 
-kommen und deine Energie optimal zu nutzen. 
+### Pfeil zeigt LINKS (←) — Passiv/Appetite
+Du isst und nimmst auf, wenn echter Hunger oder Appetit vorhanden ist. Kein Essen nach Plan oder sozialen Verpflichtungen. Warte auf den natürlichen Impuls. Dein Körper weiß, was er wann braucht.
 
+**Praktisch:**
+- Iss nur, wenn echter Hunger da ist — nicht aus Gewohnheit oder Stress
+- Vermeide erzwungene Mahlzeiten-Zeiten
+- Dein Appetit ist dein Kompass — folge ihm
+
+### Pfeil zeigt RECHTS (→) — Aktiv/Taste
+Du brauchst bewusste Entscheidungen darüber, was du dir "schmecken" lässt. Du bist selektiver und brauchst Qualität statt Quantität.
+
+**Praktisch:**
+- Wähle bewusst, was in deinen Körper kommt
+- Qualität geht über Menge
+- Lerne deine spezifischen Ernährungspräferenzen kennen
+
+### Die 6 PHS Ernährungstypen (Colors)
+
+**Color 1 — Appetit (Appetite)**
+- Essen wenn echter Hunger da ist, kein emotionales Essen
+- Warm / Kalt: Heiß essen (Warm) oder Kalt essen bevorzugen (Kalt)
+
+**Color 2 — Geschmack (Taste)**
+- Qualität und Geschmack über Menge
+- Genuss ist gesund — nicht schuldbelastet essen
+- Warm: Essen in Gesellschaft / Kalt: Allein essen für optimale Verdauung
+
+**Color 3 — Durst (Thirst)**
+- Trinken ist oft genauso wichtig wie Essen
+- Achte darauf, ausreichend Flüssigkeit zu dir zu nehmen
+- Warm: Flüssige Mahlzeiten, Suppen, warme Getränke / Kalt: Feste Nahrung, klares Wasser
+
+**Color 4 — Berührung (Touch)**
+- Das Bewusstsein für Textur, Konsistenz und physisches Erleben beim Essen
+- Wie sich das Essen anfühlt ist relevant
+- Warm: Vertraute Texturen und Gerichte / Kalt: Neue Konsistenzen und Erfahrungen
+
+**Color 5 — Klang (Sound)**
+- Die Geräuschkulisse beim Essen beeinflusst die Verdauung
+- Stille oder bestimmte Klänge optimieren die Nahrungsaufnahme
+- Warm: Stilles Essen / Kalt: Essen mit angenehmen Hintergrundgeräuschen
+
+**Color 6 — Licht (Light)**
+- Das Umgebungslicht beim Essen hat Auswirkungen
+- Natürliches Licht vs. künstliches Licht bei der Nahrungsaufnahme
+- Warm: Helles Licht / Kalt: Gedämpftes Licht
 
 ---
+
+## Pfeil 2: Perspektive / Cognition (Oberer rechter Pfeil)
+**Persönlichkeit/Bewusst — Geist-Wahrnehmung**
+
+Zeigt, wie dein Geist Informationen verarbeitet und die Welt wahrnimmt. Dies ist dein natürlicher kognitiver Stil — nicht wie du denken SOLLTEST, sondern wie dein Geist am natürlichsten arbeitet.
+
+### Pfeil zeigt LINKS (←) — Passiv/Receiving
+Dein Geist empfängt und verarbeitet Informationen auf eine empfangende, absorbierende Weise. Du verarbeitest tief, bevor du antwortest. Innere Reflexion vor äußerem Ausdruck.
+
+### Pfeil zeigt RECHTS (→) — Aktiv/Projecting
+Dein Geist projiziert aktiv nach außen — du verarbeitest durch Reden, durch Austausch, durch Aktivität. Denken passiert im Tun und Kommunizieren.
+
+### Die 6 Perspektiven
+
+**Perspektive 1 — Taste/Smell (Geschmack/Geruch)**
+Verarbeitung durch "Kosten und Riechen" der Situation. Intuitive Qualitätsbewertung. Warnung vor dem Schlechten, Anziehung zum Guten.
+
+**Perspektive 2 — Inner Vision (Innere Vision)**
+Verarbeitung durch innere Bilder und Visualisierungen. Denken in Bildern, nicht in Worten. Braucht stille Visualisierungs-Zeit.
+
+**Perspektive 3 — Feeling (Gefühl)**
+Verarbeitung durch emotionale Resonanz. Entscheidungen durch das körperliche Spüren der Konsequenzen. "Wie fühlt sich das an?"
+
+**Perspektive 4 — Taste/Outer Vision (Geschmack/Außenblick)**
+Verarbeitung durch externen Blick — das Beobachten von außen. Objektive Perspektive. Sehen, was andere nicht sehen.
+
+**Perspektive 5 — Sound/Inner Voice (Klang/Innere Stimme)**
+Verarbeitung durch innere Stimme oder Klang. Interner Dialog ist der primäre Verarbeitungsweg. Musik, Sprache, Rhythmus als kognitive Tools.
+
+**Perspektive 6 — Smell/Outer Touch (Geruch/Äußeres Gefühl)**
+Verarbeitung durch atmosphärische Wahrnehmung. Sehr sensibel für die "Stimmung" von Situationen und Menschen.
+
+---
+
+## Pfeil 3: Umgebung / Environment (Unterer linker Pfeil)
+**Design/Unbewusst — Körper im Raum**
+
+Zeigt, in welcher physischen Umgebung dein Körper und dein Geist optimal funktionieren. Die falsche Umgebung kostet enorm viel Energie — die richtige gibt Energie zurück.
+
+### Pfeil zeigt LINKS (←) — Passiv/Caves
+Du brauchst Rückzugsorte, Privatsphäre, deine eigene Höhle. Zu viel offene, laute oder überfüllte Umgebungen erschöpfen dich.
+
+**Praktisch:** Eigenes Büro, eigener Schreibtisch, klar definierter persönlicher Raum. Vermeide Großraumbüros ohne Rückzug.
+
+### Pfeil zeigt RECHTS (→) — Aktiv/Markets
+Du brauchst Stimulation, Menschen, Austausch, Aktivität in der Umgebung. Isolation erschöpft dich.
+
+**Praktisch:** Cafés, Co-Working, lebendige Orte. Alleinsein über lange Zeit ist kein Optimal-Zustand für dich.
+
+### Die 6 Umgebungstypen
+
+**Umgebung 1 — Höhlen (Caves)**
+Privatsphäre, Rückzug, klar definierter persönlicher Raum. Das Zuhause als Heiligtum. Braucht Grenzen gegenüber Lärm und ungebetenen Gästen.
+
+Warm: Selektive Umgebung — wenige, vertraute Menschen, stille Räume.
+Kalt: Einfache, klare, aufgeräumte Räume.
+
+**Umgebung 2 — Märkte (Markets)**
+Lebendigkeit, Austausch, Menschen, Bewegung. Inspiration durch externe Stimuli. Flüssige Grenzen zwischen innen und außen.
+
+Warm: Lebendige soziale Umgebungen.
+Kalt: Neutrale Treffpunkte, Orte ohne persönliche Geschichte.
+
+**Umgebung 3 — Küchen (Kitchens)**
+Transformation als zentrales Umgebungsthema. Orte wo Dinge verändert werden — Küchen, Werkstätten, Labore. Praktische, funktionale Räume.
+
+Warm: Gemeinschaftliche Küchen, Schaffensbereiche.
+Kalt: Private Arbeitsräume mit klaren Funktionen.
+
+**Umgebung 4 — Täler (Valleys)**
+Natürliche Tieflagen, beschützte Bereiche, Senken. Physisch und metaphorisch: Orte, die von einer größeren Energie umgeben sind. Universitäten, Städte im Tal, geschützte Buchten.
+
+Warm: Bekannte, vertraute Täler und Regionen.
+Kalt: Neue, unbekannte Tieflagen.
+
+**Umgebung 5 — Hügel (Hills)**
+Erhöhung, Überblick, Weite. Orte mit Aussicht — physisch und metaphorisch. Berge, Hügel, hohe Gebäude, weite Landschaften.
+
+Warm: Bekannte Hügellandschaften, Rückzugsort in der Höhe.
+Kalt: Neue Panorama-Orte, städtische Höhenpunkte.
+
+**Umgebung 6 — Küsten (Shores)**
+Grenzflächen, Übergänge, Grenzen zwischen zwei Welten. Seen, Flüsse, Küstenlinien, Stadtgrenzen. Orte des Übergangs.
+
+Warm: Vertraute Küsten und Gewässer.
+Kalt: Neue Grenzgebiete, unbekannte Gewässer.
+
+---
+
+## Pfeil 4: Motivation (Unterer rechter Pfeil)
+**Persönlichkeit/Bewusst — Antrieb und Ausrichtung**
+
+Zeigt, was dich wirklich motiviert — und was dein Not-Self-Thema in der Motivation ist. Die Motivation ist der tiefste Antrieb für dein Handeln. Wenn du nicht aus deiner wahren Motivation heraus lebst, fühlt sich das Leben bedeutungslos an.
+
+### Pfeil zeigt LINKS (←) — Passiv/Fear (Angst-Umkehrung)
+Deine tiefste Motivation arbeitet durch Vermeidung und Umkehrung von Angst. Du wirst motiviert durch das, was du NICHT willst — und dadurch findest du, was du willst. Dies ist kein negativer Zustand, sondern ein natürlicher Navigationsweg.
+
+### Pfeil zeigt RECHTS (→) — Aktiv/Hope (Hoffnung-Ausrichtung)
+Deine tiefste Motivation arbeitet durch Ausrichtung auf ein positives Ziel. Du weißt, was du willst, und bewegst dich darauf zu.
+
+### Die 6 Motivationstypen
+
+**Motivation 1 — Angst / Hoffnung (Fear/Hope)**
+Grundlegende Überlebensmotivation. Angst vor dem Schlechten treibt an — oder die Hoffnung auf das Gute zieht an. Beides ist kraftvoll, wenn es bewusst genutzt wird.
+
+Not-Self: Angst oder falsche Hoffnung als Entscheidungsgrundlage.
+Höchster Ausdruck: Klare Unterscheidung zwischen echter Angst als Information und konditionierter Angst.
+
+**Motivation 2 — Hoffnung / Angst (Hope/Fear)**
+Variation der ersten Motivation mit umgekehrter Primär-Sekundär-Gewichtung. Hoffnung als primärer Motor, Angst als Korrektiv.
+
+**Motivation 3 — Wunsch / Gleichgültigkeit (Desire/Indifference)**
+Tiefe Sehnsüchte treiben an — oder die Fähigkeit, loszulassen, wenn der Wunsch nicht stimmt. Die Kunst liegt im Unterschied zwischen echtem Wunsch und konditioniertem Wollen.
+
+Not-Self: Endlose Sehnsüchte ohne Erfüllung, oder Gleichgültigkeit als Schutzmechanismus.
+Höchster Ausdruck: Lebendiger Wunsch im Einklang mit dem Design.
+
+**Motivation 4 — Gleichgültigkeit / Wunsch (Indifference/Desire)**
+Gelassenheit und Akzeptanz als primäre Kraft — mit Wunsch als Ergänzung. Diese Menschen können loslassen wie kaum jemand anderes.
+
+**Motivation 5 — Unwissenheit / Wissen (Guilt/Innocence)**
+Schuldgefühle oder das Gefühl, "nicht zu wissen" als Antrieb zur Verbesserung. Die Suche nach Wissen und Unschuld.
+
+Not-Self: Lähmende Schuld oder obsessive Wissenssuche.
+Höchster Ausdruck: Unschuld als Ausgangspunkt, Wissen als Geschenk.
+
+**Motivation 6 — Wissen / Unwissenheit (Innocence/Guilt)**
+Unschuld als primäre Qualität — das Wissen, dass man nicht alles wissen muss. Vertrauen in den natürlichen Ablauf.
+
+---
+
+## Die vier Pfeil-Kombinationen — Grundtypen
+
+### Alle Pfeile links (←←←←) — Vollständig passiv/empfangend
+Maximale Empfänglichkeit. Diese Menschen brauchen einen sehr individuellen, zurückgezogenen Rhythmus. Kein Druck, kein Pushing. Alles kommt zu ihnen — wenn sie in der richtigen Umgebung sind.
+
+### Alle Pfeile rechts (→→→→) — Vollständig aktiv/projizierend
+Maximale Aktivität und Ausdruck. Diese Menschen brauchen Stimulation, Austausch, Bewegung. Zu viel Stille und Isolation blockiert ihre Kraft.
+
+### Gemischte Pfeile — Die häufigste Variante
+Die meisten Menschen haben eine Mischung aus Links- und Rechts-Pfeilen — was eine individuelle Kombination aus passiven und aktiven Qualitäten in verschiedenen Lebensbereichen bedeutet.
+
+---
+
+## Das Variable-System im Reading
+
+Beim Reading werden die vier Pfeile des Clients übergeben (z.B.: arrows: "↑left ↑right ↓left ↓right" oder als Array).
+
+**Format der Chart-Daten:**
+```
+arrows: {
+  top_left: "left" | "right",      // Ernährung
+  top_right: "left" | "right",     // Perspektive
+  bottom_left: "left" | "right",   // Umgebung
+  bottom_right: "left" | "right"   // Motivation
+}
+```
+
+**Im Reading nutzen:**
+- Ernährung → Abschnitt "Körper & Gesundheit", "PHS"
+- Umgebung → Abschnitt "Dein optimaler Raum"
+- Perspektive → Abschnitt "Dein Geist", "Kognition"
+- Motivation → Abschnitt "Was dich wirklich antreibt"
+
+---
+
+## Wichtige Hinweise für Readings
+
+1. **Variable ist nicht Strategie/Autorität.** Diese Ebene ist feiner und subtiler — sie optimiert, was der Körper und Geist bereits gut können.
+
+2. **Links ≠ besser als rechts.** Beide Richtungen sind gleichwertig — sie sind einfach unterschiedliche Formen derselben Energie.
+
+3. **Not-Self blockiert die Variable.** Wenn jemand gegen seinen Typ/Strategie/Autorität handelt, spürt er die Vorteile der Variable kaum.
+
+4. **Praktisch, nicht philosophisch.** Die Variable sollte konkret und handlungsrelevant erklärt werden: Was isst du? Wo arbeitest du? Wie denkst du?
+
+5. **Individuell und einzigartig.** Keine zwei Menschen mit gleichen 4 Pfeilen leben das Variable-System identisch — es interagiert immer mit dem gesamten Chart.
+
+---
+
+## Kurzreferenz: Pfeile auf einen Blick
+
+| Pfeil | Position | Zeigt | Links (←) | Rechts (→) |
+|---|---|---|---|---|
+| 1 | Oben links | Ernährung | Passiv/Appetit | Aktiv/Geschmack |
+| 2 | Oben rechts | Perspektive | Empfangend/Innen | Projizierend/Außen |
+| 3 | Unten links | Umgebung | Rückzug/Höhle | Stimulation/Markt |
+| 4 | Unten rechts | Motivation | Angst/Umkehrung | Hoffnung/Ausrichtung |

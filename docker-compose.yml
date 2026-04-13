@@ -139,6 +139,9 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    volumes:
+      - ./reading-worker/knowledge:/app/knowledge
+      - ./reading-worker/templates:/app/templates
     restart: unless-stopped
     networks:
       - app-network

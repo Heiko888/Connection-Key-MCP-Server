@@ -1,83 +1,386 @@
-# Reading-Typen
+# Reading-Typen — Vollständige Übersicht
 
-## Basic Reading
-Ein grundlegendes Reading mit:
-- Typ und Strategie
-- Autorität
-- Zentren (definiert/undefiniert)
-- Basis-Insights
+Dieses System hat 32 Template-Dateien in 5 Kategorien. Diese Datei beschreibt jeden Reading-Typ, seinen Fokus, seine Zielgruppe und die enthaltenen Schwerpunkte.
 
-## Detailed Reading
-Ein detailliertes Reading mit:
-- Vollständige Typ-Analyse
-- Strategie & Autorität (tiefgreifend)
-- Alle Zentren erklärt
-- Channels & Gates
-- Profile
-- Inkarnationskreuz
-- Praktische Anwendungen
+---
 
-## Business Reading
-Fokus auf berufliche Aspekte:
-- Berufliche Talente und Stärken
-- Arbeitsumgebung und Team-Dynamik
-- Leadership-Stil
-- Karriere-Empfehlungen
-- Business-Strategien basierend auf Typ
+## KATEGORIE 1: HD STANDARD-READINGS
 
-## Relationship Reading
-Fokus auf Beziehungen:
-- Beziehungsdynamik
-- Kommunikationsstil
-- Kompatibilität mit anderen Typen
-- Intimität und Nähe
-- Beziehungs-Empfehlungen
+### basic
+**Datei:** basic.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Einsteiger, erste Begegnung mit Human Design
+**Fokus:** Die wichtigsten HD-Grundlagen kompakt und verständlich
+**Enthält:**
+- Typ & Strategie (kurze Erklärung für Alltag)
+- Innere Autorität (wie Entscheidungen treffen)
+- Zentren-Überblick (definiert vs. offen)
+- Basis-Insights und erste Schritte
+**Stil:** Klar, verständlich, motivierend, kompakt
 
-## Career Reading
-Fokus auf Karriere und berufliche Entwicklung:
-- Berufliche Talente
-- Ideale Arbeitsumgebung
-- Karriere-Empfehlungen
-- Leadership & Zusammenarbeit
-- Karriere-Strategien
+---
 
-## Health Reading
-Fokus auf Gesundheit und Wohlbefinden:
-- Energie-Management
-- Körperliche Gesundheit
-- Emotionale Gesundheit
-- Stress & Erschöpfung
-- Lifestyle-Empfehlungen
+### detailed (2-Pass-System)
+**Datei:** detailed.txt (existiert, wird NICHT genutzt — Sonderfall)
+**Routing:** generateDetailedReadingTwoParts() — zwei parallele Claude-Calls
+**Zielgruppe:** Fortgeschrittene, vertiefte Auseinandersetzung
+**Fokus:** Vollständiges, tiefgründiges HD-Reading wie eine 90-Minuten-Coaching-Session
+**Teil 1 enthält:** Typ, Autorität, Zentren (alle einzeln)
+**Teil 2 enthält:** Channels & Gates, Profil, Inkarnationskreuz, Konditionierungsmuster, konkrete nächste Schritte
+**Zusatz:** 5 persönliche Reflexionsfragen (parallel generiert)
+**Stil:** Tief, persönlich, direkt an die Person gerichtet (Du-Form)
 
-## Parenting Reading
-Fokus auf Elternschaft und Familie:
-- Elternschafts-Stil
-- Kommunikation mit Kindern
-- Familien-Dynamik
-- Erziehung & Entwicklung
-- Familien-Harmonie
+---
 
-## Spiritual Reading
-Fokus auf spirituelles Wachstum:
-- Spiritueller Weg
-- Bewusstseins-Entwicklung
-- Meditation & Praxis
-- Intuition & Weisheit
-- Lebenszweck
+### default
+**Datei:** default.txt | **Routing:** Fallback wenn kein Template passt
+**Zielgruppe:** Allgemein
+**Fokus:** Detailliertes HD-Reading als Standardfall
+**Enthält:** Typ, Strategie, Autorität, Zentren, Channels, Profil, Inkarnationskreuz, Empfehlungen
 
-## Compatibility Reading
-Fokus auf Kompatibilität:
-- Beziehungs-Kompatibilität
-- Kommunikations-Dynamik
-- Energie-Interaktion
-- Herausforderungen & Lösungen
-- Beziehungs-Empfehlungen
+---
 
-## Life Purpose Reading
-Fokus auf Lebenszweck:
-- Inkarnationskreuz
-- Lebenszweck
-- Talente & Gaben
-- Lebensweg
-- Erfüllung & Sinn
+## KATEGORIE 2: PARTNERSHIP-READINGS (2 Personen)
 
+### connection (Connection Key)
+**Datei:** connection.txt | **Routing:** processConnectionJob() wenn 2 Personen
+**Zielgruppe:** Paare, Freundschaften, Geschäftspartner
+**Fokus:** Die Energie zwischen zwei Menschen — ihr gemeinsames Feld
+**Enthält:**
+1. Verbindung im Überblick (Typen-Kombination, energetisches Thema)
+2. Elektromagnetische Anziehung & aktivierte Kanäle
+3. Konditionierungsdynamik (wer beeinflusst wen wie)
+4. Energie-Dynamik im Alltag (Tempo, Regeneration)
+5. Kommunikation & Entscheidungen (Strategien beider)
+6. Profil-Dynamik (zwei Lebensrollen)
+7. Das gemeinsame Feld (was sie zusammen in die Welt bringen)
+8. Stärken & Superkräfte der Verbindung
+9. Herausforderungen & Wachstumsfeld
+10. Empfehlungen & gelebte Praxis
+
+---
+
+### relationship
+**Datei:** relationship.txt | **Routing:** processConnectionJob() wenn 2 Personen
+**Zielgruppe:** Romantische Paare, emotionale Beziehungen
+**Fokus:** Emotionale Welt, Beziehungsstile, Nähe & Distanz
+**Enthält:**
+1. Wer seid ihr füreinander?
+2. Beziehungsstile & Bedürfnisse
+3. Kommunikation (wie ihr aneinander vorbeireden könnt)
+4. Emotionale Welt & Verletzlichkeit (Solarplexus-Dynamik)
+5. Nähe & Distanz: Räume in der Zweisamkeit
+6. Konditionierung in der Beziehung
+7. Vertrauen & Fundament
+8. Wachstum: Wozu lädt diese Beziehung ein?
+9. Herausforderungen & ehrliche Einschätzung
+10. Konkrete Empfehlungen
+
+---
+
+### compatibility
+**Datei:** compatibility.txt | **Routing:** processConnectionJob() wenn 2 Personen
+**Zielgruppe:** Menschen die energetische Kompatibilität verstehen wollen
+**Fokus:** Elektromagnetische Anziehung, Kanäle, Circuit-Kompatibilität
+**Enthält:** Typ-Kombination, gemeinsame Kanäle (Elektromagnetismus), Dominanz-/Begleitschafts-Analyse, Zentren-Resonanz, Circuitry-Kompatibilität, Connection Key Score
+
+---
+
+### sexuality
+**Datei:** sexuality.txt | **Routing:** processSexualityJob() wenn 2 Personen; sonst processHumanDesignJob()
+**Zielgruppe:** Paare, intime Verbindungen
+**Fokus:** Intimität, körperliche Verbindung, Anziehungsdynamik
+**Enthält:** Gate 59 (Intimität), Gate 6 (Reibung), sensorische Typen beider Personen, Öffnungs-/Schließungsmuster, Anziehungsdynamik
+**Stil:** Würdevoll, klar, nie voyeuristisch
+
+---
+
+## KATEGORIE 3: GRUPPEN-READING
+
+### penta
+**Datei:** penta.txt | **Routing:** processPentaJob() — 3–5 Personen
+**Zielgruppe:** Kleine Teams, Gründerpaare, Familien, Gruppen
+**Fokus:** Das Gruppen-Feld als eigene Entität — nicht Summe der Einzelpersonen
+**Enthält:**
+- Das Penta-Feld (Gruppenenergie)
+- Wer führt energetisch?
+- Wer stabilisiert die Gruppe?
+- Wer bringt Bewegung und Innovation?
+- Kommunikationsdynamik im Team
+- Kollektive Stärken und blinde Flecken
+- Empfehlungen für die Gruppe
+
+---
+
+## KATEGORIE 4: SPEZIAL-READINGS
+
+### shadow-work
+**Datei:** shadow-work.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die tiefer in ihre Konditionierung eintauchen wollen
+**Fokus:** Not-Self, Schatten, Konditionierungsmuster — ohne Dramatisierung
+**Enthält:**
+1. Not-Self Thema (nach Typ: Wut/Frustration/Bitterkeit/Enttäuschung)
+2. Offene Zentren als Konditionierungsfelder (für jedes offene Zentrum)
+3. Konditionierung durch Strategie-Verletzung
+4. Profil-Konditionierungen (alle 6 Linien)
+5. Not-Self in Beziehungen
+6. Integration: Vom Schatten zur Weisheit
+7. Schritte zur Befreiung
+
+---
+
+### transit
+**Datei:** transit.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die aktuelle Planeteneinflüsse verstehen wollen
+**Fokus:** Wie aktuelle Transiten das persönliche Design beeinflussen
+**Enthält:** Aktuelle Planetenpositionen + Aktivierungen, wie Transiten offene Zentren aktivieren, planetarische Konditionierungen, Transit-Zyklen und ihre Bedeutung
+
+---
+
+### jahres-reading
+**Datei:** jahres-reading.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Jahreswechsel, neue Lebensabschnitte
+**Fokus:** Das kommende Jahr aus HD-Perspektive
+**Enthält:** Jahres-Energie (Transiten-Überblick), persönliche Schwerpunkte, günstige Phasen für Entscheidungen, Wachstumsfelder im Jahr
+
+---
+
+### depth-analysis
+**Datei:** depth-analysis.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Fortgeschrittene HD-Kenner
+**Fokus:** Tiefste Analyse aller Chart-Elemente
+**Enthält:** Vollständige Zentren-Analyse, alle aktivierten Kanäle und Gates mit Linien, Circuit-Analyse, Variable (4 Pfeile), Split-Analyse, Inkarnationskreuz-Tiefe
+
+---
+
+### channel-analysis
+**Datei:** channel-analysis.txt | **Routing:** processChannelAnalysisJob() — Sonder-Routing
+**Zielgruppe:** Menschen die ihre Kanäle tief verstehen wollen
+**Fokus:** Jeder aktivierte Kanal einzeln analysiert
+**Enthält:** Für jeden definierten Kanal: Thema, Energie, Talente, Alltagsmomente, Herausforderung, höchster Ausdruck; Circuit-Zugehörigkeit; Zusammenspiel der Kanäle
+
+---
+
+## KATEGORIE 5: THEMEN-READINGS
+
+### business
+**Datei:** business.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Unternehmer, Führungskräfte, Business-Entscheidungen
+**Fokus:** Unternehmerische Energie, Leadership, Business-Strategie aus HD
+**Enthält:**
+1. Business-Energie (Typ im Unternehmenskontext)
+2. Kommunikation & Präsentation
+3. Entscheidungsmechanik im Business
+4. Marketing-Stärken (natürliche Anziehungskraft)
+5. Leadership-Stil
+6. Team-Dynamik & Zusammenarbeit
+7. Finanzielle Energie & Ressourcen
+8. Business-Strategie basierend auf Typ/Profil
+
+---
+
+### career
+**Datei:** career.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die berufliche Ausrichtung suchen
+**Fokus:** Berufliche Talente, ideale Arbeitsumgebung, Karriereweg
+**Enthält:**
+1. Berufliche Kerntalente (aus Zentren und Kanälen)
+2. Ideale Arbeitsumgebung
+3. Karriere-Strategie nach Typ
+4. Zusammenarbeit & Teams
+5. Leadership-Potenzial
+6. Konkrete Karriere-Empfehlungen
+
+---
+
+### health
+**Datei:** health.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die Gesundheit und Wohlbefinden aus HD-Perspektive verstehen wollen
+**Fokus:** Körperliche Gesundheit, Energie, PHS-System
+**Enthält:**
+1. Energietyp und Gesundheitsgrundlagen
+2. PHS (Primary Health System) — die 4 Pfeile
+3. Ernährungstyp (Digestion/Determination)
+4. Optimale Umgebung für Gesundheit
+5. Schlaf und Regeneration
+6. Stress und Not-Self-Auswirkungen auf Körper
+7. Praktische Gesundheitsempfehlungen
+
+---
+
+### life-purpose
+**Datei:** life-purpose.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die ihren Lebenssinn suchen
+**Fokus:** Inkarnationskreuz, Lebenszweck, Mission
+**Enthält:**
+1. Inkarnationskreuz (Lebensaufgabe, evolutionäre Aufgabe)
+2. Lebenszweck (Mission, Beitrag zur Welt)
+3. Talente & Gaben für den Lebenszweck
+4. Lebensweg (wie sich der Zweck entfaltet)
+5. Herausforderungen & Wachstum auf dem Weg
+6. Erfüllung & Sinn
+
+---
+
+### parenting
+**Datei:** parenting.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Eltern die ihr Erziehungsdesign verstehen wollen
+**Fokus:** Elternschafts-Energie, Kommunikation mit Kindern, Familien-Dynamik
+**Enthält:**
+1. Elternschafts-Stil (aus Typ und Profil)
+2. Kommunikation mit Kindern
+3. Familien-Dynamik
+4. Erziehung & Entwicklung
+5. Herausforderungen als Elternteil
+6. Familien-Harmonie
+
+---
+
+### spiritual
+**Datei:** spiritual.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Spirituell Suchende, Menschen auf innerem Weg
+**Fokus:** Spiritueller Entwicklungsweg aus HD-Perspektive
+**Enthält:**
+1. Spiritueller Weg (nach Typ und Profil)
+2. Bewusstseins-Entwicklung
+3. Meditation & spirituelle Praxis
+4. Intuition & innere Weisheit
+5. Lebenszweck (Inkarnationskreuz)
+6. Spirituelle Integration
+
+---
+
+### emotions
+**Datei:** emotions.txt | **Routing:** processHumanDesignJob() — VERZWEIGT nach Solarplexus-Status
+**Zielgruppe:** Menschen die ihre Emotionalität verstehen wollen
+**Fokus:** Emotionale Welt, emotionale Autorität, Gefühlsdynamik
+**Besonderheit:** Zwei verschiedene Prompt-Pfade je nach Solarplexus:
+- Solarplexus DEFINIERT → Wellenmuster, Klarheitsformel, Entscheidungen in der Welle
+- Solarplexus OFFEN → Konditionierungsmuster, fremde Emotionen als eigene, Konfliktscheu
+**Gemeinsam:**
+- Emotionale Muster aus Gates & Kanälen (Gate 6, 22, 36, 37, 49, 55, 30, 41)
+- Emotionale Autorität im Alltag
+- Emotionen in Beziehungen
+- 3 Kernfragen zur Reflexion
+
+---
+
+### reflection
+**Datei:** reflection.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die durch Fragen statt Aussagen wachsen wollen
+**Fokus:** NUR Reflexionsfragen — keine Aussagen, keine Ratschläge
+**Besonderheit:** Generiert ausschließlich Fragen (keine Ja/Nein-Fragen)
+**Enthält:**
+1. Typ & Strategie (5–7 Fragen)
+2. Autorität (5–7 Fragen)
+3. Profil (5–7 Fragen)
+4. Definierte Zentren (5–7 Fragen)
+5. Offene Zentren (5–7 Fragen)
+6. Kanäle & Tore (5–7 Fragen)
+7. Eine einzige Kernfrage die das gesamte Design auf den Punkt bringt
+**Verboten:** Generische HD-Phrasen, versteckte Ratschläge, Suggestivfragen
+
+---
+
+### geld-ueberfluss
+**Datei:** geld-ueberfluss.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die ihre Beziehung zu Geld und Überfluss verstehen wollen
+**Fokus:** Finanzielle Energie, Überfluss-Muster, materielle Manifestation aus HD
+**Enthält:** Geld-Energie nach Typ, finanzielle Autorität, materielle Stärken (Kanäle/Gates), Konditionierungsmuster um Geld, Überfluss-Strategie
+
+---
+
+### kinder
+**Datei:** kinder.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Eltern die das HD-Design ihres Kindes verstehen wollen
+**Fokus:** Das Kind in seinem Design verstehen und unterstützen
+**Enthält:** Typ und Strategie des Kindes, Autoritäts-Bedürfnisse, Lernstil, Soziale Energie, Erziehungshinweise für Eltern, Entwicklungsphasen
+
+---
+
+### trauma
+**Datei:** trauma.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die Traumaheilung aus HD-Perspektive angehen wollen
+**Fokus:** Wie Design und Trauma sich überlagern; Heilungsweg aus HD-Perspektive
+**Stil:** Ohne Dramatisierung, mit tiefer Würde und Sorgfalt
+**Enthält:** Typ-spezifische Traumamuster, offene Zentren als Verletzlichkeitsorte, Ressourcen und Resilienz aus dem Design, Heilungsweg nach Autorität und Strategie
+
+---
+
+### variable-phs
+**Datei:** variable-phs.txt | **Routing:** processHumanDesignJob()
+**Zielgruppe:** Menschen die ihr PHS-System (4 Pfeile) verstehen wollen
+**Fokus:** Primary Health System — Ernährung, Umgebung, Perspektive, Motivation
+**Enthält:**
+1. Ernährungstyp (oberer linker Pfeil)
+2. Umgebungstyp (unterer linker Pfeil)
+3. Perspektive/Kognition (oberer rechter Pfeil)
+4. Motivation (unterer rechter Pfeil)
+5. Praktische Anwendung im Alltag
+6. Gesundheits- und Wellbeing-Empfehlungen
+
+---
+
+## KATEGORIE 6: TAGESIMPULS (Spezial-System)
+
+### tagesimpuls
+**Datei:** tagesimpuls.txt | **Routing:** processTagesimpulsJob() — eigenes System
+**Zielgruppe:** Tägliche HD-Inspiration basierend auf aktuellen Transiten
+**Fokus:** Wie sich die heutigen Planetenkonstellationen auf das persönliche Design auswirken
+**Besonderheit:** Nutzt 4 vollständige Knowledge-Dateien (type-specific, authority-specific, profile-specific, transit-impulse-instructions)
+**Enthält:** Tages-Transit-Analyse, persönliche Aktivierungen, Tagesenergie, Empfehlungen für den Tag
+
+---
+
+### tagesimpuls-reel
+**Datei:** tagesimpuls-reel.txt | **Routing:** processTagesimpulsJob() wenn reel=true
+**Zielgruppe:** Social-Media-Content aus Tagesimpuls
+**Fokus:** Tagesimpuls als Reel-Script (30–60 Sekunden)
+**Format:** Hook, Kernbotschaft, Call-to-Action nach Brandbook-Vorgaben
+
+---
+
+## KATEGORIE 7: PIPELINE-TEMPLATES (intern)
+
+### validate-reading
+**Datei:** validate-reading.txt | **Routing:** Pipeline-intern
+**Zweck:** Qualitätskontrolle — prüft generiertes Reading auf Vollständigkeit und HD-Korrektheit
+**Kein User-Output** — nur intern für Qualitätssicherung
+
+---
+
+### correct-reading
+**Datei:** correct-reading.txt | **Routing:** Pipeline-intern nach validate-reading
+**Zweck:** Korrektur eines Readings das validate-reading nicht bestanden hat
+**Kein User-Output** — nimmt Fehler aus validate-reading und verbessert das Reading
+
+---
+
+## INFO-TEMPLATES (Kanal-Wissensdatenbank)
+
+### channel-hd-wissen
+**Datei:** channel-hd-wissen.txt | **Typ:** Info
+**Zweck:** Kanal-spezifisches HD-Wissen für channel-analysis Readings
+
+### reflection-profiles
+**Datei:** reflection-profiles.txt | **Typ:** Info
+**Zweck:** Profil-spezifische Reflexionsfragen für reflection Readings
+
+---
+
+## ROUTING-ÜBERSICHT
+
+| reading_type | → Funktion |
+|---|---|
+| tagesimpuls | processTagesimpulsJob() |
+| connection, composite | processConnectionJob() |
+| relationship, compatibility + 2. Person | processConnectionJob() |
+| channel-analysis | processChannelAnalysisJob() |
+| sexuality + 2. Person | processSexualityJob() |
+| penta | processPentaJob() |
+| **alle anderen** | processHumanDesignJob() |
+
+**Wichtige Edge Cases:**
+- sexuality OHNE 2. Person → fällt durch zu processHumanDesignJob()
+- relationship/compatibility OHNE 2. Person → fällt durch zu processHumanDesignJob()
+- Unbekannte reading_types → processHumanDesignJob() mit Template-Fallback auf "default"
+- multi-agent → sofort "failed" (gesperrt)

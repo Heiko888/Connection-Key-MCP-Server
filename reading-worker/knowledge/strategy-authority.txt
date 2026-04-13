@@ -1,58 +1,162 @@
-# Strategie & Autorität
+# Strategie & Autorität — Vollständige Referenz
 
-## Strategie
-Die Strategie ist der Weg, wie jeder Typ richtig mit der Welt interagiert.
+Strategie und Autorität sind das Herzstück des Human Design. Alles andere (Profil, Kreuz, Zentren) entfaltet sich erst, wenn Strategie und Autorität gelebt werden.
 
-### Generator Strategie
-- **Warten und Reagieren:** Nicht initiieren, sondern auf das reagieren, was kommt
-- **Sakrale Antwort:** Auf die innere "Aha" oder "Hmm" Reaktion hören
-- **Nicht fragen:** Nicht andere fragen, was zu tun ist, sondern auf die innere Antwort warten
+**Strategie** = WIE ich mit der Welt interagiere (nach außen)
+**Autorität** = WIE ich Entscheidungen treffe (nach innen)
 
-### Manifestor Strategie
-- **Informieren:** Andere informieren, bevor man handelt
-- **Nicht um Erlaubnis fragen:** Einfach informieren, was man tun wird
-- **Reduziert Widerstand:** Informieren reduziert Widerstand von anderen
+---
 
-### Projector Strategie
-- **Auf Einladung warten:** Nicht initiieren, sondern auf echte Einladungen warten
-- **Erkannt werden:** Warten, bis man für die eigenen Talente erkannt wird
-- **Keine Energie verschwenden:** Nicht versuchen, Generator-Energie zu haben
+## STRATEGIEN NACH TYP
 
-### Reflector Strategie
-- **Mondzyklus warten:** 28 Tage warten für wichtige Entscheidungen
-- **Spiegeln:** Die Umgebung spiegeln, um Klarheit zu bekommen
-- **Sich umgeben:** Mit den richtigen Menschen umgeben
+### Generator — Warten und Reagieren
+- **Kernprinzip:** Nicht initiieren. Auf externe Impulse warten, dann aus dem Sakral reagieren
+- **Richtig:** Auf etwas reagieren das von außen kommt (Frage, Angebot, Situation, Einladung)
+- **Falsch:** Aus dem Kopf heraus initiieren, Pläne schmieden ohne Reaktions-Auslöser
+- **Signatur:** Zufriedenheit — tiefes Gefühl "Ich bin am richtigen Platz"
+- **Not-Self:** Frustration — Signal: "Ich tue etwas ohne echtes Sakral-Ja"
+- **Häufige Falle:** Frustration als Ansporn nehmen und noch mehr zu tun — statt innezuhalten
 
-## Autorität
-Die Autorität ist der innere Entscheidungsmechanismus.
+### Manifesting Generator (MG) — Reagieren, dann Informieren
+- **Kernprinzip:** Erst auf Sakral-Reaktion warten, dann schnell handeln UND informieren
+- **Richtig:** Sakral-Ja abwarten → relevante Menschen informieren ("Ich werde X tun") → handeln
+- **Besonderheit:** MGs dürfen Schritte überspringen — das ist kein Fehler, sondern Design
+- **Signatur:** Zufriedenheit und Frieden
+- **Not-Self:** Frustration (kein Sakral-Ja) und/oder Wut (nicht informiert, Widerstand erfahren)
+- **Häufige Falle:** Informieren als Erlaubnis-Fragen missverstehen — es ist eine Ankündigung, kein Fragen
 
-### Sakrale Autorität (Generator)
-- Bauchgefühl, "Aha" oder "Hmm" Reaktion
-- Sofortige, körperliche Antwort
-- Nicht rational erklärbar
+### Manifestor — Informieren
+- **Kernprinzip:** Aus inneren Impulsen heraus initiieren — aber VORHER relevante Menschen informieren
+- **Richtig:** Inneren Impuls spüren → betroffene Menschen informieren → handeln
+- **Informieren ≠ Erlaubnis fragen:** "Ich werde X tun" — nicht "Darf ich X tun?"
+- **Wer wird informiert?** Alle die von der Handlung direkt betroffen sind
+- **Signatur:** Frieden — das Gefühl, frei zu sein ohne Widerstand
+- **Not-Self:** Wut — entsteht durch Widerstand (nicht informiert) oder durch unterdrückte Impulse
+- **Häufige Falle:** Kindheitskonditonierung ("Frag erst nach") führt zu Passivität und aufgestauter Wut
 
-### Emotionale Autorität
-- Warten, bis die Emotionen klar sind
-- Wellen der Emotionen durchlaufen
-- Nicht impulsiv entscheiden
+### Projektor — Auf Einladung warten
+- **Kernprinzip:** Warten auf eine echte, spezifische Einladung — nicht initiieren
+- **Echte Einladung:** Kommt von anderen, die den Projektor für seine spezifische Gabe anerkennen
+- **Falsche Einladung:** Allgemeine Aufforderung ohne Anerkennung der Gabe ("Du kannst auch kommen")
+- **Große Lebensentscheidungen** (Job, Beziehung, Wohnort) brauchen immer echte Einladung
+- **Kleinere Entscheidungen** dürfen freier fließen
+- **Signatur:** Erfolg — echte, tiefe Anerkennung für die eigene Gabe
+- **Not-Self:** Bitterkeit — "Ich gebe und gebe, aber niemand sieht es"
+- **Häufige Falle:** Wissen ungefragt teilen → Widerstand → Bitterkeit
 
-### Splenic Autorität
-- Intuitive, sofortige Antworten
-- Instinktive Entscheidungen
-- Schnelle Reaktionen
+### Reflektor — 28-Tage-Mondzyklus
+- **Kernprinzip:** Wichtige Entscheidungen über einen vollen Mondzyklus (~28 Tage) beobachten
+- **Richtig:** Entscheidungsfrage notieren, täglich beobachten, mit vertrauten Menschen sprechen, am Ende des Zyklus entscheiden
+- **Der Mond** bewegt sich durch alle 64 Gates in 28 Tagen — Reflektoren erleben so alle Energiequalitäten
+- **Signatur:** Überraschung und Freude — wenn das Leben sich magisch entfaltet
+- **Not-Self:** Enttäuschung — wenn Umfeld nicht stimmt oder zu schnell entschieden wurde
+- **Häufige Falle:** Sozialer Druck zu schnellen Entscheidungen
 
-### Ego-Autorität
-- Entscheidungen basierend auf Willenskraft
-- Klare, direkte Antworten
-- Selbstbewusste Entscheidungen
+---
 
-### G-Autorität (Selbst)
-- Antworten kommen vom Selbst
-- Verbindung mit der eigenen Essenz
-- Tiefe innere Weisheit
+## AUTORITÄTEN IM DETAIL
 
-### Mondzyklus-Autorität (Reflector)
-- 28 Tage warten
-- Verschiedene Phasen des Mondzyklus durchlaufen
-- Klarheit durch Zeit
+### Sakrale Autorität
+**Typen:** Generator, MG (wenn kein definierter Solarplexus)
+**Mechanik:** Spontane, körperliche Ja/Nein-Reaktion des Sakralzentrums
+- Ja-Reaktion: "Uhhh-hm" — Energie, Kribbeln, Anziehung, Freude
+- Nein-Reaktion: "Mmm-mm" — Absacken, Leere, Widerstand
+- Kommt VOR dem Denken — körperlich, nicht mental
+- Wird durch Ja/Nein-Fragen aktiviert
+**Praxis:** Körperreaktion auf Fragen beobachten. "Will ich das?" nicht "Soll ich das?"
+**Blockiert durch:** Entscheidungen aus Pflichtgefühl, sozialem Druck, Kopf-Logik
 
+### Emotionale Autorität (Solarplexus-Autorität)
+**Typen:** Alle Typen mit definiertem Solarplexus — überschreibt andere Autoritäten
+**Mechanik:** Klarheit entsteht NICHT im Moment, sondern nach dem Durchlaufen der emotionalen Welle
+- Keine Spontanentscheidungen — auch nicht bei positivem Hochgefühl
+- Welle durchlaufen: Hoch → Mittel → Tief → Mittel → relative Klarheit
+- Mehrfach prüfen: heute, morgen, in 3 Tagen, in einer Woche
+**Praxis:** "Schlafe eine Nacht darüber" als Grundregel. Entscheidungs-Tagebuch führen.
+**Blockiert durch:** Impulsive Entscheidungen im Hoch ("Ich bin so begeistert!") oder Tief ("Es ist eh egal")
+
+### Milz-Autorität (Spleenische Autorität)
+**Typen:** Projektor, Manifestor, Generator/MG (wenn kein Solarplexus, nur Milz definiert)
+**Mechanik:** Spontane, leise Körperintuition im gegenwärtigen Moment
+- Spricht EINMAL — leise, flüchtig, nicht wiederholend
+- Nur im JETZT — keine Vergangenheit, keine Zukunft
+- Körperlich: Kribbeln, Gänsehaut, leises Ja/Nein-Gefühl
+**Praxis:** Im Moment präsent sein. Dem ersten Körpersignal vertrauen. Nicht analysieren.
+**Blockiert durch:** Überdenken nach dem ersten Impuls, Warten auf Bestätigung, Angst vor dem Impuls
+
+### Ego-Autorität (Wills-Autorität)
+**Typen:** Manifestor, Projektor (selten — nur spezifische Kanal-Konfiguration)
+**Mechanik:** Entscheidungen aus echtem persönlichem Willen
+- "Will ICH das — wirklich, aus meinem tiefsten Inneren?"
+- Stärke und Motivation als Kompass: echte Wille gibt Kraft, Pflicht erschöpft
+- Hören was der Mund sagt: Wahrheit kommt spontan heraus vor dem mentalen Filter
+**Praxis:** "Ich will..." Sätze vervollständigen. Unterschied zwischen echtem Wille und sozialem Sollen erforschen.
+**Blockiert durch:** Entscheidungen aus Pflichtgefühl, Erwartungen anderer, konditioniertem "Ich sollte"
+
+### Selbst-projizierte Autorität (G-Zentrum-Autorität)
+**Typen:** Projektor (nur — G-Zentrum direkt mit Kehlkopf verbunden)
+**Mechanik:** Wahrheit entsteht beim Sprechen — nicht beim Denken
+- Mit vertrauten, neutralen Menschen sprechen
+- Beim eigenen Sprechen ZUHÖREN: Was sage ich wirklich?
+- Nicht die Meinung des Gesprächspartners übernehmen — die eigene Stimme hören
+- Umgebung und Identitätsgefühl prüfen: passt diese Entscheidung zu wer ich bin?
+**Praxis:** Wichtige Entscheidungen immer erst laut besprechen. "Ich höre mir selbst zu."
+**Blockiert durch:** Allein im Kopf entscheiden, falsche Gesprächspartner (mit Agenda)
+
+### Mentale/Äußere Autorität (Keine innere Autorität)
+**Typen:** Projektor und Reflektor ohne innere Autoritätszentren
+**Mechanik:** Keine körperliche Antwort — Klarheit durch Prozess und Umgebung
+- Verschiedene Umgebungen aufsuchen und beobachten wie sich die Entscheidung dort anfühlt
+- Mit mehreren vertrauten, neutralen Menschen sprechen
+- Nicht Meinungen sammeln — den eigenen Prozess beobachten
+- Zeit ist entscheidend — niemals unter Druck entscheiden
+**Praxis:** "Wie fühlt sich diese Entscheidung an wenn ich an verschiedenen Orten darüber nachdenke?"
+**Blockiert durch:** Zeitdruck, Menschen mit Agenda, Erwartung einer klaren inneren Antwort
+
+### Mond-Autorität
+**Typen:** Reflektor (ausschließlich)
+**Mechanik:** Mond bewegt sich in ~28 Tagen durch alle 64 Gates — Reflektor erlebt alle Energiequalitäten
+- Wichtige Entscheidungen brauchen vollen 28-Tage-Zyklus
+- Mondzyklus-Tagebuch: täglich notieren wie sich die Entscheidungsfrage anfühlt
+- Mit verschiedenen vertrauten Menschen über die Entscheidung sprechen
+- Am Ende des Zyklus: Gefühl konstant zugenommen? Oder verblasst?
+**Praxis:** 28-Tage-Kalender für wichtige Entscheidungen. Stabile Vertrauenspersonen als "Spiegelhalter".
+**Blockiert durch:** Sozialer Druck zu schnellen Entscheidungen, falsches Umfeld
+
+---
+
+## NICHT-SELBST (NOT-SELF) — SCHNELLREFERENZ
+
+| Typ | Not-Self-Emotion | Bedeutung | Richtige Reaktion |
+|---|---|---|---|
+| Generator | Frustration | Kein echtes Sakral-Ja | Innehalten, was hat kein Ja? |
+| MG | Frustration + Wut | Kein Sakral-Ja / nicht informiert | Sakral prüfen, informieren |
+| Manifestor | Wut | Widerstand durch nicht-Informieren / unterdrückter Impuls | Informieren oder Impuls prüfen |
+| Projektor | Bitterkeit | Ohne echte Einladung gegeben | Zurückziehen, auf Einladung warten |
+| Reflektor | Enttäuschung | Umfeld stimmt nicht / zu schnell entschieden | Umfeld überprüfen, Zeit geben |
+
+---
+
+## SIGNATUR — ZIELZUSTAND
+
+| Typ | Signatur | Wie es sich anfühlt |
+|---|---|---|
+| Generator | Zufriedenheit | "Ich bin genau am richtigen Platz" — ruhige, tiefe Freude an der Tätigkeit |
+| MG | Zufriedenheit + Frieden | Lebendige Energie ohne Widerstand, viele Projekte fühlen sich richtig an |
+| Manifestor | Frieden | Keine Kontrolle von außen, freier Fluss der eigenen Impulse |
+| Projektor | Erfolg | Echte, tiefe Anerkennung für die eigene Gabe — nicht oberflächliches Lob |
+| Reflektor | Überraschung + Freude | Das Leben entfaltet sich magisch und überraschend positiv |
+
+---
+
+## STRATEGIE-AUTORITÄT ZUSAMMENGEFASST
+
+Die einfachste Formel:
+
+**Strategie** beantwortet: *Wann und wie handle ich in der Welt?*
+**Autorität** beantwortet: *Welche Entscheidungen sind wirklich meine?*
+
+Wenn jemand gegen seine Strategie handelt → Not-Self-Emotion entsteht
+Wenn jemand gegen seine Autorität entscheidet → falsche Richtung wird eingeschlagen
+
+Beide zusammen: **Das ist der direkte Weg zu Signatur und Erfüllung.**

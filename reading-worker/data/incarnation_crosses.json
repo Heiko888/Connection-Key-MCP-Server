@@ -1,0 +1,419 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "format": "PersonalitySun-PersonalityEarth-DesignSun-DesignEarth",
+    "notes": "Jeder Eintrag hat beide Profil-Varianten (PS/DS getauscht). Gate-Polaritäten: 1↔2, 3↔50, 4↔49, 5↔35, 6↔36, 7↔13, 8↔14, 9↔16, 10↔15, 11↔12, 17↔18, 19↔33, 20↔34, 21↔48, 22↔47, 23↔43, 24↔44, 25↔46, 26↔45, 27↔28, 29↔30, 31↔41, 32↔42, 37↔40, 38↔39, 51↔57, 52↔58, 53↔54, 55↔59, 56↔60, 61↔62, 63↔64"
+  },
+
+  "gate_names": {
+    "1":  { "name": "Kreativität",        "keyword": "Selbstausdruck" },
+    "2":  { "name": "Empfänger",          "keyword": "Innere Richtung" },
+    "3":  { "name": "Schwierigkeit",      "keyword": "Mutation durch Chaos" },
+    "4":  { "name": "Formeln",            "keyword": "Mentale Lösungen" },
+    "5":  { "name": "Feste Rhythmen",     "keyword": "Kosmischer Takt" },
+    "6":  { "name": "Reibung",            "keyword": "Emotionale Grenzen" },
+    "7":  { "name": "Armee",              "keyword": "Führung durch Weisheit" },
+    "8":  { "name": "Beitrag",            "keyword": "Einzigartiger Beitrag" },
+    "9":  { "name": "Fokus",              "keyword": "Konzentration auf Details" },
+    "10": { "name": "Verhalten des Selbst","keyword": "Authentisches Sein" },
+    "11": { "name": "Frieden / Ideen",    "keyword": "Konzeptuelle Kreativität" },
+    "12": { "name": "Stillstand",         "keyword": "Vorsichtiger Ausdruck" },
+    "13": { "name": "Zuhörer",            "keyword": "Hüter von Geheimnissen" },
+    "14": { "name": "Reichtum",           "keyword": "Sacral-Kraft für Ressourcen" },
+    "15": { "name": "Bescheidenheit",     "keyword": "Menschlicher Rhythmus" },
+    "16": { "name": "Enthusiasmus",       "keyword": "Begeisterung für Fähigkeiten" },
+    "17": { "name": "Meinungen",          "keyword": "Logische Überzeugungen" },
+    "18": { "name": "Korrektur",          "keyword": "Verbesserungsinstinkt" },
+    "19": { "name": "Annäherung",         "keyword": "Sensibilität für Bedürfnisse" },
+    "20": { "name": "Das Jetzt",          "keyword": "Gegenwärtigkeit" },
+    "21": { "name": "Kontrolle",          "keyword": "Materielle Meisterschaft" },
+    "22": { "name": "Anmut",              "keyword": "Emotionale Offenheit" },
+    "23": { "name": "Assimilation",       "keyword": "Integration des Neuen" },
+    "24": { "name": "Rationalisierung",   "keyword": "Wiederkehrende Erkenntnisse" },
+    "25": { "name": "Unschuld",           "keyword": "Universale Liebe" },
+    "26": { "name": "Der Bändiger",       "keyword": "Integrität und Einfluss" },
+    "27": { "name": "Ernährung",          "keyword": "Fürsorge und Pflege" },
+    "28": { "name": "Spiel mit dem Tod",  "keyword": "Sinn und Zweck" },
+    "29": { "name": "Hingabe",            "keyword": "Bedingungsloses Ja" },
+    "30": { "name": "Verlangen",          "keyword": "Leidenschaft und Gefühle" },
+    "31": { "name": "Einfluss",           "keyword": "Demokratische Führung" },
+    "32": { "name": "Kontinuität",        "keyword": "Überlebensinstinkt" },
+    "33": { "name": "Rückzug",            "keyword": "Erfahrungen verarbeiten" },
+    "34": { "name": "Kraft",              "keyword": "Reine Lebensenergie" },
+    "35": { "name": "Fortschritt",        "keyword": "Hunger nach Erfahrung" },
+    "36": { "name": "Verdunkelung",       "keyword": "Krise als Wachstum" },
+    "37": { "name": "Familie",            "keyword": "Stammesverbindungen" },
+    "38": { "name": "Kämpfer",            "keyword": "Sinnvoller Widerstand" },
+    "39": { "name": "Provokation",        "keyword": "Emotionale Herausforderung" },
+    "40": { "name": "Alleinsein",         "keyword": "Befreiung durch Rückzug" },
+    "41": { "name": "Neuer Anfang",       "keyword": "Emotionaler Hunger" },
+    "42": { "name": "Vollendung",         "keyword": "Zyklen abschließen" },
+    "43": { "name": "Durchbruch",         "keyword": "Revolutionäre Einsicht" },
+    "44": { "name": "Zusammenkommen",     "keyword": "Muster aus der Vergangenheit" },
+    "45": { "name": "Der Sammler",        "keyword": "Ressourcen für die Gemeinschaft" },
+    "46": { "name": "Liebe des Körpers",  "keyword": "Körperliche Freude" },
+    "47": { "name": "Realisierung",       "keyword": "Sinn aus Erfahrung" },
+    "48": { "name": "Der Brunnen",        "keyword": "Tiefes Wissen" },
+    "49": { "name": "Revolution",         "keyword": "Prinzipientreue" },
+    "50": { "name": "Werte",              "keyword": "Stammesverantwortung" },
+    "51": { "name": "Erschütterung",      "keyword": "Initiation durch Schock" },
+    "52": { "name": "Stillstand",         "keyword": "Stille Konzentration" },
+    "53": { "name": "Entwicklung",        "keyword": "Neue Zyklen beginnen" },
+    "54": { "name": "Ambition",           "keyword": "Aufstieg und Transformation" },
+    "55": { "name": "Überfluss",          "keyword": "Geist und Fülle" },
+    "56": { "name": "Der Wanderer",       "keyword": "Stimulation durch Geschichten" },
+    "57": { "name": "Intuition",          "keyword": "Körperbasierte Weisheit" },
+    "58": { "name": "Freude",             "keyword": "Tiefe Lebensfreude" },
+    "59": { "name": "Intimität",          "keyword": "Öffnung für Verbindung" },
+    "60": { "name": "Begrenzung",         "keyword": "Transformation durch Grenzen" },
+    "61": { "name": "Innere Wahrheit",    "keyword": "Mystisches Wissen" },
+    "62": { "name": "Details",            "keyword": "Präzision und Genauigkeit" },
+    "63": { "name": "Zweifel",            "keyword": "Logischer Druck" },
+    "64": { "name": "Verwirrung",         "keyword": "Inspiration aus dem Chaos" }
+  },
+
+  "crosses": {
+
+    "1-2-13-7": {
+      "name": "Sphinx",
+      "theme": "Erinnerung, Führung und Richtung",
+      "description": "Das Kreuz der Sphinx trägt die Weisheit kollektiver Erinnerungen. Gate 1 (Kreativität) und Gate 13 (Zuhörer) verbinden sich zu einer magnetischen Führungskraft, die durch das Zuhören und Weitergeben von Geschichten wirkt."
+    },
+    "13-7-1-2": {
+      "name": "Sphinx",
+      "theme": "Erinnerung, Führung und Richtung",
+      "description": "Das Kreuz der Sphinx in seiner zweiten Variante — die Führungskraft (Gate 7) und das Zuhören (Gate 13) stehen im Vordergrund, genährt von kreativem Selbstausdruck (Gate 1)."
+    },
+
+    "43-23-49-4": {
+      "name": "Penetrating Sword",
+      "theme": "Durchbruch, Einsicht und Transformation",
+      "description": "Das Kreuz des durchdringenden Schwertes bringt revolutionäre Einsichten (Gate 43) in die Welt, übersetzt sie in Sprache (Gate 23) und verbindet sie mit tiefgreifendem Wandel (Gate 49) und logischen Lösungen (Gate 4)."
+    },
+    "49-4-43-23": {
+      "name": "Penetrating Sword",
+      "theme": "Durchbruch, Einsicht und Transformation",
+      "description": "Revolution (Gate 49) und Formeln (Gate 4) als Persönlichkeitskraft — genährt von Durchbruch (Gate 43) und Assimilation (Gate 23)."
+    },
+
+    "17-18-47-22": {
+      "name": "Four Ways",
+      "theme": "Logik, Korrektur und Verbesserung",
+      "description": "Das Kreuz der Vier Wege verbindet logische Überzeugungen (Gate 17), Korrektur (Gate 18), Realisierung (Gate 47) und emotionale Offenheit (Gate 22) zu einer Lebensaufgabe der systematischen Verbesserung."
+    },
+    "47-22-17-18": {
+      "name": "Four Ways",
+      "theme": "Logik, Korrektur und Verbesserung",
+      "description": "Realisierung (Gate 47) und Anmut (Gate 22) als bewusste Kraft — unterstützt durch logische Meinungen (Gate 17) und Korrekturinstinkt (Gate 18)."
+    },
+
+    "36-6-11-12": {
+      "name": "Eden",
+      "theme": "Erfahrungssuche, Krise und kreative Expression",
+      "description": "Das Kreuz Edens trägt den Drang nach tiefen emotionalen Erfahrungen (Gate 36) und kreativen Ideen (Gate 11), navigiert durch Reibung (Gate 6) und vorsichtigen Ausdruck (Gate 12)."
+    },
+    "11-12-36-6": {
+      "name": "Eden",
+      "theme": "Erfahrungssuche, Krise und kreative Expression",
+      "description": "Ideen (Gate 11) und vorsichtiger Ausdruck (Gate 12) als Persönlichkeitskraft — tief verwurzelt in emotionaler Erfahrung (Gate 36) und Reibung (Gate 6)."
+    },
+
+    "46-25-15-10": {
+      "name": "Vessel of Love",
+      "theme": "Liebe des Körpers und der Menschheit",
+      "description": "Das reinste Liebeskreuz: Körperfreude (Gate 46), Unschuld (Gate 25), menschlicher Rhythmus (Gate 15) und authentisches Sein (Gate 10) formen eine Lebensaufgabe bedingungsloser Liebe."
+    },
+    "15-10-46-25": {
+      "name": "Vessel of Love",
+      "theme": "Liebe des Körpers und der Menschheit",
+      "description": "Bescheidenheit (Gate 15) und authentisches Selbst-Sein (Gate 10) als Persönlichkeitskraft — genährt von Körperliebe (Gate 46) und universaler Unschuld (Gate 25)."
+    },
+
+    "51-57-61-62": {
+      "name": "Unexpected",
+      "theme": "Initiation, Schock und innere Wahrheit",
+      "description": "Das Kreuz des Unerwarteten: Erschütterung (Gate 51) und Körperintuition (Gate 57) verbinden sich mit innerer Wahrheit (Gate 61) und präzisen Details (Gate 62) zu einer Kraft die andere durch Überraschung aufweckt."
+    },
+    "61-62-51-57": {
+      "name": "Unexpected",
+      "theme": "Initiation, Schock und innere Wahrheit",
+      "description": "Innere Wahrheit (Gate 61) und Details (Gate 62) als bewusste Kraft — unterstützt durch initiativen Mut (Gate 51) und Intuition (Gate 57)."
+    },
+
+    "55-59-9-16": {
+      "name": "Sleeping Phoenix",
+      "theme": "Geist, Überfluss und neues Bewusstsein",
+      "description": "Das Kreuz des schlafenden Phönix trägt die Energie des erwachenden Geistes (Gate 55), Intimität (Gate 59), Fokus (Gate 9) und Begeisterung (Gate 16) — ein Kreuz des neuen Zeitalters."
+    },
+    "9-16-55-59": {
+      "name": "Sleeping Phoenix",
+      "theme": "Geist, Überfluss und neues Bewusstsein",
+      "description": "Konzentration (Gate 9) und Enthusiasmus (Gate 16) als bewusste Kraft — tief genährt von spirituellem Überfluss (Gate 55) und Intimität (Gate 59)."
+    },
+
+    "45-26-21-48": {
+      "name": "Rulership",
+      "theme": "Materielles Meistertum und Führung",
+      "description": "Das Kreuz der Herrschaft: Der Sammler (Gate 45) und der Bändiger (Gate 26) verbinden sich mit Kontrolle (Gate 21) und tiefem Wissen (Gate 48) zu einer Lebensaufgabe materieller Meisterschaft."
+    },
+    "21-48-45-26": {
+      "name": "Rulership",
+      "theme": "Materielles Meistertum und Führung",
+      "description": "Kontrolle (Gate 21) und Tiefe (Gate 48) als Persönlichkeitskraft — ergänzt durch kollektive Ressourcenführung (Gate 45) und Integrität (Gate 26)."
+    },
+
+    "38-39-28-27": {
+      "name": "Tension",
+      "theme": "Kampf, Zweck und Fürsorge",
+      "description": "Das Kreuz der Spannung: Der Kämpfer (Gate 38) und Provokation (Gate 39) suchen nach Sinn (Gate 28) und verbinden ihn mit Fürsorge (Gate 27). Lebensaufgabe: Herausfinden wofür es sich wirklich zu kämpfen lohnt."
+    },
+    "28-27-38-39": {
+      "name": "Tension",
+      "theme": "Kampf, Zweck und Fürsorge",
+      "description": "Sinnsuche (Gate 28) und Fürsorge (Gate 27) als Persönlichkeitskraft — angetrieben durch Kämpfergeist (Gate 38) und Provokation (Gate 39)."
+    },
+
+    "53-54-42-32": {
+      "name": "Plane",
+      "theme": "Zyklen, Beginn und Vollendung",
+      "description": "Das Kreuz der Ebene: Neue Zyklen beginnen (Gate 53), Ambition (Gate 54), Vollendung (Gate 42) und Kontinuität (Gate 32) formen eine Lebensaufgabe vollständiger Erfahrungszyklen."
+    },
+    "42-32-53-54": {
+      "name": "Plane",
+      "theme": "Zyklen, Beginn und Vollendung",
+      "description": "Vollendung (Gate 42) und Kontinuität (Gate 32) als bewusste Kraft — genährt von Entwicklung (Gate 53) und Aufstieg (Gate 54)."
+    },
+
+    "4-49-8-14": {
+      "name": "Explanation",
+      "theme": "Formeln, Antworten und Beitrag",
+      "description": "Das Kreuz der Erklärung: Mentale Lösungen (Gate 4) und revolutionäre Prinzipien (Gate 49) verbinden sich mit einzigartigem Beitrag (Gate 8) und materieller Kraft (Gate 14)."
+    },
+    "8-14-4-49": {
+      "name": "Explanation",
+      "theme": "Formeln, Antworten und Beitrag",
+      "description": "Beitrag (Gate 8) und Reichtum (Gate 14) als Persönlichkeitskraft — unterstützt durch logische Formeln (Gate 4) und Prinzipientreue (Gate 49)."
+    },
+
+    "20-34-10-15": {
+      "name": "Clarion",
+      "theme": "Gegenwärtigkeit, Kraft und Empowerment",
+      "description": "Das Kreuz der Klarinette: Das Jetzt (Gate 20) und reine Kraft (Gate 34) verbinden sich mit authentischem Selbst-Sein (Gate 10) und menschlichem Rhythmus (Gate 15) zu kraftvoller Präsenz."
+    },
+    "10-15-20-34": {
+      "name": "Clarion",
+      "theme": "Gegenwärtigkeit, Kraft und Empowerment",
+      "description": "Authentisches Sein (Gate 10) und Bescheidenheit (Gate 15) als Persönlichkeitskraft — genährt von Gegenwärtigkeit (Gate 20) und Sacral-Kraft (Gate 34)."
+    },
+
+    "63-64-5-35": {
+      "name": "Consciousness",
+      "theme": "Fragen, Zweifel und Erfahrung",
+      "description": "Das Kreuz des Bewusstseins: Logischer Zweifel (Gate 63) und Verwirrung (Gate 64) suchen Antworten durch feste Rhythmen (Gate 5) und Hunger nach Erfahrung (Gate 35)."
+    },
+    "5-35-63-64": {
+      "name": "Consciousness",
+      "theme": "Fragen, Zweifel und Erfahrung",
+      "description": "Kosmischer Takt (Gate 5) und Fortschritt (Gate 35) als Persönlichkeitskraft — angetrieben durch mentalen Druck (Gate 63) und Inspiration aus dem Chaos (Gate 64)."
+    },
+
+    "56-60-27-28": {
+      "name": "Maya",
+      "theme": "Überzeugung, Grenzen und Fürsorge",
+      "description": "Das Kreuz der Maya: Der Wanderer (Gate 56) und Begrenzung (Gate 60) verbinden sich mit Fürsorge (Gate 27) und Sinnsuche (Gate 28) zu einer Lebensaufgabe durch Geschichten und Fürsorge."
+    },
+    "27-28-56-60": {
+      "name": "Maya",
+      "theme": "Überzeugung, Grenzen und Fürsorge",
+      "description": "Ernährung (Gate 27) und Sinn (Gate 28) als Persönlichkeitskraft — genährt durch Stimulation (Gate 56) und Transformation durch Grenzen (Gate 60)."
+    },
+
+    "19-33-44-24": {
+      "name": "Duality",
+      "theme": "Rückzug, Erinnerung und Bedürfnisse",
+      "description": "Das Kreuz der Dualität: Sensibilität für Bedürfnisse (Gate 19) und Rückzug (Gate 33) verbinden sich mit Mustern aus der Vergangenheit (Gate 44) und Rationalisierung (Gate 24)."
+    },
+    "44-24-19-33": {
+      "name": "Duality",
+      "theme": "Rückzug, Erinnerung und Bedürfnisse",
+      "description": "Muster aus der Vergangenheit (Gate 44) und Rationalisierung (Gate 24) als Persönlichkeitskraft — verbunden mit Sensibilität (Gate 19) und Rückzug (Gate 33)."
+    },
+
+    "31-41-24-44": {
+      "name": "Dominion",
+      "theme": "Führung durch Einfluss und neue Anfänge",
+      "description": "Das Kreuz der Dominanz: Demokratischer Einfluss (Gate 31) und neue Anfänge (Gate 41) verbinden sich mit Rationalisierung (Gate 24) und dem Erkennen von Mustern (Gate 44)."
+    },
+    "24-44-31-41": {
+      "name": "Dominion",
+      "theme": "Führung durch Einfluss und neue Anfänge",
+      "description": "Rationalisierung (Gate 24) und Zusammenkommen (Gate 44) als Persönlichkeitskraft — entfaltet durch Einfluss (Gate 31) und emotionalen Hunger (Gate 41)."
+    },
+
+    "17-18-58-52": {
+      "name": "Service",
+      "theme": "Dienst durch freudige Verbesserung",
+      "description": "Das Kreuz des Dienstes: Meinungen (Gate 17) und Korrektur (Gate 18) verbinden sich mit tiefer Lebensfreude (Gate 58) und stiller Konzentration (Gate 52) zu einem Lebensweg durch freudige Verbesserung."
+    },
+    "58-52-17-18": {
+      "name": "Service",
+      "theme": "Dienst durch freudige Verbesserung",
+      "description": "Freude (Gate 58) und Stille (Gate 52) als Persönlichkeitskraft — kanalisiert durch logische Überzeugungen (Gate 17) und Korrekturinstinkt (Gate 18)."
+    },
+
+    "25-46-10-15": {
+      "name": "Healing",
+      "theme": "Unschuld, Heilung und Selbstliebe",
+      "description": "Das Kreuz der Heilung: Universale Liebe (Gate 25) und Körperfreude (Gate 46) verbinden sich mit authentischem Selbst-Sein (Gate 10) und menschlichem Rhythmus (Gate 15). Heilung durch Präsenz."
+    },
+    "10-15-25-46": {
+      "name": "Healing",
+      "theme": "Unschuld, Heilung und Selbstliebe",
+      "description": "Authentisches Sein (Gate 10) und Bescheidenheit (Gate 15) als Persönlichkeitskraft — genährt von Unschuld (Gate 25) und Körperliebe (Gate 46)."
+    },
+
+    "40-37-63-64": {
+      "name": "Aloofness",
+      "theme": "Einsamkeit, Gemeinschaft und mentale Auflösung",
+      "description": "Das Kreuz der Distanz: Alleinsein (Gate 40) und Familie (Gate 37) spannen den Bogen zwischen Einsamkeit und Gemeinschaft, unterstützt durch Zweifel (Gate 63) und Verwirrung (Gate 64)."
+    },
+    "63-64-40-37": {
+      "name": "Aloofness",
+      "theme": "Einsamkeit, Gemeinschaft und mentale Auflösung",
+      "description": "Zweifel (Gate 63) und Verwirrung (Gate 64) als Persönlichkeitskraft — navigiert durch Alleinsein (Gate 40) und Stammesverbindungen (Gate 37)."
+    },
+
+    "61-62-3-50": {
+      "name": "Four Lights",
+      "theme": "Innere Wahrheit und Mutation",
+      "description": "Das Kreuz der Vier Lichter: Innere Wahrheit (Gate 61) und Details (Gate 62) verbinden sich mit Mutation (Gate 3) und Stammesverantwortung (Gate 50) — Wahrheit durch Chaos."
+    },
+    "3-50-61-62": {
+      "name": "Four Lights",
+      "theme": "Innere Wahrheit und Mutation",
+      "description": "Mutation (Gate 3) und Werte (Gate 50) als Persönlichkeitskraft — genährt von innerer Wahrheit (Gate 61) und Präzision (Gate 62)."
+    },
+
+    "56-60-35-5": {
+      "name": "Migration",
+      "theme": "Wanderung, Erfahrung und Stimulation",
+      "description": "Das Kreuz der Migration: Stimulation durch Geschichten (Gate 56) und Begrenzung (Gate 60) verbinden sich mit Hunger nach Erfahrung (Gate 35) und kosmischen Rhythmen (Gate 5)."
+    },
+    "35-5-56-60": {
+      "name": "Migration",
+      "theme": "Wanderung, Erfahrung und Stimulation",
+      "description": "Fortschritt (Gate 35) und feste Rhythmen (Gate 5) als Persönlichkeitskraft — genährt durch Wanderung (Gate 56) und Transformation durch Grenzen (Gate 60)."
+    },
+
+    "37-40-9-16": {
+      "name": "Planning",
+      "theme": "Gemeinschaft, Fokus und Planung",
+      "description": "Das Kreuz der Planung: Familie (Gate 37) und Alleinsein (Gate 40) verbinden sich mit Fokus auf Details (Gate 9) und Enthusiasmus (Gate 16) zu einer Lebensaufgabe gemeinschaftlicher Organisation."
+    },
+    "9-16-37-40": {
+      "name": "Planning",
+      "theme": "Gemeinschaft, Fokus und Planung",
+      "description": "Konzentration (Gate 9) und Begeisterung (Gate 16) als Persönlichkeitskraft — entfaltet durch Familie (Gate 37) und Befreiung (Gate 40)."
+    },
+
+    "29-30-20-34": {
+      "name": "Separation",
+      "theme": "Hingabe, Präsenz und Kraft",
+      "description": "Das Kreuz der Trennung: Bedingungslose Hingabe (Gate 29) und Verlangen (Gate 30) verbinden sich mit Gegenwärtigkeit (Gate 20) und reiner Kraft (Gate 34) — Leben durch vollständiges Ja-Sagen."
+    },
+    "20-34-29-30": {
+      "name": "Separation",
+      "theme": "Hingabe, Präsenz und Kraft",
+      "description": "Das Jetzt (Gate 20) und reine Kraft (Gate 34) als Persönlichkeitskraft — genährt durch Hingabe (Gate 29) und Leidenschaft (Gate 30)."
+    },
+
+    "60-56-28-27": {
+      "name": "Limitation",
+      "theme": "Transformation durch Grenzen",
+      "description": "Das Kreuz der Begrenzung: Grenzen als Ausgangspunkt (Gate 60) und Stimulation (Gate 56) verbinden sich mit Sinnsuche (Gate 28) und Fürsorge (Gate 27). Wachstum nur innerhalb von Grenzen."
+    },
+    "28-27-60-56": {
+      "name": "Limitation",
+      "theme": "Transformation durch Grenzen",
+      "description": "Sinnsuche (Gate 28) und Ernährung (Gate 27) als Persönlichkeitskraft — navigiert durch Begrenzung (Gate 60) und Wanderung (Gate 56)."
+    },
+
+    "29-30-14-8": {
+      "name": "Industriousness",
+      "theme": "Sacral-Kraft, Hingabe und Beitrag",
+      "description": "Das Kreuz des Fleißes: Hingabe (Gate 29) und Leidenschaft (Gate 30) verbinden sich mit materieller Kraft (Gate 14) und einzigartigem Beitrag (Gate 8) — Ausdauer für das Richtige."
+    },
+    "14-8-29-30": {
+      "name": "Industriousness",
+      "theme": "Sacral-Kraft, Hingabe und Beitrag",
+      "description": "Reichtum (Gate 14) und Beitrag (Gate 8) als Persönlichkeitskraft — angetrieben durch Hingabe (Gate 29) und Verlangen (Gate 30)."
+    },
+
+    "23-43-29-30": {
+      "name": "Assimilation",
+      "theme": "Integration, Durchbruch und Hingabe",
+      "description": "Das Kreuz der Assimilation: Das Neue integrieren (Gate 23) und Durchbrüche (Gate 43) verbinden sich mit bedingungsloser Hingabe (Gate 29) und tiefem Verlangen (Gate 30) — Lebensaufgabe: Neues in bestehendes Wissen assimilieren."
+    },
+    "29-30-23-43": {
+      "name": "Assimilation",
+      "theme": "Integration, Durchbruch und Hingabe",
+      "description": "Hingabe (Gate 29) und Leidenschaft (Gate 30) als Persönlichkeitskraft — kanalisiert durch Assimilation (Gate 23) und Durchbruch (Gate 43)."
+    },
+
+    "7-13-31-41": {
+      "name": "Alpha",
+      "theme": "Führung, Zuhören und neuer Anfang",
+      "description": "Das Kreuz der Alpha-Führung: Führung durch Weisheit (Gate 7) und Zuhören (Gate 13) verbinden sich mit demokratischem Einfluss (Gate 31) und neuen Anfängen (Gate 41)."
+    },
+    "31-41-7-13": {
+      "name": "Alpha",
+      "theme": "Führung, Zuhören und neuer Anfang",
+      "description": "Einfluss (Gate 31) und emotionaler Hunger (Gate 41) als Persönlichkeitskraft — geerdet durch Führungsweisheit (Gate 7) und tiefes Zuhören (Gate 13)."
+    },
+
+    "49-4-19-33": {
+      "name": "Revolution",
+      "theme": "Prinzipien, Sensibilität und Rückzug",
+      "description": "Das Kreuz der Revolution: Prinzipientreue (Gate 49) und logische Formeln (Gate 4) verbinden sich mit Sensibilität für Bedürfnisse (Gate 19) und Rückzug zur Reflexion (Gate 33)."
+    },
+    "19-33-49-4": {
+      "name": "Revolution",
+      "theme": "Prinzipien, Sensibilität und Rückzug",
+      "description": "Sensibilität (Gate 19) und Rückzug (Gate 33) als Persönlichkeitskraft — angetrieben durch Revolution (Gate 49) und Formeln (Gate 4)."
+    },
+
+    "36-6-37-40": {
+      "name": "Obscuration",
+      "theme": "Krise, Gemeinschaft und Befreiung",
+      "description": "Das Kreuz der Verdunkelung: Krise als Wachstum (Gate 36) und emotionale Grenzen (Gate 6) verbinden sich mit Familie (Gate 37) und Befreiung durch Alleinsein (Gate 40)."
+    },
+    "37-40-36-6": {
+      "name": "Obscuration",
+      "theme": "Krise, Gemeinschaft und Befreiung",
+      "description": "Familie (Gate 37) und Alleinsein (Gate 40) als Persönlichkeitskraft — navigiert durch Krisenenergie (Gate 36) und Reibung (Gate 6)."
+    },
+
+    "32-42-51-57": {
+      "name": "Laws",
+      "theme": "Kontinuität, Vollendung und Initiation",
+      "description": "Das Kreuz der Gesetze: Kontinuität (Gate 32) und Vollendung (Gate 42) verbinden sich mit Initiative (Gate 51) und Körperintuition (Gate 57) — Lebensaufgabe: Was hat Bestand?"
+    },
+    "51-57-32-42": {
+      "name": "Laws",
+      "theme": "Kontinuität, Vollendung und Initiation",
+      "description": "Erschütterung (Gate 51) und Intuition (Gate 57) als Persönlichkeitskraft — verankert durch Kontinuität (Gate 32) und Zyklen-Vollendung (Gate 42)."
+    },
+
+    "55-59-39-38": {
+      "name": "Moods",
+      "theme": "Geist, Intimität und sinnvoller Kampf",
+      "description": "Das Kreuz der Stimmungen: Überfluss und Geist (Gate 55) und Intimität (Gate 59) verbinden sich mit Provokation (Gate 39) und dem Kämpfer (Gate 38) — emotionale Tiefe als Lebensweg."
+    },
+    "39-38-55-59": {
+      "name": "Moods",
+      "theme": "Geist, Intimität und sinnvoller Kampf",
+      "description": "Provokation (Gate 39) und Kämpfergeist (Gate 38) als Persönlichkeitskraft — genährt von spirituellem Überfluss (Gate 55) und Intimität (Gate 59)."
+    }
+
+  }
+}

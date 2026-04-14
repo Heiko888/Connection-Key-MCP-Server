@@ -15,6 +15,7 @@
  */
 
 import express from "express";
+import cors from "cors";
 import { Worker } from "bullmq";
 import IORedis from "ioredis";
 import { createClient } from "@supabase/supabase-js";
@@ -25,7 +26,24 @@ import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { runReadingPipeline } from "./reading-pipeline.js";
 
+const ALLOWED_ORIGINS = [
+  "https://the-connection-key.de",
+  "https://www.the-connection-key.de",
+  "https://coach.the-connection-key.de",
+  "https://agent.the-connection-key.de",
+  "http://localhost:3000",
+  "http://localhost:3002"
+];
+
 const app = express();
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} nicht erlaubt`));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // ======================================================

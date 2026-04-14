@@ -10,7 +10,17 @@ export const config = {
   
   // CORS
   cors: {
-    allowedOrigins: process.env.CORS_ORIGINS || '*'
+    allowedOrigins: process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(",").map(s => s.trim())
+      : [
+          "https://the-connection-key.de",
+          "https://www.the-connection-key.de",
+          "https://coach.the-connection-key.de",
+          "https://agent.the-connection-key.de",
+          "http://localhost:3000",
+          "http://localhost:3002",
+          "http://localhost:5173"
+        ]
   },
   
   // Server

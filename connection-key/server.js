@@ -51,9 +51,18 @@ export class ConnectionKeyServer {
   }
 
   setupMiddleware() {
-    // CORS
+    // CORS - dynamische Origin-Prüfung mit credentials Support
+    const allowedOrigins = config.cors.allowedOrigins;
     this.app.use(cors({
-      origin: config.cors.allowedOrigins || "*",
+      origin: function (origin, callback) {
+        // Erlaube Requests ohne Origin (Server-zu-Server, curl, etc.)
+        if (!origin) return callback(null, true);
+        // Wildcard: alles erlauben
+        if (allowedOrigins.includes("*")) return callback(null, true);
+        // Prüfe ob Origin in der Liste ist
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        callback(new Error(`CORS: Origin ${origin} nicht erlaubt`));
+      },
       credentials: true
     }));
 

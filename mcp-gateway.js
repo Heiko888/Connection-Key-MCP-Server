@@ -9,6 +9,7 @@
  */
 
 import express from 'express';
+import cors from 'cors';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -43,6 +44,23 @@ if (!process.env.ANTHROPIC_API_KEY) {
   console.warn('⚠️  ANTHROPIC_API_KEY nicht gesetzt - Reading Agent wird mit Placeholder arbeiten');
 }
 
+const ALLOWED_ORIGINS = [
+  "https://the-connection-key.de",
+  "https://www.the-connection-key.de",
+  "https://coach.the-connection-key.de",
+  "https://agent.the-connection-key.de",
+  "http://localhost:3000",
+  "http://localhost:3002"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: Origin ${origin} nicht erlaubt`));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Request Queue (max 1 gleichzeitig)

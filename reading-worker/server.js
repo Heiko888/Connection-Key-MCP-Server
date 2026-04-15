@@ -4415,20 +4415,42 @@ ${chartInfo}${focus ? `\n\nBESONDERER FOKUS FÜR DIESES READING:\n${focus}` : ''
     const client = new Anthropic({ apiKey });
 
     let totalText = '';
-    const stream = await client.messages.stream({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 8000,
-      temperature: 0.7,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
-    });
+    const MAX_TOKENS = 16000;
+    const MAX_CONTINUATIONS = 3;
+    const messages = [{ role: 'user', content: userMessage }];
 
-    for await (const chunk of stream) {
-      if (chunk.type === 'content_block_delta' && chunk.delta?.type === 'text_delta') {
-        const text = chunk.delta.text;
-        totalText += text;
-        send({ type: 'chunk', text });
+    for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+      const stream = await client.messages.stream({
+        model: 'claude-sonnet-4-6',
+        max_tokens: MAX_TOKENS,
+        temperature: 0.7,
+        system: systemPrompt,
+        messages,
+      });
+
+      let chunkText = '';
+      let stopReason = 'end_turn';
+
+      for await (const chunk of stream) {
+        if (chunk.type === 'content_block_delta' && chunk.delta?.type === 'text_delta') {
+          const text = chunk.delta.text;
+          chunkText += text;
+          totalText += text;
+          send({ type: 'chunk', text });
+        }
+        if (chunk.type === 'message_delta' && chunk.delta?.stop_reason) {
+          stopReason = chunk.delta.stop_reason;
+        }
       }
+
+      // Wenn nicht wegen max_tokens gestoppt → fertig
+      if (stopReason !== 'max_tokens' || attempt >= MAX_CONTINUATIONS) break;
+
+      // Continuation: bisherigen Text als Assistant-Turn + Fortsetzen
+      console.log(`   [SSE Stream] max_tokens erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
+      send({ type: 'status', text: 'Fortsetzung wird generiert…' });
+      messages.push({ role: 'assistant', content: chunkText });
+      messages.push({ role: 'user', content: 'Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie "Ich fahre fort" — einfach weiterschreiben.' });
     }
 
     send({ type: 'done', length: totalText.length });

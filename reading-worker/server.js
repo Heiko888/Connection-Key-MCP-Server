@@ -705,6 +705,7 @@ const KNOWLEDGE_MAP = {
   'compatibility':    ['connection-knowledge', 'channels-gates', 'types-detailed', 'centers-detailed'],
   // Penta
   'penta':            ['penta-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed'],
+  'penta-communication': ['penta-knowledge', 'penta-communication-dynamics', 'penta-strategy-impulses', 'channels-gates', 'centers-detailed', 'types-detailed'],
   // Psychologie / Tiefe
   'depth-analysis':   ['channels-gates', 'centers-detailed', 'splits-detailed', 'authority-detailed', 'profiles-detailed', 'incarnation-cross'],
   'shadow-work':      ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'strategy-authority'],
@@ -2291,14 +2292,14 @@ async function pollForJobs() {
         const jobStart = Date.now();
         if (readingType === 'tagesimpuls') {
           await processTagesimpulsJob(job, reading);
-        } else if (['connection', 'composite'].includes(readingType) ||
+        } else if (['connection', 'composite', 'connection-basic'].includes(readingType) ||
           (['relationship', 'compatibility'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2))) {
           await processConnectionJob(job, reading);
         } else if (readingType === 'channel-analysis') {
           await processChannelAnalysisJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
           await processSexualityJob(job, reading);
-        } else if (readingType === 'penta') {
+        } else if (readingType === 'penta' || readingType === 'penta-communication' || readingType === 'penta-basic') {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
           console.warn('🚫 [Multi-Agent] Gesperrt — Job abgelehnt:', job.id);
@@ -2316,10 +2317,22 @@ async function pollForJobs() {
           await processHumanDesignJob(job, reading);
         }
 
+        // ── Dynamic Blueprint: Sections auto-erzeugen ─────────
+        const readingId = job.payload?.reading_id;
+        if (readingId) {
+          try {
+            const { writeSectionsForReading } = await import('./lib/sectionsWriter.js');
+            const sectionsResult = await writeSectionsForReading(supabasePublic, readingId);
+            console.log(`[blueprint] sections written for ${readingId}: ${sectionsResult.created} sections, clientId=${sectionsResult.clientId}`);
+          } catch (blueprintErr) {
+            // Sections-Fehler dürfen das Reading nicht scheitern lassen
+            console.error('[blueprint] sectionsWriter error:', blueprintErr.message);
+          }
+        }
+
         // ── Mattermost: Reading fertig ──────────────────────────
         const elapsed = Math.round((Date.now() - jobStart) / 1000);
         const clientName = job.payload?.name || job.payload?.personA?.name || 'Unbekannt';
-        const readingId = job.payload?.reading_id;
         const readingLink = readingId ? `https://coach.the-connection-key.de/readings-v4/${readingId}` : null;
         sendMattermost(
           `✅ **Reading fertig** | \`${readingType}\` | ${clientName} | ${elapsed}s${readingLink ? `\n[→ Reading öffnen](${readingLink})` : ''}`,
@@ -2881,7 +2894,8 @@ async function processConnectionJob(job, reading) {
   const dynamics = analyzeConnectionDynamics(personAChart, personBChart, nameA, nameB);
 
   // Template wählen
-  const templateName = readingType === 'compatibility' ? 'compatibility'
+  const templateName = readingType === 'connection-basic' ? 'connection-basic'
+    : readingType === 'compatibility' ? 'compatibility'
     : readingType === 'relationship' ? 'relationship'
     : 'connection';
 
@@ -3310,9 +3324,10 @@ async function processPentaJob(job, reading) {
   const groupDynamics = analyzePentaDynamics(memberCharts);
   const pentaChart = calculatePentaChart(memberCharts);
 
+  const pentaReadingType = reading.reading_type || 'penta';
   const rawPentaContent = await generateReading({
     agentId: 'penta',
-    template: 'penta',
+    template: pentaReadingType,
     userData: { groupName, groupContext, members, memberCharts, groupDynamics, pentaChart }
   });
 
@@ -4468,9 +4483,16 @@ ${chartInfo}${focus ? `\n\nBESONDERER FOKUS FÜR DIESES READING:\n${focus}` : ''
 app.get("/health", async (_, res) => {
   try {
     const { error: dbError } = await supabasePublic.from("readings").select("id").limit(1);
+    // Blueprint: Sections der letzten 24h
+    let sectionsLast24h = 0;
+    try {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count } = await supabasePublic.from("reading_sections").select("id", { count: "exact", head: true }).gte("created_at", since);
+      sectionsLast24h = count || 0;
+    } catch {}
     res.json({
       status: "ok",
-      version: "2.0.0-chart-integration",
+      version: "2.1.0-dynamic-blueprint",
       workers: {
         v3: workerV3.isRunning() ? "running" : "stopped",
         v4: workerV4.isRunning() ? "running" : "stopped",
@@ -4482,7 +4504,8 @@ app.get("/health", async (_, res) => {
       supabase: dbError ? "error" : "ok",
       redis: redis.status,
       knowledge: Object.keys(knowledge).length,
-      templates: Object.keys(templates).length
+      templates: Object.keys(templates).length,
+      blueprint: { sections_last_24h: sectionsLast24h }
     });
   } catch (error) {
     res.status(500).json({ status: "error", error: error.message });

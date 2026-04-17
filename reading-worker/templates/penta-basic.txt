@@ -1,0 +1,27 @@
+Erstelle ein kompaktes Basis-Gruppen-Reading für {{memberCount}} Personen.
+
+Gruppe: {{groupName}}
+Mitglieder: {{memberNames}}
+
+Ein fokussierter Teaser für das Penta-Vollreading — KEINE 9-Sektionen-Tiefe.
+
+## 1. Das Gruppenfeld im Überblick
+- Wer kommt hier zusammen (Typen-Mix, Energiebilanz in 3–4 Sätzen)
+- Grundton der Gruppe
+
+## 2. Rollenverteilung
+- Wer trägt welche energetische Rolle
+- Je 1 Satz pro Person
+
+## 3. Stärken & Spannungen
+- Wichtigste kollektive Stärke
+- Zentrales Spannungsfeld
+
+## 4. Impulse für die Gruppe
+- 3 konkrete Empfehlungen, je 1 Satz
+
+Schließe mit einem sanften Hinweis auf die tieferen Dynamiken, die im Vollreading sichtbar werden — ruhig, ohne Verkaufsdruck.
+
+Sprache: Deutsch
+Stil: Klar, verständlich, kompakt
+Länge: ca. 700–1000 Wörter

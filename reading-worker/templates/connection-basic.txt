@@ -1,0 +1,32 @@
+Erstelle ein kompaktes Basis-Verbindungs-Reading für 2 Personen.
+
+Geburtsdatum Person 1: {{birthDate}}
+Geburtszeit Person 1: {{birthTime}}
+Geburtsort Person 1: {{birthPlace}}
+
+Geburtsdatum Person 2: {{birthDate2}}
+Geburtszeit Person 2: {{birthTime2}}
+Geburtsort Person 2: {{birthPlace2}}
+
+Ein fokussierter Teaser, der Lust auf das Vollreading macht — KEINE 10-Sektionen-Tiefe.
+
+## 1. Die Verbindung im Überblick
+- Was trifft hier energetisch zusammen (2–3 Sätze)
+- Grundton der Verbindung
+
+## 2. Elektromagnetische Anziehung (Kanäle)
+- Aktivierte Kanäle mit kurzer Deutung
+- Was zieht euch energetisch zueinander
+
+## 3. Dynamik & Wachstum
+- 1–2 Stärken (was trägt euch)
+- 1 zentrales Wachstumsfeld (wo es reibt)
+
+## 4. Impulse für den Alltag
+- 3 konkrete Empfehlungen, je 1 Satz
+
+Schließe mit einem sanften Hinweis auf die tieferen Ebenen, die in der Vollanalyse sichtbar werden — ruhig, ohne Verkaufsdruck.
+
+Sprache: Deutsch
+Stil: Klar, verständlich, motivierend, kompakt
+Länge: ca. 600–900 Wörter

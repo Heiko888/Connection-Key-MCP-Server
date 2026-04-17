@@ -3,7 +3,6 @@ import cors from "cors";
 import { config } from "./config.js";
 import { chatRouter } from "./routes/chat.js";
 import { readingRouter } from "./routes/reading.js";
-import { readingsV3Router } from "./routes/readings-v3.js";
 import { stripeRouter } from "./routes/stripe.js";
 import { matchingRouter } from "./routes/matching.js";
 import { userRouter } from "./routes/user.js";
@@ -88,9 +87,6 @@ export class ConnectionKeyServer {
           health: "GET /health",
           chat: "POST /api/chat",
           reading: "POST /api/reading/generate",
-          readings_v3: "POST /api/readings-v3/create (NEW)",
-          readings_v3_status: "GET /api/readings-v3/status/:readingId (NEW)",
-          readings_v3_agents: "GET /api/readings-v3/agents (NEW)",
           chart: "POST /api/chart/calculate (NEW)",
           matching: "POST /api/matching",
           stripe_webhook: "POST /api/stripe/webhook (public)",
@@ -115,7 +111,6 @@ export class ConnectionKeyServer {
     // Routes registrieren
     apiRouter.use("/chat", chatRouter);
     apiRouter.use("/reading", readingRouter);
-    apiRouter.use("/readings-v3", readingsV3Router);
     apiRouter.use("/chart", chartRouter);
     apiRouter.use("/charts", chartRouter); // Alias für Frontend-Kompatibilität
     apiRouter.use("/matching", matchingRouter);

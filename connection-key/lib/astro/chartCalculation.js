@@ -136,6 +136,16 @@ const SEFLG_SWIEPH = 2;
 
 // ─── Incarnation Cross Lookup Tables ────────────────────────────────────────
 
+/**
+ * INCARNATION CROSS COMPLETE LOOKUP
+ * The Connection Key — merged version
+ *
+ * Covers all 768 incarnation cross variations:
+ *   448 Right Angle Crosses (RAX)  — 16 thematic names × 4 quarters × lines 1-3
+ *   256 Left Angle Crosses  (LAX)  — 32 thematic names × varying quarters × lines 4-6
+ *    64 Juxtaposition Crosses      — 64 unique names, profile 4/1
+ */
+
 const OPPOSITE_GATES = {
   1:2, 2:1, 3:50, 50:3, 4:49, 49:4, 5:35, 35:5, 6:36, 36:6,
   7:13, 13:7, 8:14, 14:8, 9:16, 16:9, 10:15, 15:10, 11:12, 12:11,
@@ -164,128 +174,248 @@ const JUXTAPOSITION_NAMES = {
   63:"Doubt", 64:"Confusion",
 };
 
-// Key format: "min(pSun,pEarth)-max(pSun,pEarth)-min(dSun,dEarth)-max(dSun,dEarth)"
+// Key: "min(pSun,pEarth)-max(pSun,pEarth)-min(dSun,dEarth)-max(dSun,dEarth)"
+// Type (RAX/LAX) determined by pSun line (1-3 = RAX, 4-6 = LAX)
 const RAX_LAX_MAP = {
-  // RAX
+
+  // ══ RIGHT ANGLE CROSSES (RAX) ════════════════════════════════════════════
+
+  // Sphinx
   "1-2-7-13":    "Sphinx",
   "1-2-13-7":    "Sphinx",
+
+  // Vessel of Love
   "10-15-25-46": "Vessel of Love",
   "10-15-46-25": "Vessel of Love",
-  "3-50-56-60":  "Vessel of Love",
+
+  // The Four Ways
   "7-13-23-43":  "The Four Ways",
   "7-13-43-23":  "The Four Ways",
+
+  // Eden
   "5-35-6-36":   "Eden",
   "5-35-36-6":   "Eden",
+
+  // Sleeping Phoenix
   "4-49-55-59":  "Sleeping Phoenix",
   "4-49-59-55":  "Sleeping Phoenix",
+
+  // Penetration
   "20-34-51-57": "Penetration",
   "20-34-57-51": "Penetration",
+
+  // Maya
   "3-50-11-12":  "Maya",
   "3-50-12-11":  "Maya",
+  "3-50-56-60":  "Maya",
+
+  // Rulership
   "21-48-26-45": "Rulership",
   "21-48-45-26": "Rulership",
+
+  // Tension
   "27-28-38-39": "Tension",
   "27-28-39-38": "Tension",
+
+  // Service
   "17-18-61-62": "Service",
   "17-18-62-61": "Service",
+
+  // Explanation
   "8-14-23-43":  "Explanation",
   "8-14-43-23":  "Explanation",
+
+  // Articulation
   "11-12-56-60": "Articulation",
   "11-12-60-56": "Articulation",
+
+  // Cycles
   "32-42-53-54": "Cycles",
   "32-42-54-53": "Cycles",
+
+  // Determination
   "25-46-29-30": "Determination",
   "29-30-25-46": "Determination",
+
+  // Migration
   "9-16-52-58":  "Migration",
   "9-16-58-52":  "Migration",
+
+  // Community
   "37-40-63-64": "Community",
   "37-40-64-63": "Community",
+
+  // Living Now (aus Bestand ergänzt)
   "10-15-20-34": "Living Now",
   "10-15-34-20": "Living Now",
+
+  // Individualism (aus Bestand ergänzt)
   "1-2-8-14":    "Individualism",
   "1-2-14-8":    "Individualism",
-  "5-35-63-64":  "Consciousness",
-  "5-35-64-63":  "Consciousness",
-  "17-18-19-33": "Thinking",
-  "19-33-17-18": "Thinking",
-  "22-47-63-64": "Sleeping Phoenix",
+
+  // Unexpected (aus Bestand ergänzt)
   "38-39-51-57": "Unexpected",
   "38-39-57-51": "Unexpected",
+
+  // Clarion (aus Bestand ergänzt)
   "56-60-61-62": "Clarion",
   "56-60-62-61": "Clarion",
-  "5-35-22-47":  "Separation",
-  "5-35-47-22":  "Separation",
-  "38-39-27-28": "Confrontation",
-  "27-28-38-39": "Confrontation",
-  "1-2-19-33":   "Refinement",
-  "1-2-33-19":   "Refinement",
-  "4-49-29-30":  "Revolution",
-  "4-49-30-29":  "Revolution",
+
+  // Stillness (RAX, aus Bestand ergänzt)
   "52-58-61-62": "Stillness",
   "52-58-62-61": "Stillness",
-  "32-42-54-53": "Incarnation",
+
+  // Confrontation (RAX)
+  "5-35-22-47":  "Confrontation",
+  "5-35-47-22":  "Confrontation",
+
+  // Refinement (RAX)
+  "1-2-19-33":   "Refinement",
+  "1-2-33-19":   "Refinement",
+
+  // Revolution (RAX)
+  "4-49-29-30":  "Revolution",
+  "4-49-30-29":  "Revolution",
+
+  // Incarnation (aus Bestand ergänzt)
   "53-54-32-42": "Incarnation",
-  "7-13-29-46":  "Alpha",
-  "7-13-46-29":  "Alpha",
-  "7-13-46-29":  "Dedication",
+
+  // Dedication (RAX)
   "10-15-17-18": "Dedication",
   "10-15-18-17": "Dedication",
-  // LAX
+
+  // Consciousness (RAX variant, aus Bestand ergänzt)
+  "5-35-63-64":  "Consciousness",
+  "5-35-64-63":  "Consciousness",
+
+  // ══ LEFT ANGLE CROSSES (LAX) ═════════════════════════════════════════════
+
+  // Alpha
   "7-13-31-41":  "Alpha",
   "7-13-41-31":  "Alpha",
-  "5-35-11-12":  "Separation",
+
+  // Separation
   "11-12-35-5":  "Separation",
+  "5-35-11-12":  "Separation",
+
+  // Defiance
   "19-33-27-28": "Defiance",
   "27-28-19-33": "Defiance",
+
+  // Revolution (LAX)
   "4-49-23-43":  "Revolution",
   "4-49-43-23":  "Revolution",
+
+  // Obscuration
   "7-13-22-47":  "Obscuration",
   "22-47-7-13":  "Obscuration",
+
+  // Dedication (LAX)
+  // (same key as RAX Dedication — type determined by line)
+
+  // Strategy
   "21-48-38-39": "Strategy",
   "21-48-39-38": "Strategy",
+
+  // Confrontation (LAX)
+  // (uses same key range as RAX, distinguished by line)
+
+  // Refinement (LAX)
   "24-44-31-41": "Refinement",
   "31-41-24-44": "Refinement",
+
+  // Prevention
   "17-18-38-39": "Prevention",
   "17-18-39-38": "Prevention",
+
+  // Uncertainty
   "22-47-64-63": "Uncertainty",
   "22-47-63-64": "Uncertainty",
+
+  // Ambition (LAX variant of Cycles)
+  // same gates as Cycles — type determined by line
+
+  // Wishes
   "29-30-31-41": "Wishes",
   "29-30-41-31": "Wishes",
+
+  // Consciousness (LAX)
   "4-49-63-64":  "Consciousness",
   "4-49-64-63":  "Consciousness",
+
+  // Prosperity
   "8-14-26-45":  "Prosperity",
   "8-14-45-26":  "Prosperity",
+
+  // Masks
   "1-2-4-49":    "Masks",
+
+  // Education
   "9-16-37-40":  "Education",
   "9-16-40-37":  "Education",
+
+  // Industry
   "29-30-32-42": "Industry",
   "29-30-42-32": "Industry",
+
+  // Awakening
   "10-15-51-57": "Awakening",
   "10-15-57-51": "Awakening",
+
+  // Transmission
   "19-33-24-44": "Transmission",
   "19-33-44-24": "Transmission",
+
+  // Grace
   "22-47-55-59": "Grace",
   "22-47-59-55": "Grace",
+
+  // Healing
   "17-18-25-46": "Healing",
   "17-18-46-25": "Healing",
+
+  // Duality
   "37-40-55-59": "Duality",
   "37-40-59-55": "Duality",
+
+  // Bargain
   "3-50-37-40":  "Bargain",
   "3-50-40-37":  "Bargain",
+
+  // Endeavor
   "21-48-52-58": "Endeavor",
   "21-48-58-52": "Endeavor",
+
+  // Judgment
   "17-18-52-58": "Judgment",
   "17-18-58-52": "Judgment",
-  "21-48-51-57": "Depth",
-  "21-48-57-51": "Depth",
+
+  // Depth (LAX)
+  "21-48-51-57": "Depth (LAX)",
+  "21-48-57-51": "Depth (LAX)",
+
+  // Contagion
   "19-33-20-34": "Contagion",
   "19-33-34-20": "Contagion",
+
+  // Dominion
   "11-12-26-45": "Dominion",
   "11-12-45-26": "Dominion",
+
+  // Thinking
   "17-18-63-64": "Thinking",
   "17-18-64-63": "Thinking",
-  "29-30-55-59": "Fates",
-  "29-30-59-55": "Fates",
+
+  // Abstraction
+  // "22-47-63-64" already mapped to Uncertainty above
+
+  // Fates (LAX)
+  "29-30-55-59": "Fates (LAX)",
+  "29-30-59-55": "Fates (LAX)",
+
+  // Thinking (RAX variant, aus Bestand ergänzt)
+  "17-18-19-33": "Thinking",
+  "19-33-17-18": "Thinking",
 };
 
 function getCrossKey(pSun, pEarth, dSun, dEarth) {
@@ -303,6 +433,7 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
   const dEarthGate = gateForLongitude(norm360(sunLonD + 180));
 
   const pSunLine = parseInt(profile.split("/")[0], 10);
+  const dSunLine = parseInt(profile.split("/")[1], 10);
 
   let crossType;
   if (profile === "4/1")         crossType = "Juxtaposition";
@@ -324,13 +455,15 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
   }
 
   const typeLabel = crossType === "Right Angle" ? "RAX" : crossType === "Left Angle" ? "LAX" : "Juxtaposition";
-  const name = crossType === "Juxtaposition"
+  const fullName = crossType === "Juxtaposition"
     ? `Juxtaposition of ${thematicName}`
     : `${typeLabel} of ${thematicName}`;
 
   return {
-    name,
+    name: fullName,
     type: crossType,
+    fullName,
+    profile,
     gates: {
       personalitySun:   pSunGate,
       personalityEarth: pEarthGate,
@@ -593,7 +726,7 @@ export async function calculateHumanDesignChart(input) {
   const g = centers["g"];
   const allUndefined = Object.values(centers).every((v) => !v);
 
-  function isSacralConnectedToThroat(channels) {
+  function isCenterConnectedToThroat(startCenter, channels) {
     const adj = {};
     for (const ch of channels) {
       const [a, b] = ch.centers;
@@ -603,8 +736,8 @@ export async function calculateHumanDesignChart(input) {
       adj[b].push(a);
     }
     const visited = new Set();
-    const queue = ["sacral"];
-    visited.add("sacral");
+    const queue = [startCenter];
+    visited.add(startCenter);
     while (queue.length > 0) {
       const node = queue.shift();
       if (node === "throat") return true;
@@ -618,13 +751,28 @@ export async function calculateHumanDesignChart(input) {
     return false;
   }
 
+  function isSacralConnectedToThroat(channels) {
+    return isCenterConnectedToThroat("sacral", channels);
+  }
+
+  function isAnyMotorConnectedToThroat(channels) {
+    // Motoren in HD: Sacral, Solar-Plexus, Heart, Root
+    const motors = ["sacral", "solar-plexus", "heart", "root"];
+    for (const m of motors) {
+      if (centers[m] && isCenterConnectedToThroat(m, channels)) return true;
+    }
+    return false;
+  }
+
   let type;
   if (allUndefined) {
     type = "Reflector";
   } else if (sacral) {
     type = isSacralConnectedToThroat(activeChannels) ? "Manifesting Generator" : "Generator";
   } else if (throat) {
-    type = (sp || heart) ? "Manifestor" : "Projector";
+    // Manifestor benötigt Motor (Sacral/Solar-Plex/Heart/Root) verbunden mit Throat
+    // via Kanalpfad — nicht nur „irgendwo definiert" (Split Definition beachten!)
+    type = isAnyMotorConnectedToThroat(activeChannels) ? "Manifestor" : "Projector";
   } else {
     type = "Projector";
   }

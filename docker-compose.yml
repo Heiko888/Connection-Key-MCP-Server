@@ -52,6 +52,9 @@ services:
       - CANVA_REDIRECT_URI=${CANVA_REDIRECT_URI:-}
       - CANVA_MCP_URL=${CANVA_MCP_URL:-https://mcp.canva.com/mcp}
       - FRONTEND_URL=${FRONTEND_URL:-https://coach.the-connection-key.de}
+    volumes:
+      # Content-Topics-Datenbank (readonly) — social-youtube Agent liest hieraus
+      - /opt/mcp-connection-key/content-topics:/app/content-topics:ro
     restart: unless-stopped
     networks:
       - app-network

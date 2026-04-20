@@ -1,0 +1,1451 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "created": "2026-04-20",
+    "purpose": "Content-Themen-Datenbank für den social-youtube Agent (MCP Gateway Port 7000). Wird von n8n-Workflows genutzt, um automatisch Instagram-Posts, Reels, TikToks und YouTube-Content zu generieren.",
+    "brand_voice": "Klar, direkt, tief, humorvoll, luxuriös, bewusst. Kein 'Love & Light', keine Leerformeln. Premium, intelligent, präzise.",
+    "forbidden_phrases": [
+      "Liebe & Licht",
+      "Universum liefert",
+      "Manifestiere dir",
+      "Hohe Schwingungen",
+      "Du bist ein Lichtwesen",
+      "Einfach positiv denken"
+    ],
+    "content_pillars": ["awareness", "education", "conversion"],
+    "formats": ["reel_15s", "reel_30s", "carousel_6slides", "carousel_10slides", "quote_post", "story_sequence", "tiktok_hook", "youtube_short", "youtube_longform", "linkedin_article", "newsletter"],
+    "total_topics": 182,
+    "rotation_weeks": 26
+  },
+
+  "categories": [
+
+    {
+      "id": "cat_01_dating_anziehung",
+      "name": "Dating & Anziehung",
+      "priority": 1,
+      "core_message": "Anziehung ist kein Zufall. Sie ist energetische Mathematik.",
+      "target_audience": "primary",
+      "reading_link": "connection",
+      "topics": [
+        {
+          "id": "t_001",
+          "title": "Warum du immer denselben Typ Mensch anziehst",
+          "hook": "Es ist nicht 'dein Beuteschema'. Es sind deine offenen Zentren, die nach genau dieser Energie hungern.",
+          "format": ["reel_30s", "carousel_6slides"],
+          "pillar": "awareness",
+          "cta": "Hol dir dein Connection Reading."
+        },
+        {
+          "id": "t_002",
+          "title": "Electromagnetic Channel — wenn ihr euch magnetisch anzieht",
+          "hook": "Ihr zieht euch an wie zwei Magnete. Das ist nicht 'Liebe auf den ersten Blick'. Das ist ein Electromagnetic Channel.",
+          "format": ["carousel_10slides", "youtube_short"],
+          "pillar": "education",
+          "cta": "Welche Dynamik habt ihr? Link in Bio."
+        },
+        {
+          "id": "t_003",
+          "title": "Companionship — die 'nette' Beziehung, die niemanden erfüllt",
+          "hook": "Ihr streitet nie. Ihr passt super. Und trotzdem fehlt etwas. Willkommen im Companionship-Match.",
+          "format": ["reel_30s", "tiktok_hook"],
+          "pillar": "awareness"
+        },
+        {
+          "id": "t_004",
+          "title": "Dominance — wenn ein Chart den anderen überrollt",
+          "hook": "Einer von euch fühlt sich permanent klein. Das ist kein Charakterfehler. Das ist Chart-Dominanz.",
+          "format": ["carousel_6slides"],
+          "pillar": "education"
+        },
+        {
+          "id": "t_005",
+          "title": "Compromise — die Dynamik, die euch lehrt",
+          "hook": "Ihr triggert euch. Immer wieder. Und genau deshalb wachst ihr. Compromise ist kein Fehler, es ist Schule.",
+          "format": ["reel_30s", "quote_post"],
+          "pillar": "education"
+        },
+        {
+          "id": "t_006",
+          "title": "Warum du auf unverfügbare Menschen stehst",
+          "hook": "Offenes Herzzentrum + konditionierter Beweiswille = du verliebst dich in den, der dich nicht will.",
+          "format": ["reel_30s", "carousel_6slides"],
+          "pillar": "awareness"
+        },
+        {
+          "id": "t_007",
+          "title": "Der Generator, der nie eingeladen wird",
+          "hook": "Wenn du als Projektor auf Dating-Apps swipest wie ein Generator — du wirst bitter. Und müde.",
+          "format": ["tiktok_hook", "reel_15s"],
+          "pillar": "awareness"
+        },
+        {
+          "id": "t_008",
+          "title": "Die Sakral-Antwort auf Dating-Profile",
+          "hook": "Dein Bauch weiß in 2 Sekunden, ob es ein Ja ist. Dein Kopf braucht 3 Dates, um es zu ignorieren.",
+          "format": ["quote_post", "reel_15s"],
+          "pillar": "awareness"
+        },
+        {
+          "id": "t_009",
+          "title": "Warum Manifestors das Dating abbrechen sollten",
+          "hook": "Du bist kein Generator. Du wartest nicht. Du initiierst. Und du informierst — sonst wird's explosiv.",
+          "format": ["carousel_6slides"],
+          "pillar": "education"
+        },
+        {
+          "id": "t_010",
+          "title": "Die 5 HD-Typen beim ersten Date",
+          "hook": "Wie jeder Typ beim ersten Date wirkt. Slide 4 erklärt, warum Projektoren oft als 'zu intensiv' gelten.",
+          "format": ["carousel_10slides"],
+          "pillar": "education"
+        },
+        {
+          "id": "t_011",
+          "title": "Ghosting aus HD-Sicht",
+          "hook": "Er hat nicht geghostet, weil du 'zu viel' warst. Er hat geghostet, weil sein Nicht-Selbst ihn kontrolliert.",
+          "format": ["reel_30s"],
+          "pillar": "awareness"
+        },
+        {
+          "id": "t_012",
+          "title": "Bindungsangst ist ein Nervensystem-Ding",
+          "hook": "Offene Milz + offenes Solarplexus = du brauchst länger. Das ist nicht Bindungsangst. Das ist Design.",
+          "format": ["carousel_6slides", "youtube_short"],
+          "pillar": "education"
+        }
+      ]
+    },
+
+    {
+      "id": "cat_02_beziehungen_partnerschaft",
+      "name": "Beziehungen & Partnerschaft",
+      "priority": 1,
+      "core_message": "Warum ihr harmoniert — und wo echtes Wachstum entsteht.",
+      "target_audience": "primary",
+      "reading_link": "connection",
+      "topics": [
+        {
+          "id": "t_013",
+          "title": "Ihr streitet immer über dasselbe Thema",
+          "hook": "Das ist kein Zufall. Das ist Gate 6 gegen Gate 59. Und wenn ihr das wisst, wird der Streit unpersönlich.",
+          "format": ["reel_30s", "tiktok_hook"]
+        },
+        {
+          "id": "t_014",
+          "title": "Wenn dein Partner dich nicht 'sieht'",
+          "hook": "Du bist Projektor. Du willst erkannt werden. Er ist Generator. Er will Frieden. Das ist kein Mangel an Liebe.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_015",
+          "title": "Die 4 Zentren, die Beziehungen sprengen",
+          "hook": "Wenn eure Solarplexus-Dynamik nicht klar ist, werdet ihr aneinander zerbrechen.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_016",
+          "title": "Warum Langzeitpaare sich nach 7 Jahren fremd werden",
+          "hook": "Alle Zellen erneuern sich. Deine Konditionierung löst sich. Dein Partner verliebt sich in jemanden, der nicht mehr existiert.",
+          "format": ["reel_30s", "youtube_short"]
+        },
+        {
+          "id": "t_017",
+          "title": "Der Fehler, den emotionale Autoritäten in Beziehungen machen",
+          "hook": "Du sagst 'Ja' in der Welle. Am nächsten Tag bereust du es. Das ist nicht Unentschlossenheit. Das ist deine Autorität.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_018",
+          "title": "Getrennte Schlafzimmer — radikal oder richtig?",
+          "hook": "Wenn du undefinierte Aura hast und er definierte — du schläfst seit Jahren in seiner Energie.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_019",
+          "title": "Wenn ein Projektor einen Manifestor liebt",
+          "hook": "Er informiert nicht. Du fühlst dich überrollt. Er spürt deinen Druck. Beide bitter. Lösbar — mit einer Regel.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        },
+        {
+          "id": "t_020",
+          "title": "Fremdenergie aus der Beziehung erkennen",
+          "hook": "Nicht jede schlechte Laune gehört dir. Offene Zentren saugen auf, was im Raum ist.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_021",
+          "title": "Warum 'kommunizieren' allein nicht reicht",
+          "hook": "Ihr redet. Ihr versteht euch nicht. Weil eure Kehlen verschieden wirken. Design erklärt, was Therapie manchmal nicht löst.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_022",
+          "title": "Trennung aus HD-Sicht",
+          "hook": "Manche Beziehungen enden, weil der Zweck erfüllt ist. Nicht jedes Ende ist Scheitern.",
+          "format": ["quote_post", "reel_30s"]
+        },
+        {
+          "id": "t_023",
+          "title": "Eifersucht und offene Zentren",
+          "hook": "Offenes G-Zentrum + offenes Herzzentrum = du fühlst dich permanent ersetzbar. Das ist nicht Eifersucht. Das ist Design.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_024",
+          "title": "Die 3 Gates, die echte Intimität ermöglichen",
+          "hook": "Tiefe entsteht nicht durch Zeit. Sie entsteht durch Gates. Diese 3 sind die Schlüssel.",
+          "format": ["carousel_10slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_03_selbsterkenntnis_identitaet",
+      "name": "Selbsterkenntnis & Identität",
+      "priority": 1,
+      "core_message": "Wer du wirklich bist — jenseits von Konditionierung.",
+      "target_audience": "primary",
+      "reading_link": "basic",
+      "topics": [
+        {
+          "id": "t_025",
+          "title": "Du bist kein Generator, der faul ist",
+          "hook": "Du bist ein Generator, der wartet. Und das ist der Unterschied zwischen Burnout und Kraft.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_026",
+          "title": "Die 5 HD-Typen in 60 Sekunden",
+          "hook": "Manifestor, Generator, Manifesting Generator, Projektor, Reflektor. Einer davon bist du. Und er bestimmt alles.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_027",
+          "title": "Warum 'positives Denken' für dich nicht funktioniert",
+          "hook": "Wenn dein Nervensystem 'Nein' schreit, hilft dir kein Affirmations-Audio. Du brauchst deine Autorität.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_028",
+          "title": "Die 7-Jahres-Reise des Deconditionings",
+          "hook": "Dein Chart verändert sich nicht. Aber du — alle 7 Jahre schälst du eine Schicht ab.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        },
+        {
+          "id": "t_029",
+          "title": "Dein Profil ist dein Lebensrollen-Ticket",
+          "hook": "6/2 ist nicht 3/5. Und wenn du dein Profil nicht kennst, lebst du das Drehbuch von jemand anderem.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_030",
+          "title": "Warum deine Kindheit dich nicht 'kaputt' gemacht hat",
+          "hook": "Sie hat dich konditioniert. Das ist nicht dasselbe. Konditionierung ist reversibel.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_031",
+          "title": "Das Nicht-Selbst — die Maske, die du ablegen darfst",
+          "hook": "Generator: Frust. Projektor: Bitterkeit. Manifestor: Wut. Reflektor: Enttäuschung. Erkennst du dich?",
+          "format": ["carousel_6slides", "youtube_short"]
+        },
+        {
+          "id": "t_032",
+          "title": "Warum du ständig das Gefühl hast, 'zu viel' zu sein",
+          "hook": "Du bist nicht zu viel. Du bist zu viel für Menschen, die nicht für dich gebaut sind.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_033",
+          "title": "Offene vs definierte Zentren — der Unterschied",
+          "hook": "Offen heißt nicht schwach. Es heißt weise. Du lernst hier, was andere nie verstehen.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_034",
+          "title": "Warum Selbstliebe-Ratgeber bei dir nicht greifen",
+          "hook": "Die meisten Ratgeber sind von Generatoren für Generatoren geschrieben. Du bist Projektor. Du brauchst was anderes.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_035",
+          "title": "Die Autorität — dein persönliches Navigationssystem",
+          "hook": "Sakral, emotional, splenisch, Ego, Selbst, Mond. Welche ist deine? Und warum rettet sie dich.",
+          "format": ["carousel_10slides", "youtube_short"]
+        },
+        {
+          "id": "t_036",
+          "title": "Warum du müde bist, obwohl du genug schläfst",
+          "hook": "Du schläfst vermutlich in Fremdenergie. Deine offene Milz speichert sie. Die Lösung ist räumlich, nicht mental.",
+          "format": ["reel_30s", "carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_04_business_karriere",
+      "name": "Business & Karriere",
+      "priority": 1,
+      "core_message": "Dein Design ist dein Businessplan.",
+      "target_audience": "secondary",
+      "reading_link": "business",
+      "topics": [
+        {
+          "id": "t_037",
+          "title": "Warum dein Business sich anfühlt wie ein Kampf",
+          "hook": "Wenn du als Projektor arbeitest wie ein Manifestor — du verbrennst. Nicht weil du zu wenig willst. Weil du gegen deine Energie arbeitest.",
+          "format": ["reel_30s", "linkedin_article"]
+        },
+        {
+          "id": "t_038",
+          "title": "Generator-Unternehmer — wann du 'Ja' sagen darfst",
+          "hook": "Nicht jeder Auftrag gehört dir. Dein Sakral weiß es. Dein Kontostand auch — nach 6 Monaten.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_039",
+          "title": "Die 5 Typen und ihr Pricing",
+          "hook": "Manifestoren dürfen mehr verlangen. Projektoren auch. Generatoren müssen Volumen denken. Das ist kein Trick — das ist Design.",
+          "format": ["carousel_10slides", "linkedin_article"]
+        },
+        {
+          "id": "t_040",
+          "title": "Warum Networking für Projektoren nicht funktioniert",
+          "hook": "Du wirst nicht durch 'mehr Kontakte' erkannt. Du wirst durch Einladung erkannt. Qualität schlägt Menge — immer.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_041",
+          "title": "Das Ego-Center und dein Selbstwert im Business",
+          "hook": "Undefiniert? Du verkaufst dich unter Wert. Definiert? Du unterschätzt, wie viel Willenskraft du hast.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_042",
+          "title": "Manifesting Generators — warum du Multi-Passionate bist",
+          "hook": "Du musst nicht ein Business haben. Du musst drei haben. Gleichzeitig. Und das ist okay.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_043",
+          "title": "Burnout nach HD-Typ",
+          "hook": "Jeder Typ verbrennt anders. Projektor = Erschöpfung. Generator = Frust-Stau. Manifestor = Isolation. Erkennst du dich?",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_044",
+          "title": "Warum dein Content nicht zieht",
+          "hook": "Wenn du Reels machst, aber keine Projektor-Energie hast — du sprichst an niemanden. Design first, Algorithmus second.",
+          "format": ["reel_30s", "linkedin_article"]
+        },
+        {
+          "id": "t_045",
+          "title": "Verhandeln nach Autorität",
+          "hook": "Emotionale Autorität? Niemals in der ersten Verhandlung abschließen. Sakral? Vertrau dem Bauchgeräusch.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_046",
+          "title": "Money Blocks und offene Zentren",
+          "hook": "Offenes Ego + offener Root = du sabotierst deine Preise. Das ist kein 'Mindset-Ding'. Das ist Design.",
+          "format": ["youtube_short", "linkedin_article"]
+        },
+        {
+          "id": "t_047",
+          "title": "Warum Reflektoren die besten Team-Leads sind",
+          "hook": "Sie sehen, was funktioniert und was nicht. In 28 Tagen. Ohne dass jemand etwas sagen muss.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_048",
+          "title": "Passive Income nach HD — wer für wen?",
+          "hook": "Manifestor: ja. Projektor: bedingt. Generator: nur wenn es antwortet. Die Wahrheit über 'skalieren'.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_05_emotionen_klarheit",
+      "name": "Emotionen & Klarheit",
+      "priority": 2,
+      "core_message": "Deine Wellen sind kein Problem. Sie sind dein Kompass.",
+      "target_audience": "primary",
+      "reading_link": "emotions",
+      "topics": [
+        {
+          "id": "t_049",
+          "title": "Die emotionale Welle — 50% der Menschen reiten sie",
+          "hook": "Du bist nicht 'zu emotional'. Du hast einen definierten Solarplexus. Deine Welle ist deine Weisheit.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_050",
+          "title": "Niemals in der Welle entscheiden",
+          "hook": "Hoch = kaufen, versprechen, Ja sagen. Tief = kündigen, Schluss machen, verbrennen. Beides falsch.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_051",
+          "title": "Offenes Solarplexus — warum du fremde Wellen fühlst",
+          "hook": "Dein Partner ist traurig. Du weinst. Das ist nicht Empathie-Mangel. Das ist undefiniertes Solarplexus.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_052",
+          "title": "Die 3 Phasen einer emotionalen Welle",
+          "hook": "Hoffnung, Schmerz, Neutralität. Alle drei gehören dazu. Wer nur 'positiv' bleiben will, stoppt seine Klarheit.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_053",
+          "title": "Wut ist nicht dein Feind",
+          "hook": "Wenn du Manifestor bist, ist Wut dein Signal. Sie sagt dir: 'Du wurdest kontrolliert.' Nicht unterdrücken — lesen.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_054",
+          "title": "Warum du nachts um 3 wach bist",
+          "hook": "Dein Solarplexus verarbeitet. Dein Verstand stört nur. Aufstehen, aufschreiben, weiterschlafen.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_055",
+          "title": "Angst vs Druck — der Unterschied",
+          "hook": "Angst kommt aus der Milz. Druck aus der Wurzel. Lösung ist jeweils anders. Die meisten verwechseln beides.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_056",
+          "title": "Trauer nach HD-Design",
+          "hook": "Manche Menschen trauern in Wellen. Manche schnell und tief. Manche ewig leise. Alles richtig — wenn es zum Design passt.",
+          "format": ["reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_06_gesundheit_vitalitaet",
+      "name": "Gesundheit & Vitalität",
+      "priority": 2,
+      "core_message": "Energie kommt nicht von außen. Sie entsteht aus Ausrichtung.",
+      "target_audience": "primary",
+      "reading_link": "health",
+      "topics": [
+        {
+          "id": "t_057",
+          "title": "Sakral-Erschöpfung — wenn dein Motor überdreht",
+          "hook": "Generatoren, die 10 Jahre 'Ja' zu allem gesagt haben, landen hier. Erschöpfung ist kein Zeichen von Schwäche — es ist ein Schrei.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_058",
+          "title": "Warum 'Sport für alle' ein Mythos ist",
+          "hook": "Projektoren brauchen keine 5x Krafttraining. Sie brauchen Regeneration. Alles andere ist Selbstausbeutung.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_059",
+          "title": "PHS — Primary Health System erklärt",
+          "hook": "Wie du isst, wo du lebst, was du siehst, wie du hörst. HD sagt dir das individuell.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        },
+        {
+          "id": "t_060",
+          "title": "Schlaf nach HD-Typ",
+          "hook": "Generatoren: bis Erschöpfung. Projektoren: allein, früh, lang. Manifestor: wenn sie wollen. Reflektor: wo die Energie stimmt.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_061",
+          "title": "Die 3 Zentren, die dein Nervensystem steuern",
+          "hook": "Milz = Immunsystem. Solarplexus = Emotionen. Root = Druck. Wenn eines davon offen ist, läuft es anders bei dir.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_062",
+          "title": "Intuitive Ernährung vs HD-Ernährung",
+          "hook": "Intuition sagt 'hör auf deinen Körper'. HD sagt 'hör auf diese spezifische Variable'. Ein Unterschied, der alles verändert.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_063",
+          "title": "Warum du bei manchen Menschen krank wirst",
+          "hook": "Deine offene Milz saugt ihre energetischen Müllreste auf. Kein Aberglaube — dein Immunsystem spiegelt.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_064",
+          "title": "Burnout ist kein Charakterfehler",
+          "hook": "Es ist fehlerhafte Energiezuordnung. Du hast Energie verliehen, die nicht deine war.",
+          "format": ["quote_post", "reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_07_lebenssinn_purpose",
+      "name": "Lebenssinn & Purpose",
+      "priority": 2,
+      "core_message": "Du bist nicht hier, um zu funktionieren.",
+      "target_audience": "primary",
+      "reading_link": "life-purpose",
+      "topics": [
+        {
+          "id": "t_065",
+          "title": "Dein Inkarnationskreuz — die Kern-Mission",
+          "hook": "Du hast keinen 'Zweck'. Du hast einen Kreuz-Code. Und der bleibt dein Leben lang gleich.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        },
+        {
+          "id": "t_066",
+          "title": "Warum du nicht weißt, 'was du willst'",
+          "hook": "Weil du nicht Generator bist. Oder weil du Generator bist, aber nie gefragt wurdest. Jeder Typ hat seinen Weg.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_067",
+          "title": "Die 4 Quartale der Inkarnationskreuze",
+          "hook": "Initiation, Zivilisation, Dualität, Mutation. Dein Purpose liegt in einem davon.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_068",
+          "title": "Warum 'follow your passion' nicht für alle gilt",
+          "hook": "Passion ist ein Generator-Konzept. Projektoren folgen Einladungen. Manifestoren folgen Impulsen. Nicht Passion.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_069",
+          "title": "Sinnkrise mit 30 — was dein Design dazu sagt",
+          "hook": "Uranus Opposition trifft Chiron Return. Aber dein HD-Chart zeigt, wo genau du umsteigen sollst.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_070",
+          "title": "Spirituelle Bypass-Fallen",
+          "hook": "Wenn du 'Ich lasse los' sagst, um nicht fühlen zu müssen — das ist nicht Erleuchtung. Das ist Verdrängung.",
+          "format": ["reel_30s", "quote_post"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_08_teams_gruppen",
+      "name": "Teams & Gruppen",
+      "priority": 3,
+      "core_message": "Gruppen haben eine eigene Energie. Lern sie lesen.",
+      "target_audience": "secondary",
+      "reading_link": "penta",
+      "topics": [
+        {
+          "id": "t_071",
+          "title": "Was ein Penta ist — und warum es Gruppen verändert",
+          "hook": "Sobald 3 Menschen zusammenkommen, entsteht ein neues Wesen. Das Penta hat seine eigene Energie.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_072",
+          "title": "Warum manche Teams nicht funktionieren",
+          "hook": "Zu viele Manifestoren. Zu wenig Projektoren. Oder: alle haben dieselbe offene Milz. Design sieht es sofort.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_073",
+          "title": "Die 5 Rollen im Penta",
+          "hook": "Jedes Mitglied hat eine energetische Rolle. Wenn du sie kennst, führst du anders. Besser.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_074",
+          "title": "Familien-Penta — die Energie, in der du groß wurdest",
+          "hook": "Du warst nicht 'anders'. Du warst das Element, das im Penta gefehlt hat. Deshalb hast du dich fremd gefühlt.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_075",
+          "title": "Remote Teams aus HD-Sicht",
+          "hook": "Penta-Energie löst sich bei Distanz auf. Das ist nicht esoterisch — das ist messbar an der Produktivität.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_076",
+          "title": "Warum Business-Partner manchmal scheitern müssen",
+          "hook": "Zwei Ego-definierte Generatoren + offener Solarplexus bei beiden = programmierte Katastrophe.",
+          "format": ["linkedin_article", "carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_09_intimitaet_sexualitaet",
+      "name": "Intimität & Sexualität",
+      "priority": 1,
+      "core_message": "Anziehung ist messbar. Verbindung ist tiefbar.",
+      "target_audience": "primary",
+      "reading_link": "sexuality",
+      "topics": [
+        {
+          "id": "t_077",
+          "title": "Gate 59 — die Tür zur Intimität",
+          "hook": "Nicht jeder Mensch öffnet dich. Nur die, deren Gate 59 zu deinem Gate 6 passt. Das ist keine Theorie. Das ist Chemie.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_078",
+          "title": "Warum guter Sex nicht immer tiefer Sex ist",
+          "hook": "Chemie = Gates. Tiefe = Kanäle. Zwei verschiedene Ebenen. Die meisten verwechseln das.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_079",
+          "title": "Design Crystal — der 'Körper-Plan' in der Intimität",
+          "hook": "Dein Körper weiß früher als dein Kopf, wer dich berühren darf. Vertrau der Crystal, nicht dem Wunsch.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_080",
+          "title": "Wenn dein Kopf 'Ja' sagt, aber dein Körper 'Nein'",
+          "hook": "Das ist kein Trauma. Das ist deine Autorität. Und sie schützt dich, bevor dein Verstand versteht.",
+          "format": ["reel_30s", "quote_post"]
+        },
+        {
+          "id": "t_081",
+          "title": "Polaritätsarbeit im Chart sichtbar",
+          "hook": "Maskulin-feminin ist kein Gender. Es ist Energie. Und dein Chart zeigt, welche du in Intimität brauchst.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_082",
+          "title": "Warum manche Paare nie ankommen",
+          "hook": "Ihr liebt euch. Aber der Sex fühlt sich getrennt an. Das ist nicht 'zu wenig Aufwand'. Das sind fehlende Gates.",
+          "format": ["reel_30s", "youtube_short"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_10_familie_herkunft",
+      "name": "Familie & Herkunft",
+      "priority": 2,
+      "core_message": "Du bist nicht deine Familie. Aber du trägst ihre Energie.",
+      "target_audience": "primary",
+      "reading_link": "parenting",
+      "topics": [
+        {
+          "id": "t_083",
+          "title": "Warum du dich in deiner Familie fremd fühlst",
+          "hook": "Dein Chart hat Zentren definiert, die bei ihnen offen sind. Du bist 'anders', weil du das Element bringst, das ihnen fehlt.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_084",
+          "title": "Kinder sind kein 'leeres Blatt'",
+          "hook": "Dein Kind kommt mit einem vollständigen HD-Chart auf die Welt. Dein Job: nicht konditionieren. Unterstützen.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_085",
+          "title": "Generations-Konditionierung erkennen",
+          "hook": "Deine Mutter hatte offenes Solarplexus. Du auch. Du trägst ihre unverarbeitete Wut — nicht deine eigene.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_086",
+          "title": "Warum Geschwister so verschieden sind",
+          "hook": "Selbes Elternhaus, unterschiedliche Charts. Ihr wart nie gleich. Ihr wart nur im selben Penta.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_087",
+          "title": "Der Projektor-Teenager, den keiner versteht",
+          "hook": "Er ist nicht faul. Er ist erschöpft von Schulsystemen, die für Generatoren gebaut sind.",
+          "format": ["reel_30s", "linkedin_article"]
+        },
+        {
+          "id": "t_088",
+          "title": "Eltern werden nach HD",
+          "hook": "Manifestor-Eltern informieren. Generator-Eltern warten. Projektor-Eltern erkennen. Reflektor-Eltern spiegeln.",
+          "format": ["carousel_10slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_11_freundschaften",
+      "name": "Freundschaften & Soziale Verbindungen",
+      "priority": 2,
+      "core_message": "Nicht jede Freundschaft ist für ewig gemacht.",
+      "target_audience": "primary",
+      "reading_link": "connection",
+      "topics": [
+        {
+          "id": "t_089",
+          "title": "Welche Freunde dich wirklich nähren",
+          "hook": "Es gibt Menschen, nach denen du dich leer fühlst. Und welche, nach denen du aufblühst. Design erklärt warum.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_090",
+          "title": "Warum Freundschaften nach 7 Jahren enden",
+          "hook": "Du hast dich deconditioned. Er nicht. Oder umgekehrt. Das ist kein Verrat — das ist Entwicklung.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_091",
+          "title": "Der 'Energie-Vampir' aus HD-Sicht",
+          "hook": "Er nimmt dir nicht absichtlich Energie. Er ist einfach in deinen offenen Zentren zuhause. Lösung: Abstand. Oder Awareness.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_092",
+          "title": "Einsamkeit und offenes G-Zentrum",
+          "hook": "Du fühlst dich allein, selbst in Gruppen. Dein G-Zentrum sucht Richtung, die niemand geben kann. Außer du selbst.",
+          "format": ["carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_12_alltag_lifestyle",
+      "name": "Alltag & Lifestyle",
+      "priority": 3,
+      "core_message": "Dein Design formt deinen Alltag. Wenn du ihn lässt.",
+      "target_audience": "primary",
+      "reading_link": "basic",
+      "topics": [
+        {
+          "id": "t_093",
+          "title": "Morgenroutinen für jeden HD-Typ",
+          "hook": "5 Uhr aufstehen ist für Manifestoren. Projektoren brauchen 9 Uhr. Generatoren — wenn sie antworten.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_094",
+          "title": "Wie du richtig Entscheidungen triffst",
+          "hook": "Nicht pro/contra Liste. Deine Autorität. 6 verschiedene gibt es. Eine ist deine.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_095",
+          "title": "Produktivität nach HD-Typ",
+          "hook": "Generatoren: 8 Stunden Flow. Projektoren: 3 Stunden Fokus. Manifestoren: Schübe. Reflektoren: 28-Tage-Zyklen.",
+          "format": ["carousel_6slides", "linkedin_article"]
+        },
+        {
+          "id": "t_096",
+          "title": "Warum Social Media bei dir anders funktioniert",
+          "hook": "Scrollen ist Sakral-Missbrauch. Du antwortest auf Dinge, die nicht von dir kommen. Müdigkeit garantiert.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_097",
+          "title": "Reisen und Environment",
+          "hook": "Manche Menschen blühen in der Natur auf. Andere nur in Städten. HD sagt dir, wo deine Energie funktioniert.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_098",
+          "title": "Wohnen nach HD — Licht, Schall, Farbe",
+          "hook": "Dein Chart zeigt, ob du helles oder gedämpftes Licht brauchst. Ob Stille oder Rhythmus. Wohnen wird messbar.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_099",
+          "title": "Warum du Pausen anders brauchst",
+          "hook": "Manche regenerieren in Bewegung. Andere nur im Bett. Dein Motor-Zentrum entscheidet — nicht dein Wille.",
+          "format": ["reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_13_spiritualitaet_tiefe",
+      "name": "Spiritualität & Tiefe",
+      "priority": 2,
+      "core_message": "Spiritualität ohne Struktur ist Flucht.",
+      "target_audience": "primary",
+      "reading_link": "spiritual",
+      "topics": [
+        {
+          "id": "t_100",
+          "title": "Meditation ist nicht für jeden gleich",
+          "hook": "Projektoren meditieren anders als Manifestoren. Reflektoren anders als alle. 'Einfach still sitzen' klappt nicht für jeden.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_101",
+          "title": "Mondphasen und Reflektoren",
+          "hook": "Reflektoren sind lebende Mondkalender. Ihr Chart ändert sich jeden Tag. 28 Tage sind ihre Wahrheit.",
+          "format": ["reel_30s", "youtube_short"]
+        },
+        {
+          "id": "t_102",
+          "title": "Warum 'Loslassen' für dich schwer ist",
+          "hook": "Definierter Kopf + definiertes Ajna = du kannst nicht einfach 'aufhören zu denken'. Deine Magie ist im Denken.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_103",
+          "title": "Astrologie vs Human Design — der Unterschied",
+          "hook": "Astrologie zeigt den Himmel. HD zeigt den Körper. Beide wahr. Nur unterschiedliche Ebenen.",
+          "format": ["carousel_10slides", "youtube_longform"]
+        },
+        {
+          "id": "t_104",
+          "title": "Energiearbeit und offene Zentren",
+          "hook": "Reiki wirkt bei dir anders als bei deiner Freundin. Weil eure Zentren anders gebaut sind.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_105",
+          "title": "Rückzug ist kein Spirit-Defizit",
+          "hook": "Projektoren brauchen Alleinsein, um sich zu entleeren. Das ist kein Widerstand. Das ist Hygiene.",
+          "format": ["quote_post", "reel_15s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_14_trauma_schatten",
+      "name": "Trauma & Schattenarbeit",
+      "priority": 2,
+      "core_message": "Dein Trauma ist sichtbar im Design. Und lösbar.",
+      "target_audience": "primary",
+      "reading_link": "shadow-work",
+      "topics": [
+        {
+          "id": "t_106",
+          "title": "Wo Trauma sich im Chart zeigt",
+          "hook": "Offene Zentren sind keine Schwächen. Sie sind Trauma-Einfallstore — und gleichzeitig Weisheitsschulen.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_107",
+          "title": "Das offene Solarplexus und Kindheitsangst",
+          "hook": "Wenn deine Eltern oft wütend waren, hast du gelernt, ihre Wellen zu überleben. Das prägt dich bis heute.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_108",
+          "title": "Schattenarbeit nach Profil",
+          "hook": "3er-Linien arbeiten durch Erfahrung. 5er durch Projektion. Dein Profil bestimmt, wie du deinen Schatten integrierst.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_109",
+          "title": "People Pleasing und offener Willen",
+          "hook": "Offenes Ego = du beweist ständig. Das ist kein Charakter. Das ist Überleben. Und es ist heilbar.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_110",
+          "title": "Warum du dich sabotierst",
+          "hook": "Nicht jede Selbstsabotage ist psychologisch. Manche ist Nicht-Selbst-Strategie. Der Unterschied ist alles.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_111",
+          "title": "Transgenerationales Trauma im Chart",
+          "hook": "Deine Großmutter hat nicht getrauert. Du trägst es. Nicht weil du 'empathisch' bist — weil dein Chart es aufnimmt.",
+          "format": ["carousel_10slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_15_geld_ueberfluss",
+      "name": "Geld & Überfluss",
+      "priority": 2,
+      "core_message": "Geld ist Energie. Und energetisch ist es messbar.",
+      "target_audience": "secondary",
+      "reading_link": "geld-ueberfluss",
+      "topics": [
+        {
+          "id": "t_112",
+          "title": "Die 3 Gates für Reichtum",
+          "hook": "Gate 45, 21, 26. Wer sie definiert hat, hat Zugang zu materiellem Überfluss. Wer nicht — muss es anders lernen.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_113",
+          "title": "Money Mindset ist überbewertet",
+          "hook": "Wenn dein Ego-Zentrum offen ist, kannst du 1000 Affirmationen sagen. Das Problem ist Design, nicht Mindset.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_114",
+          "title": "Warum manche leicht Geld anziehen",
+          "hook": "Sie haben definierte Willens-Kanäle. Du nicht. Deshalb musst du anders verkaufen — nicht härter.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_115",
+          "title": "Sparen vs Investieren nach HD",
+          "hook": "Emotionale Autoritäten: niemals in der Welle investieren. Sakralwesen: der Bauch weiß, welche Aktie.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_116",
+          "title": "Reichtum durch Antwort",
+          "hook": "Generatoren werden nicht reich durch Wollen. Sie werden reich durch Antworten auf richtige Möglichkeiten.",
+          "format": ["quote_post", "reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_16_persoenlichkeitsentwicklung",
+      "name": "Persönlichkeitsentwicklung",
+      "priority": 2,
+      "core_message": "Wachstum ist nicht linear. Es ist zyklisch und typ-spezifisch.",
+      "target_audience": "primary",
+      "reading_link": "reflection",
+      "topics": [
+        {
+          "id": "t_117",
+          "title": "Grenzen setzen nach Design",
+          "hook": "Offene Aura + undefinierte Milz = du spürst fremde Grenzen schneller als deine eigenen. Üben heißt: deine finden.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_118",
+          "title": "Selbstwert und definierter Wille",
+          "hook": "Manche Menschen wissen instinktiv, was sie wert sind. Andere müssen es sich erarbeiten. Design entscheidet — nicht Charakter.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_119",
+          "title": "Die drei Stimmen in deinem Kopf",
+          "hook": "Intuition, Verstand, Konditionierung. Dein Chart zeigt dir, welche du vertrauen darfst.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_120",
+          "title": "Perfektionismus und offenes Ajna",
+          "hook": "Du musst nicht sicher sein. Dein Ajna ist offen — das ist deine Stärke. Die Suche nach Gewissheit ist das Problem.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_121",
+          "title": "Warum 'Ich-Sätze' bei dir nicht wirken",
+          "hook": "NLP geht davon aus, dass alle gleich funktionieren. HD zeigt: Sprache wirkt auf offene Zentren anders als auf definierte.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_122",
+          "title": "Nein sagen lernen nach HD",
+          "hook": "Generatoren: Bauchgefühl. Projektoren: nur bei Einladung überhaupt drüber nachdenken. Manifestoren: informieren, nicht erklären.",
+          "format": ["reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_17_provokant_viral",
+      "name": "Provokant & Viral (Dein Stil)",
+      "priority": 1,
+      "core_message": "Wahrheit ist viraler als Marketing.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_123",
+          "title": "'Einfach positiv denken' — der gefährlichste Ratschlag",
+          "hook": "Sagt der Mensch, der noch nie Schmerzen hatte. Toxic Positivity ist der Tod von Klarheit.",
+          "format": ["reel_30s", "quote_post"]
+        },
+        {
+          "id": "t_124",
+          "title": "'Das Universum liefert' — nur nicht für dich",
+          "hook": "Wenn dein Design Warten sagt und du 'manifestierst' — du sabotierst dich. Mit Stil.",
+          "format": ["reel_30s", "tiktok_hook"]
+        },
+        {
+          "id": "t_125",
+          "title": "Warum 99% der HD-Creator Blödsinn erzählen",
+          "hook": "Sie reden über Typen. Sie reden nicht über Autorität. Das ist wie Medizin ohne Diagnose.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_126",
+          "title": "Die Affirmations-Industrie ist kaputt",
+          "hook": "Wenn dein Root-Center unter Druck steht, wird dich kein 'Ich bin genug' retten. Du brauchst Bewegung.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_127",
+          "title": "Dating Apps aus HD-Sicht sind eine Katastrophe",
+          "hook": "Swipen heißt, mit dem Verstand zu entscheiden. Dein Bauch wurde nie gefragt. Kein Wunder, dass es nicht klappt.",
+          "format": ["reel_30s", "tiktok_hook"]
+        },
+        {
+          "id": "t_128",
+          "title": "'Sei authentisch' — aber wie?",
+          "hook": "Niemand sagt dir, was 'authentisch' bedeutet. HD schon: Typ + Strategie + Autorität. Rest ist Konditionierung.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_129",
+          "title": "Warum Coaches versagen",
+          "hook": "80% aller Coaches coachen ihre eigene Geschichte. Ohne HD wissen sie nicht, wo der Klient anders ist.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_130",
+          "title": "Die Lüge vom 'alles ist möglich'",
+          "hook": "Für Manifestoren vielleicht. Für dich vielleicht nicht. Und das ist nicht Mangel — das ist Klarheit.",
+          "format": ["quote_post", "reel_15s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_18_hd_mythen",
+      "name": "HD-Mythen & Missverständnisse",
+      "priority": 2,
+      "core_message": "Human Design wird viel falsch erklärt. Hier kommt die Wahrheit.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_131",
+          "title": "'Manifestoren sind die Bosse' — Mythos",
+          "hook": "Sie sind nicht Bosse. Sie sind Initiatoren. Und sie werden oft schlecht behandelt, weil Gesellschaft sie falsch liest.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_132",
+          "title": "'Projektoren sind faul' — falsch",
+          "hook": "Sie sind nicht für dauerhafte Aktivität gebaut. Und in einem Generator-System werden sie für krank gehalten.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_133",
+          "title": "Dein Typ ist nicht alles",
+          "hook": "Der Typ ist 10% des Charts. Profil, Autorität, Definition, Zentren — das ist der Rest.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_134",
+          "title": "Reflektoren sind keine 'seltenen Engel'",
+          "hook": "Sie sind 1% der Bevölkerung und extrem sensibel gegenüber Umgebung. Das ist keine Superkraft — das ist Arbeit.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_135",
+          "title": "Der Irrglaube vom 'perfekten Match'",
+          "hook": "Es gibt kein 'perfektes Match'. Es gibt bewusste Dynamiken. Matching ist Werkzeug, nicht Verheißung.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_136",
+          "title": "HD ist keine Religion",
+          "hook": "Es ist eine Sprache für Energie. Wer es als Dogma verkauft, hat nichts verstanden.",
+          "format": ["quote_post", "reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_19_coaches_berater",
+      "name": "Für Coaches & Berater (B2B)",
+      "priority": 2,
+      "core_message": "Deine Arbeit wird tiefer, wenn du HD integrierst.",
+      "target_audience": "secondary",
+      "reading_link": "business",
+      "topics": [
+        {
+          "id": "t_137",
+          "title": "Warum dein Coaching bei manchen nicht greift",
+          "hook": "Du coachst wie du gebaut bist. Dein Klient ist anders gebaut. Ohne HD arbeitest du auf Vermutung.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_138",
+          "title": "Readings automatisieren — ohne Qualitätsverlust",
+          "hook": "Manuelle Readings: 4 Stunden. Mit Connection Key: 4 Minuten. Gleiche Tiefe. Weil das System deine Struktur kennt.",
+          "format": ["linkedin_article", "reel_30s"]
+        },
+        {
+          "id": "t_139",
+          "title": "Die 3 Fragen, die jedes Coaching beginnen sollte",
+          "hook": "Typ, Autorität, offene Zentren. Wenn du das weißt, triffst du den Klienten da, wo er wirklich ist.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_140",
+          "title": "Kunden filtern nach HD",
+          "hook": "Nicht jeder Klient ist dein Klient. Und manche kostest du mehr Energie, als sie dir bringen.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_141",
+          "title": "Workshop-Design nach Gruppendynamik",
+          "hook": "Wenn deine Teilnehmer zu 80% offenes Solarplexus haben, wird dein 'harmonisches' Format sie überfordern.",
+          "format": ["linkedin_article", "carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_20_transits_timing",
+      "name": "Transits & Timing",
+      "priority": 3,
+      "core_message": "Der Himmel bewegt sich. Und du mit ihm.",
+      "target_audience": "primary",
+      "reading_link": "transit",
+      "topics": [
+        {
+          "id": "t_142",
+          "title": "Was ein Transit ist — einfach erklärt",
+          "hook": "Die Planeten aktivieren jeden Tag andere Gates. Du fühlst es. Ohne HD kannst du es nicht benennen.",
+          "format": ["carousel_6slides", "youtube_short"]
+        },
+        {
+          "id": "t_143",
+          "title": "Die Sonne im Wassermann — kollektive Energie",
+          "hook": "Wenn die Sonne Gate XY aktiviert, fühlen Millionen dasselbe. Das ist keine Esoterik — das ist Astronomie mit Bedeutung.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_144",
+          "title": "Solstice und Equinox aus HD-Sicht",
+          "hook": "Jahres-Wendepunkte aktivieren spezifische Quadranten. Deine Energie verschiebt sich — ob du es weißt oder nicht.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_145",
+          "title": "Warum du jeden Morgen anders aufwachst",
+          "hook": "Die Erde dreht sich. Andere Gates sind aktiv. Dein Körper reagiert auf einen neuen Himmel.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_146",
+          "title": "Retrograde-Phasen und offene Zentren",
+          "hook": "Mercury retrograd trifft dich härter, wenn dein Ajna offen ist. Das ist messbar — nicht Einbildung.",
+          "format": ["carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_21_channels_deep_dive",
+      "name": "Kanäle & Gates — Deep Dive",
+      "priority": 3,
+      "core_message": "Kanäle sind deine energetischen Superpowers.",
+      "target_audience": "primary",
+      "reading_link": "channel-analysis",
+      "topics": [
+        {
+          "id": "t_147",
+          "title": "Der Channel of Inspiration (1-8)",
+          "hook": "Wer diesen Kanal hat, ist hier, um die Welt zu inspirieren. Nicht alle. Wenn du ihn hast — du weißt es.",
+          "format": ["carousel_6slides", "youtube_short"]
+        },
+        {
+          "id": "t_148",
+          "title": "Der Talent-Kanal (2-14)",
+          "hook": "Du bist hier, um Richtung zu finden und Ressourcen zu verwalten. Das ist nicht Glück — das ist Design.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_149",
+          "title": "Der Logik-Kanal (63-4)",
+          "hook": "Du zweifelst. Du suchst Antworten. Das ist kein Versagen — das ist deine Rolle für die Menschheit.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_150",
+          "title": "Der Struggle-Kanal (28-38)",
+          "hook": "Du kämpfst für das, was dir wichtig ist. Auch wenn niemand mitkämpft. Das ist dein Channel of Stubbornness.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_151",
+          "title": "Der Judgment-Kanal (18-58)",
+          "hook": "Du siehst, was nicht funktioniert. Sofort. Das macht dich zum besten Kritiker — und zum schwersten Begleiter.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_152",
+          "title": "Der Awareness-Kanal (20-57)",
+          "hook": "Du weißt Dinge, bevor sie geschehen. Das ist nicht magisch — das ist die 57 in Aktion.",
+          "format": ["carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_22_community_testimonials",
+      "name": "Community & Testimonials (Conversion)",
+      "priority": 3,
+      "core_message": "Andere haben es erlebt. Du kannst es auch.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_153",
+          "title": "Wie Sarah ihr Dating-Leben umkrempelte",
+          "hook": "3 Jahre toxische Männer. 1 Connection Reading. Heute eine Beziehung, die funktioniert. Das ist keine Magie.",
+          "format": ["story_sequence", "reel_30s"]
+        },
+        {
+          "id": "t_154",
+          "title": "Markus war Generator-Coach — bis HD alles änderte",
+          "hook": "Er verbrannte seine Klienten. Weil er Projektor ist. Heute macht er 1/3 der Sessions — und 3x den Umsatz.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_155",
+          "title": "Ein Connection Reading vor der Hochzeit",
+          "hook": "Viele tun es. Nicht aus Misstrauen — aus Klarheit. Ihr wisst dann, wo ihr wachst. Und wo ihr Geduld braucht.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_156",
+          "title": "Die 3 häufigsten Aha-Momente im Reading",
+          "hook": "'Ich hab mich immer falsch gefühlt.' 'Ich dachte, das wäre Charakter.' 'Warum hat mir das niemand früher gesagt.'",
+          "format": ["carousel_6slides"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_23_saisonal_zeitbezogen",
+      "name": "Saisonal & Zeitbezogen",
+      "priority": 4,
+      "core_message": "Jahreszeit, Neujahr, Beziehungstage — alles durch HD gelesen.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_157",
+          "title": "Neujahrsvorsätze nach HD-Typ",
+          "hook": "Generator: nicht 'vornehmen', sondern 'antworten'. Projektor: nicht schneller — tiefer. Manifestor: informieren statt durchstarten.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_158",
+          "title": "Valentinstag für Singles aus HD-Sicht",
+          "hook": "Singles sind nicht 'nicht gut genug'. Sie sind in der Deconditioning-Phase. Und das ist heilig.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_159",
+          "title": "Weihnachten und Familienkonflikte",
+          "hook": "3 Tage im Penta deiner Herkunftsfamilie. Kein Wunder, dass du am 26. fertig bist.",
+          "format": ["reel_30s", "carousel_6slides"]
+        },
+        {
+          "id": "t_160",
+          "title": "Jahresrückblick nach Profil",
+          "hook": "1er-Linien reflektieren fundamental. 6er nehmen den Blick von oben. Dein Profil entscheidet, wie du zurückschaust.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_161",
+          "title": "Frühling und Solarplexus-Wellen",
+          "hook": "Mehr Licht = höhere Frequenz. Wellen werden intensiver. Das ist kein 'komisches Gefühl' — das ist Jahreszeit.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_162",
+          "title": "Sommer — die Phase der offenen Energie",
+          "hook": "Alle sind draußen. Alle Auren mischen sich. Für offene Zentren ist das Sommer-Erschöpfung. Plan für Rückzug.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_163",
+          "title": "Herbst und Deconditioning-Peak",
+          "hook": "Energie zieht sich zurück in den Körper. Das ist die beste Zeit, um Schichten abzuwerfen.",
+          "format": ["carousel_6slides"]
+        },
+        {
+          "id": "t_164",
+          "title": "Winter und Reflektor-Kraft",
+          "hook": "Stille, Dunkelheit, Mondzyklen sichtbarer. Reflektoren sind jetzt in ihrem Element — alle anderen lernen von ihnen.",
+          "format": ["reel_30s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_24_aha_momente_hooks",
+      "name": "Aha-Momente & Hook-Library",
+      "priority": 1,
+      "core_message": "Eine Zeile. Eine Wahrheit. Ein Trigger.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_165",
+          "title": "Verbindungen werden nicht gefunden. Sie werden gelesen.",
+          "hook": "Verbindungen werden nicht gefunden. Sie werden gelesen.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_166",
+          "title": "Nicht jede Energie gehört dir — aber jede Entscheidung trägt dich.",
+          "hook": "Nicht jede Energie gehört dir — aber jede Entscheidung trägt dich.",
+          "format": ["quote_post"]
+        },
+        {
+          "id": "t_167",
+          "title": "Anziehung ist messbar. Verbindung ist tiefbar.",
+          "hook": "Anziehung ist messbar. Verbindung ist tiefbar.",
+          "format": ["quote_post"]
+        },
+        {
+          "id": "t_168",
+          "title": "Du bist nicht zu viel. Du bist zu viel für Menschen, die nicht für dich gebaut sind.",
+          "hook": "Du bist nicht zu viel. Du bist zu viel für Menschen, die nicht für dich gebaut sind.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_169",
+          "title": "Wenn du weißt, wie du gebaut bist, brauchst du niemanden mehr um Erlaubnis zu fragen.",
+          "hook": "Wenn du weißt, wie du gebaut bist, brauchst du niemanden mehr um Erlaubnis zu fragen.",
+          "format": ["quote_post"]
+        },
+        {
+          "id": "t_170",
+          "title": "Dein Körper weiß früher als dein Kopf.",
+          "hook": "Dein Körper weiß früher als dein Kopf.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_171",
+          "title": "Zwei Menschen treffen sich nie zufällig. Sie treffen sich in einem Frequenzfeld.",
+          "hook": "Zwei Menschen treffen sich nie zufällig. Sie treffen sich in einem Frequenzfeld.",
+          "format": ["quote_post"]
+        },
+        {
+          "id": "t_172",
+          "title": "Warten ist kein Nichts-Tun. Warten ist die aktivste Form von Klarheit.",
+          "hook": "Warten ist kein Nichts-Tun. Warten ist die aktivste Form von Klarheit.",
+          "format": ["quote_post", "reel_15s"]
+        },
+        {
+          "id": "t_173",
+          "title": "Die meisten Beziehungen scheitern nicht an Liebe. Sie scheitern an fehlender Sprache.",
+          "hook": "Die meisten Beziehungen scheitern nicht an Liebe. Sie scheitern an fehlender Sprache.",
+          "format": ["quote_post"]
+        },
+        {
+          "id": "t_174",
+          "title": "Du wurdest nicht für alle gebaut.",
+          "hook": "Du wurdest nicht für alle gebaut.",
+          "format": ["quote_post", "reel_15s"]
+        }
+      ]
+    },
+
+    {
+      "id": "cat_25_app_features",
+      "name": "App & Produkt-Features (Conversion)",
+      "priority": 3,
+      "core_message": "Was der Connection Key kann — konkret gezeigt.",
+      "target_audience": "primary",
+      "reading_link": null,
+      "topics": [
+        {
+          "id": "t_175",
+          "title": "Dein Chart in 30 Sekunden — kostenlos",
+          "hook": "Geburtsdatum rein, Chart raus. Keine Anmeldung, keine Kreditkarte. Und es ist präziser als die meisten bezahlten Tools.",
+          "format": ["reel_30s", "story_sequence"]
+        },
+        {
+          "id": "t_176",
+          "title": "Connection Reading — was du bekommst",
+          "hook": "Electromagnetic Channels, Dominance Map, Compromise Dynamics. Alles sichtbar. Alles messbar. Alles deins.",
+          "format": ["carousel_10slides"]
+        },
+        {
+          "id": "t_177",
+          "title": "Matching-Engine — wie funktioniert sie wirklich",
+          "hook": "Sie vergleicht 64 Gates, 9 Zentren, 12 Profile und 36 Kanäle. In Sekunden. Mit messbaren Ergebnissen.",
+          "format": ["youtube_short"]
+        },
+        {
+          "id": "t_178",
+          "title": "Tagesimpuls — dein tägliches Transit-Reading",
+          "hook": "Die Planeten bewegen sich. Dein Chart nicht. Der Tagesimpuls zeigt, wo sich deine Energie heute verschiebt.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_179",
+          "title": "Für Coaches: Readings in 4 Minuten",
+          "hook": "Keine manuellen Stunden mehr. Gleiche Tiefe. Professionelle PDFs. Weißer Label möglich.",
+          "format": ["linkedin_article"]
+        },
+        {
+          "id": "t_180",
+          "title": "Penta Reading für Teams",
+          "hook": "3–5 Personen. Eine Analyse. Eine gemeinsame Sprache. Business-Führung wird berechenbar.",
+          "format": ["linkedin_article", "carousel_6slides"]
+        },
+        {
+          "id": "t_181",
+          "title": "Sexuality Reading — die tiefste Verbindung",
+          "hook": "Für Paare, die ihre energetische Intimität verstehen wollen. Kein Ratgeber — eine Karte.",
+          "format": ["reel_30s"]
+        },
+        {
+          "id": "t_182",
+          "title": "Jahres-Reading — dein persönliches Navigationssystem",
+          "hook": "12 Monate. Deine Gates. Die Transits. Deine strategischen Phasen. Für das Jahr, in dem du nicht mehr im Blindflug lebst.",
+          "format": ["carousel_10slides"]
+        }
+      ]
+    }
+  ],
+
+  "rotation_strategy": {
+    "weekly_theme": "Pro Woche ein Hauptthema (1 Kategorie) über alle Kanäle",
+    "daily_rotation": {
+      "monday": "Awareness (Reel + Quote)",
+      "tuesday": "Education (Carousel)",
+      "wednesday": "Story Sequence + TikTok Hook",
+      "thursday": "Quote Post + Community",
+      "friday": "Conversion (CTA + Newsletter)",
+      "saturday": "Community Repost",
+      "sunday": "Reflection / Poll"
+    },
+    "category_priority_order": [
+      "cat_01_dating_anziehung",
+      "cat_02_beziehungen_partnerschaft",
+      "cat_03_selbsterkenntnis_identitaet",
+      "cat_04_business_karriere",
+      "cat_09_intimitaet_sexualitaet",
+      "cat_17_provokant_viral",
+      "cat_24_aha_momente_hooks",
+      "cat_05_emotionen_klarheit",
+      "cat_06_gesundheit_vitalitaet",
+      "cat_10_familie_herkunft",
+      "cat_13_spiritualitaet_tiefe",
+      "cat_14_trauma_schatten",
+      "cat_15_geld_ueberfluss",
+      "cat_16_persoenlichkeitsentwicklung",
+      "cat_07_lebenssinn_purpose",
+      "cat_11_freundschaften",
+      "cat_12_alltag_lifestyle",
+      "cat_18_hd_mythen",
+      "cat_25_app_features",
+      "cat_19_coaches_berater",
+      "cat_08_teams_gruppen",
+      "cat_20_transits_timing",
+      "cat_21_channels_deep_dive",
+      "cat_22_community_testimonials",
+      "cat_23_saisonal_zeitbezogen"
+    ]
+  },
+
+  "agent_integration": {
+    "target_agent": "social-youtube",
+    "mcp_endpoint": "https://mcp.the-connection-key.de/agent/social-youtube",
+    "recommended_path": "/opt/mcp-connection-key/content-topics/content-topics.json",
+    "usage_in_n8n": "Workflow lädt JSON → wählt Kategorie (rotation) → wählt Topic (weighted random) → generiert Post via social-youtube Agent mit Hook + Brand Voice + Format-Spec"
+  }
+}

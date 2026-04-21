@@ -20,6 +20,9 @@ import IORedis from "ioredis";
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
@@ -4722,116 +4725,7 @@ app.post('/api/channel/content/:id/send-telegram', async (req, res) => {
 // KANAL-CONTENT: Tagesimpuls + HD-Wissen
 // ======================================================
 
-const HD_WISSEN_TOPICS = [
-  { topic: 'Der Generator-Typ', topicHashtag: 'Generator' },
-  { topic: 'Der Manifestierende Generator', topicHashtag: 'ManifestierenderGenerator' },
-  { topic: 'Der Projektor-Typ', topicHashtag: 'Projektor' },
-  { topic: 'Der Manifestor-Typ', topicHashtag: 'Manifestor' },
-  { topic: 'Der Reflektor-Typ', topicHashtag: 'Reflektor' },
-  { topic: 'Das Sakral-Zentrum', topicHashtag: 'SakralZentrum' },
-  { topic: 'Das G-Zentrum und Identität', topicHashtag: 'GZentrum' },
-  { topic: 'Das Solar-Plexus-Zentrum und emotionale Autorität', topicHashtag: 'EmotionaleAutorität' },
-  { topic: 'Das Kehlkopf-Zentrum und Manifestation', topicHashtag: 'Kehle' },
-  { topic: 'Das Milz-Zentrum und Intuition', topicHashtag: 'Milz' },
-  { topic: 'Das Herzens-Zentrum und Willenskraft', topicHashtag: 'Herz' },
-  { topic: 'Das Ajna-Zentrum und Konzeptualisierung', topicHashtag: 'Ajna' },
-  { topic: 'Das Kopf-Zentrum und Inspiration', topicHashtag: 'Kopf' },
-  { topic: 'Das Wurzel-Zentrum und Druck', topicHashtag: 'Wurzel' },
-  { topic: 'Profil 1/3 — Forscher und Märtyrer', topicHashtag: 'Profil13' },
-  { topic: 'Profil 1/4 — Forscher und Opportunist', topicHashtag: 'Profil14' },
-  { topic: 'Profil 2/4 — Einsiedler und Opportunist', topicHashtag: 'Profil24' },
-  { topic: 'Profil 2/5 — Einsiedler und Häretiker', topicHashtag: 'Profil25' },
-  { topic: 'Profil 3/5 — Märtyrer und Häretiker', topicHashtag: 'Profil35' },
-  { topic: 'Profil 4/6 — Opportunist und Rollenmodell', topicHashtag: 'Profil46' },
-  { topic: 'Profil 5/1 — Häretiker und Forscher', topicHashtag: 'Profil51' },
-  { topic: 'Profil 6/2 — Rollenmodell und Einsiedler', topicHashtag: 'Profil62' },
-  { topic: 'Strategie und Autorität als Grundprinzip', topicHashtag: 'StrategieAutorität' },
-  { topic: 'Konditionierung und offene Zentren', topicHashtag: 'Konditionierung' },
-  { topic: 'Die Inkarnationskreuze im Überblick', topicHashtag: 'Inkarnationskreuz' },
-  { topic: 'Definierte vs. offene Zentren', topicHashtag: 'Zentren' },
-  { topic: 'Warten auf Einladung — was das wirklich bedeutet', topicHashtag: 'Einladung' },
-  { topic: 'Das Nicht-Selbst und seine Fallen', topicHashtag: 'NichtSelbst' },
-  { topic: 'Human Design und Beziehungen', topicHashtag: 'Beziehungen' },
-  { topic: 'Tor 1 — Die Kreativität', topicHashtag: 'Tor1' },
-  { topic: 'Tor 10 — Das Verhalten des Selbst', topicHashtag: 'Tor10' },
-  { topic: 'Tor 13 — Der Zuhörer', topicHashtag: 'Tor13' },
-  { topic: 'Tor 25 — Die Unschuld', topicHashtag: 'Tor25' },
-  { topic: 'Tor 48 — Die Tiefe', topicHashtag: 'Tor48' },
-  // Beziehungen & Resonanz
-  { topic: 'Beziehungen im Human Design — Kompatibilität und Konditionierung', topicHashtag: 'HDBeziehungen' },
-  { topic: 'Resonanz im Human Design — warum manche Menschen sich sofort verbinden', topicHashtag: 'Resonanz' },
-  { topic: 'Elektromagnetische Verbindungen — wenn zwei Menschen einen Kanal vervollständigen', topicHashtag: 'Elektromagnetismus' },
-  { topic: 'Das Connection Chart — was passiert wenn zwei Charts aufeinandertreffen', topicHashtag: 'ConnectionChart' },
-  // Autoritäten (einzeln)
-  { topic: 'Sakrale Autorität — dem Körper vertrauen statt dem Kopf', topicHashtag: 'SakraleAutorität' },
-  { topic: 'Emotionale Autorität — die Welle ausreiten bevor du entscheidest', topicHashtag: 'EmotionaleWelle' },
-  { topic: 'Milz-Autorität — dem ersten Impuls vertrauen', topicHashtag: 'MilzAutorität' },
-  { topic: 'Ego-Autorität — was das Herz wirklich will', topicHashtag: 'EgoAutorität' },
-  { topic: 'Selbst-projizierte Autorität — laut denken um sich selbst zu hören', topicHashtag: 'SelbstprojizierteAutorität' },
-  { topic: 'Mentale Autorität und Umgebung — Projektoren die keiner inneren Stimme folgen', topicHashtag: 'MentaleAutorität' },
-  { topic: 'Lunar-Autorität — der 28-Tage-Zyklus des Reflektors', topicHashtag: 'LunarAutorität' },
-  // Kanäle (spezifisch)
-  { topic: 'Kanal 20-34 — Charisma: wenn Präsenz und Kraft sich verbinden', topicHashtag: 'Kanal2034' },
-  { topic: 'Kanal 2-14 — Schlüssel-Schloss: Richtung und Kraftfeld', topicHashtag: 'Kanal214' },
-  { topic: 'Kanal 36-35 — Transienz: der Hunger nach neuen Erfahrungen', topicHashtag: 'Kanal3635' },
-  { topic: 'Kanal 13-33 — der Zeuge: Geschichten hören und bewahren', topicHashtag: 'Kanal1333' },
-  { topic: 'Kanal 57-20 — Hirnwellen: Intuition die sich sofort ausdrückt', topicHashtag: 'Kanal5720' },
-  { topic: 'Kanal 34-57 — Kraft und Intuition: der Motor des Überlebens', topicHashtag: 'Kanal3457' },
-  { topic: 'Kanal 1-8 — Inspiration und Beitrag: kreative Führung', topicHashtag: 'Kanal18' },
-  { topic: 'Kanal 11-56 — Neugier: Ideen die zu Geschichten werden', topicHashtag: 'Kanal1156' },
-  { topic: 'Kanal 47-64 — Abstraktion: vom Chaos zur Erkenntnis', topicHashtag: 'Kanal4764' },
-  { topic: 'Kanal 37-40 — Gemeinschaft und Willenskraft: der Tribals-Deal', topicHashtag: 'Kanal3740' },
-  { topic: 'Kanal 6-59 — Intimität: Auren die sich öffnen und schließen', topicHashtag: 'Kanal659' },
-  { topic: 'Kanal 25-51 — Initiation: Schock als Erweckung', topicHashtag: 'Kanal2551' },
-  // Konzepte
-  { topic: 'Dekonditionierung — der 7-Jahres-Prozess zur Rückkehr zu dir selbst', topicHashtag: 'Dekonditionierung' },
-  { topic: 'Das Nicht-Selbst-Thema je Typ — Frustration, Bitterkeit, Wut, Enttäuschung', topicHashtag: 'NichtSelbstThema' },
-  { topic: 'Aura-Typen und wie sie wirken — warum manche Menschen Räume füllen', topicHashtag: 'Aura' },
-  { topic: 'Schaltkreise im Human Design — Individual, Tribal, Kollektiv', topicHashtag: 'Schaltkreise' },
-  { topic: 'Die 6 Linien im Detail — von der Forschung zum Rollenmodell', topicHashtag: 'Linien' },
-  { topic: 'Linie 1 — der Forscher: Sicherheit durch Wissen', topicHashtag: 'Linie1' },
-  { topic: 'Linie 2 — der Einsiedler: das unbewusste Genie das gerufen werden will', topicHashtag: 'Linie2' },
-  { topic: 'Linie 3 — der Märtyrer: lernen durch Trial and Error', topicHashtag: 'Linie3' },
-  { topic: 'Linie 4 — der Opportunist: Einfluss durch das eigene Netzwerk', topicHashtag: 'Linie4' },
-  { topic: 'Linie 5 — der Häretiker: die Last der Projektion anderer', topicHashtag: 'Linie5' },
-  { topic: 'Linie 6 — das Rollenmodell: drei Lebensphasen und die Reifung zur Weisheit', topicHashtag: 'Linie6' },
-  { topic: 'Transite und ihre Wirkung — wenn Planeten deinen Chart aktivieren', topicHashtag: 'Transite' },
-  { topic: 'HD und Kinder — das Design deines Kindes lesen und respektieren', topicHashtag: 'HDKinder' },
-  { topic: 'HD und Gesundheit — was der Body Graph über körperliche Intelligenz sagt', topicHashtag: 'HDGesundheit' },
-  { topic: 'HD und Beruf — Berufung statt Karriere: was dein Design wirklich will', topicHashtag: 'HDBeruf' },
-  { topic: 'HD und Geld — warum deine Strategie wichtiger ist als dein Mindset', topicHashtag: 'HDGeld' },
-  { topic: 'Der Ursprung von Human Design — Ra Uru Hu und die Erfahrung von 1987', topicHashtag: 'Geschichte' },
-  { topic: 'I Ching und Human Design — die 64 Hexagramme als Tore', topicHashtag: 'IChing' },
-  { topic: 'Astrologie im Human Design — Planeten Bewusstsein und Design', topicHashtag: 'Astrologie' },
-  { topic: 'Variable und PHS — Ernährung Umgebung Perspektive nach deinem Design', topicHashtag: 'Variable' },
-  { topic: 'Schlafrichtungen im Human Design — warum deine Schlafposition zählt', topicHashtag: 'Schlafrichtung' },
-  { topic: 'Human Design im Business — Strategie Autorität und Unternehmertum', topicHashtag: 'HDBusiness' },
-  { topic: 'Das Inkarnationskreuz — dein übergeordneter Lebenszweck', topicHashtag: 'Inkarnationskreuz' },
-  { topic: 'Split-Definition — wenn dein Chart in zwei Teile geteilt ist', topicHashtag: 'SplitDefinition' },
-  { topic: 'Triple-Split und Quad-Split — der Hunger nach Brücken', topicHashtag: 'TripleSplit' },
-  { topic: 'Single-Definition — die in sich geschlossene Energie', topicHashtag: 'SingleDefinition' },
-  // Weitere Gates
-  { topic: 'Tor 2 — Die Richtung des Selbst: wissen wohin ohne es erklären zu können', topicHashtag: 'Tor2' },
-  { topic: 'Tor 7 — Die Rolle des Selbst in Interaktion: natürliche Führung', topicHashtag: 'Tor7' },
-  { topic: 'Tor 20 — Jetzt: Präsenz als einzige Wahrheit', topicHashtag: 'Tor20' },
-  { topic: 'Tor 34 — Die Kraft: rohe Energie die sich selbst gehört', topicHashtag: 'Tor34' },
-  { topic: 'Tor 57 — Intuition: das sanfte Flüstern das Leben rettet', topicHashtag: 'Tor57' },
-  { topic: 'Tor 36 — Krise und emotionale Tiefe: wachsen durch Erfahrung', topicHashtag: 'Tor36' },
-  { topic: 'Tor 37 — Freundschaft und Gemeinschaft: Deals die funktionieren', topicHashtag: 'Tor37' },
-  { topic: 'Tor 55 — Geist und Überfluss: Stimmung als Kompass', topicHashtag: 'Tor55' },
-  { topic: 'Tor 64 — Verwirrung als Ausgangspunkt: bevor die Erkenntnis kommt', topicHashtag: 'Tor64' },
-  { topic: 'Tor 41 — Kontraktion und Fantasie: der Anfang aller Erfahrung', topicHashtag: 'Tor41' },
-  { topic: 'Tor 22 — Anmut und das Ohr für die richtige Zeit', topicHashtag: 'Tor22' },
-  { topic: 'Tor 26 — der Egoist: Ressourcen sammeln und weitergeben', topicHashtag: 'Tor26' },
-  { topic: 'Tor 44 — Energie aus der Vergangenheit: Muster erkennen', topicHashtag: 'Tor44' },
-  { topic: 'Tor 50 — Werte und Verantwortung: das Gesetz der Gemeinschaft', topicHashtag: 'Tor50' },
-  { topic: 'Tor 6 — Reibung und Intimität: die Türhüter-Energie', topicHashtag: 'Tor6' },
-  { topic: 'Tor 59 — Sexualität und Auflösung von Grenzen', topicHashtag: 'Tor59' },
-  { topic: 'Tor 30 — Flammen und Wünsche: Feuer das nicht erlischt', topicHashtag: 'Tor30' },
-  { topic: 'Tor 29 — Das Ja sagen: Hingabe als Kraft und Falle', topicHashtag: 'Tor29' },
-  { topic: 'Tor 39 — Der Provokateur: Emotionen wecken um Geist zu finden', topicHashtag: 'Tor39' },
-  { topic: 'Tor 19 — Wollen und Sensibilität: das Bedürfnis nach Zugehörigkeit', topicHashtag: 'Tor19' },
-];
+const HD_WISSEN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-wissen.json'), 'utf-8'));
 
 /**
  * Lädt Transit-Daten für heute aus Supabase oder API.
@@ -4930,43 +4824,7 @@ async function postChannelTagesimpuls() {
   }
 }
 
-const HD_BEZIEHUNG_TOPICS = [
-  { topic: 'Beziehungen im Human Design — Kompatibilität und Konditionierung', topicHashtag: 'HDBeziehungen' },
-  { topic: 'Resonanz im Human Design — warum manche Menschen sich sofort verbinden', topicHashtag: 'Resonanz' },
-  { topic: 'Elektromagnetische Verbindungen — wenn zwei Menschen einen Kanal vervollständigen', topicHashtag: 'Elektromagnetismus' },
-  { topic: 'Das Connection Chart — was passiert wenn zwei Charts aufeinandertreffen', topicHashtag: 'ConnectionChart' },
-  { topic: 'Offene Zentren in Beziehungen — wie wir unseren Partner konditionieren ohne es zu merken', topicHashtag: 'OffeneZentren' },
-  { topic: 'Typen in Beziehungen — Generator und Projektor: die häufigste Kombination', topicHashtag: 'TypenBeziehung' },
-  { topic: 'Emotionale Autorität in der Partnerschaft — warum Warten kein Versagen ist', topicHashtag: 'EmotionaleWellePartnerschaft' },
-  { topic: 'Das offene G-Zentrum — Identität die sich durch andere formt', topicHashtag: 'OffenesGZentrum' },
-  { topic: 'Das offene Herzens-Zentrum in Beziehungen — Versprechen die nicht gehalten werden können', topicHashtag: 'OffenesHerz' },
-  { topic: 'Split Definition und Partnerschaft — wenn der andere die Lücke schließt', topicHashtag: 'SplitDefinitionLiebe' },
-  { topic: 'Der Tribal Circuit — Beziehungen die auf Deals basieren', topicHashtag: 'TribalCircuit' },
-  { topic: 'Sakrale Antwort in Beziehungen — wie Generatoren wirklich Ja sagen', topicHashtag: 'SakraleAntwort' },
-  { topic: 'Warten auf Einladung in der Liebe — was das für Projektoren wirklich bedeutet', topicHashtag: 'EinladungLiebe' },
-  { topic: 'Linie 5 in Beziehungen — die Last der Projektion des anderen', topicHashtag: 'Linie5Beziehung' },
-  { topic: 'Linie 4 in Beziehungen — Liebe durch das eigene Netzwerk', topicHashtag: 'Linie4Beziehung' },
-  { topic: 'Tor 59 und Tor 6 — die Tore der Intimität und warum manche Auren sich nicht öffnen', topicHashtag: 'Intimität' },
-  { topic: 'Reflektor in Beziehungen — der Spiegel der Gemeinschaft', topicHashtag: 'ReflektorBeziehung' },
-  { topic: 'Manifestor in Beziehungen — Autonomie und Verbindung gleichzeitig', topicHashtag: 'ManifestorBeziehung' },
-  { topic: 'Familienkonstellationen im Human Design — Typen und Rollen in der Familie', topicHashtag: 'HDFamilie' },
-  { topic: 'Eltern und Kinder im Human Design — das Design deines Kindes respektieren', topicHashtag: 'ElternKinder' },
-  { topic: 'Das offene Solar Plexus Zentrum — Emotionen des anderen fühlen als wären es eigene', topicHashtag: 'OffenesSolarPlexus' },
-  { topic: 'Milz-Zentrum in Beziehungen — instinktives Wissen über Menschen', topicHashtag: 'MilzBeziehung' },
-  { topic: 'Geschäftspartnerschaften im Human Design — wer ergänzt wen', topicHashtag: 'BusinessPartner' },
-  { topic: 'Penta — die 5-Personen-Gruppe als eigenes Bewusstseinsfeld', topicHashtag: 'Penta' },
-  { topic: 'Grenzen im Human Design — warum dein Typ bestimmt wie du Nein sagst', topicHashtag: 'Grenzen' },
-  { topic: 'Konflikte im Human Design — Nicht-Selbst trifft Nicht-Selbst', topicHashtag: 'KonflikteHD' },
-  { topic: 'Trennungen im Human Design — was dein Design über Loslassen sagt', topicHashtag: 'Trennung' },
-  { topic: 'Freundschaft im Human Design — warum manche Verbindungen Jahre brauchen', topicHashtag: 'FreundschaftHD' },
-  { topic: 'Das Kehlen-Zentrum in Beziehungen — wer spricht für wen', topicHashtag: 'KehleBeziehung' },
-  { topic: 'Synchronizität und Human Design — zufällige Begegnungen die keine sind', topicHashtag: 'Synchronizität' },
-  { topic: 'Konditionierung durch die Familie — welche Muster du von zu Hause trägst', topicHashtag: 'FamilienKonditionierung' },
-  { topic: 'Mondtransite und Beziehungen — warum manche Tage leichter sind als andere', topicHashtag: 'MondBeziehung' },
-  { topic: 'Venus-Transite im Human Design — kollektive Liebesenergie', topicHashtag: 'VenusTransit' },
-  { topic: 'Aura und Anziehung — warum du bestimmte Menschen magnetisch anziehst', topicHashtag: 'AuraAnziehung' },
-  { topic: 'Gemeinschaft im Human Design — Stamm Kollektiv oder Individuum', topicHashtag: 'Gemeinschaft' },
-];
+const HD_BEZIEHUNG_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-beziehung.json'), 'utf-8'));
 
 /**
  * Postet täglich einen Beziehungs- und Resonanz-Beitrag in den Telegram-Kanal.
@@ -5264,18 +5122,7 @@ async function postWeeklyBusinessTip(force = false) {
   if (!TELEGRAM_CHANNEL_ID) return;
   console.log('💼 [Business] Generiere wöchentlichen Business-Tipp...');
   try {
-    const BUSINESS_TOPICS = [
-      'Wie jeder HD-Typ Angebote kommunizieren sollte',
-      'Preise setzen nach deiner Strategie und Autorität',
-      'Burnout-Prävention für Selbstständige nach HD-Typ',
-      'Sichtbarkeit im Business — wie jeder Typ gefunden wird',
-      'Teamdynamiken im Human Design: wer macht was?',
-      'Verkaufsgespräche nach Authorität führen',
-      'Content-Erstellung nach HD-Typ — was fließt, was kostet Energie',
-      'Nein sagen im Business — Grenzen nach HD-Design',
-      'Kundenkommunikation: wie jeder Typ am besten kommuniziert',
-      'Business-Entscheidungen: wann ist der richtige Zeitpunkt?',
-    ];
+    const BUSINESS_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-business.json'), 'utf-8'));
     const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
     const topic = BUSINESS_TOPICS[dayOfYear % BUSINESS_TOPICS.length];
 

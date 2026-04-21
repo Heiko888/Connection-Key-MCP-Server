@@ -57,6 +57,42 @@ REGEL 6 – PRONOMEN KORRIGIEREN
 Wenn das Geschlecht falsch ist: Ersetze alle falschen Pronomen im gesamten Text.
 Weiblich → sie/ihr/ihre, Männlich → er/ihm/seine.
 
+REGEL 7 – FALSCHE VERBINDUNGSTYP-LABELS KORRIGIEREN (Connection/Penta/Dating/Resonanz)
+Wenn im Fehlerbericht ein CHECK 7-Fehler gemeldet wird:
+  Ersetze das falsche Label im Text durch den korrekten Typ laut chartData.composite.connections.
+  - Falsch "elektromagnetisch" bei einseitig vollständigem Kanal
+      → durch "Kompromiss" oder "Companionship" ersetzen, je nach chartData-Befund.
+  - Falsch "Goldader" / "Ergänzung" / "Anziehung" bei einseitig vollständigem Kanal
+      → durch "Kompromiss" oder "Companionship" ersetzen.
+  - Falsch "parallel" ohne ≥ 2 vollständige Personen
+      → auf die tatsächliche Kategorie ummappen (z.B. "elektromagnetisch" oder "Kompromiss").
+  - Falsch "Kompromiss" ohne vollständige Person
+      → auf "elektromagnetisch" korrigieren.
+Wichtig: Ändere NUR das Label-Wort und das direkt beschreibende Satzfragment, nicht die
+umliegende Beschreibung des Kanals selbst.
+Die Kanal-Nummer und die deutschen Kanal-Namen (aus chartData.channels[i].name_de)
+bleiben unverändert.
+
+REGEL 8 – HALLUZINIERTE PLANETEN-POSITIONEN LÖSCHEN (strikt, kein Ersatz)
+Wenn im Fehlerbericht ein CHECK 8-Fehler gemeldet wird:
+  Lösche die betroffene Aussage KOMPLETT. Kein Ersatz. Wenn der Satz dadurch leer
+  wird, lösche den ganzen Satz. Wenn ein Absatz nur aus der halluzinierten Aussage
+  besteht, lösche den Absatz.
+  Kürzer ist besser als falsch.
+  Nicht durch "vielleicht" oder "möglicherweise" ersetzen — weg damit.
+  Einzige Ausnahme: Die Position steht tatsächlich in chartData.personality oder
+  chartData.design — dann ist sie korrekt und bleibt stehen.
+
+REGEL 9 – BEGRIFFS-WIDERSPRUCH VEREINHEITLICHEN
+Wenn im Fehlerbericht ein CHECK 9-Fehler gemeldet wird:
+  Ersetze den gesamten widersprüchlichen Block durch eine einzige, an chartData
+  ausgerichtete Formulierung. Wenn z.B. 16-48 erst als EM, dann als kein EM
+  bezeichnet wird und chartData sagt "compromise", dann komplette Passage
+  auf "Kompromiss" umschreiben.
+Wenn ein "Kanal" erwähnt wird, der laut chartData.channels nicht existiert:
+  Die Erwähnung des Kanal-Konstrukts entfernen. Die beteiligten einzelnen Tore
+  dürfen erwähnt bleiben, aber nicht als Kanal.
+
 ---
 
 AUSGABE:

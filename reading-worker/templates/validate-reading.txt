@@ -57,6 +57,50 @@ CHECK 6 – GESCHLECHT / PRONOMEN
 - Prüfe im Reading: Werden konsistent die richtigen Pronomen verwendet?
 - Fehler: Falsche Pronomen (z.B. er/ihm für eine weibliche Person).
 
+CHECK 7 – VERBINDUNGSTYPEN (nur bei Connection / Relationship / Penta / Sexuality / Dating / Resonanz)
+- Nur anwendbar wenn chartData.composite.connections existiert.
+- Für JEDEN im Reading-Text erwähnten Kanal, der im Kontext "elektromagnetisch",
+  "Kompromiss", "Parallel", "Companionship", "Goldader" oder "Ergänzung" benannt wird:
+  Finde den Kanal-Key (z.B. "59-6" oder "6-59") in chartData.composite.connections
+  und prüfe, in welcher Kategorie er tatsächlich steht.
+- Fehler (severity: critical) wenn:
+  a) Kanal im Text als "elektromagnetisch" bezeichnet, liegt aber laut chartData
+     unter "compromise", "companionship" oder "parallel".
+  b) Kanal als "Goldader", "Ergänzung" oder "Anziehung" beschrieben, obwohl er
+     bei EINER Person vollständig definiert ist (= Kompromiss oder Companionship).
+  c) Kanal als "parallel" bezeichnet, obwohl nicht ≥ 2 Personen ihn je vollständig haben.
+  d) Kanal als "Kompromiss" bezeichnet, obwohl niemand ihn vollständig hat.
+- Beispiel-Eingabe (Reading-Text):
+    "Zwischen euch aktiviert sich der Kanal 59-6 elektromagnetisch..."
+  chartData.composite.connections.compromise:
+    [{ "channel": "6-59", "completePerson": 0, "partialPersons": [1], "partialDetails": [{"gate": 6}] }]
+  Erwarteter Fehler:
+    check: CHECK 7, severity: critical,
+    description: "Kanal 59-6 im Text als elektromagnetisch bezeichnet, laut chartData ist es Kompromiss",
+    expected: "Kompromiss (Person 0 hat Kanal vollständig, Person 1 nur Gate 6)",
+    found: "elektromagnetisch",
+    location: "Abschnitt mit 'Zwischen euch aktiviert sich der Kanal 59-6'"
+
+CHECK 8 – HALLUZINIERTE PLANETEN / ACHSEN (strikt)
+- Jede Aussage der Form "Mond in Gate X", "Chiron in Gate X", "Lilith in Gate X",
+  "Knotenachse X/Y", "Nordknoten Gate X", "Südknoten Gate X", "Merkur in Gate X",
+  "Venus in Gate X", "Mars in Gate X", "Jupiter in Gate X", "Saturn in Gate X",
+  "Uranus in Gate X", "Neptun in Gate X", "Pluto in Gate X".
+- Vergleiche mit chartData.personality.{planet} und chartData.design.{planet}.
+- Fehler (severity: critical) wenn die Aussage im Text steht, aber der Planet
+  laut chartData in einem anderen Gate steht ODER die Planeten-Position nicht
+  im chartData vorhanden ist (z.B. Chiron/Lilith bei Light-Charts).
+- STRIKT: Keine Ausgabe einer Planeten-Position, die nicht aus chartData kommt.
+  Lieber den Satz löschen als eine ungestützte Position stehen lassen.
+
+CHECK 9 – BEGRIFFS-WIDERSPRUCH
+- Fehler (severity: critical) wenn derselbe Kanal im Text mit zwei widersprüchlichen
+  Kategorien belegt wird (z.B. "elektromagnetisch" UND "Kompromiss" für denselben
+  Kanal), oder wenn derselbe Kanal erst als aktiv und dann als inaktiv bezeichnet wird.
+- Auch erfasst: ein Kanal, der laut chartData NICHT im aktivierten Set steht, aber
+  im Reading dennoch als "euer Kanal" beschrieben wird (Tore die kein vollständiger
+  Kanal sind, dürfen nicht als Kanäle dargestellt werden).
+
 ---
 
 AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
@@ -66,7 +110,7 @@ AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
   "errorCount": 0,
   "errors": [
     {
-      "check": "CHECK 1-6",
+      "check": "CHECK 1-9",
       "severity": "critical",
       "description": "Was ist falsch",
       "expected": "Was laut chartData korrekt wäre",

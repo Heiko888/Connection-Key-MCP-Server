@@ -119,6 +119,140 @@ const CHANNEL_NAMES = {
   "24-61": "Awareness",
 };
 
+// Deutsche Kanal-Namen (kanonisch, aus reading-worker/knowledge/channels-gates.txt).
+// Wird zusaetzlich zu CHANNEL_NAMES im Chart-Response mitgegeben, damit Reading-
+// Templates und LLMs den deutschen Namen NICHT frei uebersetzen und halluzinieren.
+// Quelle der Wahrheit fuer das LLM: channel.name_de.
+const CHANNEL_NAMES_DE = {
+  "1-8":   "Inspiration",
+  "2-14":  "Der Pulsschlag",
+  "3-60":  "Mutation",
+  "4-63":  "Logik",
+  "5-15":  "Rhythmus",
+  "6-59":  "Intimitaet",
+  "7-31":  "Alpha",
+  "9-52":  "Konzentration",
+  "10-20": "Erwachung",
+  "10-34": "Erforschung",
+  "10-57": "Perfekte Form",
+  "11-56": "Neugier",
+  "12-22": "Offenheit",
+  "13-33": "Der verlorene Sohn / Der Zeuge",
+  "16-48": "Wellenlaenge",
+  "17-62": "Akzeptanz",
+  "18-58": "Urteil",
+  "19-49": "Synthese",
+  "20-34": "Charisma",
+  "20-57": "Die Gehirnwelle",
+  "21-45": "Geldlinie",
+  "23-43": "Strukturierung",
+  "24-61": "Bewusstsein",
+  "25-51": "Initiation",
+  "26-44": "Uebergabe",
+  "27-50": "Bewahrung",
+  "28-38": "Kampf",
+  "29-46": "Entdeckung",
+  "30-41": "Erkennung",
+  "32-54": "Transformation",
+  "34-57": "Kraft",
+  "35-36": "Vergaenglichkeit",
+  "37-40": "Gemeinschaft",
+  "39-55": "Emotion",
+  "42-53": "Reifung",
+  "47-64": "Abstraktion",
+};
+
+// Deutsche Inkarnationskreuz-Themennamen. Map von englischem thematischen Namen
+// (wie aus RAX_LAX_MAP/JUXTAPOSITION_NAMES) auf den deutschen Namen.
+// Nur der thematische Teil — "RAX of " / "LAX der " / "Juxtaposition der " wird
+// separat vorangestellt.
+const CROSS_THEMATIC_DE = {
+  "Abstraction":        "Abstraktion",
+  "Acceptance":         "Akzeptanz",
+  "Alpha":              "Alpha",
+  "Articulation":       "Artikulation",
+  "Awakening":          "Erwachung",
+  "Awareness":          "Bewusstsein",
+  "Bargain":            "Handel",
+  "Brainwave":          "Gehirnwelle",
+  "Charisma":           "Charisma",
+  "Clarion":            "Klarion",
+  "Community":          "Gemeinschaft",
+  "Concentration":      "Konzentration",
+  "Confrontation":      "Konfrontation",
+  "Consciousness":      "Bewusstsein",
+  "Contagion":          "Ansteckung",
+  "Curiosity":          "Neugier",
+  "Cycles":             "Zyklen",
+  "Dedication":         "Hingabe",
+  "Defiance":           "Trotz",
+  "Depth":              "Tiefe",
+  "Determination":      "Entschlossenheit",
+  "Discovery":          "Entdeckung",
+  "Dominion":           "Herrschaft",
+  "Duality":            "Dualitaet",
+  "Eden":               "Eden",
+  "Education":          "Bildung",
+  "Emoting":            "Emotion",
+  "Endeavor":           "Streben",
+  "Explanation":        "Erklaerung",
+  "Exploration":        "Erforschung",
+  "Fates":              "Schicksale",
+  "Grace":              "Gnade",
+  "Healing":            "Heilung",
+  "Incarnation":        "Inkarnation",
+  "Individualism":      "Individualitaet",
+  "Industry":           "Industrie",
+  "Informing":          "Informieren",
+  "Initiation":         "Initiation",
+  "Inspiration":        "Inspiration",
+  "Judgment":           "Urteil",
+  "Laws":               "Gesetze",
+  "Maya":               "Maya",
+  "Masks":              "Masken",
+  "Migration":          "Wanderung",
+  "Mutation":           "Mutation",
+  "Needs":              "Beduerfnisse",
+  "Openness":           "Offenheit",
+  "Penetration":        "Durchdringung",
+  "Power":              "Kraft",
+  "Preservation":       "Bewahrung",
+  "Prevention":         "Praevention",
+  "Prodigal":           "Der verlorene Sohn",
+  "Prosperity":         "Wohlstand",
+  "Recognition":        "Erkennung",
+  "Refinement":         "Verfeinerung",
+  "Revolution":         "Revolution",
+  "Rhythm":             "Rhythmus",
+  "Rulership":          "Herrschaft",
+  "Separation":         "Trennung",
+  "Service":            "Dienst",
+  "Sleeping Phoenix":   "Schlafender Phoenix",
+  "Sphinx":             "Sphinx",
+  "Stillness":          "Stille",
+  "Strategy":           "Strategie",
+  "Structuring":        "Strukturierung",
+  "Struggle":           "Kampf",
+  "Surrender":          "Uebergabe",
+  "Survival":           "Ueberleben",
+  "Synthesis":          "Synthese",
+  "Tension":            "Spannung",
+  "The Four Ways":      "Die vier Wege",
+  "Thinking":           "Denken",
+  "Transformation":     "Transformation",
+  "Transitoriness":     "Vergaenglichkeit",
+  "Transmission":       "Uebertragung",
+  "Uncertainty":        "Ungewissheit",
+  "Unexpected":         "Das Unerwartete",
+  "Vessel of Love":     "Gefaess der Liebe",
+  "Wavelength":         "Wellenlaenge",
+  "Wishes":             "Wuensche",
+  "Logic":              "Logik",
+  "Mating":             "Intimitaet",
+  "Money":              "Geldlinie",
+  "Keeper of Keys":     "Hueter der Schluessel",
+};
+
 const SE_SUN       = 0;
 const SE_MOON      = 1;
 const SE_MERCURY   = 2;
@@ -459,10 +593,24 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
     ? `Juxtaposition of ${thematicName}`
     : `${typeLabel} of ${thematicName}`;
 
+  // Deutscher Name: Themenstamm aus CROSS_THEMATIC_DE, Prefix aus Kreuz-Typ.
+  // Bei unbekanntem Thema (z.B. auto-generiertes "Gate X / Gate Y") wird der
+  // englische Stamm unveraendert uebernommen, damit der Text nie kaputtgeht.
+  const thematicDe = CROSS_THEMATIC_DE[thematicName] || thematicName;
+  const typePrefixDe =
+    crossType === "Juxtaposition" ? "Juxtaposition der"
+    : crossType === "Right Angle" ? "RAX der"
+    : "LAX der";
+  const fullName_de = `${typePrefixDe} ${thematicDe}`;
+
   return {
     name: fullName,
+    name_de: fullName_de,
+    thematicName,
+    thematicName_de: thematicDe,
     type: crossType,
     fullName,
+    fullName_de,
     profile,
     gates: {
       personalitySun:   pSunGate,
@@ -832,7 +980,11 @@ export async function calculateHumanDesignChart(input) {
 
   const channelsList = activeChannels.map((ch) => {
     const key = [...ch.gates].sort((a, b) => a - b).join("-");
-    return { gates: ch.gates, name: CHANNEL_NAMES[key] || key };
+    return {
+      gates: ch.gates,
+      name: CHANNEL_NAMES[key] || key,
+      name_de: CHANNEL_NAMES_DE[key] || CHANNEL_NAMES[key] || key,
+    };
   });
 
   const incarnationCross = getIncarnationCross(sunLonP, sunLonD, profile);
@@ -841,7 +993,7 @@ export async function calculateHumanDesignChart(input) {
   console.log(`[Chart] Aktive Gates: ${Array.from(activeGates).sort((a, b) => a - b).join(", ")}`);
   console.log(`[Chart] Channels: ${channelsList.map(c => c.gates.join("-")).join(", ")}`);
   console.log(`[Chart] Zentren: ${Object.entries(centers).filter(([, v]) => v).map(([k]) => k).join(", ")}`);
-  if (incarnationCross) console.log(`[Chart] Inkarnationskreuz: ${incarnationCross.name} (${incarnationCross.gates.personalitySun}/${incarnationCross.gates.personalityEarth} | ${incarnationCross.gates.designSun}/${incarnationCross.gates.designEarth})`);
+  if (incarnationCross) console.log(`[Chart] Inkarnationskreuz: ${incarnationCross.name_de} / ${incarnationCross.name} (${incarnationCross.gates.personalitySun}/${incarnationCross.gates.personalityEarth} | ${incarnationCross.gates.designSun}/${incarnationCross.gates.designEarth})`);
 
   const strategyMap = {
     "Generator": "Warten und antworten",

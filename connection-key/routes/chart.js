@@ -1,6 +1,7 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import { calculateHumanDesignChart } from "../lib/astro/chartCalculation.js";
+import { classifyCompositeConnections } from "../lib/astro/composite.js";
 
 // Supabase optional – nur für Persistenz. Chart-Berechnung funktioniert auch ohne.
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -112,7 +113,7 @@ router.get("/:chartId", async (req, res, next) => {
 });
 
 const HD_CHANNELS = [
-  [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,57],
+  [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,34],[10,57],
   [11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],[20,57],
   [21,45],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],[29,46],[30,41],
   [32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64],
@@ -146,46 +147,9 @@ router.post('/composite', async (req, res) => {
     ));
 
     const gateNumbers = results.map(r => (r.gates || []).map(g => typeof g === 'object' ? g.number : g));
-    const gateSets = gateNumbers.map(arr => new Set(arr));
     const allGates = [...new Set(gateNumbers.flat())];
-    const compositeChannels = [];
-    const connections = { electromagnetic: [], dominance: [], companionship: [], compromise: [] };
-
-    for (const [gA, gB] of HD_CHANNELS) {
-      const hasA = gateSets.map(s => s.has(gA));
-      const hasB = gateSets.map(s => s.has(gB));
-      if (!hasA.some(Boolean) && !hasB.some(Boolean)) continue;
-
-      const channelKey = `${gA}-${gB}`;
-
-      for (let i = 0; i < persons.length; i++) {
-        for (let j = i + 1; j < persons.length; j++) {
-          if ((hasA[i] && hasB[j]) || (hasB[i] && hasA[j])) {
-            connections.electromagnetic.push({ channel: channelKey, persons: [i, j] });
-            if (!compositeChannels.includes(channelKey)) compositeChannels.push(channelKey);
-          }
-        }
-      }
-
-      for (let i = 0; i < persons.length; i++) {
-        if (hasA[i] && hasB[i]) {
-          if (!compositeChannels.includes(channelKey)) compositeChannels.push(channelKey);
-          for (let j = 0; j < persons.length; j++) {
-            if (i !== j && (hasA[j] || hasB[j]) && !(hasA[j] && hasB[j])) {
-              connections.dominance.push({ channel: channelKey, dominant: i, other: j });
-            }
-          }
-          const othersHaveNone = gateSets.every((_, j) => i === j || (!hasA[j] && !hasB[j]));
-          if (othersHaveNone) connections.companionship.push({ channel: channelKey, person: i });
-        }
-      }
-
-      const aCount = hasA.filter(Boolean).length;
-      const bCount = hasB.filter(Boolean).length;
-      if ((aCount > 1 || bCount > 1) && !compositeChannels.includes(channelKey)) {
-        connections.compromise.push({ channel: channelKey });
-      }
-    }
+    const { channels: compositeChannels, connections } =
+      classifyCompositeConnections(HD_CHANNELS, gateNumbers);
 
     const compositeCenters = {};
     const allCenter = new Set(allGates.map(g => GATE_CENTER[g]).filter(Boolean));

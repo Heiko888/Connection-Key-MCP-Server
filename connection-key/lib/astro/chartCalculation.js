@@ -308,6 +308,28 @@ const JUXTAPOSITION_NAMES = {
   63:"Doubt", 64:"Confusion",
 };
 
+// Deutsche Themen pro Tor — wird als Fallback verwendet wenn ein Inkarnationskreuz
+// nicht in RAX_LAX_MAP gelistet ist und der thematicName aus zwei Gate-Namen
+// zusammengesetzt wird. Ohne diese Tabelle wuerde "RAX der Details / Growth"
+// im deutschen Namen stehen bleiben.
+const JUXTAPOSITION_NAMES_DE = {
+  1:"Selbstausdruck", 2:"Empfaenger", 3:"Mutation", 4:"Formulierung",
+  5:"Feste Muster", 6:"Reibung", 7:"Interaktion", 8:"Beitrag",
+  9:"Fokus", 10:"Verhalten", 11:"Ideen", 12:"Vorsicht", 13:"Zuhoerer",
+  14:"Machtfaehigkeiten", 15:"Extreme", 16:"Faehigkeiten", 17:"Meinungen",
+  18:"Korrektur", 19:"Wollen", 20:"Jetzt", 21:"Kontrolle", 22:"Offenheit",
+  23:"Assimilation", 24:"Rationalisierung", 25:"Unschuld", 26:"Trickster",
+  27:"Fuersorge", 28:"Kampf", 29:"Hingabe", 30:"Schicksale", 31:"Einfluss",
+  32:"Bewahrung", 33:"Rueckzug", 34:"Kraft", 35:"Erfahrung", 36:"Krise",
+  37:"Freundschaft", 38:"Opposition", 39:"Provokation", 40:"Verleugnung",
+  41:"Fantasie", 42:"Vollendung", 43:"Einsicht", 44:"Wachsamkeit", 45:"Besitz",
+  46:"Gluecksfall", 47:"Verwirklichung", 48:"Tiefe", 49:"Prinzipien",
+  50:"Werte", 51:"Schock", 52:"Stille", 53:"Anfaenge", 54:"Antrieb",
+  55:"Stimmungen", 56:"Stimulation", 57:"Intuition", 58:"Vitalitaet",
+  59:"Sexualitaet", 60:"Begrenzung", 61:"Geheimnis", 62:"Details",
+  63:"Zweifel", 64:"Verwirrung",
+};
+
 // Key: "min(pSun,pEarth)-max(pSun,pEarth)-min(dSun,dEarth)-max(dSun,dEarth)"
 // Type (RAX/LAX) determined by pSun line (1-3 = RAX, 4-6 = LAX)
 const RAX_LAX_MAP = {
@@ -594,9 +616,21 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
     : `${typeLabel} of ${thematicName}`;
 
   // Deutscher Name: Themenstamm aus CROSS_THEMATIC_DE, Prefix aus Kreuz-Typ.
-  // Bei unbekanntem Thema (z.B. auto-generiertes "Gate X / Gate Y") wird der
-  // englische Stamm unveraendert uebernommen, damit der Text nie kaputtgeht.
-  const thematicDe = CROSS_THEMATIC_DE[thematicName] || thematicName;
+  // Bei Single-Word-Thema (in RAX_LAX_MAP gelistet): direkte Uebersetzung.
+  // Bei Kombi-Fallback "Gate X / Gate Y": Gate-spezifische deutsche Namen aus
+  // JUXTAPOSITION_NAMES_DE zusammensetzen — so wird "Details / Growth"
+  // zu "Details / Vollendung" statt halb-deutsch zu bleiben.
+  let thematicDe;
+  if (CROSS_THEMATIC_DE[thematicName]) {
+    thematicDe = CROSS_THEMATIC_DE[thematicName];
+  } else if (crossType !== "Juxtaposition" && !RAX_LAX_MAP[getCrossKey(pSunGate, pEarthGate, dSunGate, dEarthGate)] && !RAX_LAX_MAP[getCrossKey(dSunGate, dEarthGate, pSunGate, pEarthGate)]) {
+    // Kombi-Fallback: baue den deutschen Namen aus den Gate-Themen
+    const pDe = JUXTAPOSITION_NAMES_DE[pSunGate] || JUXTAPOSITION_NAMES[pSunGate] || `Tor ${pSunGate}`;
+    const dDe = JUXTAPOSITION_NAMES_DE[dSunGate] || JUXTAPOSITION_NAMES[dSunGate] || `Tor ${dSunGate}`;
+    thematicDe = `${pDe} / ${dDe}`;
+  } else {
+    thematicDe = thematicName;
+  }
   const typePrefixDe =
     crossType === "Juxtaposition" ? "Juxtaposition der"
     : crossType === "Right Angle" ? "RAX der"

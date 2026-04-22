@@ -379,6 +379,17 @@ function isClaudeAvailable() {
 
 const CLAUDE_TIMEOUT_MS = parseInt(process.env.CLAUDE_TIMEOUT_MS || "120000", 10);
 
+// ── BullMQ Worker-Lifecycle ────────────────────────────────────────────────
+// lockDuration: max. Zeit die ein Job einen Worker "sperrt" bevor ein anderer
+// Worker annimmt dass der Job hängt und ihn übernimmt. Muss größer sein als
+// die längste Reading-Generierung (2-Pass Detailed + Pipeline).
+// 2-Pass ~360s + Validator 60s + Corrector 60s + Sections 30s ≈ 510s worst case.
+// Default 480s (8 min) — via ENV überschreibbar.
+const WORKER_LOCK_DURATION_MS = parseInt(process.env.WORKER_LOCK_DURATION_MS || "480000", 10);
+function workerOptions(extra = {}) {
+  return { connection: redis, lockDuration: WORKER_LOCK_DURATION_MS, ...extra };
+}
+
 async function generateWithClaude(prompt, options = {}) {
   if (!anthropicClient) {
     throw new Error("Claude API nicht konfiguriert. ANTHROPIC_API_KEY setzen.");
@@ -538,7 +549,9 @@ PFLICHT: Beschreibe JEDES definierte Zentrum, JEDEN Kanal und JEDE offene Zentru
 `;
 }
 
-function buildKnowledgeText(maxEntries = 8, maxCharsPerEntry = 1000) {
+// Deep-Fallback: nur wenn kein KNOWLEDGE_MAP-Eintrag greift.
+// Defaults großzügig gewählt, damit die Regel-Inhalte nicht abgeschnitten werden.
+function buildKnowledgeText(maxEntries = 20, maxCharsPerEntry = 5000) {
   return Object.entries(knowledge)
     .slice(0, maxEntries)
     .map(([key, val]) => `\n### ${key}\n${val.substring(0, maxCharsPerEntry)}`)
@@ -732,17 +745,23 @@ const KNOWLEDGE_MAP = {
   'correct-reading':  ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority'],
 };
 
+// Always-prepend: Dateien die für jedes Reading hart im Kontext stehen müssen
+// (z.B. strikte HD-Regeln, Halluzinations-Verbote). Baustein 6 erweitert diese Liste.
+const ALWAYS_KNOWLEDGE_KEYS = [];
+
 function buildReadingKnowledge(readingType) {
-  const keys = KNOWLEDGE_MAP[readingType];
-  if (!keys) {
-    // Fallback: generisches Bundle mit den wichtigsten Kern-Files
-    const FALLBACK_KEYS = ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'profiles-detailed'];
-    return FALLBACK_KEYS
-      .filter(k => knowledge[k])
-      .map(k => `\n### ${k}\n${knowledge[k]}`)
-      .join('\n');
-  }
-  return keys
+  const typeKeys = KNOWLEDGE_MAP[readingType]
+    || ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'profiles-detailed'];
+
+  // Dedup: Always-Keys zuerst, dann Type-Keys, dann einzigartig
+  const seen = new Set();
+  const ordered = [...ALWAYS_KNOWLEDGE_KEYS, ...typeKeys].filter(k => {
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  return ordered
     .filter(k => knowledge[k])
     .map(k => `\n### ${k}\n${knowledge[k]}`)
     .join('\n');
@@ -1592,7 +1611,7 @@ const workerV3 = new Worker(
       throw err;
     }
   },
-  { connection: redis }
+  workerOptions()
 );
 
 workerV3.on("failed", (job, err) => {
@@ -1739,7 +1758,7 @@ const workerV4 = new Worker(
       throw err;
     }
   },
-  { connection: redis }
+  workerOptions()
 );
 
 workerV4.on("failed", (job, err) => {
@@ -1906,7 +1925,7 @@ const connectionWorker = new Worker(
       throw err;
     }
   },
-  { connection: redis }
+  workerOptions()
 );
 
 connectionWorker.on("failed", (job, err) => {
@@ -2052,7 +2071,7 @@ const pentaWorker = new Worker(
       throw err;
     }
   },
-  { connection: redis }
+  workerOptions()
 );
 
 pentaWorker.on("failed", (job, err) => {
@@ -2209,7 +2228,7 @@ const multiAgentWorker = new Worker(
       throw err;
     }
   },
-  { connection: redis }
+  workerOptions()
 );
 
 multiAgentWorker.on("failed", (job, err) => {

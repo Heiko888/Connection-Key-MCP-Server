@@ -61,9 +61,45 @@ Sequenzielle Generierung).
   - `buildKnowledgeText()` Deep-Fallback-Defaults: 8->20 Eintraege,
     1000->5000 Zeichen.
 
+### fix(docker-compose): content-topics Volume-Mount
+- Commit: `9523413`
+- Latenter Bug aus Commit f7a8f91 (telegram-topics-json-migration):
+  server.js las via `path.join(__dirname, '../content-topics/...')` aus drei
+  JSON-Dateien am Repo-Root. Der reading-worker Build-Kontext ist aber nur
+  `./reading-worker`, sodass der Ordner nie in den Container kam. Alter
+  Container lief nur, weil sein Image noch vor f7a8f91 gebaut war.
+- Fix: `./content-topics:/content-topics:ro` Volume-Mount. Bonus:
+  JSON-Aenderungen wirken jetzt ohne Rebuild.
+
+### fix(reading-worker): Block 2.5 — Composite-Klassifikation auf Block-2-Doktrin
+- Commits: `a1ad462`, Merge `f309c87`
+- Datei neu: `reading-worker/lib/composite-classification.js` (Port von
+  `connection-key/lib/astro/composite.js`).
+- Datei neu: `reading-worker/tests/composite-classification.test.js`
+  (29 Tests, alle gruen).
+- Datei geaendert: `reading-worker/server.js` (+125 / -59).
+- Kontext: Block 2 am 2026-04-21 hatte die Klassifikation in connection-key
+  auf vier gegenseitig ausschliessende Kategorien umgestellt (electromagnetic,
+  compromise, companionship, parallel). reading-worker hatte aber eine
+  eigene Duplikat-Klassifikation (`classifyChannel` in server.js:3768) mit
+  den alten Labels EM/Goldader/Parallelenergie. Vier Pfade (Connection,
+  HD-Job, Streaming, Sexuality) produzierten deshalb weiterhin die alten
+  Labels im Prompt — unabhaengig davon dass connection-key intern die
+  neue Klassifikation geliefert hatte.
+- Fix:
+  - `classifyChannel()` geloescht.
+  - `analyzeConnectionDynamics()` nutzt jetzt `classifyTwoPersonChannels()`
+    aus der neuen lib.
+  - `dynamics`-Objekt um neue Felder erweitert: `compromise_channels`,
+    `companionship_channels`, `parallel_channels`. `activatedChannels[].type`
+    jetzt `electromagnetic | compromise | companionship | parallel`.
+  - Legacy-Felder (`dominanz_channels`, `kompromiss_channels`) bleiben
+    aus Rueckwaertskompatibilitaet befuellt: dominanz = companionship +
+    compromise (alt-Goldader-Semantik), kompromiss = parallel (alt-Name
+    war historisch falsch).
+- Container rebuilt, Health-Check OK.
+
 ### Ausstehend
-- Container-Neustart fuer reading-worker (notwendig, damit lockDuration
-  wirkt). `docker compose up -d --build reading-worker`.
 - Bausteine 4-7 + Monitoring (Plan v2.0).
 - Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-Follow-up,
   anderes Repo).

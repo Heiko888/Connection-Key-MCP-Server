@@ -99,8 +99,67 @@ Sequenzielle Generierung).
     war historisch falsch).
 - Container rebuilt, Health-Check OK.
 
+### feat(reading-worker): Baustein 4 — deterministischer Fakten-Block
+- Commits: `4ef43f3`, Merge `2405c3c`
+- Datei neu: `reading-worker/lib/facts-builder.js` (~350 Zeilen).
+- Datei neu: `reading-worker/tests/facts-builder.test.js` (27 Tests, alle gruen).
+- Datei geaendert: `reading-worker/server.js` (Import + Strict-Mode-Flag).
+- Kontext: Plan v2.0 / Baustein 4. `buildChartInfo()` lieferte bisher einen
+  freien Chart-Block in dem das LLM Tor-Namen, Kanal-Namen, Planeten-
+  Positionen rekonstruieren musste — Quelle der Halluzinationen.
+- Fix: `buildFactsBlock()` liefert jetzt einen strikt formatierten deutschen
+  Fakten-Block:
+  - Kern-Daten + Inkarnationskreuz mit 4 Gates + deutschen Namen + Keywords
+  - Alle 9 Zentren (DEFINIERT / offen)
+  - Kanaele mit deutschem Namen aus chartData.channels[i].name_de
+  - Tore mit deutschem Namen + Keyword + Source-Tag [Persoenlichkeit /
+    Design / beide]
+  - Alle 15 Planeten-Positionen
+  - Composite-Sektion (electromagnetic / compromise / companionship / parallel)
+  - Konditionierungs-Matrix (nur zentrum-zu-zentrum gleichen Typs)
+  - Transit-Whitelist bei Transit/Jahres/Tagesimpuls
+  - ERLAUBTE ERWAEHNUNGEN: Liste aller erlaubten Gates/Kanaele/Planeten
+  - VERBOTEN-Sektion (kein Goldader, keine cross-center Konditionierung,
+    keine halluzinierten Planeten-Positionen)
+  - WAHRHEITSQUELLE-Instruktion am Ende
+- Quelle der deutschen Tor-Namen: `reading-worker/data/incarnation_crosses.json`
+  (`gate_names`-Block, 64 Eintraege).
+- Feature-Flag: `READING_STRICT_MODE` (default `true`). Auf `false` setzen
+  → altes Verhalten zurueck.
+- Smoke-Test gegen echten Chart (Generator 3/5 Sacral): 2950 Zeichen alt
+  → 4344 Zeichen neu. Kanaele jetzt deutsch ("Der Pulsschlag", "Akzeptanz",
+  "Strukturierung"), Tore deutsch mit Keywords ("Details (Praezision und
+  Genauigkeit)", "Vollendung (Zyklen abschliessen)"), Source-Tags
+  korrekt.
+- Bekannte Einschraenkung: Inkarnationskreuz-Kombi-Themen wie "RAX der
+  Details / Growth" bleiben halb-deutsch, weil CROSS_THEMATIC_DE in
+  connection-key/chartCalculation.js nicht alle Kombi-Namen abdeckt.
+  Separater Folge-Fix.
+
+### feat(reading-worker): Composite-Block + Konditionierungs-Matrix in Connection-Prompt
+- Commit: `5bf9a64`
+- Baustein-4-Follow-up. `generateConnectionReadingTwoParts` (Connection /
+  Relationship / Compatibility) haengt jetzt im Strict-Mode den
+  deterministischen Composite-Block + Konditionierungs-Matrix an die
+  Prompts beider Teile.
+- Vorher fehlte der Composite-Block bei Connection-Readings, weil
+  `buildChartInfo()` ohne `opts.composite` aufgerufen wurde.
+- Sektion-4-Prompt-Text aktualisiert: "Aktivierte Kanaele nach
+  Block-2-Klassifikation" statt "EM / Goldader / Stabile Parallelenergie".
+- Sektion-2-Konditionierung-Anweisung: nur zentrum-zu-zentrum gleichen Typs.
+- Sexuality, ChannelAnalysis und Penta nutzen ad-hoc-Formatter statt
+  `buildChartInfo` und bekommen den Composite-Block noch nicht — separater
+  Folge-Commit.
+
 ### Ausstehend
-- Bausteine 4-7 + Monitoring (Plan v2.0).
+- Sexuality / ChannelAnalysis / Penta auf `buildChartInfo` umstellen
+  (damit sie den Fakten-Block + Composite-Sektion erhalten).
+- Bausteine 5 (Fakten-Whitelist als Prompt-Addendum, faktisch durch Block 4
+  schon abgedeckt — nur als Redundanz im Plan), 6 (HD-Regel-Whitelist als
+  separate Knowledge-Datei in `ALWAYS_KNOWLEDGE_KEYS`), 7 (sequenzielle
+  2-Pass-Generierung) + Monitoring (Plan v2.0).
+- Inkarnationskreuz-Kombi-Themen vollstaendig auf Deutsch
+  (CROSS_THEMATIC_DE in connection-key/chartCalculation.js erweitern).
 - Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-Follow-up,
   anderes Repo).
 

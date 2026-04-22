@@ -145,6 +145,10 @@ services:
     volumes:
       - ./reading-worker/knowledge:/app/knowledge
       - ./reading-worker/templates:/app/templates
+      # Telegram-Content-Topics: server.js liest aus `../content-topics/...`
+      # relativ zu /app → /content-topics. Volume-Mount, damit JSON-Änderungen
+      # ohne Rebuild wirken.
+      - ./content-topics:/content-topics:ro
     restart: unless-stopped
     networks:
       - app-network

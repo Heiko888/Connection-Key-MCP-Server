@@ -172,21 +172,100 @@ Sequenzielle Generierung).
 - Token-Kosten: ~1.6k zusaetzliche Input-Tokens pro Reading-Prompt.
   Mit Prompt-Caching vernachlaessigbar.
 
-### Ausstehend
-- Sexuality / ChannelAnalysis / Penta auf `buildChartInfo` umstellen
-  (damit sie den Fakten-Block + Composite-Sektion erhalten).
-- Baustein 7 (sequenzielle 2-Pass-Generierung): Part 2 bekommt Part 1 als
-  Kontext, soll nicht widersprechen.
-- Validator CHECK 10-14 (Plan v2.0): Cross-Pass-Widerspruch,
-  HD-Regel-Konformitaet, Goldader-String-Check, numerische Behauptungen,
-  Whitelist-Verstoss.
-- Monitoring + Dashboard (`v4.reading_validation_log` + Frontend).
-- Inkarnationskreuz-Kombi-Themen vollstaendig auf Deutsch
-  (CROSS_THEMATIC_DE in connection-key/chartCalculation.js erweitern).
-- Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-Follow-up,
-  anderes Repo).
-- Baustein 5 (Fakten-Whitelist als Prompt-Addendum) wurde durch Baustein 4
-  faktisch abgedeckt — nicht separat noetig.
+### feat(reading-worker): Baustein 7 — sequenzielle 2-Pass-Generierung
+- Commits: `cb6732c`, Merge `...`
+- Datei neu: `reading-worker/tests/sequential-generation.test.js` (10 Tests).
+- Datei geaendert: `reading-worker/server.js` (+41 Zeilen Helper
+  `injectPart1Context` + sequentielle Branches in `generateDetailedReading
+  TwoParts` und `generateTwoParts`).
+- Kontext: Teil 1 und Teil 2 liefen bisher parallel via Promise.all —
+  wussten nichts voneinander. Daraus entstanden Widersprueche wie
+  "Kanal 3-60 bei A vollstaendig" (Teil 1) vs. "Kanal 3-60 elektromagnetisch"
+  (Teil 2).
+- Fix: Im Strict-Mode laeuft Teil 2 sequentiell nach Teil 1 und bekommt
+  dessen Text als Kontext-Praefix mit expliziter Anti-Widerspruchs-
+  Anweisung ("Widerspreche KEINER Aussage aus Teil 1", "Verbindungstyp-
+  Kategorien bleiben unveraendert").
+- Performance: Detailed + Connection sind jetzt ~2x langsamer (160s statt 80s).
+  Der in Preflight gesetzte BullMQ `lockDuration=480s` faengt das auf.
+- Tests: 10/10 gruen.
+
+### fix(chart-engine): Inkarnationskreuz-Kombi-Themen vollstaendig auf Deutsch
+- Commit: `25a9d3f`
+- Datei: `connection-key/lib/astro/chartCalculation.js`
+- Neue Tabelle `JUXTAPOSITION_NAMES_DE` (64 Tor-Themen auf Deutsch).
+- Bei unbekannten Kreuz-Kombinationen (kein Match in `RAX_LAX_MAP`) wird
+  der Name aus `JUXTAPOSITION_NAMES_DE[pSun] / [dSun]` zusammengesetzt
+  statt halb-deutsch zu bleiben.
+- Vorher: "RAX der Details / Growth". Jetzt: "RAX der Details / Vollendung".
+
+### refactor(reading-worker): Sexuality + ChannelAnalysis auf buildChartInfo
+- Commit: `30bed72`
+- Beide Pfade nutzten ad-hoc `formatChartCenters/Channels/Gates` statt
+  `buildChartInfo` und bekamen weder Fakten-Block noch Composite-Block.
+- Neuer Helper `buildTwoPersonCompositeBlock(chartA, chartB, nameA, nameB)`
+  — DRY-Refactor der Inline-Logik aus `generateConnectionReadingTwoParts`.
+- Sexuality: `userMessage` nutzt jetzt `buildChartInfo(chartA/B)` +
+  Composite-Block.
+- ChannelAnalysis: dito. Dead Code entfernt (CHANNEL_NAMES_MAP mit 35
+  Zeilen, `getChName`, `emText`).
+- Penta bleibt: benoetigt groesseren Refactor (Template-Pfad mit
+  `chartData: null`), separater Folge-Commit.
+
+### fix(pipeline): Validator CHECK 10-14 + Corrector REGEL 10-14
+- Commit: `e939ca6`
+- Baustein 3 komplett (Plan v2.0). Ergaenzt CHECK 7-9 um 5 weitere:
+  - **CHECK 10** Cross-Pass-Widerspruch: Fakt in Teil 1 anders als in Teil 2.
+  - **CHECK 11** HD-Regel-Konformitaet: Abgleich gegen `hd-regeln-strikt.txt`.
+  - **CHECK 12** Goldader-Begriff: simpler String-Check (major).
+  - **CHECK 13** Numerische Behauptungen: Zahlen-Abgleich + Beleg-Pflicht (major).
+  - **CHECK 14** Whitelist-Verstoss: Gates/Kanaele ausserhalb der Whitelist.
+- Corrector-Regeln 10-14 spiegeln die Checks. Whitelist-Verstoesse werden
+  geloescht (kein Ersatz).
+
+### feat(monitoring): Baustein 8 — reading_validation_log + Health-Dashboard
+- Commits: Merge `...`
+- Migration: `2026042201_reading_validation_log.sql` (applied auf
+  Supabase-Projekt `connection-key-v3` = `wdiadklhvhlndnjojrfu`).
+- Tabelle `public.reading_validation_log`: id, reading_id (ohne FK),
+  reading_type, template, validated_at, error_count, errors (JSONB),
+  correction_applied, pre/post_length, chart_fingerprint, model_used,
+  duration_ms, strict_mode, sampled_for_review, reviewed_at, verdict.
+- RLS: Service-Role insert, Coaches select + review.
+- `reading-pipeline.js`: `setPipelineSupabase()`-Setter, `chartFingerprint()`
+  SHA256, `logValidationRun()`-Helper. Jeder Pipeline-Lauf schreibt einen
+  Eintrag. Sampling-Rate 1/20 (via `REVIEW_SAMPLING_RATE`).
+- Dashboard-Endpoints auf reading-worker:
+  - `GET /admin/reading-health?days=7` — Aggregate nach Typ / CHECK,
+    Fehlerrate, pending_reviews.
+  - `GET /admin/reading-health/recent?limit=20&only_errors=true` — letzte
+    Laeufe tabellarisch.
+- Frontend-Coach-UI unter `/admin/reading-health` nicht Teil dieses
+  Commits (.167 separates Repo) — die JSON-Endpunkte sind direkt
+  einbindbar.
+
+### Baustein-Uebersicht Plan v2.0 — STATUS
+| Baustein | Status |
+|---|---|
+| 1 Chart-Engine-Stammdaten | ✅ (21.4.) |
+| 2 Composite-Klassifikation (connection-key) | ✅ (21.4.) |
+| 2.5 Composite-Klassifikation (reading-worker) | ✅ |
+| 3 Validator + Corrector (CHECK 7-14 + REGEL 7-14) | ✅ |
+| 4 Deterministischer Fakten-Block | ✅ |
+| 4 Composite-Block-Integration (Connection) | ✅ |
+| 5 Fakten-Whitelist als Prompt-Addendum | ✅ (durch Baustein 4 abgedeckt) |
+| 6 HD-Regel-Whitelist | ✅ |
+| 7 Sequenzielle 2-Pass-Generierung | ✅ |
+| 8 Monitoring + Dashboard | ✅ |
+| Extra: CROSS_THEMATIC_DE vollstaendig | ✅ |
+| Extra: Sexuality + ChannelAnalysis Refactor | ✅ |
+
+### Ausstehend (nicht Plan-v2.0-kritisch)
+- Penta auf `buildChartInfo` umstellen (braucht userData.memberCharts-Composite).
+- Frontend-Coach UI `/admin/reading-health` fuer Dashboard-Rendering.
+- Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-UI-Follow-up).
+- End-to-End-Smoketest gegen echtes Reading mit Review-Queue fuellen.
+- Deployment/Push nach origin/main (24 Commits ahead of origin).
 
 ---
 

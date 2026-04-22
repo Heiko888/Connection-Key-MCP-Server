@@ -1,0 +1,187 @@
+# HD-REGEL-WHITELIST (strikt, verbindlich)
+
+Diese Datei kodifiziert die harten, regelbasierten Mechaniken des Human-Design-Systems.
+Sie wird in JEDEN fachlichen Reading-Prompt geladen und ist **nicht verhandelbar**.
+Wenn dein Trainings-Wissen einer dieser Regeln widerspricht, **gilt diese Datei**.
+
+Lieber kürzer und korrekt als lang und falsch.
+
+---
+
+## 1. KONDITIONIERUNG
+
+- Konditionierung passiert **ausschließlich** zentrum-zu-zentrum zwischen **gleichen Zentrums-Typen**.
+- Wenn Person A das Sakral definiert hat und Person B das Sakral offen hat, dann konditioniert A's Sakral B's Sakral.
+- Genauso für alle 9 Zentren analog: Kopf konditioniert Kopf, Ajna konditioniert Ajna, Kehle konditioniert Kehle, G-Zentrum konditioniert G-Zentrum, Herz/Ego konditioniert Herz/Ego, Solarplexus konditioniert Solarplexus, Sakral konditioniert Sakral, Milz konditioniert Milz, Wurzel konditioniert Wurzel.
+
+### Ungültig — niemals so formulieren:
+- "Sakral konditioniert Wurzel"
+- "Kehle konditioniert Solarplexus"
+- "Solarplexus überträgt sich auf das Herz"
+- jede Konditionierung quer über Zentrums-Typen
+
+### Gültig — so formulieren:
+- "A's definiertes Sakral konditioniert B's offenes Sakral"
+- "B's definierte Wurzel konditioniert A's offene Wurzel"
+- "Beide haben Spleen definiert — keine Konditionierung in diesem Zentrum"
+- "Beide haben Solarplexus offen — kein Konditionierungs-Druck untereinander"
+
+---
+
+## 2. KANÄLE
+
+- Ein Kanal existiert **nur**, wenn beide definierenden Gates entweder bei derselben Person oder in einer Composite-Konstellation gemeinsam abgedeckt sind.
+- Gate 16 allein ist nicht "Kanal 16-48". Gate 48 allein ist nicht "Kanal 16-48".
+- Themen-Resonanz zwischen zwei Gates ist **kein** Kanal und darf nicht als Kanal formuliert werden.
+- Wenn der Fakten-Block einen Kanal nicht listet, existiert er für dieses Reading nicht. Punkt.
+
+### Ungültig:
+- "Ihr habt resonant Kanal 1-8" (wenn nur ein Gate aktiviert ist)
+- "Fast wie Kanal 16-48"
+- "Themenresonanz Kanal 59-6" (für sich genommen kein Kanal)
+
+### Gültig:
+- "Person A trägt Gate 16, Person B trägt Gate 48 — zusammen aktiviert sich Kanal 16-48 elektromagnetisch"
+- "A hat Kanal 16-48 vollständig" (nur wenn beide Gates bei A aktiv sind)
+
+---
+
+## 3. VERBINDUNGSTYPEN (Composite, ≥ 2 Personen)
+
+Genau vier Kategorien, gegenseitig ausschließend:
+
+### Elektromagnetisch
+- Niemand hat den Kanal alleine vollständig.
+- Mindestens zwei verschiedene Personen decken zusammen die beiden Gates ab.
+- Echte energetische Anziehung — der Kanal entsteht *durch* die Verbindung.
+
+### Kompromiss
+- Genau eine Person hat den Kanal vollständig.
+- Mindestens eine andere Person hat nur eines der beiden Gates.
+- Reibung am einzelnen Gate.
+
+### Companionship
+- Genau eine Person hat den Kanal vollständig.
+- Niemand sonst hat ein Gate dieses Kanals.
+- Andere können die Energie erleben, aber nicht berühren.
+
+### Parallel
+- Mindestens zwei Personen haben den Kanal jeweils unabhängig vollständig.
+- Keine Spannung, keine Anziehung — parallele Energie.
+
+### Verbindliche Folgerungen:
+- Ein Kanal, der bei einer Person vollständig definiert ist, ist für diese Person **keine** elektromagnetische Verbindung — auch nicht wenn eine andere Person eines der Gates ebenfalls hat.
+- Eine elektromagnetische Verbindung existiert **nur**, wenn niemand den Kanal allein komplett hat und zwei Personen zusammen beide Gates abdecken.
+- Der Begriff **"Goldader" ist abgeschafft**. Verwende stattdessen die präzise Kategorie aus der obigen Liste. Der Begriff darf in keinem generierten Reading-Text auftauchen.
+
+---
+
+## 4. INKARNATIONSKREUZE
+
+- Jedes Inkarnationskreuz besteht aus **exakt 4 Gates**: Persönlichkeitssonne, Persönlichkeitserde, Design-Sonne, Design-Erde.
+- Es gibt drei Kreuz-Typen:
+  - **Right Angle (RAX)** — Linien 1-3 in P-Sonne und D-Sonne
+  - **Left Angle (LAX)** — mindestens eine Linie 4-6 (außer Profil 4/1)
+  - **Juxtaposition (JUX)** — ausschließlich Profil 4/1
+- Der Name eines Kreuzes wird aus der Lookup-Tabelle gelesen, **nie erraten**.
+- Wenn der Name nicht in der Tabelle steht, wird ein deterministischer Fallback wie `"LAX (Tore: 1/2/3/4)"` verwendet — kein erfundener Name.
+
+### Ungültig:
+- "Du trägst das Kreuz der Heilung" (wenn das Kreuz im Fakten-Block einen anderen Namen hat oder den Fallback liefert)
+- "Inkarnationskreuz der Verbindung" (frei erfunden)
+
+### Gültig:
+- Genau den Namen wiedergeben, der im Fakten-Block unter "Inkarnationskreuz:" steht.
+- Bei Fallback-Format: das Format genauso übernehmen.
+
+---
+
+## 5. PLANETEN-POSITIONEN
+
+- Jede Aussage der Form "Planet X in Gate Y" muss **exakt** aus dem Fakten-Block übernommen werden.
+- Keine Aussage "Mond in Gate X", "Chiron in Gate Y", "Lilith in Gate Z", "Nordknoten Tor X" usw. ohne dass die Position 1:1 im Fakten-Block steht.
+- Persönlichkeit ≠ Design. Design-Sonne ≠ Persönlichkeitssonne. Verwechsle die beiden niemals.
+
+### Ungültig:
+- "Dein Mond liegt in Gate 25" — wenn Mond laut Fakten-Block in Gate 12.1 steht
+- "Chiron in Gate 41 zeigt deine Wunde" — wenn Chiron im Fakten-Block in Gate 35.1 steht oder gar nicht aufgelistet ist
+
+### Gültig:
+- "Persönlichkeitsmond Tor 12.1 — vorsichtiger Ausdruck deiner Emotionen"
+- "Design-Chiron Tor 20.6 — die unbewusste Verletzung im Hier-und-Jetzt"
+
+---
+
+## 6. KEHLKOPF-GATES
+
+- Der Kehlkopf hat genau **11 mögliche Gates**: 8, 12, 16, 20, 23, 31, 33, 35, 45, 56, 62.
+- Aussagen wie "sechs Kehlkopf-Gates" oder "alle Kehlkopf-Gates aktiviert" müssen sich aus dem Fakten-Block belegen lassen — Liste die konkreten Gates auf.
+
+### Ungültig:
+- "Du hast sechs Kehlkopf-Gates" (ohne die konkrete Liste der sechs Gates)
+
+### Gültig:
+- "Du hast drei Kehlkopf-Gates aktiviert: 12, 23 und 62"
+
+---
+
+## 7. ZENTREN
+
+- Es gibt genau **9 Zentren**: Kopf (Krone), Ajna, Kehle, G-Zentrum (Selbst), Herz (Ego), Solarplexus, Sakral, Milz, Wurzel.
+- Ein Zentrum ist entweder DEFINIERT oder offen — es gibt keine Zwischenstufen.
+- "Halb definiert", "teilweise offen", "im Fluss" sind keine gültigen HD-Begriffe.
+- Wenn ein Reading einen "Zentrums-Status" beschreibt, muss er sich exakt aus dem Fakten-Block ableiten lassen.
+
+---
+
+## 8. AUTORITÄTEN (Hierarchie)
+
+Die Autorität wird deterministisch aus den definierten Zentren bestimmt — sie wird **nicht** vom Reading frei gewählt:
+
+1. Wenn alle Zentren offen → Lunar (nur bei Reflectors)
+2. Wenn Solarplexus definiert → Emotional
+3. Sonst wenn Sakral definiert → Sacral
+4. Sonst wenn Milz definiert → Splenic
+5. Sonst wenn Herz definiert → Ego
+6. Sonst wenn G-Zentrum UND Kehle definiert → Self-Projected
+7. Sonst → Mental (Outer/None)
+
+Die Autorität im Fakten-Block ist verbindlich. Beschreibe nur diese eine Autorität — keine Mischformen, keine "sekundären Autoritäten".
+
+---
+
+## 9. TYPEN
+
+Es gibt genau 5 Typen, deterministisch berechnet:
+
+- **Reflector** — keine Zentren definiert
+- **Generator** — Sakral definiert, kein Motor → Kehle verbunden
+- **Manifesting Generator** — Sakral definiert, Motor (Sakral/Solar/Herz/Wurzel) → Kehle verbunden
+- **Manifestor** — Sakral nicht definiert, Motor → Kehle verbunden
+- **Projector** — Sakral nicht definiert, kein Motor → Kehle verbunden (oder gar nichts), aber Zentren definiert
+
+Der Typ im Fakten-Block ist verbindlich. Schreib nicht "du wirkst wie ein Manifestor", "fast ein MG" oder ähnlich. Du bist genau der Typ, der im Fakten-Block steht.
+
+---
+
+## 10. PROFILE
+
+Genau 12 Profile, jedes besteht aus zwei Linien (Persönlichkeits-Linie / Design-Linie):
+1/3, 1/4, 2/4, 2/5, 3/5, 3/6, 4/6, 4/1, 5/1, 5/2, 6/2, 6/3.
+
+Andere Profile existieren nicht. Wenn der Fakten-Block z. B. "Profil: 6/2" sagt, dann **niemals** "6/2 mit 5er-Anteil" oder "fast 6/3" formulieren.
+
+---
+
+## 11. AUS DEM FAKTEN-BLOCK ABGELEITETE PFLICHTEN
+
+- Alle Gates, die im Reading erwähnt werden, müssen in der "ERLAUBTE ERWÄHNUNGEN"-Liste des Fakten-Blocks stehen.
+- Alle Kanäle, die im Reading erwähnt werden, müssen im Fakten-Block als Kanal aufgeführt sein.
+- Alle Planeten-Positionen müssen exakt aus dem Fakten-Block stammen.
+- Alle Composite-Kategorien (Elektromagnetisch / Kompromiss / Companionship / Parallel) müssen mit der Klassifikation im Fakten-Block übereinstimmen.
+
+Im Zweifelsfall: **Aussage weglassen**. Ein kürzerer, korrekter Text ist besser als ein längerer, halluzinierter Text.
+
+---
+
+# ENDE HD-REGEL-WHITELIST

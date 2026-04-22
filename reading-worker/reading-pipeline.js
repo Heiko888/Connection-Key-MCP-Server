@@ -11,6 +11,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 // ── Konfiguration ─────────────────────────────────────────────────────────────
 const TEMPLATE_PATH = process.env.TEMPLATE_PATH || "/app/templates";
@@ -19,6 +20,59 @@ const PIPELINE_TIMEOUT_MS = 120000;
 
 // Minimale Textlänge: Korrekturtext muss mind. 50% des Originals haben
 const MIN_CORRECTION_RATIO = 0.5;
+
+// Baustein 8 (Monitoring): Jedes N-te Reading wird in die Review-Queue geschrieben
+const REVIEW_SAMPLING_RATE = parseInt(process.env.REVIEW_SAMPLING_RATE || "20", 10);
+
+function chartFingerprint(chartData) {
+  if (!chartData) return null;
+  try {
+    const gates = (chartData.gates || [])
+      .map(g => typeof g === 'object' ? g.number : g)
+      .filter(Boolean)
+      .sort((a, b) => a - b);
+    const norm = {
+      type: chartData.type,
+      profile: chartData.profile,
+      authority: chartData.authority,
+      gates,
+      centers: chartData.centers || {},
+    };
+    return crypto.createHash('sha256').update(JSON.stringify(norm)).digest('hex').slice(0, 16);
+  } catch { return null; }
+}
+
+// Module-Level-Supabase-Client, wird via setPipelineSupabase() einmal gesetzt.
+// Minimal-invasiv: bestehende runReadingPipeline()-Callsites brauchen
+// nicht angepasst zu werden.
+let _pipelineSupabase = null;
+export function setPipelineSupabase(client) { _pipelineSupabase = client; }
+
+async function logValidationRun(opts) {
+  const supabasePublic = opts.supabasePublic || _pipelineSupabase;
+  if (!supabasePublic) return;
+  try {
+    await supabasePublic
+      .from('reading_validation_log')
+      .insert({
+        reading_id:             opts.readingId || null,
+        reading_type:           opts.readingType || null,
+        template:               opts.template || null,
+        error_count:            opts.errorCount || 0,
+        errors:                 opts.errors || [],
+        correction_applied:     opts.correctionApplied || false,
+        pre_correction_length:  opts.preLength ?? null,
+        post_correction_length: opts.postLength ?? null,
+        chart_fingerprint:      opts.chartFingerprint || null,
+        model_used:             opts.model || PIPELINE_MODEL,
+        duration_ms:            opts.durationMs || null,
+        strict_mode:            opts.strictMode ?? null,
+        sampled_for_review:     opts.sampledForReview || false,
+      });
+  } catch (e) {
+    console.warn('[Pipeline] Validation-Log Insert fehlgeschlagen:', e.message);
+  }
+}
 
 // ── Anthropic Client ──────────────────────────────────────────────────────────
 let anthropic = null;
@@ -259,7 +313,21 @@ export async function correctReading(readingText, chartData, validationResult) {
  * @param {object}  chartData - Chart-Daten (Quelle der Wahrheit)
  * @returns {{ text, validated, corrected, errorCount, errors }}
  */
-export async function runReadingPipeline(rawText, chartData) {
+export async function runReadingPipeline(rawText, chartData, opts = {}) {
+  const startedAt = Date.now();
+  const fingerprint = chartFingerprint(chartData);
+  const sampledForReview = Math.random() * REVIEW_SAMPLING_RATE < 1;
+
+  // Helper für konsistentes Logging
+  const logRun = async (info) => logValidationRun({
+    ...opts,
+    ...info,
+    chartFingerprint: fingerprint,
+    sampledForReview,
+    durationMs: Date.now() - startedAt,
+    strictMode: process.env.READING_STRICT_MODE?.toLowerCase() !== 'false',
+  });
+
   // ── Frühe Rückgabe wenn keine Eingabe ────────────────────────────────────
   if (!rawText) {
     console.log("[Pipeline] Übersprungen: kein Reading-Text");
@@ -280,6 +348,7 @@ export async function runReadingPipeline(rawText, chartData) {
     validationResult = await validateReading(rawText, chartData);
   } catch (validateErr) {
     console.warn("[Pipeline] Validierung fehlgeschlagen — Fallback auf Original:", validateErr.message);
+    await logRun({ errorCount: 0, errors: [], preLength: rawText.length, postLength: rawText.length, correctionApplied: false });
     return {
       text: rawText,
       validated: false,
@@ -293,6 +362,7 @@ export async function runReadingPipeline(rawText, chartData) {
   // ── 2. Valide → Original zurückgeben ─────────────────────────────────────
   if (validationResult.valid || validationResult.errorCount === 0) {
     console.log("[Pipeline] Reading valide — keine Korrektur nötig");
+    await logRun({ errorCount: 0, errors: [], preLength: rawText.length, postLength: rawText.length, correctionApplied: false });
     return {
       text: rawText,
       validated: true,
@@ -304,12 +374,14 @@ export async function runReadingPipeline(rawText, chartData) {
 
   // ── 3. Fehler gefunden → Korrektur ───────────────────────────────────────
   let correctedText = rawText; // Fallback
+  let correctionApplied = false;
   try {
     const candidate = await correctReading(rawText, chartData, validationResult);
 
     // Sicherheitscheck: Korrektur darf nicht wesentlich kürzer sein als Original
     if (candidate && candidate.length >= rawText.length * MIN_CORRECTION_RATIO) {
       correctedText = candidate;
+      correctionApplied = true;
       console.log(
         `[Pipeline] Korrektur akzeptiert — Original: ${rawText.length} Zeichen, ` +
         `Korrigiert: ${correctedText.length} Zeichen`
@@ -324,11 +396,22 @@ export async function runReadingPipeline(rawText, chartData) {
     console.warn("[Pipeline] Korrektur fehlgeschlagen — Fallback auf Original:", correctErr.message);
   }
 
+  const errorCount = validationResult.errorCount || validationResult.errors?.length || 0;
+  const errors = validationResult.errors || [];
+
+  await logRun({
+    errorCount,
+    errors,
+    preLength: rawText.length,
+    postLength: correctedText.length,
+    correctionApplied,
+  });
+
   return {
     text: correctedText,
     validated: true,
     corrected: correctedText !== rawText,
-    errorCount: validationResult.errorCount || validationResult.errors?.length || 0,
-    errors: validationResult.errors || [],
+    errorCount,
+    errors,
   };
 }

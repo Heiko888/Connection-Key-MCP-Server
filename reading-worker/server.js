@@ -27,7 +27,7 @@ import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
-import { runReadingPipeline } from "./reading-pipeline.js";
+import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
 import { classifyTwoPersonChannels, classifyCompositeConnections, HD_CHANNELS } from "./lib/composite-classification.js";
 import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from "./lib/facts-builder.js";
 
@@ -311,6 +311,9 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 const supabasePublic = createClient(supabaseUrl, supabaseKey, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
+
+// Baustein 8: Pipeline bekommt Supabase-Client fuer validation-log-Insert
+setPipelineSupabase(supabasePublic);
 
 console.log("✅ Supabase (V4):", supabaseUrl.substring(0, 40) + "...");
 
@@ -4568,6 +4571,101 @@ ${chartInfo}${focus ? `\n\nBESONDERER FOKUS FÜR DIESES READING:\n${focus}` : ''
 // ======================================================
 // Health Endpoint
 // ======================================================
+// ======================================================
+// Monitoring: Reading-Health Dashboard (Baustein 8)
+// ======================================================
+//
+// Liefert aggregierte Statistiken fuer /admin/reading-health UI im
+// Frontend-Coach. Query-Param `days` begrenzt das Zeitfenster (Default 7).
+app.get("/admin/reading-health", async (req, res) => {
+  try {
+    const days = Math.max(1, Math.min(90, parseInt(req.query.days || "7", 10)));
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+    // Alle Logs im Zeitfenster (für In-Memory-Aggregation)
+    const { data: logs, error } = await supabasePublic
+      .from("reading_validation_log")
+      .select("reading_type, error_count, errors, correction_applied, validated_at, sampled_for_review, reviewed_at")
+      .gte("validated_at", since)
+      .order("validated_at", { ascending: false });
+
+    if (error) throw error;
+
+    const total = logs.length;
+    const withErrors = logs.filter(l => l.error_count > 0).length;
+    const corrected = logs.filter(l => l.correction_applied).length;
+    const errorRate = total > 0 ? +(withErrors / total * 100).toFixed(1) : 0;
+
+    // Fehlerrate pro Reading-Typ
+    const byType = {};
+    for (const l of logs) {
+      const t = l.reading_type || 'unbekannt';
+      if (!byType[t]) byType[t] = { total: 0, withErrors: 0 };
+      byType[t].total++;
+      if (l.error_count > 0) byType[t].withErrors++;
+    }
+    const typeStats = Object.entries(byType).map(([type, s]) => ({
+      type, total: s.total, withErrors: s.withErrors,
+      errorRate: +(s.withErrors / s.total * 100).toFixed(1),
+    })).sort((a, b) => b.errorRate - a.errorRate);
+
+    // Fehlerrate pro CHECK-Nummer
+    const byCheck = {};
+    for (const l of logs) {
+      for (const e of (l.errors || [])) {
+        const c = e.check || 'UNKNOWN';
+        byCheck[c] = (byCheck[c] || 0) + 1;
+      }
+    }
+    const checkStats = Object.entries(byCheck)
+      .map(([check, count]) => ({ check, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // Offene Stichproben-Reviews
+    const { count: pendingReviews } = await supabasePublic
+      .from("reading_validation_log")
+      .select("id", { count: "exact", head: true })
+      .eq("sampled_for_review", true)
+      .is("reviewed_at", null);
+
+    res.json({
+      window_days: days,
+      total_runs: total,
+      runs_with_errors: withErrors,
+      corrections_applied: corrected,
+      overall_error_rate_pct: errorRate,
+      by_reading_type: typeStats,
+      by_check: checkStats,
+      pending_reviews: pendingReviews || 0,
+    });
+  } catch (err) {
+    console.error("[reading-health] Fehler:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Letzte N Validator-Läufe (für Tabellen-Ansicht im Dashboard)
+app.get("/admin/reading-health/recent", async (req, res) => {
+  try {
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || "20", 10)));
+    const onlyErrors = req.query.only_errors === 'true';
+
+    let q = supabasePublic
+      .from("reading_validation_log")
+      .select("id, reading_id, reading_type, template, validated_at, error_count, errors, correction_applied, chart_fingerprint, sampled_for_review, reviewed_at, review_verdict")
+      .order("validated_at", { ascending: false })
+      .limit(limit);
+    if (onlyErrors) q = q.gt("error_count", 0);
+
+    const { data, error } = await q;
+    if (error) throw error;
+    res.json({ count: data.length, logs: data });
+  } catch (err) {
+    console.error("[reading-health/recent] Fehler:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/health", async (_, res) => {
   try {
     const { error: dbError } = await supabasePublic.from("readings").select("id").limit(1);

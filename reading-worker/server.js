@@ -998,6 +998,42 @@ async function generateTwoParts({ readingType, part1Prompt, part2Prompt, modelCo
   return `${part1}\n\n---\n\n${part2}`;
 }
 
+// Baustein 4 Helper: berechnet den Composite-Block (Block-2-Klassifikation +
+// Konditionierungs-Matrix) für 2 Personen. Wird in Connection / Sexuality /
+// ChannelAnalysis verwendet.
+// Returns '' wenn READING_STRICT_MODE=false oder Charts fehlen.
+function buildTwoPersonCompositeBlock(chartA, chartB, nameA = 'Person A', nameB = 'Person B') {
+  if (!READING_STRICT_MODE) return '';
+  if (!chartA || !chartB) return '';
+  const normalizeGates = (gates) => (gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
+  const gatesA = normalizeGates(chartA.gates);
+  const gatesB = normalizeGates(chartB.gates);
+  const composite = classifyCompositeConnections(HD_CHANNELS, [gatesA, gatesB]);
+  const compositeText = formatCompositeBlock(composite, [nameA, nameB]);
+
+  const CENTER_KEYS = ['head','ajna','throat','g','heart','solar-plexus','sacral','spleen','root'];
+  const conditioning = {};
+  for (const key of CENTER_KEYS) {
+    const aDef = chartA.centers?.[key] === true;
+    const bDef = chartB.centers?.[key] === true;
+    const definedBy = [];
+    const conditions = [];
+    if (aDef) definedBy.push(0);
+    if (bDef) definedBy.push(1);
+    if (aDef && !bDef) conditions.push(1);
+    if (bDef && !aDef) conditions.push(0);
+    conditioning[key] = { definedBy, conditions };
+  }
+  const conditioningText = formatConditioningMatrix(conditioning, [nameA, nameB]);
+
+  return `\n=== COMPOSITE ${nameA} + ${nameB} (Block-2-Klassifikation) ===
+${compositeText}
+
+KONDITIONIERUNG (nur zentrum-zu-zentrum gleichen Typs):
+${conditioningText}
+=== ENDE COMPOSITE ===`;
+}
+
 // Baustein 7: Part-1-Text als Kontext-Präfix in den Part-2-Prompt einfügen.
 // Position: direkt nach dem System-Teil, vor den konkreten Abschnitts-Anweisungen.
 // Markiert durch einen klaren Header damit das Model versteht dass es sich um
@@ -1042,39 +1078,8 @@ async function generateConnectionReadingTwoParts({ userData, personAChart, perso
   const chartB = `${nameB}:\n${buildChartInfo(personBChart)}`;
   const connectionQuestion = userData.connectionQuestion ? `\nVerbindungsfrage: ${userData.connectionQuestion}` : '';
 
-  // Composite-Block: deterministische Block-2-Klassifikation der gemeinsamen Kanäle
-  // + Konditionierungs-Matrix. Wird nur im Strict-Mode angehängt.
-  let compositeBlock = '';
-  if (READING_STRICT_MODE && personAChart && personBChart) {
-    const normalizeGates = (gates) => (gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
-    const gatesA = normalizeGates(personAChart.gates);
-    const gatesB = normalizeGates(personBChart.gates);
-    const composite = classifyCompositeConnections(HD_CHANNELS, [gatesA, gatesB]);
-    const compositeText = formatCompositeBlock(composite, [nameA, nameB]);
-
-    // Konditionierungs-Matrix: pro Zentrum welche Person definiert / wer wird konditioniert
-    const conditioning = {};
-    const CENTER_KEYS = ['head','ajna','throat','g','heart','solar-plexus','sacral','spleen','root'];
-    for (const key of CENTER_KEYS) {
-      const aDef = personAChart.centers?.[key] === true;
-      const bDef = personBChart.centers?.[key] === true;
-      const definedBy = [];
-      const conditions = [];
-      if (aDef) definedBy.push(0);
-      if (bDef) definedBy.push(1);
-      if (aDef && !bDef) conditions.push(1);
-      if (bDef && !aDef) conditions.push(0);
-      conditioning[key] = { definedBy, conditions };
-    }
-    const conditioningText = formatConditioningMatrix(conditioning, [nameA, nameB]);
-
-    compositeBlock = `\n=== COMPOSITE ${nameA} + ${nameB} (Block-2-Klassifikation) ===
-${compositeText}
-
-KONDITIONIERUNG (nur zentrum-zu-zentrum gleichen Typs):
-${conditioningText}
-=== ENDE COMPOSITE ===`;
-  }
+  // Composite-Block via Helper (Block-2-Klassifikation + Konditionierungs-Matrix)
+  const compositeBlock = buildTwoPersonCompositeBlock(personAChart, personBChart, nameA, nameB);
 
   const [transitData, prevA, prevB] = await Promise.all([
     fetchCurrentTransits(),
@@ -3145,65 +3150,31 @@ async function processChannelAnalysisJob(job, reading) {
     console.log(`   [ChannelAnalysis] Aktivierte Kanäle: ${dynamics.activatedChannels?.length || 0} (EM: ${dynamics.electromagnetic_channels?.length || 0}, Kompromiss: ${dynamics.compromise_channels?.length || 0}, Companionship: ${dynamics.companionship_channels?.length || 0}, Parallel: ${dynamics.parallel_channels?.length || 0})`);
   }
 
-  const CHANNEL_NAMES_MAP = {
-    '1-8':'Inspiration','2-14':'Schlüssel-Schloss','3-60':'Mutation',
-    '4-63':'Logik','5-15':'Rhythmus','6-59':'Mating',
-    '7-31':'Der Alpha','9-52':'Konzentration','10-20':'Erwachen',
-    '10-34':'Forschung','10-57':'Vollkommenheit','11-56':'Neugier',
-    '12-22':'Offenheit','13-33':'Der Zeuge','16-48':'Wellenlänge',
-    '17-62':'Akzeptanz','18-58':'Urteil','19-49':'Synthese',
-    '20-34':'Charisma','20-57':'Hirnwellen','21-45':'Das Geldlinie',
-    '23-43':'Strukturierung','24-61':'Bewusstsein','25-51':'Initiative',
-    '26-44':'Übertragung','27-50':'Bewahrung','28-38':'Kampf',
-    '29-46':'Entdeckung','30-41':'Erkenntnis','32-54':'Transformation',
-    '35-36':'Transitorium','37-40':'Gemeinschaft','39-55':'Emotionale Tiefe',
-    '42-53':'Reifung','47-64':'Abstraktion',
-  };
-  const getChName = (g1, g2) => {
-    const k = `${Math.min(g1,g2)}-${Math.max(g1,g2)}`;
-    return CHANNEL_NAMES_MAP[k] || CHANNEL_NAMES_MAP[`${g1}-${g2}`] || `${g1}-${g2}`;
-  };
-
-  const emText = hasPartner && dynamics.electromagnetic_channels?.length > 0
-    ? dynamics.electromagnetic_channels.map(ec =>
-        `  - Kanal ${ec.channel} (${getChName(ec.personA_gate, ec.personB_gate)}): Tor ${ec.personA_gate} von ${nameA} + Tor ${ec.personB_gate} von ${nameB}`
-      ).join('\n')
-    : hasPartner ? '  Keine elektromagnetischen Kanäle zwischen diesen Personen.' : '';
+  // Dead Code entfernt: CHANNEL_NAMES_MAP / getChName / emText —
+  // Composite-Block (siehe unten) liefert deutsche Kanal-Namen direkt.
 
   const sectionNum = hasPartner ? 7 : 6;
 
   const systemPrompt = `Du bist ein Human Design Experte mit tiefem Verständnis der 36 Kanäle, ihrer Circuit-Zugehörigkeit und ihrer Wirkung im Alltag. Dieses Reading ist ein professionelles Coach-Tool.\n\n${templates['channel-analysis'] || ''}`;
 
+  // Baustein 4: deutsche Fakten-Blöcke für beide Personen
+  const factsA = `=== ${nameA} ===\n${buildChartInfo(chartA)}`;
+  const factsB = hasPartner ? `\n=== ${nameB} ===\n${buildChartInfo(chartB)}` : '';
+  const compositeBlock = hasPartner ? buildTwoPersonCompositeBlock(chartA, chartB, nameA, nameB) : '';
+
+  // Legacy-Sektion mit deutschem Kanal-Namen (CHANNEL_NAMES_MAP) bleibt als
+  // ergänzender Hinweis — der Composite-Block oben ist die Wahrheitsquelle.
   const partnerBlock = hasPartner ? `
----
-VERBINDUNGS-PARTNER: ${nameB}
-Typ: ${chartB.type || 'Unbekannt'}
-Profil: ${chartB.profile || 'Unbekannt'}
-Aktive Gates von ${nameB}: ${(chartB.gates || []).slice(0,30).map(g => g.number || g).join(', ')}
+${factsB}
+${compositeBlock}
 
-ELEKTROMAGNETISCHE KANÄLE (entstehen nur durch diese Verbindung):
-${emText}
-
-Sektion 6 (Elektromagnetische Verbindung) mit den obigen Daten einschließen.
+Sektion 6 (Elektromagnetische Verbindung) nur für die im Composite-Block oben
+unter "Elektromagnetisch" gelisteten Kanäle einschließen.
 ` : '\nKein Partner — Sektion 6 weglassen.';
 
-  const userMessage = `Erstelle eine vollständige Kanal-Analyse für:
+  const userMessage = `Erstelle eine vollständige Kanal-Analyse für ${nameA}${hasPartner ? ` & ${nameB}` : ''}:
 
-Name: ${nameA}
-Typ: ${chartA.type || 'Unbekannt'}
-Profil: ${chartA.profile || 'Unbekannt'}
-Autorität: ${chartA.authority || 'Unbekannt'}
-Strategie: ${chartA.strategy || 'Unbekannt'}
-Definition: ${chartA.definition || 'Unbekannt'}
-
-AKTIVE KANÄLE:
-${formatChartChannels(chartA.channels)}
-
-AKTIVE GATES:
-${formatChartGates(chartA.gates)}
-
-ZENTREN:
-${formatChartCenters(chartA.centers)}
+${factsA}
 ${partnerBlock}
 Letzte Sektion (Coach-Werkzeugkasten) = Sektion ${sectionNum}.
 Nur angegebene Kanäle/Gates verwenden. ${nameA} in jeder Sektion beim Namen nennen.`;
@@ -3295,30 +3266,17 @@ ${templates['sexuality'] || 'Erstelle ein Intimität & Sexualität Reading für 
 Verwende folgendes Wissen:
 ${buildReadingKnowledge('sexuality')}`;
 
-  const userMessage = `Erstelle ein Intimität & Sexualität Resonanz-Reading für:
+  // Baustein 4: deutsche Fakten-Blöcke pro Person + Composite-Block
+  const factsA = `=== ${nameA} ===\n${buildChartInfo(chartA)}`;
+  const factsB = `=== ${nameB} ===\n${buildChartInfo(chartB)}`;
+  const compositeBlock = buildTwoPersonCompositeBlock(chartA, chartB, nameA, nameB);
 
-Person A: ${nameA}
-  Typ: ${chartA.type || 'Unbekannt'}
-  Profil: ${chartA.profile || 'Unbekannt'}
-  Autorität: ${chartA.authority || 'Unbekannt'}
-  Strategie: ${chartA.strategy || 'Unbekannt'}
-  Zentren: ${formatChartCenters(chartA.centers)}
-  Kanäle: ${formatChartChannels(chartA.channels)}
-  Tore: ${formatChartGates(chartA.gates)}
+  const userMessage = `Erstelle ein Intimität & Sexualität Resonanz-Reading für ${nameA} & ${nameB}.
 
-Person B: ${nameB}
-  Typ: ${chartB.type || 'Unbekannt'}
-  Profil: ${chartB.profile || 'Unbekannt'}
-  Autorität: ${chartB.authority || 'Unbekannt'}
-  Strategie: ${chartB.strategy || 'Unbekannt'}
-  Zentren: ${formatChartCenters(chartB.centers)}
-  Kanäle: ${formatChartChannels(chartB.channels)}
-  Tore: ${formatChartGates(chartB.gates)}
+${factsA}
 
-VERBINDUNGS-DYNAMIK:
-Elektromagnetische Kanäle: ${JSON.stringify(dynamics.electromagnetic_channels || [])}
-Komplementäre Gates: ${JSON.stringify(dynamics.complementary_gates || [])}
-Gemeinsamkeiten: ${JSON.stringify(dynamics.similarities || [])}
+${factsB}
+${compositeBlock}
 
 WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren Namen!`;
 

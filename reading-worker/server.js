@@ -29,6 +29,13 @@ import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline } from "./reading-pipeline.js";
 import { classifyTwoPersonChannels } from "./lib/composite-classification.js";
+import { buildFactsBlock } from "./lib/facts-builder.js";
+
+// ── Feature-Flag Baustein 4 ──────────────────────────────────────────────────
+// READING_STRICT_MODE=true → buildChartInfo() wird durch buildFactsBlock() ersetzt,
+// der Fakten-Block enthält Whitelist + Verbote + Wahrheitsquelle-Instruktion.
+// Bei Problemen: READING_STRICT_MODE=false setzen, altes Verhalten kommt zurück.
+const READING_STRICT_MODE = (process.env.READING_STRICT_MODE || 'true').toLowerCase() !== 'false';
 
 const app = express();
 app.use(express.json());
@@ -500,8 +507,14 @@ function formatPlanetActivations(chartData) {
   return lines.join('\n');
 }
 
-function buildChartInfo(chartData) {
+function buildChartInfo(chartData, opts = {}) {
   if (!chartData) return '';
+
+  // Baustein 4: im Strict-Mode liefert der Fakten-Block den deterministischen
+  // deutschen Chart-Block inkl. Whitelist/Verbote/Wahrheitsquelle.
+  if (READING_STRICT_MODE) {
+    return buildFactsBlock(chartData, opts);
+  }
 
   // Inkarnationskreuz — name + gates aus allen möglichen Strukturen lesen
   const cross = chartData.incarnationCross || chartData.incarnation_cross || {};

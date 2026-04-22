@@ -93,6 +93,45 @@ Wenn ein "Kanal" erwähnt wird, der laut chartData.channels nicht existiert:
   Die Erwähnung des Kanal-Konstrukts entfernen. Die beteiligten einzelnen Tore
   dürfen erwähnt bleiben, aber nicht als Kanal.
 
+REGEL 10 – CROSS-PASS-WIDERSPRUCH (2-Pass-Readings)
+Wenn CHECK 10 einen Widerspruch zwischen Teil 1 und Teil 2 meldet:
+  - Bestimme welche Aussage korrekt ist, indem du chartData prüfst.
+  - Behalte die korrekte Formulierung bei und ersetze die falsche durch
+    die korrekte.
+  - Wenn beide falsch sind: ersetze beide durch die chartData-konforme
+    Formulierung.
+
+REGEL 11 – HD-REGEL-VERSTOSS LÖSCHEN ODER UMFORMULIEREN
+Wenn CHECK 11 eine Regel-Verletzung meldet:
+  - Konditionierung quer über Zentrums-Typen (Sakral → Wurzel etc.):
+    Ersetze durch die korrekte zentrum-zu-zentrum-Formulierung
+    (z.B. "Person A's definiertes Sakral konditioniert Person B's
+    offenes Sakral"). Oder lösche die Aussage wenn keine gültige
+    Konditionierung zu konstruieren ist.
+  - Falsche Anwendung der Verbindungstyp-Definition: auf die
+    chartData-konforme Kategorie umschreiben.
+
+REGEL 12 – GOLDADER ERSETZEN ODER STREICHEN
+Wenn CHECK 12 den Begriff "Goldader" findet:
+  Ersetze durch die im Fakten-Block für diesen Kanal gesetzte Kategorie
+  (Elektromagnetisch / Kompromiss / Companionship / Parallel). Wenn der
+  Kontext unklar ist (z.B. "Goldader" als allgemeine Metapher ohne
+  konkreten Kanal-Bezug), streiche den Satz.
+
+REGEL 13 – NUMERISCHE BEHAUPTUNGEN KORRIGIEREN
+Wenn CHECK 13 eine falsche Zahl oder fehlende Liste meldet:
+  - Falsche Zahl: ersetze durch die korrekte Anzahl aus chartData.
+  - Fehlende Belegliste: ergänze die konkrete Aufzählung
+    (z.B. "drei Kehlkopf-Gates: 12, 23, 62").
+
+REGEL 14 – WHITELIST-VERSTOSS LÖSCHEN (strikt)
+Wenn CHECK 14 ein Gate oder einen Kanal erwähnt, der nicht in der
+Whitelist steht:
+  Lösche die Erwähnung KOMPLETT (kein Ersatz).
+  Wenn der Satz dadurch leer wird, streiche den Satz.
+  Wenn ein Absatz nur aus solchen Erwähnungen besteht, streiche den Absatz.
+  Kürzer ist besser als falsch.
+
 ---
 
 AUSGABE:

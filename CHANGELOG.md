@@ -5,6 +5,71 @@ Format: `## YYYY-MM-DD` Abschnitt pro Tag, darunter ein Block pro Fix/Feature.
 
 ---
 
+## 2026-04-22 — Pre-flight vor Bausteinen 4-7 + Doku
+
+Ein Branch `chore/blueprint-sections-knowledge` mit drei Commits, in `main` gemergt.
+Zweck: Git mit Production-Zustand synchronisieren + Infrastruktur-Gerüst für
+die kommenden Prompt-seitigen Fixes (Fakten-Block, Fakten-Whitelist, HD-Regeln,
+Sequenzielle Generierung).
+
+### chore(reading-worker): Blueprint-Sections + Knowledge aus Production committen
+- Commit: `ed905ae`
+- Dateien: 21 files, +3240 / -38
+- Kontext: Knowledge-Files + sectionParser/Writer + Migrations liefen seit
+  Wochen live im Container, waren aber nie nach Git geflossen. Git war
+  hinter Production.
+- Committed: 8 Knowledge-Files (business/career/emotions/kinder/parenting/
+  spiritual + penta-communication-dynamics.md + penta-strategy-impulses.md),
+  penta-knowledge.txt-Update (+325 Z "Die 9 Zentren im Penta-Kontext"),
+  sectionParser.js + sectionsWriter.js, 3 Migrations (client_profiles +
+  reading_sections + profiles.active_gates), backfillSections-Scripts,
+  rls-smoke.sql, sectionParser.test.js, penta-communication.txt Template.
+- .gitignore: .claude/, .agents/, *.bak, *.backup ergaenzt.
+- Geloescht: generateReading.js.backup, production/agent-social.js.bak.
+- Keine Verhaltensaenderung, nur Git-Sync.
+
+### docs: komplette Reading-System-Dokumentation
+- Commit: `9795806`
+- Datei: `docs/READING_SYSTEM.md` (1377 Zeilen)
+- Inhalt: 18 Abschnitte + 3 Anhaenge. Datenfluss, HTTP-Endpunkte, BullMQ-
+  Queues, Modell-Config, Prompt-Aufbau (`buildChartInfo`, `buildKnowledgeText`,
+  `generateReading`), Two-Pass-Generierung, Validator + Corrector
+  (kompletter Prompt wortgenau in Anhang A/B), Chart-Engine, Composite-
+  Klassifikation, 35 Templates tabelliert, 27+ Knowledge-Dateien, Section-
+  Parser/Writer, Psychology-Worker, V4-Job-Flow, Frontend-Integration,
+  Supabase-Schema, offene Punkte.
+- Stichtag: Commit `65ab2ed`, 2026-04-22. Zeilennummern muessen bei
+  Refactorings nachgezogen werden.
+
+### fix(reading-worker): BullMQ lockDuration + Knowledge-Loading-Geruest
+- Commit: `d13b27b`
+- Datei: `reading-worker/server.js` (+35 / -16)
+- Kontext: Vorbereitung fuer Bausteine 6 + 7 (HD-Regel-Whitelist und
+  sequentielle Generierung).
+- Fix 1 — BullMQ `lockDuration`:
+  - Bisher kein Lock gesetzt -> BullMQ-Default 30s.
+  - 2-Pass-Detailed (~360s) + Pipeline (~120s) reisst den Lock, sodass
+    ein zweiter Worker den laufenden Job uebernommen haette.
+  - `workerOptions()`-Factory an alle 5 Workers (V3, V4, Connection,
+    Penta, Multi-Agent). Default 480_000 ms, via ENV
+    `WORKER_LOCK_DURATION_MS` ueberschreibbar.
+- Fix 2 — Knowledge-Loading:
+  - `ALWAYS_KNOWLEDGE_KEYS` Array in `buildReadingKnowledge()` eingefuehrt
+    (aktuell leer; Baustein 6 traegt dort `hd-regeln-strikt` ein).
+  - Dedup-Logik: wenn Key doppelt, wird er nur einmal eingefuegt.
+  - Fallback-Bundle in die Haupt-Funktion konsolidiert.
+  - `buildKnowledgeText()` Deep-Fallback-Defaults: 8->20 Eintraege,
+    1000->5000 Zeichen.
+
+### Ausstehend
+- Container-Neustart fuer reading-worker (notwendig, damit lockDuration
+  wirkt). `docker compose up -d --build reading-worker`.
+- Bausteine 4-7 + Monitoring (Plan v2.0).
+- Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-Follow-up,
+  anderes Repo).
+
+---
+
 ## 2026-04-21 — Reading-System Fehlerbehebung (Connection / Penta / Chart)
 
 Drei zusammenhaengende Bloecke, jeder auf eigenem Feature-Branch committed:

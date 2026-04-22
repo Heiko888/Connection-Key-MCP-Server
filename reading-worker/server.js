@@ -28,8 +28,8 @@ import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline } from "./reading-pipeline.js";
-import { classifyTwoPersonChannels } from "./lib/composite-classification.js";
-import { buildFactsBlock } from "./lib/facts-builder.js";
+import { classifyTwoPersonChannels, classifyCompositeConnections, HD_CHANNELS } from "./lib/composite-classification.js";
+import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from "./lib/facts-builder.js";
 
 // ── Feature-Flag Baustein 4 ──────────────────────────────────────────────────
 // READING_STRICT_MODE=true → buildChartInfo() wird durch buildFactsBlock() ersetzt,
@@ -989,6 +989,40 @@ async function generateConnectionReadingTwoParts({ userData, personAChart, perso
   const chartB = `${nameB}:\n${buildChartInfo(personBChart)}`;
   const connectionQuestion = userData.connectionQuestion ? `\nVerbindungsfrage: ${userData.connectionQuestion}` : '';
 
+  // Composite-Block: deterministische Block-2-Klassifikation der gemeinsamen Kanäle
+  // + Konditionierungs-Matrix. Wird nur im Strict-Mode angehängt.
+  let compositeBlock = '';
+  if (READING_STRICT_MODE && personAChart && personBChart) {
+    const normalizeGates = (gates) => (gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
+    const gatesA = normalizeGates(personAChart.gates);
+    const gatesB = normalizeGates(personBChart.gates);
+    const composite = classifyCompositeConnections(HD_CHANNELS, [gatesA, gatesB]);
+    const compositeText = formatCompositeBlock(composite, [nameA, nameB]);
+
+    // Konditionierungs-Matrix: pro Zentrum welche Person definiert / wer wird konditioniert
+    const conditioning = {};
+    const CENTER_KEYS = ['head','ajna','throat','g','heart','solar-plexus','sacral','spleen','root'];
+    for (const key of CENTER_KEYS) {
+      const aDef = personAChart.centers?.[key] === true;
+      const bDef = personBChart.centers?.[key] === true;
+      const definedBy = [];
+      const conditions = [];
+      if (aDef) definedBy.push(0);
+      if (bDef) definedBy.push(1);
+      if (aDef && !bDef) conditions.push(1);
+      if (bDef && !aDef) conditions.push(0);
+      conditioning[key] = { definedBy, conditions };
+    }
+    const conditioningText = formatConditioningMatrix(conditioning, [nameA, nameB]);
+
+    compositeBlock = `\n=== COMPOSITE ${nameA} + ${nameB} (Block-2-Klassifikation) ===
+${compositeText}
+
+KONDITIONIERUNG (nur zentrum-zu-zentrum gleichen Typs):
+${conditioningText}
+=== ENDE COMPOSITE ===`;
+  }
+
   const [transitData, prevA, prevB] = await Promise.all([
     fetchCurrentTransits(),
     fetchPreviousReadings(userData.personA?.birthDate, nameA, null, 1),
@@ -1015,7 +1049,7 @@ Erstelle TEIL 1 des Connection Key Readings für ${nameA} & ${nameB}.
 ${chartA}
 
 ${chartB}
-${dynamicsText}${connectionQuestion}
+${dynamicsText}${connectionQuestion}${compositeBlock}
 
 ---
 
@@ -1024,12 +1058,13 @@ Beschreibe die energetische Qualität dieser Verbindung. Was macht sie einzigart
 
 # 2. Konditionierungsdynamik
 Wie konditioniert ${nameA} ${nameB} durch ihre/seine offenen Zentren — und umgekehrt? Welche Muster entstehen dadurch? Wie können beide diese Dynamik bewusst nutzen?
+WICHTIG: Konditionierung gibt es NUR zentrum-zu-zentrum gleichen Typs (Sakral konditioniert Sakral, Wurzel konditioniert Wurzel). Niemals quer (Sakral→Wurzel ist KEINE gültige Konditionierung).
 
 # 3. Kommunikation & Entscheidungsfindung
 Wie unterscheiden sich die Autoritäten (${personAChart?.authority || '?'} vs. ${personBChart?.authority || '?'})? Was bedeutet das konkret, wenn wichtige Entscheidungen gemeinsam getroffen werden müssen? Praktische Empfehlungen.
 
-# 4. Aktivierte Kanäle & elektromagnetische Verbindungen
-Analysiere jeden aktivierten Verbindungskanal einzeln. Typ (EM / Goldader / Stabile Parallelenergie), wer trägt was, was das für die Verbindung bedeutet.
+# 4. Aktivierte Kanäle nach Block-2-Klassifikation
+Analysiere jeden aktivierten Kanal aus dem COMPOSITE-Block oben. Pro Kanal: korrekte Kategorie (Elektromagnetisch / Kompromiss / Companionship / Parallel), wer trägt was, was das für die Verbindung bedeutet. Verwende NICHT den Begriff "Goldader" — nutze die exakte Kategorie aus dem Composite-Block.
 
 Schreibe mindestens 2000 Wörter. Deutsch, Du/Ihr-Form, tiefgründig und konkret.`;
 
@@ -1039,7 +1074,7 @@ Erstelle TEIL 2 des Connection Key Readings für ${nameA} & ${nameB}.
 ${chartA}
 
 ${chartB}
-${dynamicsText}${connectionQuestion}
+${dynamicsText}${connectionQuestion}${compositeBlock}
 
 Schreibe direkt weiter als Fortsetzung. Kein neuer Titel, keine Wiederholung.
 

@@ -4817,6 +4817,12 @@ Antworte NUR mit der Caption, kein Kommentar davor/danach.`;
   }
 }
 
+// GET /admin/posts — simple Admin-UI zum Anzeigen/Editieren/Kopieren der
+// generierten Channel-Posts (Instagram-Captions + Telegram-Texte).
+app.get('/admin/posts', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'posts.html'));
+});
+
 // GET /api/channel/content/today — alle heutigen Posts + Instagram-Captions
 app.get('/api/channel/content/today', async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });

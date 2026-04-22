@@ -32,3 +32,11 @@ build/
 
 # Auslese-Report von Server 138 (kann Keys/Secrets enthalten – nicht committen)
 reading-engine-138-*.txt
+
+# Claude Code / Agents (lokale Tooling, nicht Projekt-Code)
+.claude/
+.agents/
+
+# Backup-Dateien
+*.bak
+*.backup

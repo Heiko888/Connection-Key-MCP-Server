@@ -151,17 +151,42 @@ Sequenzielle Generierung).
   `buildChartInfo` und bekommen den Composite-Block noch nicht — separater
   Folge-Commit.
 
+### feat(knowledge): Baustein 6 — HD-Regel-Whitelist
+- Commits: `d132875`, Merge `5c08e42`
+- Datei neu: `reading-worker/knowledge/hd-regeln-strikt.txt` (~6.5k Zeichen).
+- Datei neu: `reading-worker/tests/hd-regeln-loading.test.js` (28 Tests).
+- Datei geaendert: `reading-worker/server.js` (`ALWAYS_KNOWLEDGE_KEYS` jetzt
+  `['hd-regeln-strikt']` im Strict-Mode — Geruest aus d13b27b ist aktiv).
+- Inhalt: 11 Regel-Bereiche als verbindliche, nicht-verhandelbare HD-Mechanik:
+  Konditionierung (nur zentrum-zu-zentrum gleichen Typs), Kanaele (beide
+  Gates noetig), Verbindungstypen (4 Kategorien, "Goldader" abgeschafft),
+  Inkarnationskreuze (RAX/LAX/JUX, Namen aus Lookup nie raten),
+  Planeten-Positionen (exakt aus Fakten-Block), Kehlkopf-Gates (genau 11),
+  Zentren (genau 9), Autoritaeten (deterministische Hierarchie),
+  Typen (genau 5), Profile (genau 12), Pflichten aus dem Fakten-Block.
+- Pro Regel: Negativ-Beispiele + Positiv-Beispiele.
+- Wird im Strict-Mode in jeden fachlichen Reading-Prompt vor allen anderen
+  Knowledge-Dateien geladen.
+- Live verifiziert: knowledge: 30 (war 29), Bundle fuer 'detailed'
+  beginnt jetzt mit hd-regeln-strikt, 184k Zeichen total.
+- Token-Kosten: ~1.6k zusaetzliche Input-Tokens pro Reading-Prompt.
+  Mit Prompt-Caching vernachlaessigbar.
+
 ### Ausstehend
 - Sexuality / ChannelAnalysis / Penta auf `buildChartInfo` umstellen
   (damit sie den Fakten-Block + Composite-Sektion erhalten).
-- Bausteine 5 (Fakten-Whitelist als Prompt-Addendum, faktisch durch Block 4
-  schon abgedeckt — nur als Redundanz im Plan), 6 (HD-Regel-Whitelist als
-  separate Knowledge-Datei in `ALWAYS_KNOWLEDGE_KEYS`), 7 (sequenzielle
-  2-Pass-Generierung) + Monitoring (Plan v2.0).
+- Baustein 7 (sequenzielle 2-Pass-Generierung): Part 2 bekommt Part 1 als
+  Kontext, soll nicht widersprechen.
+- Validator CHECK 10-14 (Plan v2.0): Cross-Pass-Widerspruch,
+  HD-Regel-Konformitaet, Goldader-String-Check, numerische Behauptungen,
+  Whitelist-Verstoss.
+- Monitoring + Dashboard (`v4.reading_validation_log` + Frontend).
 - Inkarnationskreuz-Kombi-Themen vollstaendig auf Deutsch
   (CROSS_THEMATIC_DE in connection-key/chartCalculation.js erweitern).
 - Frontend-UI auf .167 fuer `parallel`-Kategorie-Rendering (Block-2-Follow-up,
   anderes Repo).
+- Baustein 5 (Fakten-Whitelist als Prompt-Addendum) wurde durch Baustein 4
+  faktisch abgedeckt — nicht separat noetig.
 
 ---
 

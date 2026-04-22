@@ -101,6 +101,49 @@ CHECK 9 – BEGRIFFS-WIDERSPRUCH
   im Reading dennoch als "euer Kanal" beschrieben wird (Tore die kein vollständiger
   Kanal sind, dürfen nicht als Kanäle dargestellt werden).
 
+CHECK 10 – CROSS-PASS-WIDERSPRUCH (bei 2-Pass-Readings)
+- Der Reading-Text enthält einen "---"-Trenner, der Teil 1 von Teil 2 trennt.
+- Fehler (severity: critical) wenn ein Fakt in Teil 1 (vor dem Trenner) in Teil 2
+  (nach dem Trenner) anders beschrieben wird. Beispiele:
+  a) Kanal X in Teil 1 als "bei Person A vollständig" beschrieben, in Teil 2 als
+     "elektromagnetisch".
+  b) Zentrum X in Teil 1 als definiert, in Teil 2 als offen.
+  c) Profil in Teil 1 als "6/2", in Teil 2 als "3/5".
+
+CHECK 11 – HD-REGEL-KONFORMITÄT
+- Prüfe gegen die HD-Regel-Whitelist aus knowledge/hd-regeln-strikt.txt:
+  a) Konditionierung nur zentrum-zu-zentrum gleichen Typs (Sakral → Sakral etc.).
+     Aussagen wie "Sakral konditioniert Wurzel" oder "Kehle konditioniert
+     Solarplexus" → Fehler.
+  b) Ein Kanal der bei einer Person vollständig definiert ist, ist für diese Person
+     keine elektromagnetische Verbindung.
+  c) Numerische Behauptungen zu Kehlkopf-Gates (11 mögliche), Zentren (9),
+     Autoritäten, Profile müssen korrekt sein.
+- Severity: critical.
+
+CHECK 12 – GOLDADER-BEGRIFF
+- Einfacher String-Check: Enthält der Reading-Text den Begriff "Goldader"?
+- Fehler (severity: major) wenn ja. Der Begriff ist in Block 2 abgeschafft und
+  muss durch die präzise Kategorie ersetzt werden
+  (Elektromagnetisch / Kompromiss / Companionship / Parallel).
+
+CHECK 13 – NUMERISCHE BEHAUPTUNGEN OHNE BELEG
+- Aussagen wie "sechs Kehlkopf-Gates", "drei definierte Zentren", "vier Kanäle"
+  prüfen gegen chartData:
+  a) Die Zahl muss mit dem Fakten-Block übereinstimmen (z.B. Anzahl
+     chartData.gates die im Kehlkopf-Center-Set sind).
+  b) Die Behauptung muss im Text durch eine Liste belegt sein (z.B. "drei
+     Kehlkopf-Gates: 12, 23, 62") — keine nackten Zahlen ohne Aufzählung.
+- Severity: major.
+
+CHECK 14 – WHITELIST-VERSTOSS (strikt)
+- Wenn der Fakten-Block eine "ERLAUBTE ERWÄHNUNGEN"-Sektion enthält, prüfe
+  dass JEDE im Reading-Text genannte Gate-Nummer in der Gates-Whitelist und
+  JEDER Kanal in der Kanäle-Whitelist steht.
+- Fehler (severity: critical) wenn ein Gate oder Kanal erwähnt wird, der nicht
+  auf der Whitelist ist.
+- Ausnahmen: Transit-Gates (nur bei Transit/Jahres/Tagesimpuls-Readings).
+
 ---
 
 AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
@@ -110,8 +153,8 @@ AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
   "errorCount": 0,
   "errors": [
     {
-      "check": "CHECK 1-9",
-      "severity": "critical",
+      "check": "CHECK 1-14",
+      "severity": "critical|major",
       "description": "Was ist falsch",
       "expected": "Was laut chartData korrekt wäre",
       "found": "Was im Reading steht",

@@ -122,6 +122,10 @@ services:
       # Security
       - AGENT_SECRET=${AGENT_SECRET}
 
+      # Admin Basic-Auth fuer /admin/* (posts.html etc.)
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS}
+
       # Chart API
       - HD_APP_URL=${HD_APP_URL:-https://www.the-connection-key.de}
 

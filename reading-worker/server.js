@@ -4817,14 +4817,38 @@ Antworte NUR mit der Caption, kein Kommentar davor/danach.`;
   }
 }
 
+// ── Admin Basic-Auth ──────────────────────────────────────────────────────
+// ADMIN_PASS muss gesetzt sein, sonst sind alle /admin/* Routes dicht (403).
+// ADMIN_USER default: "admin".
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASS || null;
+if (!ADMIN_PASS) {
+  console.warn('⚠️  ADMIN_PASS nicht gesetzt — /admin/* Routes sind blockiert. Setze ADMIN_PASS in .env.');
+}
+function requireAdminAuth(req, res, next) {
+  if (!ADMIN_PASS) {
+    return res.status(503).send('Admin-Bereich nicht konfiguriert. ADMIN_PASS in .env setzen.');
+  }
+  const header = req.headers.authorization || '';
+  const match = header.match(/^Basic (.+)$/);
+  if (match) {
+    try {
+      const [u, p] = Buffer.from(match[1], 'base64').toString('utf8').split(':');
+      if (u === ADMIN_USER && p === ADMIN_PASS) return next();
+    } catch {}
+  }
+  res.set('WWW-Authenticate', 'Basic realm="Admin"');
+  res.status(401).send('Unauthorized');
+}
+
 // GET /admin/posts — simple Admin-UI zum Anzeigen/Editieren/Kopieren der
 // generierten Channel-Posts (Instagram-Captions + Telegram-Texte).
-app.get('/admin/posts', (_req, res) => {
+app.get('/admin/posts', requireAdminAuth, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'posts.html'));
 });
 
 // GET /api/channel/content/today — alle heutigen Posts + Instagram-Captions
-app.get('/api/channel/content/today', async (req, res) => {
+app.get('/api/channel/content/today', requireAdminAuth, async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
   const today = new Date().toISOString().split('T')[0];
   const { data, error } = await supabasePublic
@@ -4837,7 +4861,7 @@ app.get('/api/channel/content/today', async (req, res) => {
 });
 
 // GET /api/channel/content?days=7&type=tagesimpuls&q=search — Content mit Filtern
-app.get('/api/channel/content', async (req, res) => {
+app.get('/api/channel/content', requireAdminAuth, async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
   const days = req.query.days ? parseInt(req.query.days) : 7;
   const month = req.query.month; // Format: "2026-04" für Monatsansicht
@@ -4877,7 +4901,7 @@ app.get('/api/channel/content', async (req, res) => {
 });
 
 // PATCH /api/channel/content/:id — Post bearbeiten
-app.patch('/api/channel/content/:id', async (req, res) => {
+app.patch('/api/channel/content/:id', requireAdminAuth, async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
   const { id } = req.params;
   const { telegram_text, instagram_caption } = req.body;
@@ -4891,7 +4915,7 @@ app.patch('/api/channel/content/:id', async (req, res) => {
 });
 
 // POST /api/channel/content/:id/send-telegram — manuell zu Telegram senden
-app.post('/api/channel/content/:id/send-telegram', async (req, res) => {
+app.post('/api/channel/content/:id/send-telegram', requireAdminAuth, async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
   const { id } = req.params;
   const { data: post, error: fetchErr } = await supabasePublic

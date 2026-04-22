@@ -28,6 +28,7 @@ import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline } from "./reading-pipeline.js";
+import { classifyTwoPersonChannels } from "./lib/composite-classification.js";
 
 const app = express();
 app.use(express.json());
@@ -3040,7 +3041,7 @@ async function processChannelAnalysisJob(job, reading) {
       || existingReadingData.chart_data2
       || { type: 'Unbekannt', gates: [], channels: [], centers: {} };
     dynamics = analyzeConnectionDynamics(chartA, chartB, nameA, nameB);
-    console.log(`   [ChannelAnalysis] Aktivierte Kanäle: ${dynamics.activatedChannels?.length || 0} (EM: ${dynamics.electromagnetic_channels?.length || 0}, Goldader: ${dynamics.dominanz_channels?.length || 0}, Parallel: ${dynamics.kompromiss_channels?.length || 0})`);
+    console.log(`   [ChannelAnalysis] Aktivierte Kanäle: ${dynamics.activatedChannels?.length || 0} (EM: ${dynamics.electromagnetic_channels?.length || 0}, Kompromiss: ${dynamics.compromise_channels?.length || 0}, Companionship: ${dynamics.companionship_channels?.length || 0}, Parallel: ${dynamics.parallel_channels?.length || 0})`);
   }
 
   const CHANNEL_NAMES_MAP = {
@@ -3761,28 +3762,27 @@ const CENTER_NAMES_DE = {
   spleen: 'Milz', 'solar-plexus': 'Solarplexus'
 };
 
-// Klassifiziert einen aktivierten Kanal nach TCK-Typ:
-// EM (Elektromagnetische Verbindung) = jede Person hat genau eine Seite
-// Goldader                           = eine Person trägt den kompletten Kanal allein
-// Stabile Parallelenergie            = beide Personen haben den kompletten Kanal
-function classifyChannel(gate1, gate2, gatesA, gatesB) {
-  const aHas1 = gatesA.includes(gate1), aHas2 = gatesA.includes(gate2);
-  const bHas1 = gatesB.includes(gate1), bHas2 = gatesB.includes(gate2);
-  const aFull = aHas1 && aHas2;
-  const bFull = bHas1 && bHas2;
-  if (aFull && bFull) return 'Stabile Parallelenergie';
-  if (aFull || bFull) return 'Goldader';
-  return 'EM';
-}
-
+// analyzeConnectionDynamics: klassifiziert Kanäle zwischen zwei Personen
+// nach Block-2-Doktrin (electromagnetic / compromise / companionship / parallel).
+//
+// Historie: Diese Funktion nutzte bis 2026-04-22 eine eigene Duplikat-Logik
+// (classifyChannel) mit den alten Labels EM / Goldader / Stabile Parallelenergie.
+// Das war ein Block-2-Follow-up, den Block 2 im connection-key nicht mit erfasst
+// hat — reading-worker hat parallel eine falsche Klassifikation produziert.
+// Jetzt nutzen beide Container dieselbe Logik (classifyCompositeConnections).
 function analyzeConnectionDynamics(chartA, chartB, nameA, nameB) {
   const labelA = nameA || 'Person A';
   const labelB = nameB || 'Person B';
   const dynamics = {
     activatedChannels: [],
-    electromagnetic_channels: [],   // rückwärtskompatibel
-    dominanz_channels: [],
-    kompromiss_channels: [],
+    // Neue (Block-2-konforme) Kategorien
+    electromagnetic_channels: [],
+    compromise_channels: [],
+    companionship_channels: [],
+    parallel_channels: [],
+    // Legacy-Felder (DEPRECATED, bleiben aus Rückwärtskompatibilität befüllt)
+    dominanz_channels: [],      // alt: Goldader = companionship + compromise
+    kompromiss_channels: [],    // alt: Parallelenergie — irreführender Name, bleibt = parallel
     complementary_gates: [],
     similarities: [],
     differences: [],
@@ -3792,6 +3792,7 @@ function analyzeConnectionDynamics(chartA, chartB, nameA, nameB) {
   if (!chartA || !chartB) {
     return dynamics;
   }
+
   // Gates normalisieren (können Objekte oder Zahlen sein)
   const normalizeGates = (gates) => (gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
   const gatesA = normalizeGates(chartA.gates);
@@ -3808,49 +3809,55 @@ function analyzeConnectionDynamics(chartA, chartB, nameA, nameB) {
     };
   };
 
-  // Alle Kanäle durchgehen und klassifizieren
-  const channelMap = {
-    1: [8], 2: [14], 3: [60], 4: [63], 5: [15],
-    6: [59], 7: [31], 9: [52], 10: [20, 34, 57],
-    11: [56], 12: [22], 13: [33], 16: [48], 17: [62],
-    18: [58], 19: [49], 20: [34, 57], 21: [45], 23: [43],
-    24: [61], 25: [51], 26: [44], 27: [50], 28: [38],
-    29: [46], 30: [41], 32: [54], 35: [36], 37: [40],
-    39: [55], 42: [53], 47: [64]
+  // Typ-Label auf Deutsch für Prompt-Text
+  const TYPE_LABEL_DE = {
+    electromagnetic: 'elektromagnetisch',
+    compromise:      'Kompromiss',
+    companionship:   'Companionship',
+    parallel:        'parallel',
   };
-  const seenChannels = new Set();
-  for (const [g1str, partners] of Object.entries(channelMap)) {
-    const g1 = parseInt(g1str);
-    for (const g2 of partners) {
-      const key = `${Math.min(g1, g2)}-${Math.max(g1, g2)}`;
-      if (seenChannels.has(key)) continue;
-      const aHas1 = gatesA.includes(g1), aHas2 = gatesA.includes(g2);
-      const bHas1 = gatesB.includes(g1), bHas2 = gatesB.includes(g2);
-      // Kanal ist aktiviert wenn zusammen beide Seiten abgedeckt sind
-      if (!(aHas1 || bHas1) || !(aHas2 || bHas2)) continue;
-      seenChannels.add(key);
-      const type = classifyChannel(g1, g2, gatesA, gatesB);
-      let carriedBy;
-      if (type === 'EM') carriedBy = 'niemand allein';
-      else if (type === 'Stabile Parallelenergie') carriedBy = 'beide';
-      else carriedBy = (gatesA.includes(g1) && gatesA.includes(g2)) ? labelA : labelB;
 
-      // personAGate/personBGate: immer gate1→A, gate2→B (zeigt Zentrum + ob definiert)
-      const entry = {
-        channelId: key,
-        type,
-        carriedBy,
-        personAGate: gateInfo(g1, centersA),
-        personBGate: gateInfo(g2, centersB)
-      };
-      dynamics.activatedChannels.push(entry);
-      // rückwärtskompatible Felder
-      const legacyEntry = { gate1: g1, gate2: g2, channel: key, type };
-      if (type === 'EM') dynamics.electromagnetic_channels.push(legacyEntry);
-      else if (type === 'Goldader') dynamics.dominanz_channels.push(legacyEntry);
-      else dynamics.kompromiss_channels.push(legacyEntry);
-    }
+  // Einheitliche Klassifikation via lib/composite-classification.js
+  const classified = classifyTwoPersonChannels(gatesA, gatesB);
+
+  // Pro Kategorie entry im activatedChannels + legacy-Mapping
+  const addActivated = (key, gates, type, carriedBy) => {
+    const [g1, g2] = gates;
+    dynamics.activatedChannels.push({
+      channelId:   key,
+      type,                            // 'electromagnetic' | 'compromise' | 'companionship' | 'parallel'
+      typeLabelDe: TYPE_LABEL_DE[type] || type,
+      carriedBy,
+      personAGate: gateInfo(g1, centersA),
+      personBGate: gateInfo(g2, centersB),
+    });
+  };
+
+  for (const e of classified.electromagnetic) {
+    addActivated(e.channel, e.gates, 'electromagnetic', 'niemand allein');
+    dynamics.electromagnetic_channels.push({ gate1: e.gates[0], gate2: e.gates[1], channel: e.channel, type: 'electromagnetic' });
   }
+  for (const c of classified.compromise) {
+    const dominant = c.dominantSide === 'A' ? labelA : labelB;
+    addActivated(c.channel, c.gates, 'compromise', dominant);
+    const legacy = { gate1: c.gates[0], gate2: c.gates[1], channel: c.channel, type: 'compromise' };
+    dynamics.compromise_channels.push(legacy);
+    dynamics.dominanz_channels.push(legacy); // legacy: alt-Goldader == kompletter Kanal bei einer Person
+  }
+  for (const cs of classified.companionship) {
+    const carrier = cs.side === 'A' ? labelA : labelB;
+    addActivated(cs.channel, cs.gates, 'companionship', carrier);
+    const legacy = { gate1: cs.gates[0], gate2: cs.gates[1], channel: cs.channel, type: 'companionship' };
+    dynamics.companionship_channels.push(legacy);
+    dynamics.dominanz_channels.push(legacy); // legacy: alt-Goldader == kompletter Kanal bei einer Person
+  }
+  for (const p of classified.parallel) {
+    addActivated(p.channel, p.gates, 'parallel', 'beide');
+    const legacy = { gate1: p.gates[0], gate2: p.gates[1], channel: p.channel, type: 'parallel' };
+    dynamics.parallel_channels.push(legacy);
+    dynamics.kompromiss_channels.push(legacy); // legacy: alt-Parallelenergie (!Name ist historisch falsch)
+  }
+
   dynamics.similarities = gatesA.filter(g => gatesB.includes(g));
   dynamics.differences = {
     personA_unique: gatesA.filter(g => !gatesB.includes(g)),

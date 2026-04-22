@@ -759,9 +759,12 @@ const KNOWLEDGE_MAP = {
   'correct-reading':  ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority'],
 };
 
-// Always-prepend: Dateien die für jedes Reading hart im Kontext stehen müssen
-// (z.B. strikte HD-Regeln, Halluzinations-Verbote). Baustein 6 erweitert diese Liste.
-const ALWAYS_KNOWLEDGE_KEYS = [];
+// Always-prepend: Dateien die für jedes Reading hart im Kontext stehen müssen.
+// Baustein 6: hd-regeln-strikt liefert verbindliche HD-Mechaniken (Konditionierung,
+// Kanäle, Verbindungstypen, Inkarnationskreuze, Planeten, Kehlkopf-Gates) als
+// nicht-verhandelbare Regel-Liste. Wird im Strict-Mode in jedem Prompt vollständig
+// vor allen anderen Knowledge-Dateien geladen.
+const ALWAYS_KNOWLEDGE_KEYS = READING_STRICT_MODE ? ['hd-regeln-strikt'] : [];
 
 function buildReadingKnowledge(readingType) {
   const typeKeys = KNOWLEDGE_MAP[readingType]

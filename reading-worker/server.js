@@ -938,11 +938,18 @@ Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, pe
 
   for (const modelId of modelsToTry) {
     try {
-      console.log(`   [Detailed 2-Pass] Versuche Claude-Modell: ${modelId}`);
-      [part1, part2] = await Promise.all([
-        generateWithClaude(part1Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 }),
-        generateWithClaude(part2Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 })
-      ]);
+      console.log(`   [Detailed 2-Pass] Versuche Claude-Modell: ${modelId} (${READING_STRICT_MODE ? 'sequential' : 'parallel'})`);
+      if (READING_STRICT_MODE) {
+        // Baustein 7: Part 2 bekommt Part 1 als Kontext + Anti-Widerspruch-Instruktion
+        part1 = await generateWithClaude(part1Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 });
+        const part2WithContext = injectPart1Context(part2Prompt, part1);
+        part2 = await generateWithClaude(part2WithContext, { model: modelId, maxTokens: 8000, temperature: 0.7 });
+      } else {
+        [part1, part2] = await Promise.all([
+          generateWithClaude(part1Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 }),
+          generateWithClaude(part2Prompt, { model: modelId, maxTokens: 8000, temperature: 0.7 })
+        ]);
+      }
       console.log(`   ✅ [Detailed 2-Pass] ${modelId} erfolgreich (${part1.length + part2.length} Zeichen gesamt)`);
       break;
     } catch (err) {
@@ -958,16 +965,29 @@ Schreibe mindestens 2500 Wörter für diesen Teil. Sprache: Deutsch, Du-Form, pe
 // Nutzbar für alle Reading-Typen die mehr als ~4000 Tokens Inhalt brauchen.
 // part1Prompt / part2Prompt: fertige Prompt-Strings
 // modelConfig: { models: [...], maxTokens: N }
+//
+// Baustein 7 (2026-04-22): Im Strict-Mode wird Part 2 SEQUENTIELL nach Part 1
+// erzeugt, und bekommt Part 1 als Kontext-Präfix im Prompt (Anti-Widerspruch-
+// Anweisung). Im Non-Strict-Mode parallel (alte Semantik, schneller aber mit
+// Widersprüchen zwischen Teilen).
 async function generateTwoParts({ readingType, part1Prompt, part2Prompt, modelConfig, tokensPerPart = 8000 }) {
   const models = (modelConfig?.models || ['claude-sonnet-4-6']);
   let part1 = '', part2 = '';
   for (const modelId of models) {
     try {
-      console.log(`   [2-Pass:${readingType}] Versuche ${modelId}`);
-      [part1, part2] = await Promise.all([
-        generateWithClaude(part1Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
-        generateWithClaude(part2Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
-      ]);
+      console.log(`   [2-Pass:${readingType}] Versuche ${modelId} (${READING_STRICT_MODE ? 'sequential' : 'parallel'})`);
+      if (READING_STRICT_MODE) {
+        // Part 1 zuerst
+        part1 = await generateWithClaude(part1Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 });
+        // Part 2 mit Part 1 als Kontext-Präfix
+        const part2WithContext = injectPart1Context(part2Prompt, part1);
+        part2 = await generateWithClaude(part2WithContext, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 });
+      } else {
+        [part1, part2] = await Promise.all([
+          generateWithClaude(part1Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
+          generateWithClaude(part2Prompt, { model: modelId, maxTokens: tokensPerPart, temperature: 0.7 }),
+        ]);
+      }
       console.log(`   ✅ [2-Pass:${readingType}] ${modelId} — ${part1.length + part2.length} Zeichen`);
       break;
     } catch (err) {
@@ -976,6 +996,36 @@ async function generateTwoParts({ readingType, part1Prompt, part2Prompt, modelCo
   }
   if (!part1 && !part2) throw new Error(`2-Pass fehlgeschlagen (${readingType})`);
   return `${part1}\n\n---\n\n${part2}`;
+}
+
+// Baustein 7: Part-1-Text als Kontext-Präfix in den Part-2-Prompt einfügen.
+// Position: direkt nach dem System-Teil, vor den konkreten Abschnitts-Anweisungen.
+// Markiert durch einen klaren Header damit das Model versteht dass es sich um
+// bereits geschriebenen Text handelt.
+function injectPart1Context(part2Prompt, part1Text) {
+  const contextBlock = `
+
+=== TEIL 1 BEREITS GESCHRIEBEN (nicht widersprechen, nur vertiefen) ===
+${part1Text}
+=== ENDE TEIL 1 ===
+
+ANWEISUNG FÜR TEIL 2:
+- Widerspreche KEINER Aussage aus Teil 1 oben.
+- Vertiefe und ergänze die Themen, die in Teil 1 angerissen wurden.
+- Keine Wiederholungen — nur Erweiterung.
+- Wenn ein Kanal, ein Gate oder eine Dynamik in Teil 1 bereits beschrieben wurde,
+  baue darauf auf statt neu zu interpretieren.
+- Wenn eine Verbindungstyp-Kategorie (elektromagnetisch / Kompromiss / Companionship /
+  parallel) in Teil 1 für einen bestimmten Kanal gesetzt wurde, bleibt diese Kategorie
+  in Teil 2 unverändert.
+
+`;
+  // Einfügen vor "---" (Trenner vor den Abschnitten) oder am Anfang falls nicht gefunden
+  const sepIdx = part2Prompt.indexOf('\n---\n');
+  if (sepIdx >= 0) {
+    return part2Prompt.slice(0, sepIdx) + contextBlock + part2Prompt.slice(sepIdx);
+  }
+  return contextBlock + part2Prompt;
 }
 
 // ── 2-Pass: Connection / Relationship / Compatibility ────────────────────────

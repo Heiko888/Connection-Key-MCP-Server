@@ -5623,47 +5623,83 @@ async function mailchimpSetContent(campaignId, html) {
 
 function buildNewsletterHtml({ weekLabel, intro, items, reflectionQuestion, closing }) {
   const itemsHtml = items.map(it => `
-    <div style="margin:0 0 28px;padding:18px 20px;background:rgba(242,159,5,0.04);border-left:3px solid #F29F05;border-radius:6px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;color:#F29F05;text-transform:uppercase;margin:0 0 8px;">${it.category}</div>
-      <div style="font-size:16px;font-weight:700;color:#111;line-height:1.35;margin:0 0 10px;">${it.title}</div>
-      <div style="font-size:14px;color:#444;line-height:1.65;">${it.excerpt}</div>
-    </div>`).join('\n');
+    <tr><td style="padding:0 0 22px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(242,159,5,0.05);border:1px solid rgba(242,159,5,0.18);border-radius:10px;">
+        <tr><td style="padding:18px 22px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;color:#F29F05;text-transform:uppercase;margin:0 0 8px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">${it.category}</div>
+          <div style="font-size:17px;font-weight:700;color:#0b0a0f;line-height:1.35;margin:0 0 10px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">${it.title}</div>
+          <div style="font-size:14.5px;color:#3a3942;line-height:1.7;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">${it.excerpt}</div>
+        </td></tr>
+      </table>
+    </td></tr>`).join('\n');
+
+  const LOGO_URL = 'https://the-connection-key.de/images/connection-key-optimized.png';
 
   return `<!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Newsletter</title></head>
-<body style="margin:0;padding:0;background:#f7f6f2;font-family:Georgia,'Times New Roman',serif;color:#222;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7f6f2;padding:24px 12px;">
+<body style="margin:0;padding:0;background:#0b0a0f;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#e9e7f0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0b0a0f;padding:32px 12px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.05);">
+      <table width="620" cellpadding="0" cellspacing="0" border="0" style="max-width:620px;background:linear-gradient(180deg,#13121a 0%,#0f0e15 100%);border:1px solid rgba(242,159,5,0.18);border-radius:14px;overflow:hidden;">
 
-        <tr><td style="background:linear-gradient(135deg,#F29F05,#8C1D04);padding:32px 32px 24px;text-align:center;color:#fff;">
-          <div style="font-size:11px;letter-spacing:0.3em;margin:0 0 10px;opacity:0.85;">THE CONNECTION KEY</div>
-          <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;">${weekLabel}</div>
-        </td></tr>
-
-        <tr><td style="padding:32px;">
-          <div style="font-size:15px;line-height:1.7;color:#333;margin:0 0 28px;">${intro}</div>
-
-          <div style="height:1px;background:#eee;margin:0 0 24px;"></div>
-
-          ${itemsHtml}
-
-          <div style="margin:28px 0 20px;padding:20px;background:#fef6e6;border-radius:8px;text-align:center;">
-            <div style="font-size:10px;letter-spacing:0.2em;color:#8C1D04;text-transform:uppercase;font-weight:700;margin:0 0 8px;">Frage der Woche</div>
-            <div style="font-size:16px;line-height:1.5;color:#222;font-style:italic;">${reflectionQuestion}</div>
-          </div>
-
-          <div style="font-size:14px;line-height:1.7;color:#333;margin:0 0 24px;">${closing}</div>
-
-          <div style="text-align:center;margin:32px 0 8px;">
-            <a href="https://the-connection-key.de/persoenlichkeitsanalyse/sofort" style="display:inline-block;background:linear-gradient(135deg,#F29F05,#8C1D04);color:#fff;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;">✨ Kostenloses Reading anfordern</a>
+        <!-- Logo-Header mit Gradient-Schimmer -->
+        <tr><td style="padding:40px 32px 28px;text-align:center;background:radial-gradient(ellipse 80% 100% at 50% 0%, rgba(242,159,5,0.12) 0%, transparent 70%);">
+          <a href="https://the-connection-key.de" style="display:inline-block;text-decoration:none;">
+            <img src="${LOGO_URL}" alt="The Connection Key" width="180" style="max-width:180px;height:auto;display:block;margin:0 auto 14px;" />
+          </a>
+          <div style="display:inline-block;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:0.28em;color:#F29F05;background:rgba(242,159,5,0.08);border:1px solid rgba(242,159,5,0.35);border-radius:100px;">
+            ${weekLabel.toUpperCase()}
           </div>
         </td></tr>
 
-        <tr><td style="background:#111;padding:24px 32px;color:#999;font-size:11px;line-height:1.6;text-align:center;">
-          The Connection Key · Heiko Schwaninger · Dompfaffenweg 30, 63920 Großheubach<br>
-          <a href="*|UNSUB|*" style="color:#F29F05;text-decoration:none;">Abmelden</a> &nbsp;·&nbsp;
-          <a href="https://the-connection-key.de" style="color:#F29F05;text-decoration:none;">Website</a>
+        <!-- Gold-Trenner -->
+        <tr><td style="padding:0 32px;">
+          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(242,159,5,0.5),transparent);"></div>
+        </td></tr>
+
+        <!-- Intro -->
+        <tr><td style="padding:28px 32px 8px;">
+          <div style="font-size:15px;line-height:1.75;color:#c9c6d4;">${intro}</div>
+        </td></tr>
+
+        <!-- Items -->
+        <tr><td style="padding:20px 32px 4px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            ${itemsHtml}
+          </table>
+        </td></tr>
+
+        <!-- Reflexionsfrage -->
+        <tr><td style="padding:4px 32px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:linear-gradient(135deg,rgba(242,159,5,0.10) 0%,rgba(140,29,4,0.08) 100%);border:1px solid rgba(242,159,5,0.25);border-radius:12px;">
+            <tr><td style="padding:22px 24px;text-align:center;">
+              <div style="font-size:10px;letter-spacing:0.22em;color:#F29F05;text-transform:uppercase;font-weight:700;margin:0 0 10px;">✦ Frage der Woche ✦</div>
+              <div style="font-size:16px;line-height:1.55;color:#e9e7f0;font-weight:500;">${reflectionQuestion}</div>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- Closing + CTA -->
+        <tr><td style="padding:8px 32px 36px;">
+          <div style="font-size:14.5px;line-height:1.75;color:#c9c6d4;margin:0 0 26px;">${closing}</div>
+          <div style="text-align:center;">
+            <a href="https://the-connection-key.de/persoenlichkeitsanalyse/sofort" style="display:inline-block;background:linear-gradient(135deg,#F29F05 0%,#8C1D04 100%);color:#0b0a0f;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:14px;letter-spacing:0.02em;box-shadow:0 4px 20px rgba(242,159,5,0.25);">
+              ✨ Kostenloses Reading anfordern →
+            </a>
+          </div>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:24px 32px 32px;background:rgba(0,0,0,0.4);border-top:1px solid rgba(242,159,5,0.12);color:#7a7685;font-size:11px;line-height:1.7;text-align:center;">
+          <div style="margin:0 0 8px;">
+            <a href="https://the-connection-key.de" style="color:#F29F05;text-decoration:none;margin:0 8px;">Website</a>·
+            <a href="https://the-connection-key.de/impressum" style="color:#F29F05;text-decoration:none;margin:0 8px;">Impressum</a>·
+            <a href="*|UNSUB|*" style="color:#F29F05;text-decoration:none;margin:0 8px;">Abmelden</a>
+          </div>
+          <div style="color:#55525f;">
+            The Connection Key · Heiko Schwaninger<br>
+            Dompfaffenweg 30 · 63920 Großheubach
+          </div>
         </td></tr>
       </table>
     </td></tr>

@@ -5574,6 +5574,241 @@ app.delete('/api/channel/content/:id', async (req, res) => {
 });
 
 // ======================================================
+// NEWSLETTER (wöchentlicher Mailchimp-Draft, Mittwoch 08:00 UTC)
+// ======================================================
+
+const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY || '';
+const MAILCHIMP_AUDIENCE_ID = process.env.MAILCHIMP_AUDIENCE_ID || '';
+function mailchimpServerPrefix() {
+  const parts = MAILCHIMP_API_KEY.split('-');
+  return parts[parts.length - 1] || 'us21';
+}
+function mailchimpBaseUrl() {
+  return `https://${mailchimpServerPrefix()}.api.mailchimp.com/3.0`;
+}
+function mailchimpAuthHeader() {
+  return `Basic ${Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString('base64')}`;
+}
+function mailchimpConfigured() {
+  return !!(MAILCHIMP_API_KEY && MAILCHIMP_AUDIENCE_ID);
+}
+
+async function mailchimpCreateCampaign({ subject, previewText, fromName = 'The Connection Key', replyTo = 'info@the-connection-key.de' }) {
+  const res = await fetch(`${mailchimpBaseUrl()}/campaigns`, {
+    method: 'POST',
+    headers: { Authorization: mailchimpAuthHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'regular',
+      recipients: { list_id: MAILCHIMP_AUDIENCE_ID },
+      settings: { subject_line: subject, preview_text: previewText, title: subject, from_name: fromName, reply_to: replyTo, to_name: '*|FNAME|* *|LNAME|*' },
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Mailchimp createCampaign ${res.status}: ${data.detail || data.title || 'unknown'}`);
+  return data;
+}
+
+async function mailchimpSetContent(campaignId, html) {
+  const res = await fetch(`${mailchimpBaseUrl()}/campaigns/${campaignId}/content`, {
+    method: 'PUT',
+    headers: { Authorization: mailchimpAuthHeader(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(`Mailchimp setContent ${res.status}: ${data.detail || data.title || 'unknown'}`);
+  }
+  return true;
+}
+
+function buildNewsletterHtml({ weekLabel, intro, items, reflectionQuestion, closing }) {
+  const itemsHtml = items.map(it => `
+    <div style="margin:0 0 28px;padding:18px 20px;background:rgba(242,159,5,0.04);border-left:3px solid #F29F05;border-radius:6px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;color:#F29F05;text-transform:uppercase;margin:0 0 8px;">${it.category}</div>
+      <div style="font-size:16px;font-weight:700;color:#111;line-height:1.35;margin:0 0 10px;">${it.title}</div>
+      <div style="font-size:14px;color:#444;line-height:1.65;">${it.excerpt}</div>
+    </div>`).join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Newsletter</title></head>
+<body style="margin:0;padding:0;background:#f7f6f2;font-family:Georgia,'Times New Roman',serif;color:#222;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7f6f2;padding:24px 12px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.05);">
+
+        <tr><td style="background:linear-gradient(135deg,#F29F05,#8C1D04);padding:32px 32px 24px;text-align:center;color:#fff;">
+          <div style="font-size:11px;letter-spacing:0.3em;margin:0 0 10px;opacity:0.85;">THE CONNECTION KEY</div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;">${weekLabel}</div>
+        </td></tr>
+
+        <tr><td style="padding:32px;">
+          <div style="font-size:15px;line-height:1.7;color:#333;margin:0 0 28px;">${intro}</div>
+
+          <div style="height:1px;background:#eee;margin:0 0 24px;"></div>
+
+          ${itemsHtml}
+
+          <div style="margin:28px 0 20px;padding:20px;background:#fef6e6;border-radius:8px;text-align:center;">
+            <div style="font-size:10px;letter-spacing:0.2em;color:#8C1D04;text-transform:uppercase;font-weight:700;margin:0 0 8px;">Frage der Woche</div>
+            <div style="font-size:16px;line-height:1.5;color:#222;font-style:italic;">${reflectionQuestion}</div>
+          </div>
+
+          <div style="font-size:14px;line-height:1.7;color:#333;margin:0 0 24px;">${closing}</div>
+
+          <div style="text-align:center;margin:32px 0 8px;">
+            <a href="https://the-connection-key.de/persoenlichkeitsanalyse/sofort" style="display:inline-block;background:linear-gradient(135deg,#F29F05,#8C1D04);color:#fff;text-decoration:none;padding:13px 28px;border-radius:8px;font-weight:700;font-size:14px;">✨ Kostenloses Reading anfordern</a>
+          </div>
+        </td></tr>
+
+        <tr><td style="background:#111;padding:24px 32px;color:#999;font-size:11px;line-height:1.6;text-align:center;">
+          The Connection Key · Heiko Schwaninger · Dompfaffenweg 30, 63920 Großheubach<br>
+          <a href="*|UNSUB|*" style="color:#F29F05;text-decoration:none;">Abmelden</a> &nbsp;·&nbsp;
+          <a href="https://the-connection-key.de" style="color:#F29F05;text-decoration:none;">Website</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+async function generateNewsletterDraft() {
+  if (!mailchimpConfigured()) {
+    throw new Error('Mailchimp nicht konfiguriert (MAILCHIMP_API_KEY / MAILCHIMP_AUDIENCE_ID fehlt)');
+  }
+  if (!supabasePublic) throw new Error('Supabase nicht verfügbar');
+
+  console.log('📰 [Newsletter] Wähle Kandidaten aus channel_posts…');
+  const since = new Date(Date.now() - 8 * 86400 * 1000).toISOString();
+  const { data: candidates, error } = await supabasePublic
+    .from('channel_posts')
+    .select('id, date, type, topic, telegram_text, instagram_caption, created_at')
+    .gte('created_at', since)
+    .eq('used_in_newsletter', false)
+    .in('status', ['published', 'draft'])
+    .order('created_at', { ascending: false });
+  if (error) throw new Error(`Supabase-Fehler: ${error.message}`);
+  if (!candidates || candidates.length === 0) {
+    throw new Error('Keine ungenutzten Channel-Posts in den letzten 8 Tagen — nichts zum Kuratieren');
+  }
+
+  // Diversität: max 1 pro type, Priorität tagesimpuls > beziehung > hd-wissen > business-tipp > transit-ausblick > andere
+  const prioByType = { tagesimpuls: 1, beziehung: 2, 'hd-wissen': 3, 'business-tipp': 4, 'transit-ausblick': 5, 'video-concept': 6, 'social-content': 7, custom: 8 };
+  const byType = new Map();
+  for (const c of candidates) {
+    if (!byType.has(c.type)) byType.set(c.type, c);
+  }
+  const picked = Array.from(byType.values())
+    .sort((a, b) => (prioByType[a.type] || 99) - (prioByType[b.type] || 99))
+    .slice(0, 4);
+
+  const categoryLabels = {
+    tagesimpuls: 'Tagesimpuls', beziehung: 'Beziehung & Resonanz', 'hd-wissen': 'HD-Wissen',
+    'business-tipp': 'Business', 'transit-ausblick': 'Transit-Ausblick', 'video-concept': 'Video-Inspiration',
+    'social-content': 'Social-Content', custom: 'Custom',
+  };
+
+  // Claude komponiert Intro, Item-Titel/Exzerpte, Reflexionsfrage, Closing
+  const composerPrompt = `Du bist Newsletter-Kuratorin für The Connection Key (Human Design + Coaching).
+Ein wöchentlicher Newsletter soll aus diesen bestehenden Channel-Posts komponiert werden.
+Datum: ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}
+
+Posts:
+${picked.map((p, i) => `
+[${i + 1}] ${categoryLabels[p.type] || p.type} — ${p.topic || '(ohne Thema)'}
+${p.telegram_text}
+`).join('\n---\n')}
+
+Erstelle den Newsletter-Content als JSON:
+{
+  "subjectLine": "E-Mail-Betreff, 40–65 Zeichen, neugierig machend ohne Clickbait",
+  "previewText": "Preview-Text, 70–110 Zeichen",
+  "intro": "2–3 Sätze Einleitung, warm, persönlich, verbindet aktuelle Wochenenergie mit dem Thema",
+  "items": [
+    { "category": "Kategorie-Label", "title": "prägnanter Item-Titel", "excerpt": "3–4 Sätze, destilliert aus dem Original, ohne 1:1 Copy" }
+  ],
+  "reflectionQuestion": "Eine einzelne, offene Reflexionsfrage zur Mitnahme",
+  "closing": "2 Sätze Schluss, ermutigend, mit sanftem Bogen zum Reading-CTA"
+}
+
+Antworte AUSSCHLIESSLICH mit validem JSON — kein Markdown, kein Kommentar davor/danach.`;
+
+  const rawComposition = await generateWithClaude(composerPrompt, { maxTokens: 2000, temperature: 0.7 });
+  let composition;
+  try {
+    const jsonMatch = rawComposition.match(/\{[\s\S]*\}/);
+    composition = JSON.parse(jsonMatch ? jsonMatch[0] : rawComposition);
+  } catch (err) {
+    throw new Error(`Claude-Response ist kein valides JSON: ${err.message}`);
+  }
+
+  if (!composition.subjectLine || !composition.items?.length) {
+    throw new Error('Claude-Composition unvollständig');
+  }
+
+  const weekLabel = `Woche ${String(Math.ceil((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / (7 * 86400000))).padStart(2, '0')} · ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' })}`;
+
+  const html = buildNewsletterHtml({
+    weekLabel,
+    intro: composition.intro || '',
+    items: composition.items,
+    reflectionQuestion: composition.reflectionQuestion || '',
+    closing: composition.closing || '',
+  });
+
+  console.log(`📰 [Newsletter] Erstelle Mailchimp-Campaign "${composition.subjectLine}"…`);
+  const campaign = await mailchimpCreateCampaign({
+    subject: composition.subjectLine,
+    previewText: composition.previewText || composition.intro?.slice(0, 100) || '',
+  });
+  await mailchimpSetContent(campaign.id, html);
+
+  // Posts als verwendet markieren
+  const usedIds = picked.map(p => p.id);
+  await supabasePublic
+    .from('channel_posts')
+    .update({ used_in_newsletter: true, newsletter_campaign_id: campaign.id })
+    .in('id', usedIds);
+
+  console.log(`📰 [Newsletter] Draft erstellt: ${campaign.id} (${picked.length} items)`);
+  sendMattermost(
+    `📰 **Newsletter-Entwurf bereit** | ${composition.subjectLine}\n` +
+    `${picked.length} kuratierte Posts · Audience: ${MAILCHIMP_AUDIENCE_ID}\n` +
+    `[→ In Mailchimp öffnen](https://${mailchimpServerPrefix()}.admin.mailchimp.com/campaigns/edit?id=${campaign.web_id || campaign.id})`,
+    'business',
+  );
+
+  return {
+    campaignId: campaign.id,
+    webId: campaign.web_id,
+    subject: composition.subjectLine,
+    itemsUsed: picked.length,
+    editUrl: `https://${mailchimpServerPrefix()}.admin.mailchimp.com/campaigns/edit?id=${campaign.web_id || campaign.id}`,
+  };
+}
+
+// Mittwoch 08:00 UTC (10:00 CEST) — weekly check, nur an Mittwochen
+scheduleDailyAt(8, 0, async () => {
+  if (new Date().getUTCDay() !== 3) return; // Mi = 3
+  try {
+    await generateNewsletterDraft();
+  } catch (err) {
+    console.error('[Newsletter] Cron-Fehler:', err.message);
+    sendMattermost(`❌ **Newsletter-Draft-Fehler**: ${err.message}`, 'errors');
+  }
+});
+
+// Manueller Trigger (Coach kann jederzeit einen Draft bauen)
+app.post('/api/newsletter/generate-draft', requireAdminAuth, async (req, res) => {
+  try {
+    const result = await generateNewsletterDraft();
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    console.error('[Newsletter] Fehler:', err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
 // Server starten
 // ======================================================
 app.listen(4000, () => {

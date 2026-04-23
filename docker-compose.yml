@@ -143,6 +143,10 @@ services:
       - MATTERMOST_WEBHOOK_BUSINESS=${MATTERMOST_WEBHOOK_BUSINESS}
       - MATTERMOST_WEBHOOK_ERRORS=${MATTERMOST_WEBHOOK_ERRORS}
 
+      # Mailchimp (Newsletter-Campaign-Erstellung)
+      - MAILCHIMP_API_KEY=${MAILCHIMP_API_KEY:-}
+      - MAILCHIMP_AUDIENCE_ID=${MAILCHIMP_AUDIENCE_ID:-}
+
     depends_on:
       redis:
         condition: service_healthy

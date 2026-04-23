@@ -4765,7 +4765,8 @@ app.post('/api/readings/tagesimpuls/dispatch-subscribers', async (req, res) => {
 /**
  * Generiert eine Instagram-Caption aus einem Channel-Post-Text und speichert sie in Supabase.
  */
-async function generateAndSaveInstagramCaption(text, type, topic = null) {
+async function generateAndSaveInstagramCaption(text, type, topic = null, opts = {}) {
+  const { dryRun = false } = opts || {};
   try {
     const prompt = `Du bist ein Social-Media-Experte für Human Design Coaches.
 
@@ -4790,30 +4791,37 @@ Antworte NUR mit der Caption, kein Kommentar davor/danach.`;
     const caption = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.85 });
 
     // In Supabase speichern
+    let savedRow = null;
     if (supabasePublic) {
       const today = new Date().toISOString().split('T')[0];
       try {
-        await supabasePublic.from('channel_posts').upsert({
+        const row = {
           date: today,
           type,
           topic: topic || type,
           telegram_text: text,
           instagram_caption: caption.trim(),
-          telegram_sent: true,
-          sent_at: new Date().toISOString(),
-          status: 'published',
+          telegram_sent: !dryRun,
+          ...(dryRun ? {} : { sent_at: new Date().toISOString() }),
+          status: dryRun ? 'draft' : 'published',
           created_at: new Date().toISOString(),
-        }, { onConflict: 'date,type' });
+        };
+        const { data } = await supabasePublic
+          .from('channel_posts')
+          .upsert(row, { onConflict: 'date,type' })
+          .select()
+          .single();
+        savedRow = data || null;
       } catch (dbErr) {
         console.warn('[Marketing] Supabase-Save Fehler:', dbErr.message);
       }
     }
 
-    console.log(`📸 [Marketing] Instagram-Caption gespeichert (${type}, ${caption.length} Zeichen)`);
-    return caption.trim();
+    console.log(`📸 [Marketing] Instagram-Caption gespeichert (${type}, ${caption.length} Zeichen${dryRun ? ', draft' : ''})`);
+    return { caption: caption.trim(), row: savedRow };
   } catch (err) {
     console.warn('[Marketing] Instagram-Caption Fehler:', err.message);
-    return null;
+    return { caption: null, row: null };
   }
 }
 
@@ -4984,12 +4992,12 @@ async function loadTodayTransit() {
 /**
  * Postet täglich einen allgemeinen Transit-Tagesimpuls in den Telegram-Kanal.
  */
-async function postChannelTagesimpuls() {
-  if (!TELEGRAM_CHANNEL_ID) {
+async function postChannelTagesimpuls({ dryRun = false } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) {
     console.warn('[Channel] TELEGRAM_CHANNEL_ID nicht gesetzt — überspringe');
-    return;
+    return null;
   }
-  console.log('📢 [Channel] Generiere Tagesimpuls für Kanal...');
+  console.log(`📢 [Channel] Generiere Tagesimpuls${dryRun ? ' (Entwurf)' : ' für Kanal'}...`);
   try {
     const transit = await loadTodayTransit();
     const today_de = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -5031,16 +5039,24 @@ async function postChannelTagesimpuls() {
     const prompt = `${filledTemplate}\n\nErstelle jetzt den Tagesimpuls für heute (${today_de}).`;
     const text = await generateWithClaude(prompt, { maxTokens: 600, temperature: 0.85 });
 
-    const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
-    console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
-    generateAndSaveInstagramCaption(text.trim(), 'tagesimpuls');
-    sendMattermost(`✨ **Tagesimpuls gepostet** | ☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}\n${text.trim().substring(0, 200)}...`, 'channel');
-    generateSocialContent(text.trim(), `Sonne Tor ${sunGate}, Mond Tor ${moonGate}`);
+    if (!dryRun) {
+      const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
+      console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Channel] Tagesimpuls-Entwurf erstellt (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'tagesimpuls', null, { dryRun });
+    if (!dryRun) {
+      sendMattermost(`✨ **Tagesimpuls gepostet** | ☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}\n${text.trim().substring(0, 200)}...`, 'channel');
+      generateSocialContent(text.trim(), `Sonne Tor ${sunGate}, Mond Tor ${moonGate}`);
+    }
+    return row;
   } catch (err) {
     console.error('[Channel] Tagesimpuls Fehler:', err.message);
-    sendMattermost(`❌ **Tagesimpuls-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **Tagesimpuls-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
@@ -5049,9 +5065,9 @@ const HD_BEZIEHUNG_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../
 /**
  * Postet täglich einen Beziehungs- und Resonanz-Beitrag in den Telegram-Kanal.
  */
-async function postChannelBeziehung() {
-  if (!TELEGRAM_CHANNEL_ID) return;
-  console.log('💞 [Channel] Generiere Beziehung & Resonanz Post...');
+async function postChannelBeziehung({ dryRun = false } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`💞 [Channel] Generiere Beziehung & Resonanz Post${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
     const { topic, topicHashtag } = HD_BEZIEHUNG_TOPICS[dayOfYear % HD_BEZIEHUNG_TOPICS.length];
@@ -5062,31 +5078,37 @@ async function postChannelBeziehung() {
       + `\n\nErstelle jetzt den Post über: ${topic}`;
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
 
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
-    console.log(`💞 [Channel] Beziehung gepostet: ${topic} (${text.length} Zeichen)`);
-    generateAndSaveInstagramCaption(text.trim(), 'beziehung', topic);
-    sendMattermost(`💞 **Beziehung & Resonanz gepostet** | ${topic}`, 'channel');
+    if (!dryRun) {
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+      console.log(`💞 [Channel] Beziehung gepostet: ${topic} (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Channel] Beziehungs-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'beziehung', topic, { dryRun });
+    if (!dryRun) sendMattermost(`💞 **Beziehung & Resonanz gepostet** | ${topic}`, 'channel');
+    return row;
   } catch (err) {
     console.error('[Channel] Beziehung Fehler:', err.message);
-    sendMattermost(`❌ **Beziehung-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **Beziehung-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
 /**
  * Postet Mo–Fr einen HD-Wissen-Beitrag in den Telegram-Kanal.
  */
-async function postChannelHDWissen() {
-  if (!TELEGRAM_CHANNEL_ID) {
+async function postChannelHDWissen({ dryRun = false } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) {
     console.warn('[Channel] TELEGRAM_CHANNEL_ID nicht gesetzt — überspringe');
-    return;
+    return null;
   }
-  // Nur Mo–Fr (1–5)
+  // Nur Mo–Fr (1–5) — ausser dryRun (Coach kann jederzeit einen Entwurf bauen)
   const day = new Date().getUTCDay();
-  if (day === 0 || day === 6) {
+  if (!dryRun && (day === 0 || day === 6)) {
     console.log(`[Channel] HD-Wissen: kein Post am Wochenende (Wochentag ${day})`);
-    return;
+    return null;
   }
-  console.log('📚 [Channel] Generiere HD-Wissen-Post...');
+  console.log(`📚 [Channel] Generiere HD-Wissen-Post${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     // Topic anhand des Datums rotieren
     const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
@@ -5100,13 +5122,19 @@ async function postChannelHDWissen() {
     const prompt = `${filledTemplate}\n\nErstelle jetzt den HD-Wissen-Post über: ${topic}`;
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
 
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
-    console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen)`);
-    generateAndSaveInstagramCaption(text.trim(), 'hd-wissen', topic);
-    sendMattermost(`📚 **HD-Wissen gepostet** | ${topic}`, 'channel');
+    if (!dryRun) {
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+      console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Channel] HD-Wissen-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'hd-wissen', topic, { dryRun });
+    if (!dryRun) sendMattermost(`📚 **HD-Wissen gepostet** | ${topic}`, 'channel');
+    return row;
   } catch (err) {
     console.error('[Channel] HD-Wissen Fehler:', err.message);
-    sendMattermost(`❌ **HD-Wissen-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **HD-Wissen-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
@@ -5120,19 +5148,49 @@ scheduleDailyAt(10, 0, postChannelBeziehung);
 scheduleDailyAt(15, 0, postChannelHDWissen);
 
 // Manuelle Trigger
+// Wenn body.dryRun === true: Entwurf-Modus — kein Telegram-Versand, nur DB-Save als 'draft'.
+// Return wird dann synchron mit der gespeicherten Row zurueckgegeben.
+// Ohne dryRun: fire-and-forget wie bisher (fuer Cron-Kompatibilitaet).
 app.post('/api/channel/post-beziehung', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postChannelBeziehung({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'Beziehung & Resonanz Post gestartet' });
-  postChannelBeziehung();
+  postChannelBeziehung({ dryRun: false }).catch(e => console.error('[Channel] Beziehung async:', e.message));
 });
 app.post('/api/channel/post-tagesimpuls', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postChannelTagesimpuls({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'Tagesimpuls-Post gestartet' });
-  postChannelTagesimpuls();
+  postChannelTagesimpuls({ dryRun: false }).catch(e => console.error('[Channel] Tagesimpuls async:', e.message));
 });
 app.post('/api/channel/post-hd-wissen', async (req, res) => {
   const { topic } = req.body || {};
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postChannelHDWissen({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'HD-Wissen-Post gestartet' });
   if (topic) {
-    // Direktes Topic aus Request
+    // Direktes Topic aus Request — Legacy-Path, nur live (kein dryRun)
     try {
       const templateText = templates['channel-hd-wissen'] || '';
       const topicHashtag = topic.replace(/[^a-zA-ZäöüÄÖÜ]/g, '');
@@ -5145,7 +5203,7 @@ app.post('/api/channel/post-hd-wissen', async (req, res) => {
       console.error('[Channel] HD-Wissen Fehler:', err.message);
     }
   } else {
-    postChannelHDWissen();
+    postChannelHDWissen({ dryRun: false }).catch(e => console.error('[Channel] HD-Wissen async:', e.message));
   }
 });
 
@@ -5227,14 +5285,14 @@ Sprache: Deutsch. Kein Markdown, klare Trennung mit Überschriften.`;
 /**
  * #2 Video Creation: Wöchentlich montags ein Video-Konzept basierend auf aktuellen Transiten.
  */
-async function postWeeklyVideoConcept(force = false) {
+async function postWeeklyVideoConcept(force = false, { dryRun = false } = {}) {
   const day = new Date().getUTCDay();
-  if (!force && day !== 1) {
+  if (!force && !dryRun && day !== 1) {
     console.log('[Video] Kein Montag — überspringe Weekly Video Concept');
-    return;
+    return null;
   }
-  if (!TELEGRAM_CHANNEL_ID) return;
-  console.log('🎥 [Video] Generiere wöchentliches Video-Konzept...');
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`🎥 [Video] Generiere wöchentliches Video-Konzept${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     const transit = await loadTodayTransit();
     const sunGate = transit?.sun?.gate || '?';
@@ -5264,41 +5322,50 @@ Sprache: Deutsch. Praxisnah, kein Esoterik-Jargon.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 700, temperature: 0.85 });
 
+    let savedRow = null;
     if (supabasePublic) {
       try {
-        await supabasePublic.from('channel_posts').upsert({
+        const row = {
           date: new Date().toISOString().split('T')[0],
           type: 'video-concept',
           topic: `Video-Konzept KW ${weekStart}`,
           telegram_text: text.trim(),
           instagram_caption: null,
-          telegram_sent: true,
-          sent_at: new Date().toISOString(),
-          status: 'published',
+          telegram_sent: !dryRun,
+          ...(dryRun ? {} : { sent_at: new Date().toISOString() }),
+          status: dryRun ? 'draft' : 'published',
           created_at: new Date().toISOString(),
-        }, { onConflict: 'date,type' });
+        };
+        const { data } = await supabasePublic
+          .from('channel_posts')
+          .upsert(row, { onConflict: 'date,type' })
+          .select()
+          .single();
+        savedRow = data || null;
         // Instagram-Caption für Video-Konzept nachträglich generieren
-        generateAndSaveInstagramCaption(text.trim(), 'video-concept', `Video-Konzept KW ${weekStart}`);
+        generateAndSaveInstagramCaption(text.trim(), 'video-concept', `Video-Konzept KW ${weekStart}`, { dryRun });
       } catch (e) {
         console.warn('[Video] Supabase-Save Fehler:', e.message);
       }
     }
-    console.log(`🎥 [Video] Wöchentliches Video-Konzept gespeichert (${text.length} Zeichen)`);
-    sendMattermost(`🎥 **Video-Konzept gespeichert** | KW ab ${weekStart}\n[→ Channel-Content](https://coach.the-connection-key.de/channel-content)`, 'business');
+    console.log(`🎥 [Video] Wöchentliches Video-Konzept gespeichert (${text.length} Zeichen${dryRun ? ', draft' : ''})`);
+    if (!dryRun) sendMattermost(`🎥 **Video-Konzept gespeichert** | KW ab ${weekStart}\n[→ Channel-Content](https://coach.the-connection-key.de/channel-content)`, 'business');
+    return savedRow;
   } catch (err) {
     console.error('[Video] Fehler:', err.message);
-    sendMattermost(`❌ **Video-Konzept-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **Video-Konzept-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
 /**
  * #3 Transit-Wochenausblick: Montags eine Übersicht der Wochenenergie posten.
  */
-async function postWeeklyTransitOutlook(force = false) {
+async function postWeeklyTransitOutlook(force = false, { dryRun = false } = {}) {
   const day = new Date().getUTCDay();
-  if (!force && day !== 1) return;
-  if (!TELEGRAM_CHANNEL_ID) return;
-  console.log('🌍 [Transit] Generiere Wochen-Transit-Ausblick...');
+  if (!force && !dryRun && day !== 1) return null;
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`🌍 [Transit] Generiere Wochen-Transit-Ausblick${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     const transit = await loadTodayTransit();
     const weekStart = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -5322,25 +5389,29 @@ Kein Markdown. Reiner Text mit Zeilenumbrüchen.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.85 });
 
-    const header = `🌍 <b>Wochen-Transit — ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' })}</b>\n\n`;
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'HTML');
-    generateAndSaveInstagramCaption(text.trim(), 'transit-ausblick', `Woche ${weekStart}`);
-    console.log(`🌍 [Transit] Wochen-Ausblick gepostet`);
-    sendMattermost(`🌍 **Wochen-Transit-Ausblick gepostet** | Woche ab ${weekStart}\n${text.trim().substring(0, 300)}...`, 'business');
+    if (!dryRun) {
+      const header = `🌍 <b>Wochen-Transit — ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' })}</b>\n\n`;
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'HTML');
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'transit-ausblick', `Woche ${weekStart}`, { dryRun });
+    console.log(`🌍 [Transit] Wochen-Ausblick ${dryRun ? 'Entwurf erstellt' : 'gepostet'}`);
+    if (!dryRun) sendMattermost(`🌍 **Wochen-Transit-Ausblick gepostet** | Woche ab ${weekStart}\n${text.trim().substring(0, 300)}...`, 'business');
+    return row;
   } catch (err) {
     console.error('[Transit] Fehler:', err.message);
-    sendMattermost(`❌ **Transit-Ausblick-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **Transit-Ausblick-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
 /**
  * #4 Business-Tipp: Montags ein HD-Business-Tipp für den Channel.
  */
-async function postWeeklyBusinessTip(force = false) {
+async function postWeeklyBusinessTip(force = false, { dryRun = false } = {}) {
   const day = new Date().getUTCDay();
-  if (!force && day !== 1) return;
-  if (!TELEGRAM_CHANNEL_ID) return;
-  console.log('💼 [Business] Generiere wöchentlichen Business-Tipp...');
+  if (!force && !dryRun && day !== 1) return null;
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`💼 [Business] Generiere wöchentlichen Business-Tipp${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     const BUSINESS_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-business.json'), 'utf-8'));
     const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
@@ -5361,13 +5432,15 @@ Kein Markdown. Kein "Liebe Community". Direkte Sprache.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.88 });
 
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
-    generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic);
-    console.log(`💼 [Business] Business-Tipp gepostet: ${topic}`);
-    sendMattermost(`💼 **Business-Tipp gepostet** | ${topic}`, 'business');
+    if (!dryRun) await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic, { dryRun });
+    console.log(`💼 [Business] Business-Tipp ${dryRun ? 'Entwurf erstellt' : 'gepostet'}: ${topic}`);
+    if (!dryRun) sendMattermost(`💼 **Business-Tipp gepostet** | ${topic}`, 'business');
+    return row;
   } catch (err) {
     console.error('[Business] Fehler:', err.message);
-    sendMattermost(`❌ **Business-Tipp-Fehler**: ${err.message}`, 'errors');
+    if (!dryRun) sendMattermost(`❌ **Business-Tipp-Fehler**: ${err.message}`, 'errors');
+    throw err;
   }
 }
 
@@ -5383,16 +5456,43 @@ scheduleDailyAt(8, 30, postWeeklyVideoConcept);
 
 // Manuelle Trigger
 app.post('/api/channel/post-transit-ausblick', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postWeeklyTransitOutlook(true, { dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'Transit-Ausblick gestartet' });
-  postWeeklyTransitOutlook(true);
+  postWeeklyTransitOutlook(true).catch(e => console.error('[Transit] async:', e.message));
 });
 app.post('/api/channel/post-business-tipp', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postWeeklyBusinessTip(true, { dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'Business-Tipp gestartet' });
-  postWeeklyBusinessTip(true);
+  postWeeklyBusinessTip(true).catch(e => console.error('[Business] async:', e.message));
 });
 app.post('/api/channel/post-video-concept', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postWeeklyVideoConcept(true, { dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
   res.json({ success: true, message: 'Video-Konzept gestartet' });
-  postWeeklyVideoConcept(true);
+  postWeeklyVideoConcept(true).catch(e => console.error('[Video] async:', e.message));
 });
 app.post('/api/channel/post-social-content', async (req, res) => {
   const { text } = req.body || {};
@@ -5430,7 +5530,7 @@ Antworte NUR mit dem Post-Text, kein Kommentar davor/danach.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.85 });
 
-    const instagramCaption = await generateAndSaveInstagramCaption(text.trim(), type, topic);
+    const { caption: instagramCaption } = await generateAndSaveInstagramCaption(text.trim(), type, topic);
 
     const today = new Date().toISOString().split('T')[0];
     let savedId = null;

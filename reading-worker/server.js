@@ -731,7 +731,7 @@ const KNOWLEDGE_MAP = {
   'basic':            ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed'],
   'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
   'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
-  'life-purpose':     ['human-design-basics', 'types-detailed', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'authority-detailed'],
+  'life-purpose':     ['life-purpose-knowledge', 'human-design-basics', 'types-detailed', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'authority-detailed'],
   // Connection / Beziehungs-Typen
   'connection':       ['connection-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed', 'authority-detailed', 'profiles-detailed'],
   'relationship':     ['connection-knowledge', 'channels-gates', 'types-detailed', 'authority-detailed', 'centers-detailed'],
@@ -741,15 +741,18 @@ const KNOWLEDGE_MAP = {
   'penta-communication': ['penta-knowledge', 'penta-communication-dynamics', 'penta-strategy-impulses', 'channels-gates', 'centers-detailed', 'types-detailed'],
   // Psychologie / Tiefe
   'depth-analysis':   ['channels-gates', 'centers-detailed', 'splits-detailed', 'authority-detailed', 'profiles-detailed', 'incarnation-cross'],
-  'shadow-work':      ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'strategy-authority'],
+  'shadow-work':      ['shadow-work-knowledge', 'centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'strategy-authority'],
   'psychology':       ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'channels-gates'],
-  'reflection':       ['strategy-authority', 'authority-detailed', 'profiles-detailed', 'types-detailed', 'centers-detailed'],
+  'reflection':       ['reflection-knowledge', 'strategy-authority', 'authority-detailed', 'profiles-detailed', 'types-detailed', 'centers-detailed'],
+  'trauma':           ['trauma-knowledge', 'centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed'],
   'reflection-profiles': ['profiles-detailed', 'strategy-authority', 'types-detailed', 'authority-detailed'],
   'emotions':         ['authority-detailed', 'strategy-authority', 'centers-detailed', 'types-detailed'],
   // Körper / Gesundheit
-  'health':           ['human-design-basics', 'arrows-detailed', 'centers-detailed', 'types-detailed', 'authority-detailed'],
-  'sexuality':        ['centers-detailed', 'channels-gates', 'types-detailed', 'authority-detailed'],
-  'spiritual':        ['incarnation-cross', 'profiles-detailed', 'channels-gates', 'centers-detailed', 'arrows-detailed'],
+  'health':           ['health-knowledge', 'human-design-basics', 'arrows-detailed', 'centers-detailed', 'types-detailed', 'authority-detailed'],
+  'sexuality':        ['sexuality-knowledge', 'centers-detailed', 'channels-gates', 'types-detailed', 'authority-detailed'],
+  'spiritual':        ['spiritual-knowledge', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'centers-detailed', 'arrows-detailed'],
+  'geld-ueberfluss':  ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates', 'centers-detailed'],
+  'money':            ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates'],
   // Zeit / Transit
   'transit':          ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority'],
   'jahres-reading':   ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority', 'incarnation-cross'],

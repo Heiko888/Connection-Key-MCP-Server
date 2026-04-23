@@ -4826,6 +4826,13 @@ if (!ADMIN_PASS) {
   console.warn('⚠️  ADMIN_PASS nicht gesetzt — /admin/* Routes sind blockiert. Setze ADMIN_PASS in .env.');
 }
 function requireAdminAuth(req, res, next) {
+  // Service-to-Service: x-api-key (konsistent mit anderen .138-APIs)
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey && process.env.API_KEY && apiKey === process.env.API_KEY) {
+    return next();
+  }
+
+  // Interaktiv via Browser: HTTP Basic Auth
   if (!ADMIN_PASS) {
     return res.status(503).send('Admin-Bereich nicht konfiguriert. ADMIN_PASS in .env setzen.');
   }

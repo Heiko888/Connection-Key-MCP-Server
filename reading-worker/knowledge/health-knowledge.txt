@@ -2,6 +2,8 @@
 
 Wissens-Baustein für Readings zum Thema körperliche Gesundheit, Energie, Schlaf, Regeneration und PHS.
 
+**Statistik-Werte** (offen/definiert pro Zentrum) verbindlich aus Knowledge `bodygraph-statistics`. PHS-Variable (Verdauung, Wahrnehmung, Umfeld, Motivation) komplett im Knowledge `variable-arrows`. Krisen-Hilfen (psychische Notlagen, Sucht) im Knowledge `crisis-resources`.
+
 ---
 
 ## 1. DIE 9 ZENTREN ALS GESUNDHEITS-LANDKARTE
@@ -39,18 +41,18 @@ Jedes Zentrum hat physische Korrelate. Offene vs. definierte Zentren zeigen, wo 
 - **Offen**: "Ich muss mich beweisen" → kompensierter Willen → Herz-Stress, Magen-Geschwüre
 - **Heilung Offen**: Willen entspannen, Nein sagen dürfen
 
-### G-Zentrum (definiert ~55%)
+### G-Zentrum (definiert ~57%)
 - Physisch: Leber, Blut, Identität/Selbst-Wahrnehmung
 - **Definiert**: Stabile Identität, klare Richtung
 - **Offen**: Identität wird vom Umfeld geprägt. Bei ungesundem Umfeld: Identitäts-Krisen, depressive Phasen
 
-### Kehl-Zentrum (definiert ~70%)
+### Kehl-Zentrum (definiert ~72%)
 - Physisch: Schilddrüse, Hormone, Stimmbänder, Kiefer
 - **Definiert**: Stimm-Stabilität, klare Ausdrucksfähigkeit
 - **Offen**: Schilddrüsen-Empfindlichkeit, Kompensation durch Sprechen, wenn nicht gefragt
 - **Signal**: Stimm-Ermüdung, Kieferknirschen bei offener Kehle unter sozialem Druck
 
-### Ajna (definiert ~50%)
+### Ajna (definiert ~47%)
 - Physisch: Vorderhirn, Hypophyse, kognitive Verarbeitung
 - **Definiert**: Stabiles Denkmuster, feste Überzeugungen
 - **Offen**: Denkflexibilität, aber auch Anfälligkeit für Verwirrung und "Kopfhirnen" bei Überstimulation
@@ -62,47 +64,25 @@ Jedes Zentrum hat physische Korrelate. Offene vs. definierte Zentren zeigen, wo 
 
 ---
 
-## 2. PHS (PRIMARY HEALTH SYSTEM) – DIE 6 DETERMINATIONEN
+## 2. PHS / VARIABLE – Das Detail-System für den Körper
 
-Das PHS beschreibt, **wie** der Körper Nahrung, Umfeld und Energie am besten aufnimmt. Abhängig von der Sonne/Erde-Farbe (Color) zum Geburtszeitpunkt.
+PHS = **Primary Health System** = die 4 Variable-Pfeile am Kopf des Bodygraphs (**Verdauung, Wahrnehmung, Umfeld, Motivation**). Vollständige Beschreibung mit allen 6 Ausprägungen pro Pfeil im zentralen Knowledge-Block `variable-arrows`.
 
-### Die 6 PHS-Modi (High/Low für jedes Feld)
+### Für Gesundheits-Readings besonders wirksam
 
-1. **Appetite** – "Iss, wenn du Hunger hast, nicht nach Plan"
-   - High: Allein essen, im Flow
-   - Low: Mit Vertrauten, entspannter Rahmen
-2. **Thirst** – "Trink vor/während/nach – dann iss"
-   - High: Aktive Situationen, bewegter Rhythmus
-   - Low: Ruhige Situationen, passiver Rahmen
-3. **Touch** – "Berührung ist Nahrung"
-   - High: Viel Körper-Kontakt, Massage, Bewegung
-   - Low: Sanfter Kontakt, Selbst-Berührung
-4. **Taste** – "Geschmack führt"
-   - High: Neue Geschmäcker, Experimentieren
-   - Low: Vertraute Geschmäcker, Routine
-5. **Sound** – "Auditiver Raum zählt"
-   - High: Aktive Klänge, Musik beim Essen
-   - Low: Stille, Reduktion akustischer Reize
-6. **Light** – "Licht formt"
-   - High: Helles, direktes Licht
-   - Low: Gedämpftes Licht, Schatten
+- **Verdauung (Determination)** – das WIE des Essens, nicht das WAS. Sechs Ausprägungen:
+  - Aufeinanderfolgend (Consecutive), Geschlossener/Offener Geschmack, Heiß und Kalt, Ruhiges Nervensystem (Calm Nervous), Hoher/Tiefer Klang, Direktes/Indirektes Licht.
+  - Beispiel: Ein "Ruhiges-Nervensystem"-Mensch verdaut deutlich besser ohne TV/Stress am Tisch – als chronische Symptom-Quelle oft unterschätzt.
 
-**Wichtig**: PHS gilt für alle Lebensbereiche – nicht nur Essen. Ein "Touch-High"-Mensch braucht auch in der Arbeitsumgebung mehr physischen Kontakt als ein "Sound-Low".
+- **Umfeld (Environment)** – wo der Körper aufblüht. Sechs Ausprägungen:
+  - Höhlen, Märkte, Küchen, Berge, Täler, Ufer (jeweils inneres oder äußeres).
+  - Falsches Umfeld über längere Zeit = chronische Unruhe und körperliche Symptome. Umfeld-Wechsel ist oft transformierender als jede Therapie.
 
----
+- **Wahrnehmung (Cognition)** – welcher Sinn primär Wahrheit filtert: Geruch, Geschmack, Äußere/Innere Vision, Gefühl, Berührung. Bestimmt mit, wie der Körper Stress oder Heilung registriert.
 
-## 3. ENVIRONMENT (aus PHS-Linie abgeleitet)
+- **Motivation** – innere Antriebs-Energie (Furcht, Hoffnung, Verlangen, Bedürfnis, Schuld, Unschuld). Aus welcher Energie heraus jemand handelt – körperliche Folge unterschätzter Stress-Quelle.
 
-Wo ein Mensch sich körperlich wohl fühlt. Die 6 Environments:
-
-1. **Caves** – geschlossene, kleine Räume
-2. **Markets** – lebendige, viele-Menschen-Räume
-3. **Kitchens** – Herd-/Versorgungs-Räume
-4. **Mountains** – Weite, Überblick, Höhe
-5. **Valleys** – niedrige, geborgene Orte
-6. **Shores** – Grenz-/Wasser-Räume
-
-Ungeeignetes Environment über längere Zeit = chronische Unruhe, körperliche Symptome.
+**Coach-Hinweis:** Die Verdauungs-Variable ist 7-Jahres-Experiment – Wirkung baut sich langsam auf. Klient soll 1–3 Monate ausprobieren, nicht sofort beurteilen. Variable-Empfehlungen nur geben, wenn der Klient bereits stabil in Strategie + Autorität lebt – sonst Überforderung.
 
 ---
 
@@ -168,24 +148,26 @@ Sorge für andere kann die eigene Gesundheit opfern. Heilung: fürsorglich sein 
 
 ---
 
-## 7. DESIGN CRYSTAL vs. PERSONALITY CRYSTAL
+## 7. PERSÖNLICHKEIT vs. DESIGN – die zwei Seiten des Charts
 
-Zwei "Bewusstseins-Kristalle": Personality (Mental) und Design (Körperlich).
-- **Personality** (schwarze Linie im Chart): was der Mensch bewusst denkt/identifiziert
-- **Design** (rote Linie): wie der Körper reagiert, unabhängig vom Bewussten
+Im Bodygraph stehen zwei Spalten:
+- **Persönlichkeit** (schwarze Aktivierungen): das **bewusste** Erleben – wie sich der Mensch selbst wahrnimmt, was er von sich denkt
+- **Design** (rote Aktivierungen): das **körperlich-unbewusste** Geschehen – wie der Körper reagiert, ohne dass der Verstand es steuert
 
-Für Gesundheit ist das Design entscheidend – der Körper weiß, was er braucht, auch wenn der Kopf etwas anderes will. Typische Konflikte:
-- Personality will Marathon, Design braucht Yoga
-- Personality will vegan essen, Design braucht tierische Fette
-- Personality will Großstadt, Design braucht Berge
+Für Gesundheit ist die Design-Seite besonders relevant – der Körper trägt Wahrheiten, die das bewusste Selbst oft überstimmt. Typische Konflikte:
+- Persönlichkeit will Marathon, Design braucht ruhige Bewegung
+- Persönlichkeit will vegan, Design braucht tierische Fette
+- Persönlichkeit will Großstadt, Design braucht Berge oder Meer
 
 **Coach-Frage**: "Was sagt dein Körper, wenn der Kopf kurz still ist?"
+
+(Wer tiefer in die HD-spezifische "Crystal"-Lehre einsteigen möchte – Persönlichkeits-Kristall vs. Design-Kristall als Bewusstseins-Träger nach Ra Uru Hu – kann das im Coaching ausführen; im Reading nur erwähnen, wenn der Klient esoterisch offen ist.)
 
 ---
 
 ## 8. BEWEGUNG PRO TYP
 
-- **Generator**: Sattig gemachte Bewegung (bis Erschöpfung), hoher Intensitäts-Bereich ok
+- **Generator**: Vollständig ausschöpfende Bewegung (bis zur Sakral-Erschöpfung), hoher Intensitäts-Bereich ok
 - **Mani-Generator**: Variierte, multi-modale Bewegung – nicht ein Sport, sondern drei parallel
 - **Projektor**: Moderate, gelenk-schonende Bewegung, keine Hochintensitäts-Marathons
 - **Manifestor**: Initiierende Bewegung (Kampfsport, Kraft), dann Ruhephasen
@@ -195,16 +177,18 @@ Für Gesundheit ist das Design entscheidend – der Körper weiß, was er brauch
 
 ## 9. ERNÄHRUNG IM HD-KONTEXT
 
-HD gibt keine pauschalen Ernährungs-Regeln – aber die PHS-Determination beeinflusst:
+HD gibt **keine pauschalen Ernährungs-Regeln** – HD ist kein Diät-System. Die Verdauungs-Variable beschreibt nicht WAS gegessen wird, sondern WIE der Körper am besten aufnimmt:
 
-- **Appetite** → intuitives Essen, kein Essensplan
-- **Thirst** → Trinken als Rhythmusgeber
-- **Touch** → Zubereitung mit Händen (Brot, Teig), Textur-Erlebnis
-- **Taste** → vielfältige Geschmäcker, Experimentieren
-- **Sound** → Musik/Stille beim Essen variiert
-- **Light** → Tageslicht beim Essen, keine künstlichen Räume
+- **Aufeinanderfolgend**: nicht mischen, eine Sache nach der anderen
+- **Geschlossener/Offener Geschmack**: salzig vs. süß bewusst trennen, Geschmack als Leiter
+- **Heiß und Kalt**: Temperatur entscheidend, nie lauwarm
+- **Ruhiges Nervensystem**: kein Stress, keine Reize beim Essen, keine Diskussionen, kein TV
+- **Hoher / Tiefer Klang**: Klangumgebung beim Essen kritisch
+- **Direktes / Indirektes Licht**: Lichtsituation beeinflusst Verdauung
 
-**Environment zählt genauso**: allein oder mit, drinnen oder draußen, laut oder still.
+Volle Erklärung im Knowledge `variable-arrows`.
+
+**Umfeld zählt genauso**: allein oder in Gesellschaft, drinnen oder draußen, laut oder still – das ist meist wichtiger als der Inhalt des Tellers.
 
 ---
 
@@ -223,5 +207,10 @@ HD gibt keine pauschalen Ernährungs-Regeln – aber die PHS-Determination beein
 
 - HD ist **kein medizinischer Rat**. Bei Symptomen immer medizinische Abklärung empfehlen.
 - HD kann Muster aufzeigen, aber nicht diagnostizieren oder behandeln.
-- Bei psychischen Krisen: immer an Fachpersonen verweisen.
 - PHS-Empfehlungen sind Anhaltspunkte, keine Dogmen – der Körper ist der Endrichter.
+
+**Bei psychischen Krisen, Erschöpfungsdepression, Burn-out, Sucht-Themen oder akuter Suizidalität immer eine konkrete Stelle nennen** (vollständige DACH-Liste im Knowledge-Block `crisis-resources`):
+- Telefonseelsorge: **0800 111 0 111** (DE) / **142** (AT) / **143** (CH) – kostenlos, anonym, 24/7
+- Bei akuter Suizidalität / medizinischem Notfall: **112**
+- Sucht-Hotline (DE): **01806 313031**
+- Sozialpsychiatrischer Krisendienst regional über Hausarzt oder 116 117

@@ -1,6 +1,13 @@
 # Human Design – Trauma, Konditionierung & Integration
 
-Wissens-Baustein für Readings mit Trauma-Bezug. **Hinweis für Coaches:** HD kann Muster sichtbar machen, ersetzt aber keine Trauma-Therapie. Bei akutem Trauma/Krise immer an qualifizierte Fachpersonen (Somatic Experiencing, IFS, EMDR, Traumatherapie) verweisen.
+Wissens-Baustein für Readings mit Trauma-Bezug.
+
+**WICHTIG für jedes Reading mit Trauma-Bezug:**
+- HD kann Muster sichtbar machen, ersetzt aber **keine Trauma-Therapie**.
+- Bei akutem Trauma oder Krise: **immer** an qualifizierte Fachpersonen verweisen (Somatic Experiencing, IFS, EMDR, klassische Traumatherapie).
+- Krisen-Hotlines (DACH komplett) sind im zentralen Knowledge-Block `crisis-resources` hinterlegt. Im Reading bei akuter Belastung **immer** mindestens eine thematisch passende Stelle nennen (Telefonseelsorge, Hilfetelefon Sexueller Missbrauch, Gewalt gegen Frauen, etc.).
+- **Nie** Re-Traumatisierung durch zu tiefes Nachfragen ohne therapeutische Begleitung.
+- Statistik-Werte (offen/definiert pro Zentrum) verbindlich aus Knowledge `bodygraph-statistics`.
 
 ---
 
@@ -103,9 +110,9 @@ Jedes offene Zentrum hat ein typisches Not-Self-Muster, das unter Trauma verstä
 
 ---
 
-## 4. TRAUMA-GATES & IHRE SCHATTEN
+## 4. GATES, DIE IN TRAUMA-PROZESSEN HÄUFIG AUFTAUCHEN
 
-Bestimmte Gates tragen spezifische Trauma-Resonanzen. Aktive Gates sind **nicht** Trauma – aber offen für bestimmte Schatten-Muster.
+**Wichtig:** Die folgenden Gates sind **keine Trauma-Indikatoren**. Sie tragen Themen (Krise, Kampf, Isolation), die in Trauma-Prozessen häufig sichtbar werden. Ein aktives Gate 36 bedeutet **nicht**, dass die Person Trauma hat – sondern, dass das Thema "Krise" in ihrem Lebensmuster eine Rolle spielt. Im Reading bitte nicht pathologisieren.
 
 ### Gate 36 – "Krise"
 - Schatten: Chronisches Drama-Suchen, um Krisen-Erfahrung zu wiederholen
@@ -159,7 +166,11 @@ Die Milz ist das "überlebens-Zentrum" – prähistorisch das, was vor Gefahr wa
 Praktische Arbeit:
 - Das "Ja/Nein"-Gefühl im Körper wiederfinden
 - Sicherheitssignale etablieren
-- Polyvagal-Arbeit integrieren (Dorsal-, Sympathetisch-, Ventral-Vagus)
+- Polyvagal-Arbeit integrieren – die drei autonomen Zustände nach Stephen Porges:
+  1. **Ventral-Vagal**: sicher, sozial verbunden (jüngster Zweig, Säugetier-Reaktion) – das Ziel-Plateau der Heilung
+  2. **Sympathikus**: Kampf-/Flucht-Mobilisierung (mittlere Schicht)
+  3. **Dorsal-Vagal**: Shutdown, Freeze, Dissoziation (ältester Zweig)
+  Bei Trauma-Reaktion wechselt das Nervensystem in die ältere Schicht (Sympathikus oder Dorsal); Heilungsarbeit zielt auf bewusste Rückkehr in den ventralen Zustand.
 
 ---
 
@@ -176,7 +187,7 @@ Trauma beeinflusst die Aura-Dynamik:
 
 ---
 
-## 8. INTEGRATION: DER WEG ZUR WIEDERGEBURT
+## 8. INTEGRATION: DER WEG ZURÜCK INS LEBEN
 
 Nach intensiver Trauma-Arbeit (parallel zu HD) entwickelt sich oft:
 
@@ -208,8 +219,4 @@ Nach intensiver Trauma-Arbeit (parallel zu HD) entwickelt sich oft:
 - **Immer** Einverständnis zum Tiefgang einholen.
 - **Immer** bei Suizidalität / akuter Gewalt / Substanz-Notlagen: Fachperson / Krisendienst.
 
-Krisendienst in Deutschland:
-- Telefonseelsorge 0800 111 0 111 (ev.) / 0800 111 0 222 (kath.)
-- Nummer gegen Kummer (Kinder/Jugendliche): 116 111
-- Hilfetelefon Gewalt gegen Frauen: 08000 116 016
-- Bei akuter Suizidalität: 112 oder nächste Notaufnahme
+**Krisenhilfen DACH-vollständig:** siehe zentralen Knowledge-Block `crisis-resources` (DE/AT/CH, allgemeine Krise + spezialisierte Stellen für Missbrauch, Gewalt, Schwangerschaft, Schulden, Sucht). Im Reading bei Trauma-Bezug die thematisch passende Stelle (Telefonseelsorge, Hilfetelefon Sex. Missbrauch 0800 22 55 530, Gewalt-gegen-Frauen 08000 116 016, Männer-Hilfetelefon 0800 123 99 00, AT 142, CH 143) explizit nennen.

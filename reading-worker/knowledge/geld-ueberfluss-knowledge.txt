@@ -2,6 +2,8 @@
 
 Wissens-Baustein für Readings zum Thema finanzieller Fluss, Wertempfinden, Manifestation und Selbst-Ermächtigung.
 
+**Statistik-Werte** (Typen-Verteilung, offen/definiert pro Zentrum) verbindlich aus Knowledge `bodygraph-statistics`. PHS-Variable im Knowledge `variable-arrows`. Hilfen bei Schulden- oder Existenzkrise im Knowledge `crisis-resources`.
+
 ---
 
 ## 1. DIE FUNDAMENTE DES ÜBERFLUSS-THEMAS IN HD
@@ -77,14 +79,16 @@ Welche Werte werden bewahrt und weitergegeben? Zentral für Family-Business und 
 
 ## 4. VERDIENEN PRO TYP
 
-### Generator (70% der Menschen)
+### Generator (klassisch, ca. 37%)
 - Geld kommt durch **vollständiges Eintauchen** in eine Aufgabe, die auf Sakral-Ebene stimmt
 - Falle: Jobs annehmen, auf die das Sakral nicht antwortet → Frustration → Geld stagniert
-- Strategie im Business: **Antworten, nicht initiieren**. Warten, bis eine Einladung/Anfrage kommt, dann sakral prüfen: "Uhh (Ja)" oder "Unnh (Nein)"
-- **Generator-Business**: Dienstleistung, Handwerk, Ausbildung – alles mit Wiederholung und Mastery
+- Strategie im Business: **Antworten, nicht initiieren**. Warten, bis eine Einladung/Anfrage kommt, dann sakral prüfen: "Ahuh (Ja)" oder "Unhun (Nein)"
+- **Generator-Business**: Dienstleistung, Handwerk, Ausbildung – alles mit Wiederholung und Meisterschaft
 
-### Manifestierender Generator
-- Multi-passion: mehrere Einkommensströme gleichzeitig
+(Klassischer Generator + Manifestierender Generator = zusammen ca. 70% der Bevölkerung; beide haben definiertes Sakral)
+
+### Manifestierender Generator (ca. 33%)
+- Mehrere Leidenschaften / Einkommensströme gleichzeitig
 - Nicht linear, sondern parallel
 - Falle: Zu früh aufgeben, bevor eine Idee reift
 - Strategie: Antworten + Informieren
@@ -96,16 +100,16 @@ Welche Werte werden bewahrt und weitergegeben? Zentral für Family-Business und 
 - Stunden-Abrechnung ist oft falsch; Projektoren sollten nach **Wissen/Transformation** abrechnen, nicht nach Zeit
 - Hohes Honorar für wenige Kunden statt niedriges für viele
 
-### Manifestor (9%)
+### Manifestor (ca. 8–9%)
 - Geld kommt durch **Initiieren** neuer Projekte/Unternehmen
 - Falle: Nicht zu informieren → Widerstand → Wut → Start wird sabotiert
-- **Manifestor-Business**: Gründer-Rolle, disruption, Produkte lancieren
+- **Manifestor-Business**: Gründer-Rolle, Umbrüche, Produkte lancieren
 - Braucht oft nach Gründungs-Phasen Rückzug – Isolations-Gate
 
-### Reflektor (<1%)
+### Reflektor (ca. 1%)
 - Geld kommt durch **Spiegeln der Gesundheit eines Systems**
 - Falle: Zu lange in einem ungesunden Unternehmen
-- **Reflektor-Business**: Evaluator, Kritiker, "Kanarienvogel-im-Kohlengruben"-Rolle in Organisationen
+- **Reflektor-Business**: Evaluator, Kritiker, "Kanarienvogel-im-Kohlebergwerk"-Rolle in Organisationen
 - Entscheidungen zu Job/Unternehmen über einen Mondzyklus treffen
 
 ---
@@ -133,14 +137,14 @@ Welche Werte werden bewahrt und weitergegeben? Zentral für Family-Business und 
 - Der Wille selbst ist der Kompass, nicht der Verstand
 - Braucht definiertes Herz-Zentrum
 
-### Selbst-Projiziert (selten, nur G-definiert + offenes Sakral + offenes Herz + offene Milz)
+### Selbst-Projizierte Autorität (selten, nur Projektoren mit definiertem G und allen Motor-Zentren undefiniert: Sakral, Herz, Solar Plexus, Wurzel)
 - Entscheidungen kommen durch **lautes Aussprechen** und Hören der eigenen Stimme
-- "Was sage ich, wenn ich darüber rede?" ist der Kompass
+- "Was sage ich, wenn ich darüber rede?" ist der Kompass – die Stimme selbst, nicht ein Gesprächspartner, ist die Autorität
 
-### Mental-Autorität (Projektoren, offene Autorität)
-- Mit vertrauten Menschen im richtigen Umfeld sprechen
-- Die Entscheidung entsteht im Dialog, nicht allein
-- Gefährlich: einsame Entscheidungen unter Druck
+### Mentale "Autorität" / Sound Boarding (Projektoren ohne innere Autorität)
+- Streng genommen **keine Autorität im klassischen Sinne** (Mental-Projektoren haben keine fest verankerte innere Autorität)
+- Entscheidungen entstehen durch lautes Sprechen mit vertrauten Menschen im richtigen Umfeld – die anderen sind Resonanz-Spiegel, nicht Berater
+- Gefährlich: einsame Entscheidungen unter Druck. Auch: dem Gegenüber nicht die Entscheidung überlassen, sondern nur die eigene Klarheit beim Sprechen wahrnehmen
 
 ### Mondzyklus (Reflektoren)
 - Jede Entscheidung über 28 Tage tragen
@@ -152,13 +156,15 @@ Welche Werte werden bewahrt und weitergegeben? Zentral für Family-Business und 
 
 Das Inkarnationskreuz gibt die "Lebens-Rolle". Einige Beispiele mit starkem Geld-Bezug:
 
-- **Cross of Planning** (25/46 + 58/52) – organisiert Ressourcen langfristig
-- **Cross of the Four Ways** (24/44 + 19/33) – erkennt Muster und zieht daraus Strategien
-- **Cross of the Sphinx** (1/2 + 7/13) – visionäre Führungsrolle
-- **Cross of Service** (16/9 + 63/64) – Dienst als Beruf; Expertise aufbauen
-- **Cross of Eden** (15/10 + 17/18) – ordnendes Element; QA, Kuratoren
+- **Kreuz der Planung** (25/46 + 58/52) – organisiert Ressourcen langfristig
+- **Kreuz der vier Wege** (24/44 + 19/33) – erkennt Muster und zieht daraus Strategien
+- **Kreuz der Sphinx** (1/2 + 7/13) – visionäre Führungsrolle
+- **Kreuz des Dienens** (16/9 + 63/64) – Dienst als Beruf; Expertise aufbauen
+- **Kreuz von Eden** (15/10 + 17/18) – ordnendes Element; Qualitätskontrolle, Kuratoren
 
-**Coach-Hinweis**: Inkarnationskreuz ist die „Lebens-Bahn" – nicht der Job-Titel. Ein Projektor-IC "Sphinx" kann als Lehrer, Berater, Strategin, Schriftsteller arbeiten – alle führen die Rolle aus.
+**Coach-Hinweis**: Inkarnationskreuz-Namen und ihre Gate-Zuordnungen sind in HD strikt kodiert. Vor Reading-Verwendung das konkrete Kreuz über eine offizielle HD-Quelle (Jovian Archive, MyBodyGraph) abgleichen. Das Kreuz ist die "Lebens-Bahn" – nicht der Job-Titel. Ein Projektor mit dem Sphinx-Kreuz kann als Lehrer, Berater, Strategin, Schriftsteller arbeiten – alle führen die Rolle aus.
+
+**Hinweis Lücke:** In dieser Sammlung fehlen noch die klassischen Geld-Schlüsselkanäle **Kanal 2-14 ("Pulsschlag" / Beat – Schlüssel-Geld-Strom)** und **Kanal 29-46 ("Entdeckung" / Discovery – Erfolgs-Hingabe)**. Bei Bedarf im Reading aus klassischer HD-Quelle nachtragen.
 
 ---
 
@@ -242,5 +248,11 @@ Wenn diese Punkte klar sind, folgen Ressourcen natürlich. „Manifestation" in 
 
 - HD ersetzt **keine Finanzberatung**, keine Steuer-/Rechtsberatung.
 - HD erklärt Muster, garantiert aber kein Einkommen.
-- Bei Schulden / Existenzkrisen: qualifizierte Schuldnerberatung empfehlen.
-- Bei unternehmerischer Planung: HD als Ergänzung zu sinnvollen Tools (Business-Plan, Buchhaltung, Beratung).
+- Bei unternehmerischer Planung: HD als Ergänzung zu sinnvollen Werkzeugen (Geschäftsplan, Buchhaltung, professionelle Beratung).
+
+**Bei Schulden, drohender Insolvenz oder Existenzkrise immer qualifizierte Schuldnerberatung empfehlen** (vollständige Liste im Knowledge-Block `crisis-resources`):
+- **Deutschland**: Caritas, Diakonie, AWO – kostenlose Schuldnerberatung regional über `forum-schuldnerberatung.de` oder die örtliche Verbraucherzentrale
+- **Österreich**: schuldenberatung.at
+- **Schweiz**: schulden.ch
+
+Bei zusätzlicher psychischer Belastung durch finanziellen Druck: Telefonseelsorge **0800 111 0 111** (DE) / **142** (AT) / **143** (CH).

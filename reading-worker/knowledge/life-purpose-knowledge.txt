@@ -26,23 +26,25 @@ Das Inkarnationskreuz setzt sich aus 4 Gates zusammen:
 - **Design Sun** (was mein Körper natürlich tut)
 - **Design Earth** (worauf mein Körper sich natürlich stützt)
 
-Das ergibt ca. 192 einzigartige Inkarnationskreuze. Drei Haupt-Typen:
+Es gibt insgesamt **192 Inkarnationskreuze** (16 Hexagramme × 4 Quartale × 3 Winkel). Drei Haupt-Typen (Verteilung verbindlich aus Knowledge `bodygraph-statistics`):
 
-### Right-Angle Crosses (ca. 60% der Menschen)
-- Persönliche Inkarnation – der Fokus liegt auf dem Selbst
+### Right-Angle-Kreuze (ca. 70% der Menschen)
+- Persönliche Bestimmung – persönliche Inkarnation, Fokus liegt auf dem eigenen Lebensweg
 - "Ich lebe meine Geschichte"
 
-### Juxtaposition Crosses (ca. 5%)
-- Fixierte Inkarnation – spezifische, feste Rolle
+### Juxtaposition-Kreuze (ca. 5%)
+- Festes Schicksal – spezifische, feste Rolle, einzelne Lektion
 - "Ich verkörpere genau diese Position"
 
-### Left-Angle Crosses (ca. 35%)
-- Transpersonale Inkarnation – Fokus liegt außerhalb des Selbst, auf Beziehungen
+### Left-Angle-Kreuze (ca. 25%)
+- Überpersönliche Bestimmung – Fokus liegt außerhalb des Selbst, ineinander verwoben mit anderen
 - "Ich lebe andere / ich lebe durch andere"
 
 ---
 
 ## 3. BEISPIELE MARKANTER INKARNATIONSKREUZE
+
+**Coach-Hinweis:** Inkarnationskreuz-Namen und ihre Gate-Zuordnungen sind in HD strikt kodiert. Die folgenden Beispiele dienen als typische Muster – vor Reading-Verwendung das konkrete Cross über eine offizielle HD-Quelle (Jovian Archive, MyBodyGraph) abgleichen, weil Klient und HD-Coach direkt nachprüfen.
 
 ### Cross of the Sphinx (1/2 + 7/13)
 - Right-Angle
@@ -108,10 +110,10 @@ Das Profil (z.B. 5/1, 6/3) beschreibt die **Persönlichkeits-Architektur** und w
 - Lebens-Aufgabe: Über Freundschaft/Netzwerk wirken – Einladungen sind zentral
 - Braucht stabile soziale Strukturen
 
-### Profil 5 – Der Häretiker / Universelle
-- Wird projiziert, von anderen gesehen als "Lösung"
-- Lebens-Aufgabe: Praktische Antworten für andere, aber mit Respekt vor Projektion
-- Muss aufpassen, nicht von fremden Erwartungen gefangen zu werden
+### Profil 5 – Der Häretiker
+- Wird projiziert, von anderen gesehen als "Lösung" (klassische Aura-Reaktion auf 5er)
+- Lebens-Aufgabe: Praktische, universal anwendbare Antworten für andere bereitstellen, dabei mit Projektionen umgehen
+- Muss aufpassen, nicht von fremden Erwartungen oder Idealisierungen gefangen zu werden – und auch nicht vor Enttäuschung anderer zu fliehen, wenn die Lösung nicht passt
 
 ### Profil 6 – Der Rollenvorbild
 - Lebt drei Phasen:
@@ -204,8 +206,12 @@ Bei einem Lebenszweck-Reading:
 3. **Inkarnationskreuz**: Was ist die thematische Lebens-Rolle?
 4. **Personality Sun**: Was ist die bewusste Kern-Energie?
 5. **Design Sun**: Was drückt der Körper aus?
-6. **Definition**: Wie kohärent oder brücken-suchend?
-7. **Definierte Zentren/Kanäle**: Welche "Instrumente" sind fest da?
+6. **Nordknoten / Südknoten** (Knoten der Mondbahn): Umfeld-Färbung des Lebensweges – **Südknoten** = die Färbung der ersten Lebenshälfte (bis ca. 38–42), **Nordknoten** = die Färbung der zweiten Lebenshälfte. Der Wechsel um den Kiron-Return (ca. 50) markiert oft den Übergang vom "Was war" zum "Wohin"
+7. **Definition**: Wie kohärent oder brücken-suchend?
+8. **Definierte Zentren/Kanäle**: Welche "Instrumente" sind fest da?
+9. **Variable / PHS** (siehe Knowledge `variable-arrows`): Verdauung + Wahrnehmung + Umfeld + Motivation als Detailebene des Lebenswegs – relevant erst nach stabilem Strategie/Autorität-Experiment
+
+**Profil↔Typ-Verbindung:** Ein 3/5-Generator lebt anders als ein 3/5-Projektor. Profil ist nicht typ-unabhängig – immer in Kombination lesen.
 
 ---
 

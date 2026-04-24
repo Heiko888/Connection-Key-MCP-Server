@@ -1,4 +1,4 @@
-# Human Design — Shadow Work & Not-Self-Integration
+# Human Design – Shadow Work & Not-Self-Integration
 
 Wissens-Baustein für Shadow-Work-Readings: Konditionierungsmuster erkennen, Schatten-Aspekte beleuchten, Nicht-Selbst-Themen transformieren.
 
@@ -6,11 +6,11 @@ Wissens-Baustein für Shadow-Work-Readings: Konditionierungsmuster erkennen, Sch
 
 ## 1. WAS "SHADOW" IN HD BEDEUTET
 
-Der "Schatten" in Human Design ist das **Nicht-Selbst** — alles, was ein Mensch aus Konditionierung tut, glaubt, fühlt, anstatt seinem authentischen Design zu folgen.
+Der "Schatten" in Human Design ist das **Nicht-Selbst** – alles, was ein Mensch aus Konditionierung tut, glaubt, fühlt, anstatt seinem authentischen Design zu folgen.
 
 **Zwei Quellen des Schattens:**
-1. **Offene Zentren** — Orte, an denen fremde Energie die eigene überlagert
-2. **Unter-Linien der aktivierten Gates** — jede Hexagramm-Linie hat eine "niedrige" und eine "hohe" Ausdrucks-Form; unter Druck/Konditionierung zeigt sich die niedrige
+1. **Offene Zentren** – Orte, an denen fremde Energie die eigene überlagert
+2. **Unter-Linien der aktivierten Gates** – jede Hexagramm-Linie hat eine "niedrige" und eine "hohe" Ausdrucks-Form; unter Druck/Konditionierung zeigt sich die niedrige
 
 ---
 
@@ -18,31 +18,31 @@ Der "Schatten" in Human Design ist das **Nicht-Selbst** — alles, was ein Mensc
 
 Jeder Typ hat ein charakteristisches Emotions-Signal, das anzeigt, dass er im Not-Self lebt.
 
-### Generator — Frustration
+### Generator – Frustration
 - Kernfrage: "Warum läuft nichts?"
 - Quelle: Handelt, ohne auf Sakral-Antwort zu warten
 - Symptom: Chronische Frustration, Job-Wechsel-Schleifen, Gefühl "festzuhängen"
 - Transformation: Sakral-Antwort wieder ernst nehmen. Jedes "Ja" aus dem Körper, jedes "Nein" aus dem Körper. Frustration weicht der Befriedigung.
 
-### Mani-Generator — Frustration + Wut
+### Mani-Generator – Frustration + Wut
 - Kernfrage: "Warum bin ich immer gestoppt?"
 - Quelle: Springt ohne Antwort, wird dann unterbrochen
 - Symptom: Vielbeschäftigt aber nie fertig, Ungeduld mit anderen, impulsives Abbrechen
 - Transformation: Antworten + Informieren. Multi-passion mit Atempausen.
 
-### Projektor — Bitterkeit
+### Projektor – Bitterkeit
 - Kernfrage: "Warum sieht mich niemand?"
 - Quelle: Initiiert ohne Einladung, versucht wie Generator zu arbeiten
 - Symptom: Erschöpfung nach Arbeit, die keinen Respekt bringt; innerer Rückzug, bitterer Ton
 - Transformation: Auf Einladung warten. Eigenen Wert kennen, auch ohne Anerkennung zu jagen. Ruhe als Kraft.
 
-### Manifestor — Wut
+### Manifestor – Wut
 - Kernfrage: "Warum muss ich immer alles selbst machen und bin dann allein?"
 - Quelle: Handelt ohne zu informieren, erntet Widerstand
 - Symptom: Wut (unterdrückt oder eruptiv), Einsamkeit, Kontroll-Verlust in Beziehungen
 - Transformation: Informieren vor Handeln. Autorität authentisch leben. Wut weicht Frieden.
 
-### Reflektor — Enttäuschung
+### Reflektor – Enttäuschung
 - Kernfrage: "Warum sind alle so flach/verlogen?"
 - Quelle: Schnelle Entscheidungen, ohne Mondzyklus abzuwarten
 - Symptom: Chronische Enttäuschung über Menschen und Systeme, Gefühl der Einsamkeit
@@ -52,7 +52,7 @@ Jeder Typ hat ein charakteristisches Emotions-Signal, das anzeigt, dass er im No
 
 ## 3. OFFENE ZENTREN ALS SCHATTEN-LANDKARTE
 
-Jedes offene Zentrum hat eine "Universal Lie" — eine Glaubenssatz-Konditionierung, die der Mensch tendenziell übernimmt.
+Jedes offene Zentrum hat eine "Universal Lie" – eine Glaubenssatz-Konditionierung, die der Mensch tendenziell übernimmt.
 
 ### Offener Kopf
 - **Universal Lie**: "Ich muss fremde Fragen beantworten / verstehen"
@@ -67,12 +67,12 @@ Jedes offene Zentrum hat eine "Universal Lie" — eine Glaubenssatz-Konditionier
 ### Offene Kehle
 - **Universal Lie**: "Ich muss reden, um wahrgenommen zu werden"
 - Schatten: Unterbrechen, Vielreden, Worte ohne Resonanz
-- Integration: Warten, bis gefragt — dann auf den Punkt
+- Integration: Warten, bis gefragt – dann auf den Punkt
 
 ### Offenes G-Zentrum
 - **Universal Lie**: "Ich muss wissen, wer ich bin / wohin ich gehe"
 - Schatten: Identitäts-Jagd, Partner als Identitäts-Anker
-- Integration: Identität wandert mit dem Umfeld — das ist eine Fähigkeit, kein Mangel
+- Integration: Identität wandert mit dem Umfeld – das ist eine Fähigkeit, kein Mangel
 
 ### Offenes Herz/Ego
 - **Universal Lie**: "Ich muss mich beweisen / es immer schaffen"
@@ -87,17 +87,17 @@ Jedes offene Zentrum hat eine "Universal Lie" — eine Glaubenssatz-Konditionier
 ### Offenes Solar Plexus
 - **Universal Lie**: "Ich muss Konflikt vermeiden / emotional ruhig bleiben"
 - Schatten: Peaceful-Keeper, vermeidet schwere Themen, somatisiert
-- Integration: Emotionen als Weisheit, auch wenn sie fremde sind — bewusst durchlassen
+- Integration: Emotionen als Weisheit, auch wenn sie fremde sind – bewusst durchlassen
 
 ### Offene Wurzel
 - **Universal Lie**: "Ich muss fertig werden / Druck durchhalten"
 - Schatten: Chronischer Druck-Aufbau, Überforderung, Nebennieren-Erschöpfung
-- Integration: Druck kommt von außen — ich kann wählen, wie sehr er mich berührt
+- Integration: Druck kommt von außen – ich kann wählen, wie sehr er mich berührt
 
 ### Offenes Sakral
 - **Universal Lie**: "Ich sollte weiter können / ich muss nicht aufhören"
 - Schatten: Erschöpfung bis zum Burnout, Körper-Missachtung
-- Integration: Ich höre auf, wenn mein Körper aufhört — nicht später
+- Integration: Ich höre auf, wenn mein Körper aufhört – nicht später
 
 ---
 
@@ -105,43 +105,43 @@ Jedes offene Zentrum hat eine "Universal Lie" — eine Glaubenssatz-Konditionier
 
 Jedes Gate hat einen Schatten und eine Transzendenz. Einige besonders wichtige für Shadow Work:
 
-### Gate 1 — Schatten der Selbst-Ausdrucks-Gewalt
+### Gate 1 – Schatten der Selbst-Ausdrucks-Gewalt
 Schatten: Über-Exhibition, "Ich bin wichtig" als Verdrängung
 Transzendenz: Kreative Authentizität ohne Zuschauerabhängigkeit
 
-### Gate 2 — Schatten der Richtungslosigkeit
+### Gate 2 – Schatten der Richtungslosigkeit
 Schatten: "Ich weiß nicht, was ich will"
 Transzendenz: Rezeptivität als Führung
 
-### Gate 27 — Schatten der Selbst-Opferung
+### Gate 27 – Schatten der Selbst-Opferung
 Schatten: Für andere sorgen, bis man selbst zusammenbricht
 Transzendenz: Fürsorge, die Selbst-Fürsorge einschließt
 
-### Gate 30 — Schatten des chronischen Verlangens
+### Gate 30 – Schatten des chronischen Verlangens
 Schatten: Nichts ist je genug, immer das Nächste jagen
 Transzendenz: Verlangen als Lebensfunke, ohne Sucht
 
-### Gate 40 — Schatten der kalten Isolation
+### Gate 40 – Schatten der kalten Isolation
 Schatten: Rückzug als Strafe, nicht Regeneration
 Transzendenz: Alleinsein als Kraftquelle
 
-### Gate 47 — Schatten des mentalen Gefangen-Seins
+### Gate 47 – Schatten des mentalen Gefangen-Seins
 Schatten: Denken in Kreisen, keinen Durchbruch finden
 Transzendenz: Geduld mit Ungelöstem
 
-### Gate 54 — Schatten der Aufstiegs-Sucht
+### Gate 54 – Schatten der Aufstiegs-Sucht
 Schatten: Immer weiter, immer höher, nie ankommen
 Transzendenz: Ambition mit Wurzeln
 
-### Gate 55 — Schatten der Stimmungs-Gefangenschaft
+### Gate 55 – Schatten der Stimmungs-Gefangenschaft
 Schatten: Emotionale Wellen als Identität übernehmen
 Transzendenz: Freiheit in der Welle
 
-### Gate 58 — Schatten der unechten Lebensfreude
+### Gate 58 – Schatten der unechten Lebensfreude
 Schatten: Positivitäts-Zwang, erzwungene Fröhlichkeit
 Transzendenz: Vitalität als echter Zustand
 
-### Gate 64 — Schatten der Verwirrung
+### Gate 64 – Schatten der Verwirrung
 Schatten: Chronische Unklarheit, überwältigendes Nicht-Wissen
 Transzendenz: Nicht-Wissen als kreatives Feld
 
@@ -149,14 +149,14 @@ Transzendenz: Nicht-Wissen als kreatives Feld
 
 ## 5. DAS KONZEPT DER 3 SCHATTEN-EBENEN
 
-### Ebene 1 — Persönlicher Schatten
+### Ebene 1 – Persönlicher Schatten
 Was in der eigenen Biografie passiert ist und im Körper/Psyche gespeichert wurde.
 
-### Ebene 2 — Familien-/Kulturschatten
-Was durch Gate 50 (Werte) und Gate 37 (Freundschaft/Verträge) vererbt wurde — Familien-Muster, kulturelle Konditionierung.
+### Ebene 2 – Familien-/Kulturschatten
+Was durch Gate 50 (Werte) und Gate 37 (Freundschaft/Verträge) vererbt wurde – Familien-Muster, kulturelle Konditionierung.
 
-### Ebene 3 — Kollektiver Schatten
-Die Quadranten (Initiation, Civilization, Duality, Mutation) tragen jeweils kollektive Schatten — Muster, die eine ganze Menschheits-Phase prägen.
+### Ebene 3 – Kollektiver Schatten
+Die Quadranten (Initiation, Civilization, Duality, Mutation) tragen jeweils kollektive Schatten – Muster, die eine ganze Menschheits-Phase prägen.
 
 ---
 
@@ -203,7 +203,7 @@ Nach dem Bewusst-Experimentieren mit der eigenen Strategie/Autorität beginnt ei
 ## 8. SHADOW-WORK-PRAXIS IN DER SESSION
 
 ### Schritt 1: Benennen ohne werten
-"Das Offene-Herz-Muster — ich möchte mich beweisen — ist da. Nicht falsch. Nur ein Muster."
+"Das Offene-Herz-Muster – ich möchte mich beweisen – ist da. Nicht falsch. Nur ein Muster."
 
 ### Schritt 2: Lokalisieren
 Wo im Körper spürt sich das an? Welches Zentrum ist aktiv? Welches offene Zentrum nimmt auf?
@@ -223,7 +223,7 @@ Was ist das **Gift** statt des Schattens? Wie sieht authentische Ausdrucksform a
 
 - **Body-Scan**: Wo im Körper ist der Schatten spürbar?
 - **Aura-Check**: Wer ist gerade in meiner Aura? Wessen Welle reite ich?
-- **Strategy-Prüfung**: Antworte ich, warte ich, informiere ich — oder kompensiere ich?
+- **Strategy-Prüfung**: Antworte ich, warte ich, informiere ich – oder kompensiere ich?
 - **Autorität-Prüfung**: Komme ich aus dem Körper, dem Verstand oder dem fremden Druck?
 - **Gene-Keys-Kontemplation**: Welcher Key zeigt sich gerade? Wo im Zyklus Shadow/Gift/Siddhi bin ich?
 
@@ -234,5 +234,5 @@ Was ist das **Gift** statt des Schattens? Wie sieht authentische Ausdrucksform a
 - Shadow Work berührt oft tiefere Trauma-Schichten → siehe trauma-knowledge.txt
 - Bei akuter Retraumatisierung: Fachperson einschalten
 - Shadow Work im Coaching: Musterarbeit, nicht Therapie
-- **Nie** den Schatten als "falsch" werten — er ist Lebens-Material
+- **Nie** den Schatten als "falsch" werten – er ist Lebens-Material
 - **Immer** auf Stabilisierung achten: das Gute, die Gifts, die Ressourcen sind genauso wichtig wie die Schatten

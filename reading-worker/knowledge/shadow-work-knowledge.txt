@@ -1,6 +1,8 @@
-# Human Design – Shadow Work & Not-Self-Integration
+# Human Design – Schattenarbeit & Nicht-Selbst-Integration
 
-Wissens-Baustein für Shadow-Work-Readings: Konditionierungsmuster erkennen, Schatten-Aspekte beleuchten, Nicht-Selbst-Themen transformieren.
+Wissens-Baustein für Schattenarbeit-Readings: Konditionierungsmuster erkennen, Schatten-Aspekte beleuchten, Nicht-Selbst-Themen transformieren.
+
+**Statistik-Werte** (offen/definiert pro Zentrum) verbindlich aus Knowledge `bodygraph-statistics`. PHS-Variable im Knowledge `variable-arrows`. Krisen-Hilfen (bei akuter Re-Traumatisierung, Suizidalität) im Knowledge `crisis-resources`.
 
 ---
 
@@ -52,50 +54,50 @@ Jeder Typ hat ein charakteristisches Emotions-Signal, das anzeigt, dass er im No
 
 ## 3. OFFENE ZENTREN ALS SCHATTEN-LANDKARTE
 
-Jedes offene Zentrum hat eine "Universal Lie" – eine Glaubenssatz-Konditionierung, die der Mensch tendenziell übernimmt.
+Jedes offene Zentrum hat eine "Universelle Lüge" – eine Glaubenssatz-Konditionierung, die der Mensch tendenziell übernimmt.
 
 ### Offener Kopf
-- **Universal Lie**: "Ich muss fremde Fragen beantworten / verstehen"
+- **Universelle Lüge**: "Ich muss fremde Fragen beantworten / verstehen"
 - Schatten: Kopfzerbrechen über Dinge, die einen gar nicht betreffen
 - Integration: "Inspirierend ist nur, was ich selbst spüren will"
 
 ### Offene Ajna
-- **Universal Lie**: "Ich muss sicher sein / immer eine Meinung haben"
+- **Universelle Lüge**: "Ich muss sicher sein / immer eine Meinung haben"
 - Schatten: Vortäuschen von Gewissheit, Über-Intellektualisieren
 - Integration: "Offenheit ist Weisheit, nicht Mangel"
 
 ### Offene Kehle
-- **Universal Lie**: "Ich muss reden, um wahrgenommen zu werden"
+- **Universelle Lüge**: "Ich muss reden, um wahrgenommen zu werden"
 - Schatten: Unterbrechen, Vielreden, Worte ohne Resonanz
 - Integration: Warten, bis gefragt – dann auf den Punkt
 
 ### Offenes G-Zentrum
-- **Universal Lie**: "Ich muss wissen, wer ich bin / wohin ich gehe"
+- **Universelle Lüge**: "Ich muss wissen, wer ich bin / wohin ich gehe"
 - Schatten: Identitäts-Jagd, Partner als Identitäts-Anker
 - Integration: Identität wandert mit dem Umfeld – das ist eine Fähigkeit, kein Mangel
 
 ### Offenes Herz/Ego
-- **Universal Lie**: "Ich muss mich beweisen / es immer schaffen"
+- **Universelle Lüge**: "Ich muss mich beweisen / es immer schaffen"
 - Schatten: Überversprechen, chronischer Leistungsdruck, Selbstwert-Abhängigkeit
 - Integration: "Mein Wert ist nicht an meine Leistung gekoppelt"
 
 ### Offene Milz
-- **Universal Lie**: "Ich muss an dem festhalten, was mir vertraut ist"
+- **Universelle Lüge**: "Ich muss an dem festhalten, was mir vertraut ist"
 - Schatten: Klammern an Beziehungen/Jobs, die schaden; Gesundheits-Angst
 - Integration: "Was nicht mehr gesund ist, darf gehen"
 
 ### Offenes Solar Plexus
-- **Universal Lie**: "Ich muss Konflikt vermeiden / emotional ruhig bleiben"
+- **Universelle Lüge**: "Ich muss Konflikt vermeiden / emotional ruhig bleiben"
 - Schatten: Peaceful-Keeper, vermeidet schwere Themen, somatisiert
 - Integration: Emotionen als Weisheit, auch wenn sie fremde sind – bewusst durchlassen
 
 ### Offene Wurzel
-- **Universal Lie**: "Ich muss fertig werden / Druck durchhalten"
+- **Universelle Lüge**: "Ich muss fertig werden / Druck durchhalten"
 - Schatten: Chronischer Druck-Aufbau, Überforderung, Nebennieren-Erschöpfung
 - Integration: Druck kommt von außen – ich kann wählen, wie sehr er mich berührt
 
 ### Offenes Sakral
-- **Universal Lie**: "Ich sollte weiter können / ich muss nicht aufhören"
+- **Universelle Lüge**: "Ich sollte weiter können / ich muss nicht aufhören"
 - Schatten: Erschöpfung bis zum Burnout, Körper-Missachtung
 - Integration: Ich höre auf, wenn mein Körper aufhört – nicht später
 
@@ -156,47 +158,46 @@ Was in der eigenen Biografie passiert ist und im Körper/Psyche gespeichert wurd
 Was durch Gate 50 (Werte) und Gate 37 (Freundschaft/Verträge) vererbt wurde – Familien-Muster, kulturelle Konditionierung.
 
 ### Ebene 3 – Kollektiver Schatten
-Die Quadranten (Initiation, Civilization, Duality, Mutation) tragen jeweils kollektive Schatten – Muster, die eine ganze Menschheits-Phase prägen.
+Die vier **Quadranten** des Bodygraphs (jeweils 16 Gates, also ein Viertel der 64 Hexagramme) tragen kollektive Themen:
+- **Quadrant der Initiation** (Gates des Aufbruchs, Beginnens) – Schatten: Stagnation, Angst vor dem Neuen
+- **Quadrant der Zivilisation** (Form, Struktur, Gemeinschaft) – Schatten: Erstarrung in Konvention
+- **Quadrant der Dualität** (Beziehung, Polarität, Spiegel) – Schatten: Verstrickung, Co-Abhängigkeit
+- **Quadrant der Mutation** (Wandel, Durchbruch, Transformation) – Schatten: Chaos, Verlust des Bodens
+
+Welche Gates eines Klienten in welchem Quadranten liegen, zeigt, an welchen kollektiven Schatten-Themen er besonders mitarbeitet.
 
 ---
 
 ## 6. DIE "GENE KEYS"-PERSPEKTIVE (ERGÄNZUNG)
 
-Richard Rudd's Weiterentwicklung teilt jedes Gate in **Shadow / Gift / Siddhi**:
-- **Shadow**: Unter Druck, aus Angst
-- **Gift**: Im Fluss, aus Mut
-- **Siddhi**: In Gnade, aus Liebe
+Richard Rudds Weiterentwicklung teilt jedes Gate in drei Schwingungs-Frequenzen (englische Originalbegriffe sind in der Gene-Keys-Welt Standard):
+
+- **Shadow** (Schatten): unter Druck, aus Angst
+- **Gift** (Geschenk): im Fluss, aus Mut
+- **Siddhi** (höchste Verwirklichung): in Gnade, aus Liebe
 
 Beispiel Gate 30:
-- Shadow: Verlangen / Sucht
-- Gift: Leichtigkeit
-- Siddhi: Rapture
+- Shadow: Desire / Verlangen, Sucht
+- Gift: Lightness / Leichtigkeit
+- Siddhi: Rapture / Verzückung
 
-Bei Shadow Work kann die Gene-Keys-Perspektive helfen: der Schatten ist nicht zu bekämpfen, sondern zu verstehen als der Roh-Stoff, aus dem das Gift und die Siddhi wachsen.
+Bei Schattenarbeit kann die Gene-Keys-Perspektive helfen: der Schatten ist nicht zu bekämpfen, sondern als der Roh-Stoff zu verstehen, aus dem Gift und Siddhi wachsen.
+
+**Hinweis zur Konsistenz**: Die Gate-Schatten in Section 4 oben sind in **klassischer HD-Lesart** formuliert (nicht Gene Keys). In einem einzelnen Reading nicht zwischen den Systemen springen – entweder klassische HD-Sprache oder Gene-Keys-Sprache wählen, je nachdem, wozu der Klient mehr Resonanz hat.
 
 ---
 
-## 7. DECONDITIONING-PROZESS (7 JAHRE)
+## 7. DEKONDITIONIERUNG – DER 7-JAHRES-RAHMEN
 
-Nach dem Bewusst-Experimentieren mit der eigenen Strategie/Autorität beginnt ein ca. 7-jähriger Prozess:
+Nach dem bewussten Experimentieren mit der eigenen Strategie/Autorität beschreibt Ra Uru Hu einen ungefähr 7-jährigen Prozess der Dekonditionierung. **Wichtig: 7 Jahre sind eine Orientierung, keine starre Phasen-Struktur**. Manche Menschen brauchen länger, manche kürzer; nicht jeder durchläuft die Stationen in derselben Reihenfolge.
 
-### Jahr 1–2: Erste Klarheit
-- Erste "Ja/Nein"-Impulse aus dem Körper werden hörbar
-- Starke Umwälzungen in Beziehungen und Jobs
+Typische Bewegungen, die in diesem Zeitraum auftauchen können:
 
-### Jahr 3–4: Tiefer Entzug
-- Körperliche Symptome können intensivieren (Offene Zentren "entgiften")
-- Identitätskrisen
+- **Frühe Phase**: Erste "Ja/Nein"-Impulse aus dem Körper werden hörbar. Beziehungen und Arbeit fangen an, sich neu zu sortieren.
+- **Mittlere Phase**: Körperliche Symptome können intensivieren – die offenen Zentren "entgiften" alte Konditionierung. Identitätskrisen sind möglich.
+- **Reifere Phase**: Neue Muster festigen sich. Der Körper folgt zunehmend seiner eigenen Weisheit. Strategie und Autorität fühlen sich nicht mehr wie Übung, sondern wie Natur an.
 
-### Jahr 5–6: Integration
-- Neue Muster festigen sich
-- Beziehungen und Arbeit fügen sich anders
-
-### Jahr 7: Neu-Geburt
-- Der Mensch lebt zunehmend authentisch
-- Der Körper hat gelernt, seiner eigenen Weisheit zu folgen
-
-**Coach-Hinweis**: Shadow Work im HD-Rahmen ist ein **Lebensprozess**, keine Session.
+**Coach-Hinweis**: Schattenarbeit im HD-Rahmen ist ein **Lebensprozess**, keine Session. Den 7-Jahres-Rahmen im Reading nicht als starres Schema verkaufen, sondern als grobe zeitliche Größenordnung.
 
 ---
 
@@ -221,18 +222,22 @@ Was ist das **Gift** statt des Schattens? Wie sieht authentische Ausdrucksform a
 
 ## 9. WERKZEUGE FÜR DEN COACH
 
-- **Body-Scan**: Wo im Körper ist der Schatten spürbar?
-- **Aura-Check**: Wer ist gerade in meiner Aura? Wessen Welle reite ich?
-- **Strategy-Prüfung**: Antworte ich, warte ich, informiere ich – oder kompensiere ich?
-- **Autorität-Prüfung**: Komme ich aus dem Körper, dem Verstand oder dem fremden Druck?
-- **Gene-Keys-Kontemplation**: Welcher Key zeigt sich gerade? Wo im Zyklus Shadow/Gift/Siddhi bin ich?
+- **Körper-Scan**: Wo im Körper ist der Schatten spürbar?
+- **Aura-Prüfung**: Wer ist gerade in meiner Aura? Wessen Welle reite ich?
+- **Strategie-Prüfung**: Antworte ich, warte ich, informiere ich – oder kompensiere ich?
+- **Autoritäts-Prüfung**: Komme ich aus dem Körper, dem Verstand oder aus fremdem Druck?
+- **Gene-Keys-Kontemplation**: Welcher Key zeigt sich gerade? Wo im Zyklus Schatten / Geschenk / Siddhi bin ich?
 
 ---
 
 ## 10. GRENZEN DES READINGS
 
-- Shadow Work berührt oft tiefere Trauma-Schichten → siehe trauma-knowledge.txt
-- Bei akuter Retraumatisierung: Fachperson einschalten
-- Shadow Work im Coaching: Musterarbeit, nicht Therapie
+- Schattenarbeit berührt oft tiefere Trauma-Schichten → siehe Knowledge `trauma-knowledge`
+- Bei akuter Re-Traumatisierung: Fachperson einschalten (Somatic Experiencing, IFS, Trauma-Therapie)
+- Schattenarbeit im Coaching: Musterarbeit, nicht Therapie
 - **Nie** den Schatten als "falsch" werten – er ist Lebens-Material
-- **Immer** auf Stabilisierung achten: das Gute, die Gifts, die Ressourcen sind genauso wichtig wie die Schatten
+- **Immer** auf Stabilisierung achten: das Gute, die Geschenke (Gifts), die Ressourcen sind genauso wichtig wie die Schatten
+
+**Bei akuter Krise oder Suizidalität, die in der Schattenarbeit aufbrechen kann, immer eine konkrete Stelle nennen** (vollständige DACH-Liste im Knowledge-Block `crisis-resources`):
+- Telefonseelsorge: **0800 111 0 111** (DE) / **142** (AT) / **143** (CH) – kostenlos, anonym, 24/7
+- Bei akuter Suizidalität / medizinischem Notfall: **112**

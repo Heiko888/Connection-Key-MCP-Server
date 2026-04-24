@@ -2,6 +2,8 @@
 
 Wissens-Baustein für Readings und Coaching-Sessions mit Reflexions-Fokus: Tiefe Fragen stellen, innere Prozesse begleiten, Erkenntnisse vertiefen.
 
+**Statistik-Werte** (offen/definiert pro Zentrum) verbindlich aus Knowledge `bodygraph-statistics`. PHS-Variable im Knowledge `variable-arrows`. Hilfen bei akuter Krise oder Re-Traumatisierung im Knowledge `crisis-resources`.
+
 ---
 
 ## 1. GRUNDHALTUNG: REFLEXION IN HD
@@ -24,7 +26,7 @@ Reflexions-Arbeit im HD-Rahmen ist **keine Antwort-Vermittlung**, sondern ein Sp
 
 ### Sakrale Autorität – "Körperantwort"
 - Im Moment, aus dem Bauch
-- Fragen direkt: "Uhh oder Unnh? Gib mir die erste Reaktion."
+- Fragen direkt: "Ahuh oder Unhun? Gib mir die erste Reaktion."
 - **Übung**: Liste von 10 Optionen vorlesen, Körper antworten lassen – ohne Kopf
 
 ### Milz-Autorität – "Erster Impuls"
@@ -37,15 +39,17 @@ Reflexions-Arbeit im HD-Rahmen ist **keine Antwort-Vermittlung**, sondern ein Sp
 - Braucht Mut zur eigenen Lust
 - **Übung**: Tägliches "Ich will..."-Schreiben, 5 Minuten, ungefiltert
 
-### Selbst-Projiziert – "Laut aussprechen"
-- Entscheidungen werden durchs Hören der eigenen Stimme klar
+### Selbst-Projizierte Autorität – "Laut aussprechen"
+(Nur Projektoren mit definiertem G-Zentrum und allen Motor-Zentren undefiniert: Sakral, Herz, Solar Plexus, Wurzel)
+- Entscheidungen werden durchs Hören der eigenen Stimme klar – nicht durch Dialog mit anderen
 - Fragen: "Sprich laut, als würdest du es jemandem erzählen. Was sagst du?"
-- **Übung**: Voice-Memo aufnehmen, dann zurückhören
+- **Übung**: Sprach-Notiz aufnehmen, dann zurückhören – die eigene Stimme als Spiegel
 
-### Mental-Autorität (Projektoren) – "Dialog-Weisheit"
-- Entscheidungen brauchen vertraute Gesprächspartner
-- Fragen: "Mit wem würdest du das besprechen? Sprich mit ihnen, nicht mir."
-- **Übung**: 3 vertraute Menschen nacheinander konsultieren, dann integrieren
+### Mentale "Autorität" / Sound Boarding (nur Projektoren ohne innere Autorität)
+(Streng genommen keine Autorität im klassischen Sinne. Die anderen sind Resonanz-Spiegel, nicht Berater.)
+- Entscheidungen entstehen, indem im richtigen Umfeld mit vertrauten Menschen laut gesprochen wird
+- Fragen: "Mit wem würdest du das besprechen? Sprich mit ihnen, achte auf deine eigene Klarheit beim Sprechen."
+- **Übung**: 3 vertraute Menschen nacheinander konsultieren – Klarheit kommt aus dem Hören der eigenen Worte, nicht aus deren Antworten
 
 ### Mondzyklus (Reflektoren) – "28-Tage-Bogen"
 - Keine Entscheidung vor dem vollen Mondzyklus
@@ -145,48 +149,67 @@ Reflexions-Arbeit im HD-Rahmen ist **keine Antwort-Vermittlung**, sondern ein Sp
 - "Welche Projektion trägst du aktuell – und welchen Teil davon willst du abgeben?"
 - "Wo bist du 'die Lösung' – und wo ist das zu viel?"
 
-### Profil 6 – Roof-Reflexion (je nach Phase)
+### Profil 6 – Rollenvorbild-Reflexion (je nach Phase)
 - Jahr 0–30: "Welche Erfahrung sammelst du gerade – was lehrt sie dich?"
-- Jahr 30–50: "Bist du bereit, eine Weile vom Dach zu beobachten?"
+- Jahr 30–50: "Bist du bereit, eine Weile vom Dach aus zu beobachten?"
 - Jahr 50+: "Welche Weisheit willst du jetzt teilen?"
 
 ---
 
 ## 6. JOURNAL-PRAKTIKEN IM HD-RAHMEN
 
-### Daily Sakral Journal (für Generatoren)
-- Morgens: "Was ist heute da, worauf ich Uhh antworten könnte?"
+### Sakral-Tagebuch (für Generatoren / Mani-Generatoren)
+- Morgens: "Was ist heute da, worauf ich Ahuh antworten könnte?"
 - Abends: "Worauf habe ich Ja geantwortet – und war das wirklich ein Ja?"
 
-### Wave-Journal (für Emotionale Autorität)
-- 3x täglich 1 Satz zur aktuellen Welle
+### Wellen-Tagebuch (für Emotionale Autorität)
+- 3× täglich 1 Satz zur aktuellen Welle
 - Am Ende der Woche: Wellen-Muster erkennen
 
-### Moon-Cycle-Journal (für Reflektoren)
+### Mondzyklus-Tagebuch (für Reflektoren)
 - Neumond: Intention festhalten
 - Erstes Viertel: Wie fühlt sich das?
 - Vollmond: Was ist sichtbar?
 - Letztes Viertel: Was lässt du los?
 
-### Aura-Check (für alle)
+### Aura-Prüfung (für alle)
 - "Wer war heute in meiner Aura – und welche Energie habe ich mitgenommen?"
 - "Was ist mein, was ist aufgenommen?"
 
+### Stille-Praxis (für alle, besonders bei vielen offenen Zentren)
+- 10–20 Minuten allein, ohne Reize, ohne Gegenüber – nur der eigene Körper
+- Frage: "Was bleibt von mir, wenn niemand und nichts gerade da ist?"
+- Besonders heilsam, wenn die offenen Zentren über den Tag stark eingefärbt wurden
+
+### Bodygraph-Kontemplation
+- Den eigenen Bodygraph 5–10 Minuten ruhig betrachten
+- Auf ein Zentrum, einen Kanal oder ein Gate sinken lassen
+- "Wie fühlt sich diese Aktivierung in meinem Leben gerade an?"
+- Über Wochen mit verschiedenen Elementen wiederholen – langsame Verkörperung
+
+### Transit-Reflexion
+- Aktuelle Transite (z.B. Tagesimpuls oder Mondphase) mit dem eigenen Erleben abgleichen
+- "Welches Gate / welcher Kanal ist aktuell aktiv im Transit – und wo zeigt sich das in meinem Tag?"
+
 ---
 
-## 7. DIE 3 SPHÄREN DER REFLEXION
+## 7. DIE 3 EBENEN DER REFLEXION
 
-### Sphäre 1 – Tagesrhythmus
+### Ebene 1 – Tagesrhythmus
 - Strategie + Autorität jeden Tag prüfen
 - Was kam als Antwort, was aus dem Kopf?
 
-### Sphäre 2 – Lebensphase
+### Ebene 2 – Lebensphase
 - Profil-spezifische Phase aktuell
 - Ausrichtungs-Reflexion zum Inkarnationskreuz
 
-### Sphäre 3 – Kollektive Resonanz
-- Quadranten-Bewusstsein (Initiation/Civilization/Duality/Mutation)
-- Welche kollektive Welle beeinflusst aktuell?
+### Ebene 3 – Kollektive Resonanz
+- Bewusstsein für die kollektiven Themen, in denen die eigenen Gates stehen (siehe Quartale: Initiation, Zivilisation, Dualität, Mutation – Details im Knowledge `shadow-work-knowledge`)
+- Welche kollektive Welle (Transite, Zeitgeist, gemeinsame Mutationen) beeinflusst gerade?
+
+### Ebene 4 – Beziehungs-Resonanz
+- Connection-Chart-Reflexion: Wo überlappen sich mein und ein anderer Bodygraph? Welche Kanäle entstehen, wenn wir zusammen sind?
+- Frage: "Mit wem fühle ich mich als ich – und mit wem als jemand anderes?"
 
 ---
 
@@ -270,6 +293,10 @@ G-Zentrum. Frage: "Welches Extrem lebst du gerade?"
 ## 12. GRENZEN DES REFLEXIONS-COACHINGS
 
 - Reflexion ersetzt keine Therapie bei akuten Themen
-- Bei traumatischer Re-Erinnerung: Stabilisierung vor Tiefe, Fachperson empfehlen
+- Bei traumatischer Re-Erinnerung: Stabilisierung vor Tiefe, Fachperson empfehlen (Somatic Experiencing, IFS, Trauma-Therapie – siehe Knowledge `trauma-knowledge`)
 - Bei Sinn-Krisen: Logotherapie, existenzielle Beratung ergänzend
 - **Immer**: Die Weisheit liegt im Klienten. Der Coach ist Mitläufer, nicht Führer.
+
+**Bei akuter Krise oder Suizidalität, die im Reflexions-Prozess aufbrechen kann, sofort eine konkrete Stelle nennen** (vollständige DACH-Liste im Knowledge-Block `crisis-resources`):
+- Telefonseelsorge: **0800 111 0 111** (DE) / **142** (AT) / **143** (CH) – kostenlos, anonym, 24/7
+- Bei akuter Suizidalität / medizinischem Notfall: **112**

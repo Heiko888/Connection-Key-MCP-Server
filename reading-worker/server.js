@@ -5542,10 +5542,10 @@ function escHtmlGlobal(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Montags 08:00 UTC (10:00 CEST): Transit-Ausblick + Business-Tipp + Video-Konzept
-scheduleDailyAt(8, 0, postWeeklyTransitOutlook);
-// scheduleDailyAt(8, 15, postWeeklyBusinessTip);   // deaktiviert (User-Wunsch 2026-04-27)
-// scheduleDailyAt(8, 30, postWeeklyVideoConcept);  // deaktiviert (User-Wunsch 2026-04-27)
+// Montags 08:00 UTC (10:00 CEST): Transit-Ausblick + Business-Tipp + Video-Konzept — alle deaktiviert (User-Wunsch 2026-04-27)
+// scheduleDailyAt(8, 0, postWeeklyTransitOutlook);
+// scheduleDailyAt(8, 15, postWeeklyBusinessTip);
+// scheduleDailyAt(8, 30, postWeeklyVideoConcept);
 
 // Manuelle Trigger
 app.post('/api/channel/post-transit-ausblick', async (req, res) => {

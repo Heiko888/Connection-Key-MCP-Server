@@ -5153,6 +5153,66 @@ async function postChannelHDWissen({ dryRun = false } = {}) {
   }
 }
 
+/**
+ * Postet täglich um 21:00 CEST eine ruhige Abend-Reflexion mit einer Frage zum Tagesabschluss.
+ */
+async function postChannelAbendReflexion({ dryRun = false } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`🌙 [Channel] Generiere Abend-Reflexion${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    const transit = await loadTodayTransit();
+    const today_de = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const sunGate = transit?.sun?.gate || '?';
+    const sunLine = transit?.sun?.line || '?';
+    const moonGate = transit?.moon?.gate || '?';
+    const moonLine = transit?.moon?.line || '?';
+
+    const templateText = templates['channel-abend-reflexion'] || '';
+    const filledTemplate = templateText
+      .replace(/\{\{date\}\}/g, today_de)
+      .replace(/\{\{sunGate\}\}/g, sunGate).replace(/\{\{sunLine\}\}/g, sunLine)
+      .replace(/\{\{sunGateName\}\}/g, '')
+      .replace(/\{\{moonGate\}\}/g, moonGate).replace(/\{\{moonLine\}\}/g, moonLine)
+      .replace(/\{\{#moonPhase\}\}[\s\S]*?\{\{\/moonPhase\}\}/g, transit?.moonPhase ? `Mondphase: ${transit.moonPhase}` : '');
+
+    const prompt = `${filledTemplate}\n\nErstelle jetzt die Abend-Reflexion für heute (${today_de}).`;
+    const text = await generateWithClaude(prompt, { maxTokens: 600, temperature: 0.85 });
+
+    let row = null;
+    if (supabasePublic) {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabasePublic.from('channel_posts').insert({
+        date: today,
+        type: 'abend-reflexion',
+        topic: 'Tagesabschluss',
+        telegram_text: text.trim(),
+        instagram_caption: '',
+        telegram_sent: !dryRun,
+        sent_at: dryRun ? null : new Date().toISOString(),
+        status: dryRun ? 'draft' : 'published',
+        created_at: new Date().toISOString(),
+      }).select().single();
+      row = data;
+    }
+
+    if (!dryRun) {
+      const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const header = `🌙 <b>Abend-Reflexion — ${escHtml(today_de)}</b>\n\n`;
+      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
+      console.log(`🌙 [Channel] Abend-Reflexion gepostet (${text.length} Zeichen)`);
+      sendMattermost(`🌙 **Abend-Reflexion gepostet**\n${text.trim().substring(0, 200)}...`, 'channel');
+    } else {
+      console.log(`📝 [Channel] Abend-Reflexion-Entwurf erstellt (${text.length} Zeichen)`);
+    }
+    return row;
+  } catch (err) {
+    console.error('[Channel] Abend-Reflexion Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Abend-Reflexion-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
+
 // Kanal-Tagesimpuls täglich 07:00 UTC (09:00 CEST)
 scheduleDailyAt(7, 0, postChannelTagesimpuls);
 
@@ -5161,6 +5221,24 @@ scheduleDailyAt(10, 0, postChannelBeziehung);
 
 // HD-Wissen Mo–Fr 15:00 UTC (17:00 CEST) — Funktion prüft intern ob Werktag
 scheduleDailyAt(15, 0, postChannelHDWissen);
+
+// Abend-Reflexion täglich 19:00 UTC (21:00 CEST)
+scheduleDailyAt(19, 0, postChannelAbendReflexion);
+
+// Manueller Trigger für Abend-Reflexion (Coach-UI / curl)
+app.post('/api/channel/post-abend-reflexion', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postChannelAbendReflexion({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Abend-Reflexion gestartet' });
+  postChannelAbendReflexion({ dryRun: false }).catch(e => console.error('[Channel] Abend-Reflexion async:', e.message));
+});
 
 // Manuelle Trigger
 // Wenn body.dryRun === true: Entwurf-Modus — kein Telegram-Versand, nur DB-Save als 'draft'.

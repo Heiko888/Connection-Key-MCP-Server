@@ -5117,10 +5117,10 @@ async function postChannelHDWissen({ dryRun = false } = {}) {
     console.warn('[Channel] TELEGRAM_CHANNEL_ID nicht gesetzt — überspringe');
     return null;
   }
-  // Nur Mo–Fr (1–5) — ausser dryRun (Coach kann jederzeit einen Entwurf bauen)
+  // Nur Sonntag (0) — ausser dryRun (Coach kann jederzeit einen Entwurf bauen)
   const day = new Date().getUTCDay();
-  if (!dryRun && (day === 0 || day === 6)) {
-    console.log(`[Channel] HD-Wissen: kein Post am Wochenende (Wochentag ${day})`);
+  if (!dryRun && day !== 0) {
+    console.log(`[Channel] HD-Wissen: nur sonntags (heute Wochentag ${day})`);
     return null;
   }
   console.log(`📚 [Channel] Generiere HD-Wissen-Post${dryRun ? ' (Entwurf)' : ''}...`);
@@ -5219,7 +5219,7 @@ scheduleDailyAt(7, 0, postChannelTagesimpuls);
 // Beziehung & Resonanz täglich 10:00 UTC (12:00 CEST)
 scheduleDailyAt(10, 0, postChannelBeziehung);
 
-// HD-Wissen Mo–Fr 15:00 UTC (17:00 CEST) — Funktion prüft intern ob Werktag
+// HD-Wissen nur sonntags 15:00 UTC (17:00 CEST) — Funktion prüft intern den Wochentag
 scheduleDailyAt(15, 0, postChannelHDWissen);
 
 // Abend-Reflexion täglich 19:00 UTC (21:00 CEST)

@@ -4922,10 +4922,22 @@ app.get('/api/channel/content', requireAdminAuth, async (req, res) => {
 app.patch('/api/channel/content/:id', requireAdminAuth, async (req, res) => {
   if (!supabasePublic) return res.status(503).json({ error: 'Datenbank nicht verfügbar' });
   const { id } = req.params;
-  const { telegram_text, instagram_caption } = req.body;
+  const { telegram_text, instagram_caption, scheduled_for } = req.body;
   const updates = { edited: true };
   if (telegram_text !== undefined) updates.telegram_text = telegram_text;
   if (instagram_caption !== undefined) updates.instagram_caption = instagram_caption;
+  if (scheduled_for !== undefined) {
+    // Akzeptiert ISO-String oder null (Schedule entfernen)
+    if (scheduled_for === null || scheduled_for === '') {
+      updates.scheduled_for = null;
+    } else {
+      const d = new Date(scheduled_for);
+      if (isNaN(d.getTime())) {
+        return res.status(400).json({ error: 'Ungültiges Datum für scheduled_for' });
+      }
+      updates.scheduled_for = d.toISOString();
+    }
+  }
   const { data, error } = await supabasePublic
     .from('channel_posts').update(updates).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });

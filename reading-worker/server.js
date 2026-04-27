@@ -5216,14 +5216,16 @@ async function postChannelAbendReflexion({ dryRun = false } = {}) {
 // Kanal-Tagesimpuls täglich 07:00 UTC (09:00 CEST)
 scheduleDailyAt(7, 0, postChannelTagesimpuls);
 
-// Beziehung & Resonanz: Mo, Di, Mi, Do, Fr, So → 10:00 UTC (12:00 CEST)
-//                        Sa                    → 18:00 UTC (20:00 CEST)
+// Beziehung & Resonanz: Mo, Di, Mi, Do, So  → 10:00 UTC (12:00 CEST)
+//                        Fr, Sa              → 18:00 UTC (20:00 CEST)
 scheduleDailyAt(10, 0, async () => {
-  if (new Date().getUTCDay() === 6) return; // Sa nicht hier
+  const day = new Date().getUTCDay(); // 0=So, 5=Fr, 6=Sa
+  if (day === 5 || day === 6) return; // Fr + Sa nicht mittags
   return postChannelBeziehung();
 });
 scheduleDailyAt(18, 0, async () => {
-  if (new Date().getUTCDay() !== 6) return; // nur Sa
+  const day = new Date().getUTCDay();
+  if (day !== 5 && day !== 6) return; // nur Fr + Sa
   return postChannelBeziehung();
 });
 

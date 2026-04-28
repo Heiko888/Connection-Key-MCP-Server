@@ -9,6 +9,25 @@ Typ: {{type}}
 Profil: {{profile}}
 Autorität: {{authority}}
 Strategie: {{strategy}}
+Definition: {{definition}}
+
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+  - Persönlichkeitssonne: Tor {{personalitySun}}
+  - Persönlichkeitserde:  Tor {{personalityEarth}}
+  - Design-Sonne:         Tor {{designSun}}
+  - Design-Erde:          Tor {{designEarth}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+
+REGEL — Faktentreue (PFLICHT):
+- Verwende die oben angegebenen Zahlen exakt. Halluziniere keine andere Center-Anzahl, keine andere Channel-Anzahl, keine anderen IC-Tore.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste der aktivierten Tore stehen.
+- Wenn du einen Kanal nennst, muss er in der Channels-Liste stehen.
+- Verwende den korrekten Kanalnamen (z.B. 13-33 = „The Channel of the Prodigal" / „Der Kanal des Zeugen", NICHT „Kanal der Gedanken").
+- Profil → Inkarnationskreuztyp ist deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle; 4/1 → Juxtaposition; 4/6, 5/1, 5/2, 6/2, 6/3 → Left Angle. Verwechsle das nicht.
 
 Schreibe diese Analyse direkt an {{clientName}} gerichtet – als psychologischer Spiegel, nicht als Lehrbuch. Jede Sektion beginnt mit dem Namen {{clientName}}. Keine generischen Erklärungen – konkrete Einblicke in das einzigartige Konditionierungsmuster und Transformationspotenzial dieser Person.
 
@@ -18,9 +37,11 @@ Schreibe diese Analyse direkt an {{clientName}} gerichtet – als psychologische
 
 Offene Zentren sind keine Schwächen – sie sind die Orte, an denen {{clientName}} am stärksten konditioniert wurde und wird. Gleichzeitig tragen sie die tiefste Weisheit.
 
+PFLICHT: {{clientName}} hat genau {{openCentersCount}} offene Zentren ({{openCenters}}). Behandle JEDES dieser Zentren in einem eigenen Unterabschnitt — pauschalisiere nicht in Sammelblöcke. Beginne diese Sektion mit dem Satz „{{clientName}}, du lebst mit {{openCentersCount}} offenen Zentren: {{openCenters}}."
+
 **Analyse der offenen Zentren von {{clientName}}:**
 
-Für jedes offene Zentrum:
+Für jedes der {{openCentersCount}} offenen Zentren:
 
 *Das Konditionierungsfeld:*
 - Welche fremde Energie wird hier aufgenommen und verstärkt?
@@ -106,7 +127,11 @@ Für jede Linie des Profils:
 
 Die definierten Zentren von {{clientName}} sind nicht nur Stärken – sie sind auch Orte möglicher Starrheit und Projektion.
 
-**Für jedes definierte Zentrum:**
+PFLICHT: {{clientName}} hat genau {{definedCentersCount}} definierte Zentren: {{definedCenters}}. Beginne diese Sektion mit dem Satz „{{clientName}}, du trägst {{definedCentersCount}} definierte Zentren konstant in dir: {{definedCenters}}." Behandle anschließend JEDES dieser Zentren in einem eigenen Unterabschnitt.
+
+PFLICHT: Verbinde die definierten Zentren mit den aktivierten Kanälen ({{channelsList}}). Nenne pro Kanal die korrekte Bezeichnung und die beteiligten Tore.
+
+**Für jedes der {{definedCentersCount}} definierten Zentren:**
 
 *Die Licht-Seite:*
 - Die konstante Energie, die {{clientName}} in die Welt bringt
@@ -192,12 +217,21 @@ Das Profil {{profile}} bestimmt nicht nur die Rolle – es bestimmt, wie {{clien
 
 ---
 
-## 7. Die Seele hinter dem Design
+## 7. Die Seele hinter dem Design — Inkarnationskreuz
 
-Jenseits aller Mechaniken ist {{clientName}} eine Seele mit einem spezifischen Beitrag zur Welt.
+Jenseits aller Mechaniken ist {{clientName}} eine Seele mit einem spezifischen Beitrag zur Welt. Das Inkarnationskreuz ist die Lebensaufgabe, die das Profil und die vier solar/erd-Tore zusammen tragen.
+
+PFLICHT: Beginne diese Sektion mit dem Satz „{{clientName}}, dein Inkarnationskreuz ist {{incarnationCrossName}}." Behandle anschließend explizit alle vier IC-Tore und ihren Beitrag zur Lebensaufgabe:
+
+- **Persönlichkeitssonne — Tor {{personalitySun}}:** das bewussteste Thema, der Kern der bewussten Lebensausrichtung.
+- **Persönlichkeitserde — Tor {{personalityEarth}}:** der bewusste Boden, das was {{clientName}} bewusst grundet.
+- **Design-Sonne — Tor {{designSun}}:** das unbewusste, körperlich-getragene Hauptthema.
+- **Design-Erde — Tor {{designEarth}}:** der unbewusste Boden, das was {{clientName}} körperlich verankert.
+
+Verbinde diese vier Tore mit dem Profil {{profile}} und dem konkreten Lebensweg von {{clientName}}. Verwechsle nicht: Tor {{personalitySun}} ist die Persönlichkeits-Sonne (nicht die Design-Sonne); Tor {{designSun}} ist die Design-Sonne (nicht die Persönlichkeits-Sonne).
 
 **Was {{clientName}} in die Welt bringt:**
-- Die einzigartige Kombination aus Typ {{type}}, Profil {{profile}}, Autorität {{authority}} und den aktivierten Kanälen
+- Die einzigartige Kombination aus Typ {{type}}, Profil {{profile}}, Autorität {{authority}}, dem Kreuz {{incarnationCrossName}} und den {{channelsCount}} aktivierten Kanälen ({{channelsList}})
 - Was Menschen in der Welt durch {{clientName}} erfahren können, das sie sonst nirgends finden
 - Die tiefste Stärke, die noch nicht vollständig gesehen wird
 

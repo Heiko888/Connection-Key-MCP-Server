@@ -1490,6 +1490,52 @@ async function generateReading({ agentId, template, userData, chartData }) {
       .replace(/\{\{memberNames\}\}/g, memberNames);
   }
 
+  // Single-Person-Templates: Chart-Fakten als Placeholder injizieren
+  // (greift für depth-analysis, single, parenting, geld-ueberfluss, channel-analysis etc.)
+  if (chartData && !userData.members && !(userData.personA && userData.personB)) {
+    const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
+    const centers = chartData.centers || {};
+    const definedNames = Object.entries(centers).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
+    const openNames = Object.entries(centers).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
+    const channels = (chartData.channels || []);
+    const channelsList = channels.map(c => {
+      const gates = (c.gates || []).join('-');
+      const name = c.name_de || c.name || '';
+      return name ? `${gates} (${name})` : gates;
+    }).filter(Boolean).join(', ') || 'keine';
+    const gates = (chartData.gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
+    const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
+    const icGates = ic.gates || {};
+    const icName = ic.name_de || ic.name || '?';
+    const subs = {
+      clientName: userData.client_name || 'die Person',
+      birthDate: userData.birth_date || userData.birthdate || 'Unbekannt',
+      birthTime: userData.birth_time || userData.birthtime || 'Unbekannt',
+      birthPlace: userData.birth_location || userData.birthplace || 'Unbekannt',
+      type: chartData.type || 'Unbekannt',
+      profile: chartData.profile || '?',
+      authority: chartData.authority || '?',
+      strategy: chartData.strategy || '?',
+      definition: chartData.definition || '?',
+      definedCentersCount: String(definedNames.length),
+      definedCenters: definedNames.join(', ') || '(keine)',
+      openCentersCount: String(openNames.length),
+      openCenters: openNames.join(', ') || '(keine)',
+      channelsCount: String(channels.length),
+      channelsList,
+      gatesCount: String(gates.length),
+      gatesList: gates.sort((a,b) => a-b).join(', ') || '(keine)',
+      incarnationCrossName: icName,
+      personalitySun: String(icGates.personalitySun ?? '?'),
+      personalityEarth: String(icGates.personalityEarth ?? '?'),
+      designSun: String(icGates.designSun ?? '?'),
+      designEarth: String(icGates.designEarth ?? '?'),
+    };
+    for (const [key, val] of Object.entries(subs)) {
+      templateContent = templateContent.split(`{{${key}}}`).join(String(val));
+    }
+  }
+
   const knowledgeText = buildReadingKnowledge(agentId);
 
   // ── Transit-Overlay (für alle nicht-transit-spezifischen Readings) ───────

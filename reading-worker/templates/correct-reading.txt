@@ -44,13 +44,38 @@ Ersetze falsch genannte Tore oder Zentren-Zuordnungen durch die korrekten Werte 
 Passe nur die konkreten Tor-Nummern und Zentren-Namen an, nicht den Beschreibungstext drumherum.
 
 REGEL 5 – INKARNATIONSKREUZ KORRIGIEREN
-Wenn das falsche Kreuz oder falsche Tore beschrieben werden: Ersetze den gesamten Inkarnationskreuz-Abschnitt.
-Die korrekten Werte stehen im chartData-Block unter "SOLAR- UND ERD-GATES":
-  Persönlichkeitssonne = Tor X  ← dieser Wert gehört zur Persönlichkeitssonne, NICHT zur Design-Sonne
-  Persönlichkeitserde  = Tor X  ← dieser Wert gehört zur Persönlichkeitserde
-  Design-Sonne         = Tor X  ← dieser Wert gehört zur Design-Sonne, NICHT zur Persönlichkeitssonne
-  Design-Erde          = Tor X  ← dieser Wert gehört zur Design-Erde
-KRITISCH: Design-Sonne und Persönlichkeitssonne sind VERSCHIEDENE Tore — verwechsle sie nicht.
+Wenn CHECK 4 einen Fehler meldet (falsches Kreuz, falsche Tor-Position, Selbstwiderspruch
+oder Profil-Kreuztyp-Mismatch), wende die passende Korrektur an:
+
+(a) FALSCHE TOR-POSITION ("Tor X als Persönlichkeitssonne", aber chartData sagt PSon = Tor Y):
+    Ersetze die Tor-Nummer durch den korrekten Wert aus chartData.
+    Die 4 IC-Werte stehen im chartData-Block unter "SOLAR- UND ERD-GATES":
+      Persönlichkeitssonne (PSon) = Tor X
+      Persönlichkeitserde  (PErd) = Tor X
+      Design-Sonne         (DSon) = Tor X
+      Design-Erde          (DErd) = Tor X
+    KRITISCH: Diese 4 Werte sind 4 verschiedene Tore — verwechsle sie nicht.
+
+(b) SELBSTWIDERSPRUCH (dasselbe Tor wird in einem Satz/Absatz gleichzeitig zwei
+    IC-Positionen zugeschrieben, z.B. "Tor 37 als Persönlichkeitssonne und
+    Persönlichkeitserde"):
+    Lösche die falsche Position. Behalte nur die Position, die mit chartData
+    übereinstimmt. Der umliegende narrative Inhalt bleibt unverändert.
+
+(c) PROFIL-KREUZTYP-MISMATCH (Reading sagt "Right Angle Cross …" bei Profil 6/3,
+    oder "Left Angle …" bei Profil 1/3 etc.):
+    Verbindliche Tabelle:
+      1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle Cross
+      4/1                          → Juxtaposition Cross
+      4/6, 5/1, 5/2, 6/2, 6/3      → Left Angle Cross
+    Ersetze den Kreuztyp im Text. Wenn der Kreuzname-Block falsch ist
+    ("Right Angle Cross of …" → "Left Angle Cross of …"), übernimm den
+    korrekten Namen aus chartData.incarnationCross.name_de.
+
+(d) IC FEHLT GANZ (CHECK 4 Teil D meldet "Inkarnationskreuz nicht erwähnt"):
+    Ergänze einen knappen Absatz pro Person mit Kreuzname und 1-2 Sätzen zur
+    Lebensaufgabe. Wirf bestehende Sektionen nicht durcheinander.
+
 Behalte Länge und Tiefe des ursprünglichen Abschnitts bei.
 
 REGEL 6 – PRONOMEN KORRIGIEREN
@@ -131,6 +156,22 @@ Whitelist steht:
   Wenn der Satz dadurch leer wird, streiche den Satz.
   Wenn ein Absatz nur aus solchen Erwähnungen besteht, streiche den Absatz.
   Kürzer ist besser als falsch.
+
+REGEL 15 – TOR → ZENTRUM-ZUORDNUNG KORRIGIEREN
+Wenn CHECK 15 ein Tor unter falschem Zentrum meldet:
+  Verschiebe die Tor-Erwähnung in den richtigen Zentrums-Abschnitt, falls dort
+  inhaltlich Platz ist. Wenn nicht: lösche die Tor-Erwähnung an der falschen
+  Stelle und füge sie an einer korrekten Stelle ein (z.B. "Tor 39 in der Wurzel"
+  statt "Tor 39 im Solarplexus").
+  Korrigiere niemals nur das Zentrum-Label im Satz, ohne zu prüfen, ob der
+  Kontext im richtigen Zentrum überhaupt zutrifft.
+
+REGEL 16 – ZENTREN-ANZAHL KORRIGIEREN
+Wenn CHECK 16 eine falsche Anzahl definierter Zentren meldet:
+  Ersetze die Zahl im Text durch den korrekten Wert aus chartData.
+  Prüfe ALLE Vorkommen der Zahlen-Aussage im Reading (Off-by-One ist meist
+  konsistent durchgängig falsch — alle Stellen müssen geändert werden).
+  Beispiel: "sieben definierte Zentren" → "sechs definierte Zentren" überall.
 
 ---
 

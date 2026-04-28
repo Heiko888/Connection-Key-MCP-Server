@@ -3159,6 +3159,31 @@ async function generatePhasenReadingTwoParts({ userData, personAChart, personBCh
 
   // Template aus Memory mit Placeholdern füllen
   let template = templates['phasen-reading'] || '';
+
+  // Hilfsfunktionen — Composite-Kanäle als Text (snake_case-Felder sind die Wahrheit;
+  // camelCase-Aliasse existieren nicht in dynamics, deshalb Fallback nötig).
+  const formatChannelList = (arr) => {
+    if (!Array.isArray(arr) || arr.length === 0) return 'keine';
+    return arr.map(c => (typeof c === 'string' ? c : (c.channel || (c.gate1 && c.gate2 ? `${c.gate1}-${c.gate2}` : '')))).filter(Boolean).join(', ') || 'keine';
+  };
+  const dyn = userData.dynamics || {};
+  const emList            = formatChannelList(dyn.electromagneticChannels || dyn.electromagnetic_channels);
+  const compromiseList    = formatChannelList(dyn.compromiseChannels      || dyn.compromise_channels);
+  const companionshipList = formatChannelList(dyn.companionshipChannels   || dyn.companionship_channels);
+  const parallelList      = formatChannelList(dyn.parallelChannels        || dyn.parallel_channels);
+
+  // Definierte Zentren explizit zählen + benennen, damit das Modell keine
+  // Off-by-One-Fehler macht.
+  const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
+  const summarizeCenters = (chart) => {
+    const c = chart?.centers || {};
+    const def = Object.entries(c).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
+    const open = Object.entries(c).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
+    return { count: def.length, openCount: open.length, defNames: def.join(', ') || '(keine)', openNames: open.join(', ') || '(keine)' };
+  };
+  const sumA = summarizeCenters(personAChart);
+  const sumB = summarizeCenters(personBChart);
+
   const placeholders = {
     personAName: nameA,
     personBName: nameB,
@@ -3173,10 +3198,22 @@ async function generatePhasenReadingTwoParts({ userData, personAChart, personBCh
     relationshipStartDate: userData.relationshipStartDate || '',
     currentDay: String(phaseInfo.currentDay),
     currentPhase: phaseInfo.phaseLabel,
-    electromagneticChannels: (userData.dynamics?.electromagneticChannels || userData.dynamics?.electromagnetic_channels || []).join(', ') || 'keine',
-    dominanceChannels: (userData.dynamics?.dominanceChannels || []).join(', ') || 'keine',
-    companionshipChannels: (userData.dynamics?.companionshipChannels || []).join(', ') || 'keine',
-    compromiseGates: (userData.dynamics?.compromiseGates || []).join(', ') || 'keine',
+    electromagneticChannels: emList,
+    compromiseChannels: compromiseList,
+    companionshipChannels: companionshipList,
+    parallelChannels: parallelList,
+    // Legacy-Aliasse für ältere Templates — gleiche Inhalte, neue Begriffe sind Standard.
+    dominanceChannels: companionshipList,
+    compromiseGates: compromiseList,
+    // Center-Anzahl explizit, gegen Off-by-One-Halluzinationen
+    definedCentersCountA: String(sumA.count),
+    definedCentersCountB: String(sumB.count),
+    definedCentersA: sumA.defNames,
+    definedCentersB: sumB.defNames,
+    openCentersCountA: String(sumA.openCount),
+    openCentersCountB: String(sumB.openCount),
+    openCentersA: sumA.openNames,
+    openCentersB: sumB.openNames,
   };
   for (const [key, val] of Object.entries(placeholders)) {
     template = template.split(`{{${key}}}`).join(String(val));

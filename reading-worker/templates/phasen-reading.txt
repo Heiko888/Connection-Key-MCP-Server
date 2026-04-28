@@ -14,8 +14,23 @@ EINGABEDATEN:
 - Beziehungsstart: {{relationshipStartDate}}
 - Aktueller Tag der Beziehung: Tag {{currentDay}} von 90
 - Aktuelle Phase: {{currentPhase}}
-- Composite-Verbindungen: {{electromagneticChannels}}, {{dominanceChannels}}, {{companionshipChannels}}, {{compromiseGates}}
+- Composite-Verbindungen (verbindlich, mechanisch klassifiziert):
+  - Elektromagnetisch: {{electromagneticChannels}}
+  - Kompromiss:        {{compromiseChannels}}
+  - Companionship:     {{companionshipChannels}}
+  - Parallel:          {{parallelChannels}}
+- {{personAName}}: {{definedCentersCountA}} definierte Zentren ({{definedCentersA}}); {{openCentersCountA}} offene Zentren ({{openCentersA}})
+- {{personBName}}: {{definedCentersCountB}} definierte Zentren ({{definedCentersB}}); {{openCentersCountB}} offene Zentren ({{openCentersB}})
 - Vollständige Charts beider Personen: siehe userMessage
+
+REGEL — Composite-Kategorien strikt:
+- Behandle einen Kanal NUR dann als „elektromagnetisch", wenn er oben unter „Elektromagnetisch" steht.
+- Behandle einen Kanal aus „Companionship" oder „Parallel" NICHT als „eure Goldader", „Connection Key", „Resonanzachse zwischen euch" oder „elektromagnetisches Band". Companionship-Kanäle gehören EINER Person, Parallel-Kanäle existieren bei beiden unabhängig.
+- Behandle einen Kanal aus „Kompromiss" als das, was er ist: eine Person trägt ihn vollständig, die andere hat nur ein Tor — Reibung am partial-Tor, keine Brücke.
+- Wenn ein Bereich „keine" zeigt, erfinde nichts. Schreibe das Reading ohne diese Kategorie.
+
+REGEL — Zentren-Anzahl:
+- Verwende exakt die oben angegebenen Zahlen ({{definedCentersCountA}} für {{personAName}}, {{definedCentersCountB}} für {{personBName}}). Halluziniere keine andere Anzahl.
 
 KERNKONZEPT — DIE DREI PHASEN:
 - Phase 1 (Tag 1–30) — Die Anziehung: Electromagnetic-Verbindungen aktivieren sich, offene Zentren werden vom Partner gefüllt, alles fühlt sich wie Vollständigkeit an. Dies ist Chemie, nicht eure Dynamik.
@@ -55,11 +70,12 @@ Was nach 90 Tagen da ist, ist das Muster der nächsten Jahre — was bedeutet da
 Mindestens 500 Wörter.
 
 ## 5. Eure Composite-Dynamik im Detail
-Tiefenanalyse aller vier Verbindungstypen in eurer Konstellation:
-- Electromagnetic: welche Kanäle, was sie energetisch tragen, wo sie nähren, wo sie überfordern
-- Dominance: welcher Partner dominiert wo, wie das in Konflikten wirkt
-- Companionship: wo seid ihr ähnlich, wo wird es vielleicht zu flach
-- Compromise: welche Gates teilt ihr, welche Themen werden wiederkehren
+Tiefenanalyse aller vier Verbindungstypen in eurer Konstellation. Verwende ausschließlich die oben unter „Composite-Verbindungen" gelisteten Kanäle:
+- **Elektromagnetisch** ({{electromagneticChannels}}): welche Kanäle entstehen NUR durch eure Verbindung, was sie energetisch tragen, wo sie nähren, wo sie überfordern.
+- **Kompromiss** ({{compromiseChannels}}): wer trägt den Kanal vollständig, wer nur ein Tor partial — Reibung am partial-Tor.
+- **Companionship** ({{companionshipChannels}}): welche Kanäle trägt eine Person allein, ohne dass die andere ein Tor davon hat. Diese Energie gehört der tragenden Person, nicht der Verbindung.
+- **Parallel** ({{parallelChannels}}): welche Kanäle haben beide unabhängig — doppelte Stabilität, aber keine Brücke zwischen euch.
+Wenn eine Kategorie „keine" zeigt: nicht erfinden, einfach nicht behandeln.
 Mindestens 600 Wörter.
 
 ## 6. Eure Strategien und Autoritäten im 90-Tage-Rhythmus

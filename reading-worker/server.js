@@ -2434,6 +2434,8 @@ async function pollForJobs() {
           await processChannelAnalysisJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
           await processSexualityJob(job, reading);
+        } else if (readingType === 'phasen-reading') {
+          await processPhasenReadingJob(job, reading);
         } else if (readingType === 'penta' || readingType === 'penta-communication' || readingType === 'penta-basic') {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
@@ -3110,6 +3112,269 @@ async function processConnectionJob(job, reading) {
     .eq("id", job.id);
 
   console.log(`✅ [Connection] Job ${job.id} abgeschlossen (${content?.length} Zeichen, A=${nameA}, B=${nameB})`);
+}
+
+
+// ============================================================================
+// PHASEN-READING — 90-Tage-Phasenanalyse (Anziehung / Reibung / Wahrheit)
+// ============================================================================
+
+// Phasen-Berechnung anhand des Beziehungsstart-Datums
+function calculatePhase(relationshipStartDate) {
+  const start = new Date(relationshipStartDate);
+  if (isNaN(start.getTime())) {
+    throw new Error(`Ungültiges relationshipStartDate: ${relationshipStartDate}`);
+  }
+  const today = new Date();
+  const diffMs = today - start;
+  const currentDay = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
+
+  let currentPhase, phaseLabel;
+  if (currentDay <= 30) {
+    currentPhase = 'phase-1-anziehung';
+    phaseLabel = 'Phase 1 — Die Anziehung (Tag 1–30)';
+  } else if (currentDay <= 60) {
+    currentPhase = 'phase-2-reibung';
+    phaseLabel = 'Phase 2 — Die Reibung (Tag 31–60)';
+  } else if (currentDay <= 90) {
+    currentPhase = 'phase-3-wahrheit';
+    phaseLabel = 'Phase 3 — Die Wahrheit (Tag 61–90)';
+  } else {
+    currentPhase = 'post-90';
+    phaseLabel = `Beziehung läuft seit ${currentDay} Tagen — über die 90-Tage-Phase hinaus (retrospektive Analyse)`;
+  }
+
+  return { currentDay, currentPhase, phaseLabel };
+}
+
+// 2-Pass-Generierung für phasen-reading (analog generateConnectionReadingTwoParts)
+async function generatePhasenReadingTwoParts({ userData, personAChart, personBChart, modelConfig, phaseInfo }) {
+  const knowledgeText = buildReadingKnowledge('connection');
+  const nameA = userData.personA?.name || 'Person A';
+  const nameB = userData.personB?.name || 'Person B';
+
+  const chartAInfo = `${nameA}:\n${buildChartInfo(personAChart)}`;
+  const chartBInfo = `${nameB}:\n${buildChartInfo(personBChart)}`;
+  const compositeBlock = buildTwoPersonCompositeBlock(personAChart, personBChart, nameA, nameB);
+
+  // Template aus Memory mit Placeholdern füllen
+  let template = templates['phasen-reading'] || '';
+  const placeholders = {
+    personAName: nameA,
+    personBName: nameB,
+    typeA: personAChart?.type || 'Unbekannt',
+    typeB: personBChart?.type || 'Unbekannt',
+    strategyA: personAChart?.strategy || '?',
+    strategyB: personBChart?.strategy || '?',
+    authorityA: personAChart?.authority || '?',
+    authorityB: personBChart?.authority || '?',
+    profileA: personAChart?.profile || '?',
+    profileB: personBChart?.profile || '?',
+    relationshipStartDate: userData.relationshipStartDate || '',
+    currentDay: String(phaseInfo.currentDay),
+    currentPhase: phaseInfo.phaseLabel,
+    electromagneticChannels: (userData.dynamics?.electromagneticChannels || userData.dynamics?.electromagnetic_channels || []).join(', ') || 'keine',
+    dominanceChannels: (userData.dynamics?.dominanceChannels || []).join(', ') || 'keine',
+    companionshipChannels: (userData.dynamics?.companionshipChannels || []).join(', ') || 'keine',
+    compromiseGates: (userData.dynamics?.compromiseGates || []).join(', ') || 'keine',
+  };
+  for (const [key, val] of Object.entries(placeholders)) {
+    template = template.split(`{{${key}}}`).join(String(val));
+  }
+
+  const baseSystem = `${template}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Disclaimer ein. Beginne direkt mit "## 1. Wo ihr gerade steht".
+PFLICHT: Nenne BEIDE Personen (${nameA} UND ${nameB}) in JEDER Sektion explizit!
+PFLICHT: Beziehe jede Sektion auf den aktuellen Tag ${phaseInfo.currentDay} und die aktuelle Phase (${phaseInfo.phaseLabel}).`;
+
+  const part1Prompt = `${baseSystem}
+
+CHART PERSON A — ${chartAInfo}
+
+CHART PERSON B — ${chartBInfo}
+${compositeBlock}
+
+BEZIEHUNGSSTART: ${userData.relationshipStartDate}
+AKTUELLER TAG: ${phaseInfo.currentDay} von 90
+AKTUELLE PHASE: ${phaseInfo.phaseLabel}
+
+ERSTELLE NUR SEKTIONEN 1 BIS 5:
+## 1. Wo ihr gerade steht
+## 2. Phase 1 — Die Anziehung (Tag 1–30)
+## 3. Phase 2 — Die Reibung (Tag 31–60)
+## 4. Phase 3 — Die Wahrheit (Tag 61–90)
+## 5. Eure Composite-Dynamik im Detail
+
+Mindestlänge: 2500 Wörter. Beginne direkt mit "## 1. Wo ihr gerade steht". Deutsch, ihr/euch-Form, würdevoll und präzise.`;
+
+  const part2Prompt = `${baseSystem}
+
+CHART PERSON A — ${chartAInfo}
+
+CHART PERSON B — ${chartBInfo}
+${compositeBlock}
+
+BEZIEHUNGSSTART: ${userData.relationshipStartDate}
+AKTUELLER TAG: ${phaseInfo.currentDay} von 90
+AKTUELLE PHASE: ${phaseInfo.phaseLabel}
+
+ERSTELLE NUR SEKTIONEN 6 BIS 10 als Fortsetzung des Readings (kein neuer Titel):
+## 6. Eure Strategien und Autoritäten im 90-Tage-Rhythmus
+## 7. Konditionierungsmuster: Was ihr voneinander übernehmt
+## 8. Stärken und Wachstumsfeld eurer Konstellation
+## 9. Empfehlungen für die kommenden Tage bis Tag 90
+## 10. Das Muster, das bleibt
+
+Mindestlänge: 2500 Wörter. Beginne direkt mit "## 6.". Deutsch, ihr/euch-Form, würdevoll und präzise.`;
+
+  return generateTwoParts({ readingType: 'phasen-reading', part1Prompt, part2Prompt, modelConfig, tokensPerPart: 8000 });
+}
+
+// 5 Reflexionsfragen für das Paar in der aktuellen Phase
+async function generatePhasenReflexionsfragen(personAChart, personBChart, personAName, personBName, phaseInfo) {
+  if (!isClaudeAvailable()) return null;
+  const prompt = `Du bist ein erfahrener Human Design Coach. Erstelle 5 tiefe, persönliche Reflexionsfragen für dieses Paar (${personAName} & ${personBName}), basierend auf der spezifischen Composite-Konstellation und der aktuellen Phase (Tag ${phaseInfo.currentDay} — ${phaseInfo.phaseLabel}).
+
+${buildChartSummary(personAChart, personAName || 'Person A')}
+
+${buildChartSummary(personBChart, personBName || 'Person B')}
+
+Anforderungen:
+- Genau 5 Fragen
+- 1–2 Sätze pro Frage
+- keine Ja/Nein-Fragen
+- konkret zur aktuellen Phase passen
+- in der ihr-Form, einladend, nicht wertend
+
+Antworte NUR mit einem JSON-Array mit genau 5 Strings, ohne weiteren Text:
+["Frage 1", "Frage 2", "Frage 3", "Frage 4", "Frage 5"]`;
+  try {
+    const result = await generateWithClaude(prompt, { model: 'claude-sonnet-4-6', maxTokens: 1000, temperature: 0.8 });
+    const match = result.match(/\[[\s\S]*?\]/);
+    if (match) return JSON.parse(match[0]);
+    return null;
+  } catch (err) {
+    console.warn('⚠️ Phasen-Reflexionsfragen fehlgeschlagen:', err.message);
+    return null;
+  }
+}
+
+// Worker für phasen-reading Jobs (analog processConnectionJob)
+async function processPhasenReadingJob(job, reading) {
+  console.log(`🔄 [Phasen] Verarbeite Job ${job.id}`);
+  const payload = reading.client_data || job.payload || {};
+
+  const nameA = payload.name || payload.personA?.name || 'Person A';
+  const nameB = payload.name2 || payload.personB?.name || 'Person B';
+  const birthDateA = payload.birthdate || payload.personA?.birthDate;
+  const birthTimeA = payload.birthtime || payload.personA?.birthTime;
+  const birthPlaceA = payload.birthplace || payload.personA?.birthPlace;
+  const birthDateB = payload.birthdate2 || payload.personB?.birthDate;
+  const birthTimeB = payload.birthtime2 || payload.personB?.birthTime;
+  const birthPlaceB = payload.birthplace2 || payload.personB?.birthPlace;
+  const relationshipStartDate = payload.relationshipStartDate || payload.relationship_start_date;
+  const readingId = payload.reading_id;
+
+  // Pflichtfelder validieren
+  if (!birthDateB || !birthTimeB || !birthPlaceB) {
+    throw new Error('phasen-reading: zweite Person (birthdate2/birthtime2/birthplace2) ist Pflicht');
+  }
+  if (!relationshipStartDate) {
+    throw new Error('phasen-reading: relationshipStartDate ist Pflicht (Format YYYY-MM-DD)');
+  }
+
+  const phaseInfo = calculatePhase(relationshipStartDate);
+  console.log(`   [Phasen] Tag ${phaseInfo.currentDay} | ${phaseInfo.phaseLabel}`);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ status: 'processing', progress: 10 }).eq('id', readingId);
+  }
+
+  // Charts laden (Geburtsdaten → Chart-API, Fallback existing reading_data)
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from('readings').select('reading_data').eq('id', readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
+
+  const personAChart = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
+    || existingReadingData.chart_data || { type: 'Unbekannt', gates: [], centers: {} };
+  const personBChart = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
+    || existingReadingData.chart_data2 || { type: 'Unbekannt', gates: [], centers: {} };
+
+  console.log(`   [Phasen] Charts: A=${personAChart.type || '?'}, B=${personBChart.type || '?'}`);
+
+  const dynamics = analyzeConnectionDynamics(personAChart, personBChart, nameA, nameB);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ progress: 30 }).eq('id', readingId);
+  }
+
+  // 2-Pass + Reflexionsfragen parallel
+  const [rawContent, reflexionsfragen] = await Promise.all([
+    generatePhasenReadingTwoParts({
+      userData: {
+        personA: { name: nameA, birthDate: birthDateA },
+        personB: { name: nameB, birthDate: birthDateB },
+        relationshipStartDate,
+        dynamics,
+      },
+      personAChart,
+      personBChart,
+      modelConfig: MODEL_CONFIG[DEFAULT_MODEL],
+      phaseInfo,
+    }),
+    generatePhasenReflexionsfragen(personAChart, personBChart, nameA, nameB, phaseInfo),
+  ]);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ progress: 80 }).eq('id', readingId);
+  }
+
+  // Pipeline-Validierung (analog Connection)
+  let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };
+  let content = rawContent;
+  try {
+    const pipeline = await runReadingPipeline(rawContent, personAChart);
+    content = pipeline.text;
+    pipelineInfo = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pipelineErr) {
+    console.warn('[Pipeline] [Phasen] Fehler — Fallback auf Original:', pipelineErr.message);
+  }
+
+  // Reading speichern
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    chart_data: personAChart,
+    chart_data2: personBChart,
+    personA: { name: nameA },
+    personB: { name: nameB },
+    phase_info: phaseInfo,
+    relationship_start_date: relationshipStartDate,
+    ...(reflexionsfragen ? { reflexionsfragen } : {}),
+    _pipeline: pipelineInfo,
+  };
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({
+      status: 'completed',
+      progress: 100,
+      reading_data: newReadingData,
+      updated_at: new Date().toISOString(),
+    }).eq('id', readingId);
+  }
+
+  await supabase.from('reading_jobs').update({
+    status: 'completed',
+    finished_at: new Date().toISOString(),
+  }).eq('id', job.id);
+
+  console.log(`✅ [Phasen] Job ${job.id} abgeschlossen (${content?.length} Zeichen, Tag ${phaseInfo.currentDay})`);
 }
 
 

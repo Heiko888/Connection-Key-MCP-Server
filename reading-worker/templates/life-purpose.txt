@@ -1,41 +1,67 @@
-Erstelle ein Life Purpose Human Design Reading für:
+Erstelle ein Life-Purpose Human Design Reading für:
 
+Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Fokus auf Lebenszweck und höhere Bestimmung:
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}} | Profil: {{profile}} | Autorität: {{authority}} | Strategie: {{strategy}} | Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- **Inkarnationskreuz: {{incarnationCrossName}}**
+  - Persönlichkeitssonne: Tor {{personalitySun}}
+  - Persönlichkeitserde:  Tor {{personalityEarth}}
+  - Design-Sonne:         Tor {{designSun}}
+  - Design-Erde:          Tor {{designEarth}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+- Persönlichkeitsplaneten: {{personalityPlanetsList}}
+- Designplaneten: {{designPlanetsList}}
 
-## 1. Inkarnationskreuz
-- Dein spezifisches Inkarnationskreuz
-- Lebensaufgabe und höherer Zweck
-- Evolutionäre Aufgabe
+REGEL — Genre-Treue (PFLICHT):
+- Dies ist ein **Lebensaufgabe-Reading**, KEIN Business-Reading.
+- Verboten: Marketing, Sichtbarkeit, Pricing, Angebotsstruktur, Skalieren, Sales, Kunden-Akquise, Business-Modell. Wenn die Lebensaufgabe sich auch beruflich ausdrückt, bleibe auf der Mission-Ebene, nicht auf der Operativ-Ebene.
+- Das Inkarnationskreuz {{incarnationCrossName}} ist der ROTE FADEN. Nenne den Kreuznamen mehrfach (mind. 5×) und leite die Lebensaufgabe daraus ab.
 
-## 2. Lebenszweck
-- Was ist deine Mission?
-- Dein Beitrag zur Welt
-- Höhere Bestimmung
+REGEL — Faktentreue (PFLICHT):
+- Tor-Position-Konsistenz: Tor {{personalitySun}} = Persönlichkeitssonne, Tor {{personalityEarth}} = Persönlichkeitserde, Tor {{designSun}} = Design-Sonne, Tor {{designEarth}} = Design-Erde. NIE vertauschen.
+- Profil → Inkarnationskreuztyp: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle (RAX); 4/1 → Juxtaposition (JUX); 4/6, 5/1, 5/2, 6/2, 6/3 → Left Angle (LAX). Profil {{profile}} → daraus deterministisch ableitbar.
+- Wenn du eine Planet-Tor-Position nennst, MUSS sie aus den oben gegebenen Persönlichkeits- oder Design-Planeten-Listen stammen. Erfinde keine Aspekte, keine Mond-/Saturn-/Pluto-Positionen.
+- Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) sind verboten.
+- Erwähne keine anderen Personen außer {{clientName}} (keine Lisi, keine Janine, keine Hartmut etc.) — Single-Person-Reading.
 
-## 3. Talente & Gaben
-- Deine einzigartigen Talente
-- Wie du deine Gaben nutzt
-- Beitrag zur Gemeinschaft
+Erstelle das Reading in 8 Sektionen mit Lebensaufgabe-Fokus:
 
-## 4. Lebensweg
-- Dein natürlicher Lebensweg
-- Richtung und Orientierung
-- Schritte zur Erfüllung
+## 1. {{clientName}}: Wer du auf der Seelen-Ebene bist
+Fundament: {{type}} mit Profil {{profile}} und Autorität {{authority}}. Keine Operativ-Ebene, sondern: was bringt {{clientName}} als Seele hier herein?
 
-## 5. Herausforderungen & Wachstum
-- Herausforderungen auf dem Weg
-- Wachstumsbereiche
-- Wie du Hindernisse überwindest
+## 2. Dein Inkarnationskreuz: {{incarnationCrossName}}
+Beginne mit „{{clientName}}, dein Inkarnationskreuz ist {{incarnationCrossName}}." Entfalte die thematische Botschaft des Kreuzes auf 600+ Wörtern.
 
-## 6. Erfüllung & Sinn
-- Wie du Erfüllung findest
-- Sinn und Bedeutung im Leben
-- Praktische Schritte zur Umsetzung
+## 3. Die vier IC-Tore und ihre Lebens-Botschaft
+- **Persönlichkeitssonne — Tor {{personalitySun}}**: das bewussteste Lebensthema von {{clientName}}.
+- **Persönlichkeitserde — Tor {{personalityEarth}}**: der bewusste Boden.
+- **Design-Sonne — Tor {{designSun}}**: das körperlich getragene Hauptthema.
+- **Design-Erde — Tor {{designEarth}}**: der unbewusste Boden.
+Pro Tor 200+ Wörter. Verbinde die vier zu einer kohärenten Mission.
+
+## 4. Profil {{profile}} im Lebenszyklus
+Wie zeigt sich dieses Profil in den Lebensphasen? Linien-Mechanik konkret für {{clientName}}.
+
+## 5. Channels als Lebensaufgaben-Träger
+Aktivierte Kanäle {{channelsList}}. Welche Lebenskompetenzen / Mission-Aspekte tragen sie? Wie binden sie an {{incarnationCrossName}} an?
+
+## 6. Definierte vs. offene Zentren als Mission-Architektur
+Definiert ({{definedCentersCount}}): {{definedCenters}} — was {{clientName}} konstant in die Welt bringt.
+Offen ({{openCentersCount}}): {{openCenters}} — wo {{clientName}} fürs Kollektiv lernt und reflektiert.
+
+## 7. Verkörperung der Mission im Alltag
+Konkrete Lebens-Schritte (nicht Business-Strategie). Wie lebt {{clientName}} die Mission in Beziehungen, in der eigenen Entwicklung, in der Welt?
+
+## 8. Der Kern in einem Satz
+Verdichtung: {{incarnationCrossName}} in einem Satz für {{clientName}}.
 
 Sprache: Deutsch
-Stil: Inspirierend, tiefgreifend, motivierend, transformierend
-
+Stil: Inspirierend, tiefgreifend, transformierend, du-Form
+Länge: Premium-Tiefe, mind. 4000 Wörter total über beide Pässe.

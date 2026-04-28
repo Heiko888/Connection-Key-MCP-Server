@@ -1259,7 +1259,13 @@ Geburtsort: ${userData.birth_location || 'Unbekannt'}
 ${chartInfo}
 ${transitOverlay}
 ${deltaContext}`;
-  const templateContent = templates[readingType] || templates['business'] || '';
+  const placeholders = buildChartPlaceholders(chartData, userData);
+  const templateContent = applyPlaceholders(templates[readingType] || templates['business'] || '', placeholders);
+
+  // Life-Purpose: separater Pfad ohne hart-codierte Business-Sections
+  if (readingType === 'life-purpose') {
+    return generateLifePurposeTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders });
+  }
 
   const baseSystem = `Du bist ein erfahrener Human Design Business Coach.
 
@@ -1323,6 +1329,82 @@ Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret un
   return generateTwoParts({ readingType, part1Prompt, part2Prompt, modelConfig });
 }
 
+// ── 2-Pass: Life-Purpose ──────────────────────────────────────────────────────
+// Eigener Pfad ohne hart-codierte Business-Sections. Das life-purpose-Template
+// trägt die Sections, der Wrapper liefert nur Faktenkontext + Pflicht-Anker.
+async function generateLifePurposeTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders }) {
+  const baseSystem = `Du bist ein erfahrener Human Design Coach. Spezialisierung: Lebensaufgabe und Inkarnationskreuze. Dieses Reading ist KEIN Business-Reading — es geht um die seelische Mission.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Die Chart-Daten sind via Swiss Ephemeris berechnet. Beginne direkt. Kein Disclaimer.
+
+PFLICHT — Kerntreue Life-Purpose:
+- Das Inkarnationskreuz ${placeholders.incarnationCrossName} ist der ROTE FADEN. Nenne den Kreuznamen mehrfach (mindestens 5×) und leite die Lebensaufgabe daraus ab.
+- Die vier IC-Tore (PSon ${placeholders.personalitySun}, PErd ${placeholders.personalityEarth}, DSon ${placeholders.designSun}, DErd ${placeholders.designEarth}) müssen jeweils einen eigenen Abschnitt bekommen.
+- Profil ${placeholders.profile} → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle (persönliches Schicksal); 4/1 → Juxtaposition (festes Schicksal); 4/6, 5/1, 5/2, 6/2, 6/3 → Left Angle (transpersonal).
+- KEIN Business-Coaching: Marketing, Pricing, Angebotsstruktur, Sichtbarkeit, Kunden, Skalieren — diese Themen gehören NICHT in dieses Reading. Wenn Lebensaufgabe sich auch im Beruflichen zeigt, bleibe auf der Mission-Ebene, nicht auf der Operativ-Ebene.
+- Halluziniere keine Planeten-Positionen. Wenn Reading eine Planet-Tor-Aussage macht, MUSS sie aus diesen Listen kommen:
+  Persönlichkeitsplaneten: ${placeholders.personalityPlanetsList}
+  Designplaneten:          ${placeholders.designPlanetsList}`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines tiefgründigen Human Design Lebensaufgabe-Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Kein Lehrbuch, kein Business — echter Spiegel der Lebensaufgabe.
+
+---
+
+## 1. Wer du bist — Type, Profil, Autorität als Lebensgrundlage
+${placeholders.clientName} als ${placeholders.type} mit Profil ${placeholders.profile} und Autorität ${placeholders.authority}. Wie bilden diese drei zusammen das Fundament der Lebensaufgabe? Strategie ${placeholders.strategy} als Kern-Bewegung.
+
+## 2. Dein Inkarnationskreuz: ${placeholders.incarnationCrossName}
+Was bedeutet dieses Kreuz konkret? Welche Lebensaufgabe trägt es? Beginne mit dem Satz „${placeholders.clientName}, dein Inkarnationskreuz ist ${placeholders.incarnationCrossName}." und entfalte die Mission auf 600+ Wörtern.
+
+## 3. Die vier Tore deines Kreuzes
+- **Persönlichkeitssonne — Tor ${placeholders.personalitySun}**: das bewussteste Lebensthema.
+- **Persönlichkeitserde — Tor ${placeholders.personalityEarth}**: der bewusste Boden.
+- **Design-Sonne — Tor ${placeholders.designSun}**: das körperlich getragene Hauptthema.
+- **Design-Erde — Tor ${placeholders.designEarth}**: der unbewusste Boden.
+Verwechsle nicht: Tor ${placeholders.personalitySun} ist die Persönlichkeitssonne (NICHT die Design-Sonne).
+
+## 4. Profil ${placeholders.profile} im Lebenszyklus
+Wie zeigt sich dieses Profil über die Lebensphasen? Linien-Mechanik konkret für ${placeholders.clientName}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Lebensaufgabe-Fokus.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Lebensaufgabe-Readings für:
+${personContext}
+
+Direkt als Fortsetzung. Keine Wiederholung von Teil 1.
+
+---
+
+## 5. Deine Channels als Lebensaufgaben-Träger
+Aktivierte Kanäle: ${placeholders.channelsList}. Welche Lebenskompetenzen / -aufgaben tragen diese Kanäle? Wie binden sie an das Inkarnationskreuz ${placeholders.incarnationCrossName} an?
+
+## 6. Definierte vs. offene Zentren als Mission-Architektur
+Definiert (${placeholders.definedCentersCount}): ${placeholders.definedCenters} — was bringst du konstant in die Welt?
+Offen (${placeholders.openCentersCount}): ${placeholders.openCenters} — wo lernst du fürs Kollektiv?
+
+## 7. Die Verkörperung der Mission — Schritte für ${placeholders.clientName}
+Konkrete Lebens-Schritte (KEINE Business-Strategie). Wie lebt diese Person die Mission im Alltag, in Beziehungen, in der eigenen Entwicklung?
+
+## 8. Was bleibt — der Kern in einem Satz
+Schließe mit der Verdichtung: ${placeholders.incarnationCrossName} in einem Satz für ${placeholders.clientName}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Lebensaufgabe-Fokus, kein Business.`;
+
+  return generateTwoParts({ readingType: 'life-purpose', part1Prompt, part2Prompt, modelConfig });
+}
+
 // ── 2-Pass: Shadow-Work ───────────────────────────────────────────────────────
 async function generateShadowWorkTwoParts({ userData, chartData, modelConfig }) {
   const knowledgeText = buildReadingKnowledge('shadow-work');
@@ -1334,7 +1416,8 @@ async function generateShadowWorkTwoParts({ userData, chartData, modelConfig }) 
   const personContext = `Name: ${userData.client_name || 'Unbekannt'}
 ${chartInfo}
 ${deltaContext}`;
-  const templateContent = templates['shadow-work'] || '';
+  const placeholders = buildChartPlaceholders(chartData, userData);
+  const templateContent = applyPlaceholders(templates['shadow-work'] || '', placeholders);
 
   const baseSystem = `Du bist ein erfahrener Human Design Coach mit Fokus auf Schattenarbeit und Dekonditionierung.
 
@@ -1508,6 +1591,95 @@ function buildTuningInstructions({ tone, length, audience } = {}) {
   return lines.length > 0 ? `\n\n🎛️ TUNING-PARAMETER:\n${lines.join('\n')}` : '';
 }
 
+// ── Helper: Chart-Fakten als Placeholder-Map zurückgeben ──────────────────────
+// Wird von allen Single-Person-Pfaden genutzt, damit Modell harte Fakten
+// (Zentren, IC-Tore, Kanäle, Gates, Planeten) nicht halluzinieren muss.
+function buildChartPlaceholders(chartData, userData) {
+  if (!chartData) return {};
+  const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
+  const centers = chartData.centers || {};
+  const definedNames = Object.entries(centers).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
+  const openNames    = Object.entries(centers).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
+  const channels = (chartData.channels || []);
+  const channelsList = channels.map(c => {
+    const gates = (c.gates || []).join('-');
+    const name = c.name_de || c.name || '';
+    return name ? `${gates} (${name})` : gates;
+  }).filter(Boolean).join(', ') || 'keine';
+  const gates = (chartData.gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
+  const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
+  const icGates = ic.gates || {};
+  const icName = ic.name_de || ic.name || '?';
+
+  const planetLabelDe = {
+    sun: 'Sonne', earth: 'Erde', moon: 'Mond',
+    'north-node': 'Nordknoten', 'south-node': 'Südknoten',
+    northNode: 'Nordknoten', southNode: 'Südknoten',
+    mercury: 'Merkur', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
+    uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto', chiron: 'Chiron', lilith: 'Lilith',
+  };
+  const formatPlanetList = (arr) => {
+    if (!Array.isArray(arr) || arr.length === 0) return '(keine Daten)';
+    return arr.map(p => {
+      const planet = planetLabelDe[p.planet] || p.planet || '?';
+      const gate = p.gate ?? '?';
+      const line = p.line != null ? `.${p.line}` : '';
+      return `${planet} ${gate}${line}`;
+    }).join(', ');
+  };
+  const personalityPlanetsList = formatPlanetList(chartData.personalityPlanets || (chartData.personality && chartData.personality.planets) || []);
+  const designPlanetsList      = formatPlanetList(chartData.designPlanets      || (chartData.design      && chartData.design.planets)      || []);
+
+  // Jahres-Transit-Daten aus ai_config (falls vorhanden)
+  const cfg = userData?.ai_config || {};
+  const yearTransitsList = cfg.year_transits
+    ? Object.entries(cfg.year_transits).map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join('; ').slice(0, 1500)
+    : '(keine Jahres-Transit-Daten verfügbar — KEINE konkreten Transit-Aussagen erlauben)';
+  const transitGatesList = Array.isArray(cfg.transit_gates) && cfg.transit_gates.length
+    ? cfg.transit_gates.map(t => `${t.planet || '?'} ${t.gate ?? '?'}${t.line != null ? '.' + t.line : ''}${t.date ? ' (' + t.date + ')' : ''}`).join(', ')
+    : '(keine konkreten Transit-Gates verfügbar)';
+  const currentYear = String(cfg.year || new Date().getFullYear());
+
+  return {
+    clientName: userData?.client_name || 'die Person',
+    birthDate: userData?.birth_date || userData?.birthdate || 'Unbekannt',
+    birthTime: userData?.birth_time || userData?.birthtime || 'Unbekannt',
+    birthPlace: userData?.birth_location || userData?.birthplace || 'Unbekannt',
+    type: chartData.type || 'Unbekannt',
+    profile: chartData.profile || '?',
+    authority: chartData.authority || '?',
+    strategy: chartData.strategy || '?',
+    definition: chartData.definition || '?',
+    notSelf: ({ Generator: 'Frustration', 'Manifesting Generator': 'Frustration', Manifestor: 'Wut', Projector: 'Bitterkeit', Reflector: 'Enttäuschung' })[chartData.type] || 'Not-Self-Emotion',
+    definedCentersCount: String(definedNames.length),
+    definedCenters: definedNames.join(', ') || '(keine)',
+    openCentersCount: String(openNames.length),
+    openCenters: openNames.join(', ') || '(keine)',
+    channelsCount: String(channels.length),
+    channelsList,
+    gatesCount: String(gates.length),
+    gatesList: gates.sort((a,b) => a-b).join(', ') || '(keine)',
+    incarnationCrossName: icName,
+    personalitySun: String(icGates.personalitySun ?? '?'),
+    personalityEarth: String(icGates.personalityEarth ?? '?'),
+    designSun: String(icGates.designSun ?? '?'),
+    designEarth: String(icGates.designEarth ?? '?'),
+    personalityPlanetsList,
+    designPlanetsList,
+    yearTransitsList,
+    transitGatesList,
+    currentYear,
+  };
+}
+
+function applyPlaceholders(template, placeholders) {
+  let out = template;
+  for (const [key, val] of Object.entries(placeholders || {})) {
+    out = out.split(`{{${key}}}`).join(String(val));
+  }
+  return out;
+}
+
 async function generateReading({ agentId, template, userData, chartData }) {
   const rawModelId = userData?.ai_model || DEFAULT_MODEL;
   // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
@@ -1573,72 +1745,8 @@ async function generateReading({ agentId, template, userData, chartData }) {
   }
 
   // Single-Person-Templates: Chart-Fakten als Placeholder injizieren
-  // (greift für depth-analysis, single, parenting, geld-ueberfluss, channel-analysis etc.)
   if (chartData && !userData.members && !(userData.personA && userData.personB)) {
-    const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
-    const centers = chartData.centers || {};
-    const definedNames = Object.entries(centers).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
-    const openNames = Object.entries(centers).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
-    const channels = (chartData.channels || []);
-    const channelsList = channels.map(c => {
-      const gates = (c.gates || []).join('-');
-      const name = c.name_de || c.name || '';
-      return name ? `${gates} (${name})` : gates;
-    }).filter(Boolean).join(', ') || 'keine';
-    const gates = (chartData.gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
-    const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
-    const icGates = ic.gates || {};
-    const icName = ic.name_de || ic.name || '?';
-
-    // Planet-Aktivierungen (nur die, die Swiss Ephemeris berechnet hat)
-    const planetLabelDe = {
-      sun: 'Sonne', earth: 'Erde', moon: 'Mond',
-      'north-node': 'Nordknoten', 'south-node': 'Südknoten',
-      northNode: 'Nordknoten', southNode: 'Südknoten',
-      mercury: 'Merkur', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
-      uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto', chiron: 'Chiron', lilith: 'Lilith',
-    };
-    const formatPlanetList = (arr) => {
-      if (!Array.isArray(arr) || arr.length === 0) return '(keine Daten)';
-      return arr.map(p => {
-        const planet = planetLabelDe[p.planet] || p.planet || '?';
-        const gate = p.gate ?? '?';
-        const line = p.line != null ? `.${p.line}` : '';
-        return `${planet} ${gate}${line}`;
-      }).join(', ');
-    };
-    const personalityPlanetsList = formatPlanetList(chartData.personalityPlanets || (chartData.personality && chartData.personality.planets) || []);
-    const designPlanetsList      = formatPlanetList(chartData.designPlanets      || (chartData.design      && chartData.design.planets)      || []);
-
-    const subs = {
-      clientName: userData.client_name || 'die Person',
-      birthDate: userData.birth_date || userData.birthdate || 'Unbekannt',
-      birthTime: userData.birth_time || userData.birthtime || 'Unbekannt',
-      birthPlace: userData.birth_location || userData.birthplace || 'Unbekannt',
-      type: chartData.type || 'Unbekannt',
-      profile: chartData.profile || '?',
-      authority: chartData.authority || '?',
-      strategy: chartData.strategy || '?',
-      definition: chartData.definition || '?',
-      definedCentersCount: String(definedNames.length),
-      definedCenters: definedNames.join(', ') || '(keine)',
-      openCentersCount: String(openNames.length),
-      openCenters: openNames.join(', ') || '(keine)',
-      channelsCount: String(channels.length),
-      channelsList,
-      gatesCount: String(gates.length),
-      gatesList: gates.sort((a,b) => a-b).join(', ') || '(keine)',
-      incarnationCrossName: icName,
-      personalitySun: String(icGates.personalitySun ?? '?'),
-      personalityEarth: String(icGates.personalityEarth ?? '?'),
-      designSun: String(icGates.designSun ?? '?'),
-      designEarth: String(icGates.designEarth ?? '?'),
-      personalityPlanetsList,
-      designPlanetsList,
-    };
-    for (const [key, val] of Object.entries(subs)) {
-      templateContent = templateContent.split(`{{${key}}}`).join(String(val));
-    }
+    templateContent = applyPlaceholders(templateContent, buildChartPlaceholders(chartData, userData));
   }
 
   const knowledgeText = buildReadingKnowledge(agentId);

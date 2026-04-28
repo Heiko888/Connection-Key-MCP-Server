@@ -1,31 +1,58 @@
 Erstelle ein Basic Human Design Reading für:
 
+Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Ein grundlegendes Reading mit den wichtigsten Informationen:
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}}
+- Profil: {{profile}}
+- Autorität: {{authority}}
+- Strategie: {{strategy}}
+- Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+
+REGEL — Faktentreue (PFLICHT):
+- Verwende die oben angegebenen Zahlen exakt. Halluziniere keine andere Center-Anzahl, keine andere Channel-Anzahl, keine anderen Tore.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste aktivierter Tore stehen.
+- Tor → Zentrum-Zuordnung verbindlich:
+    Krone:       61, 63, 64
+    Ajna:        4, 11, 17, 24, 43, 47
+    Kehle:       8, 12, 16, 20, 23, 31, 33, 35, 45, 56, 62
+    G-Zentrum:   1, 2, 7, 10, 13, 15, 25, 46
+    Herz/Ego:    21, 26, 40, 51
+    Solarplexus: 6, 22, 30, 36, 37, 49, 55
+    Sakral:      3, 5, 9, 14, 27, 29, 34, 42, 59
+    Milz:        18, 28, 32, 44, 48, 50, 57
+    Wurzel:      19, 38, 39, 41, 52, 53, 54, 58, 60
+- Verwechsle besonders nicht: Tor 39, 41, 19 → Wurzel (NICHT Solarplexus, auch wenn ihre Kanäle dorthin führen). Tor 55 → Solarplexus (NICHT Wurzel). Tor 59 → Sakral (NICHT Solarplexus).
+- Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) sind in einem Single-Person-Reading verboten.
+
+Erstelle das Reading kompakt mit folgenden Sektionen:
 
 ## 1. Typ & Strategie
-- Dein Human Design Typ
-- Deine Strategie (wie richtig entscheiden)
-- Kurze Erklärung, was das für dich bedeutet
+{{clientName}} als {{type}}. Strategie: {{strategy}}. Was bedeutet das im Alltag konkret?
 
-## 2. Autorität
-- Deine innere Autorität
-- Wie du Entscheidungen treffen solltest
-- Praktische Tipps zur Anwendung
+## 2. Autorität: {{authority}}
+Wie {{clientName}} richtig entscheidet. Praxisnahe Tipps.
 
-## 3. Zentren (Überblick)
-- Definiert (farbig): Deine stabilen Energien
-- Undefiniert (weiß): Deine Lernbereiche
-- Kurze Erklärung der wichtigsten Zentren
+## 3. Definierte Zentren ({{definedCentersCount}})
+Konkret: {{definedCenters}}. Pro Zentrum 2-3 Sätze, was es bedeutet, wie es sich zeigt. Nenne pro Zentrum die aktivierten Tore aus der Gates-Liste.
 
-## 4. Basis-Insights
-- Die wichtigsten Erkenntnisse für dich
-- Häufige Fallen und wie sie vermeiden
-- Erste Schritte zur Umsetzung
+## 4. Offene Zentren ({{openCentersCount}})
+{{openCenters}}. Pro Zentrum 2-3 Sätze: was wird dort konditioniert, welche Lernchance liegt darin?
+
+## 5. Profil {{profile}} und Inkarnationskreuz {{incarnationCrossName}}
+Was die Profil-Linien bedeuten. Wie das Inkarnationskreuz die Lebensaufgabe trägt.
+
+## 6. Basis-Insights
+Drei wichtige Erkenntnisse für {{clientName}}, basierend auf Type, Profil und der Center-Konfiguration. Häufige Fallen + erste Schritte.
 
 Sprache: Deutsch
 Stil: Klar, verständlich, motivierend, kompakt
-
+Länge: 1500-2500 Wörter — Basic-Reading, kein Premium-Tiefenreading.

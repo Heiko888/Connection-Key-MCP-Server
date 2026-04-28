@@ -348,7 +348,7 @@ const redis = new IORedis({
 });
 
 // ======================================================
-// KI-Modell-Konfiguration (nur Claude)
+// KI-Modell-Konfiguration (Claude + OpenAI)
 // ======================================================
 const MODEL_CONFIG = {
   "claude-sonnet": {
@@ -365,6 +365,16 @@ const MODEL_CONFIG = {
     provider: "claude",
     models: ["claude-haiku-4-5-20251001", "claude-sonnet-4-6"],
     maxTokens: 8000,
+  },
+  "gpt-4o": {
+    provider: "openai",
+    models: ["gpt-4o", "gpt-4o-2024-11-20", "gpt-4o-2024-08-06"],
+    maxTokens: 16000,
+  },
+  "gpt-4o-mini": {
+    provider: "openai",
+    models: ["gpt-4o-mini", "gpt-4o-mini-2024-07-18"],
+    maxTokens: 16000,
   },
 };
 
@@ -388,7 +398,26 @@ function isClaudeAvailable() {
   return !!anthropicClient;
 }
 
+let openaiClient = null;
+try {
+  const OpenAI = (await import("openai")).default;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (apiKey) {
+    openaiClient = new OpenAI({ apiKey });
+    console.log("✅ OpenAI API verfügbar");
+  } else {
+    console.warn("⚠️  OPENAI_API_KEY nicht gesetzt – GPT-Modelle nicht verfügbar");
+  }
+} catch (e) {
+  console.warn("⚠️  openai SDK nicht installiert:", e.message);
+}
+
+function isOpenAIAvailable() {
+  return !!openaiClient;
+}
+
 const CLAUDE_TIMEOUT_MS = parseInt(process.env.CLAUDE_TIMEOUT_MS || "120000", 10);
+const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "120000", 10);
 
 // ── BullMQ Worker-Lifecycle ────────────────────────────────────────────────
 // lockDuration: max. Zeit die ein Job einen Worker "sperrt" bevor ein anderer
@@ -446,6 +475,54 @@ async function generateWithClaude(prompt, options = {}) {
 
   if (!fullContent) throw new Error("Claude lieferte leere Antwort");
   if (totalOutputTokens > 0) console.log(`   [Claude] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} output_tokens`);
+  return fullContent;
+}
+
+async function generateWithOpenAI(prompt, options = {}) {
+  if (!openaiClient) {
+    throw new Error("OpenAI API nicht konfiguriert. OPENAI_API_KEY setzen.");
+  }
+  const model = options.model || "gpt-4o";
+  const maxTokens = options.maxTokens || 8000;
+  const temperature = options.temperature ?? 0.8;
+
+  console.log(`   [OpenAI] Start ${model}, max_tokens=${maxTokens}, timeout=${OPENAI_TIMEOUT_MS / 1000}s`);
+
+  const messages = [{ role: "user", content: prompt }];
+  let fullContent = "";
+  let totalOutputTokens = 0;
+  const MAX_CONTINUATIONS = 3;
+
+  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+    const apiCall = openaiClient.chat.completions.create({
+      model,
+      max_tokens: maxTokens,
+      temperature,
+      messages,
+    });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`OpenAI Timeout nach ${OPENAI_TIMEOUT_MS / 1000}s`)), OPENAI_TIMEOUT_MS);
+    });
+
+    const response = await Promise.race([apiCall, timeoutPromise]);
+    const choice = response.choices?.[0] || {};
+    const chunk = choice.message?.content || "";
+    const finishReason = choice.finish_reason;
+    totalOutputTokens += response.usage?.completion_tokens || 0;
+    fullContent += chunk;
+
+    console.log(`   [OpenAI] Antwort erhalten (${chunk.length} Zeichen, finish_reason=${finishReason}, completion_tokens=${response.usage?.completion_tokens})`);
+
+    if (finishReason !== "length" || attempt >= MAX_CONTINUATIONS) break;
+
+    console.log(`   [OpenAI] ⚠️  length erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
+    messages.push({ role: "assistant", content: chunk });
+    messages.push({ role: "user", content: "Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie 'Ich fahre fort' — einfach weiterschreiben." });
+  }
+
+  if (!fullContent) throw new Error("OpenAI lieferte leere Antwort");
+  if (totalOutputTokens > 0) console.log(`   [OpenAI] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} completion_tokens`);
   return fullContent;
 }
 
@@ -1434,12 +1511,17 @@ function buildTuningInstructions({ tone, length, audience } = {}) {
 async function generateReading({ agentId, template, userData, chartData }) {
   const rawModelId = userData?.ai_model || DEFAULT_MODEL;
   // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
-  const selectedModelId = MODEL_CONFIG[rawModelId]
+  let selectedModelId = MODEL_CONFIG[rawModelId]
     ? rawModelId
     : Object.keys(MODEL_CONFIG).find(k => rawModelId.startsWith(k)) || DEFAULT_MODEL;
   let modelConfig = MODEL_CONFIG[selectedModelId] || MODEL_CONFIG[DEFAULT_MODEL];
   const maxTokens = userData?.ai_config?.max_tokens || modelConfig.maxTokens;
 
+  if (modelConfig.provider === "openai" && !isOpenAIAvailable()) {
+    console.warn(`⚠️  OpenAI nicht verfügbar — fallback auf claude-sonnet`);
+    selectedModelId = "claude-sonnet";
+    modelConfig = MODEL_CONFIG[selectedModelId];
+  }
   if (modelConfig.provider === "claude" && !isClaudeAvailable()) {
     throw new Error(`Claude (${selectedModelId}) nicht verfügbar`);
   }
@@ -1763,6 +1845,25 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
       }
     }
     throw new Error("Alle Claude-Modelle fehlgeschlagen");
+  }
+
+  if (modelConfig.provider === "openai") {
+    const modelsToTry = modelConfig.models || [];
+    for (const modelId of modelsToTry) {
+      try {
+        console.log(`   Versuche OpenAI-Modell: ${modelId}`);
+        const result = await generateWithOpenAI(fullPrompt, {
+          model: modelId,
+          maxTokens,
+          temperature: 0.7,
+        });
+        console.log(`   ✅ OpenAI (${modelId}) erfolgreich`);
+        return result;
+      } catch (openaiErr) {
+        console.warn(`   ⚠️  OpenAI (${modelId}) fehlgeschlagen:`, openaiErr.message);
+      }
+    }
+    throw new Error("Alle OpenAI-Modelle fehlgeschlagen");
   }
 
   throw new Error(`Unbekannter Provider: ${modelConfig.provider}`);

@@ -16,7 +16,12 @@ import crypto from "crypto";
 // ── Konfiguration ─────────────────────────────────────────────────────────────
 const TEMPLATE_PATH = process.env.TEMPLATE_PATH || "/app/templates";
 const PIPELINE_MODEL = "claude-sonnet-4-6";
-const PIPELINE_TIMEOUT_MS = 120000;
+// Validator gibt nur eine kleine JSON-Antwort zurück → 120s reichen.
+// Korrektur schreibt das gesamte Reading neu (oft 50k+ Zeichen) → braucht mehr.
+const VALIDATOR_TIMEOUT_MS = parseInt(process.env.VALIDATOR_TIMEOUT_MS || "120000", 10);
+const CORRECTOR_TIMEOUT_MS = parseInt(process.env.CORRECTOR_TIMEOUT_MS || "300000", 10);
+// Legacy-Konstante — wird wo immer möglich durch die rolle-spezifischen ersetzt.
+const PIPELINE_TIMEOUT_MS = VALIDATOR_TIMEOUT_MS;
 
 // Minimale Textlänge: Korrekturtext muss mind. 50% des Originals haben
 const MIN_CORRECTION_RATIO = 0.5;
@@ -197,11 +202,43 @@ function formatChartForPrompt(chartData) {
       `Solar- und Erd-Gates (WICHTIG — exakt diese 4 Tore für den Kreuz-Abschnitt verwenden):`,
       ...crossGatesLines,
     ] : []),
+    ...(formatPlanetBlock(chartData)),
   ].join("\n");
 }
 
+// Planet-Aktivierungen so formatieren, dass der Validator CHECK 8 sie sehen kann.
+// Sonst flagged er Modell-Aussagen wie „Uranus Persönlichkeit Tor 44.1" als
+// Halluzination, obwohl die Position aus Swiss Ephemeris stammt.
+function formatPlanetBlock(chartData) {
+  const planetLabel = {
+    sun: 'Sonne', earth: 'Erde', moon: 'Mond',
+    'north-node': 'Nordknoten', 'south-node': 'Südknoten',
+    northNode: 'Nordknoten', southNode: 'Südknoten',
+    mercury: 'Merkur', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
+    uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto', chiron: 'Chiron', lilith: 'Lilith',
+  };
+  const fmt = (arr) => {
+    if (!Array.isArray(arr) || arr.length === 0) return [];
+    return arr.map(p => {
+      const name = planetLabel[p.planet] || p.planet || '?';
+      const line = p.line != null ? `.${p.line}` : '';
+      return `  ${name}: Tor ${p.gate ?? '?'}${line}`;
+    });
+  };
+  const pp = fmt(chartData.personalityPlanets || (chartData.personality && chartData.personality.planets) || []);
+  const dp = fmt(chartData.designPlanets      || (chartData.design      && chartData.design.planets)      || []);
+  const out = [];
+  if (pp.length || dp.length) {
+    out.push('');
+    out.push('Planeten-Aktivierungen (verbindlich — falls Reading eine Planet-Tor-Position nennt, MUSS sie hier stehen):');
+  }
+  if (pp.length) { out.push('Persönlichkeits-Planeten:'); out.push(...pp); }
+  if (dp.length) { out.push('Design-Planeten:'); out.push(...dp); }
+  return out;
+}
+
 // ── Claude API call (einfach, ohne Continuation-Loop) ────────────────────────
-async function callClaude(prompt, maxTokens, temperature = 0) {
+async function callClaude(prompt, maxTokens, temperature = 0, timeoutMs = PIPELINE_TIMEOUT_MS) {
   if (!anthropic) {
     throw new Error("[Pipeline] Anthropic Client nicht verfügbar");
   }
@@ -217,9 +254,9 @@ async function callClaude(prompt, maxTokens, temperature = 0) {
     setTimeout(
       () =>
         reject(
-          new Error(`[Pipeline] Claude Timeout nach ${PIPELINE_TIMEOUT_MS / 1000}s`)
+          new Error(`[Pipeline] Claude Timeout nach ${timeoutMs / 1000}s`)
         ),
-      PIPELINE_TIMEOUT_MS
+      timeoutMs
     )
   );
 
@@ -244,7 +281,7 @@ export async function validateReading(readingText, chartData) {
     `Chart: ${chartStr.length} Zeichen`
   );
 
-  const rawResult = await callClaude(prompt, 2000, 0);
+  const rawResult = await callClaude(prompt, 2000, 0, VALIDATOR_TIMEOUT_MS);
 
   // Markdown-Backticks entfernen (falls Claude sie trotzdem schreibt)
   const cleaned = rawResult
@@ -291,10 +328,10 @@ export async function correctReading(readingText, chartData, validationResult) {
 
   console.log(
     `[Pipeline] Korrektur startet — ${validationResult.errorCount} Fehler, ` +
-    `Reading: ${readingText.length} Zeichen`
+    `Reading: ${readingText.length} Zeichen, Timeout: ${CORRECTOR_TIMEOUT_MS / 1000}s`
   );
 
-  const corrected = await callClaude(prompt, 16000, 0.3);
+  const corrected = await callClaude(prompt, 16000, 0.3, CORRECTOR_TIMEOUT_MS);
 
   if (!corrected) {
     throw new Error("[Pipeline] Korrektur lieferte leere Antwort");

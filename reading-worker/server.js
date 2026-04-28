@@ -1507,6 +1507,27 @@ async function generateReading({ agentId, template, userData, chartData }) {
     const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
     const icGates = ic.gates || {};
     const icName = ic.name_de || ic.name || '?';
+
+    // Planet-Aktivierungen (nur die, die Swiss Ephemeris berechnet hat)
+    const planetLabelDe = {
+      sun: 'Sonne', earth: 'Erde', moon: 'Mond',
+      'north-node': 'Nordknoten', 'south-node': 'Südknoten',
+      northNode: 'Nordknoten', southNode: 'Südknoten',
+      mercury: 'Merkur', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
+      uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto', chiron: 'Chiron', lilith: 'Lilith',
+    };
+    const formatPlanetList = (arr) => {
+      if (!Array.isArray(arr) || arr.length === 0) return '(keine Daten)';
+      return arr.map(p => {
+        const planet = planetLabelDe[p.planet] || p.planet || '?';
+        const gate = p.gate ?? '?';
+        const line = p.line != null ? `.${p.line}` : '';
+        return `${planet} ${gate}${line}`;
+      }).join(', ');
+    };
+    const personalityPlanetsList = formatPlanetList(chartData.personalityPlanets || (chartData.personality && chartData.personality.planets) || []);
+    const designPlanetsList      = formatPlanetList(chartData.designPlanets      || (chartData.design      && chartData.design.planets)      || []);
+
     const subs = {
       clientName: userData.client_name || 'die Person',
       birthDate: userData.birth_date || userData.birthdate || 'Unbekannt',
@@ -1530,6 +1551,8 @@ async function generateReading({ agentId, template, userData, chartData }) {
       personalityEarth: String(icGates.personalityEarth ?? '?'),
       designSun: String(icGates.designSun ?? '?'),
       designEarth: String(icGates.designEarth ?? '?'),
+      personalityPlanetsList,
+      designPlanetsList,
     };
     for (const [key, val] of Object.entries(subs)) {
       templateContent = templateContent.split(`{{${key}}}`).join(String(val));

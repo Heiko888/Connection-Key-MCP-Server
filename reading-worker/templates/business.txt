@@ -1,186 +1,89 @@
-Erstelle ein tiefgründiges Business Human Design Reading für:
+Erstelle ein Human-Design Business-Reading für:
 
 Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Typ: {{type}}
-Profil: {{profile}}
-Autorität: {{authority}}
-Strategie: {{strategy}}
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}} | Profil: {{profile}} | Autorität: {{authority}} | Strategie: {{strategy}} | Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+  - Persönlichkeitssonne: Tor {{personalitySun}}
+  - Persönlichkeitserde:  Tor {{personalityEarth}}
+  - Design-Sonne:         Tor {{designSun}}
+  - Design-Erde:          Tor {{designEarth}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+- Persönlichkeitsplaneten: {{personalityPlanetsList}}
+- Designplaneten: {{designPlanetsList}}
 
-Dieses Reading soll {{clientName}} dabei unterstützen, ihr/sein Business vollständig aus dem Design heraus aufzubauen – nicht gegen es. Schreibe konkret, tiefgründig und direkt auf {{clientName}} bezogen. Keine generischen Aussagen.
+GENRE — Business, NICHT Career, NICHT Life-Purpose (PFLICHT):
+- Dieses Reading ist ein BUSINESS-Reading. Fokus: Selbstständigkeit, Geschäftsmodell, Pricing, Marketing, Angebotsstruktur, Sichtbarkeit, Skalierung, Kunden-Akquise.
+- VERBOTEN: Career-Themen (Bewerbung, Anstellung, Stellenwechsel, Job-Pivot, Vorgesetzte) — das gehört in das Career-Reading.
+- VERBOTEN: Lebensaufgabe als Hauptthema („Du bist hier, um …" als Mission-Statement). Das Inkarnationskreuz darf nur im Business-Kontext (Sektion 8) als roter Faden auftauchen, nicht als Lebensaufgaben-Reading.
+- VERBOTEN: Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) — das gehört in Beziehungs-Readings.
+- ERLAUBT: Pricing, Marketing, Positionierung, Sichtbarkeit, Angebotsmodelle, Sales, Skalierung — diese sind das Genre-Kernthema.
 
----
+REGEL — Type-konforme Business-Logik (PFLICHT, kein HD-Mythos):
+- Wenn {{type}} = "Manifesting Generator": MG ist ein **Generator-Subtyp** mit schnellerer Sakral-Reaktion und Skip-Step-Fähigkeit. Er initiiert NICHT — er reagiert schneller. Strategie: Warten + Antworten + Informieren. Multi-Passion-Geschäftsmodelle sind HD-konform (kein Zwang zur Mono-Nische).
+- Wenn {{type}} = "Generator": Strategie ist Warten + Antworten. Geschäftsmodell wächst durch echte Begeisterung im Sakral. Niemals „initiieren".
+- Wenn {{type}} = "Projector": Strategie ist Warten auf Einladung. Einladungs-Marketing statt Push-Marketing. Tiefere Einzel-Arbeit, höheres Pricing pro Kunde, weniger Volumen. Bitterkeit als Frühwarnsystem für nicht-erkannte Arbeit.
+- Wenn {{type}} = "Manifestor": Initiieren + Informieren. Solo-Initiator, Launch-Modelle, dann Rückzug. Kunden, Team und Partner über Schritte informieren — das löst den Widerstand.
+- Wenn {{type}} = "Reflector": Mond-basierte Klarheit. Große Business-Entscheidungen (Pricing-Änderung, Launch, Partner) über mind. einen Mondzyklus reifen lassen.
 
-## 1. Dein Typ als Business-Fundament
+REGEL — Authority-First bei Business-Entscheidungen (PFLICHT):
+- Die innere Autorität {{authority}} steht IMMER vor jeder Sakral-/Bauchgefühl-Empfehlung.
+- Emotional Authority: Niemals im emotionalen Hoch ODER Tief unterschreiben (Verträge, Pricing, Kooperationen). Die emotionale Welle abwarten — Mittelwert ist die Wahrheit.
+- Sakral: laut sprechen, sofort spüren, Ja/Nein als Sound (Ahuh/Unhun).
+- Splenic: schnell, leise, einmalig — kein Warten.
+- Self-Projected (Projector): durch Sprache zur Wahrheit — laut über die Option reden.
+- Lunar (Reflector): mind. ein Mondzyklus.
 
-Analysiere den Typ von {{clientName}} ({{type}}) mit voller Tiefe in Bezug auf Business.
+REGEL — Faktentreue (PFLICHT):
+- Verwende exakt die oben angegebenen Zahlen und Tor-Listen.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste der aktivierten Tore stehen.
+- Wenn du eine Planet-Tor-Position nennst, MUSS sie aus den oben gegebenen Persönlichkeits- oder Design-Planeten-Listen stammen.
+- Tor → Zentrum verbindlich (Standardmapping). Verwechsle besonders nicht: 39, 41, 19 → Wurzel (NICHT Solarplexus). 32 → Milz (NICHT Wurzel). 55 → Solarplexus (NICHT Wurzel).
+- Profil → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → RAX | 4/1 → JUX | 4/6, 5/1, 5/2, 6/2, 6/3 → LAX.
 
-**Manifestoren im Business:**
-- Die natürliche Kraft zu initiieren – ohne um Erlaubnis zu bitten
-- Informieren als Business-Disziplin: Warum es den Unterschied macht, ob Kunden, Partner und Team informiert werden
-- Welche Businessmodelle zur natürlichen Impulsenergie passen (solo, projektbasiert, Launch-Modelle)
-- Die häufigste Business-Falle: Erschöpfung durch Widerstand – wie Informieren diesen Widerstand auflöst
-
-**Generatoren & Manifest-Generatoren im Business:**
-- Das Fundament: Nur dann nachhaltig erfolgreich, wenn das Business echte Begeisterung auslöst
-- Wie der Sakral-Response der direkteste Business-Kompass ist (was lässt das tiefe Ja fühlen?)
-- Manifest-Generatoren: Die Multi-Passionate Unternehmer – warum Fokus manchmal falsch ist
-- Die Business-Falle: Dinge zu tun, weil man sie gut kann (aber nicht liebt)
-- Warum Warten auf Response KEIN passives Warten ist – aktives Präsentsein in der Welt
-
-**Projektoren im Business:**
-- Das natürliche Geschäftsmodell: Beratung, Coaching, Begleitung, Expertise anbieten
-- Warum Projektoren nicht initiieren sollten – und wie Einladungsmarketing funktioniert
-- Die Energie-Wahrheit: Weniger Stunden, tiefere Ergebnisse – Pricing muss das widerspiegeln
-- Wie Projektoren die mächtigsten Business-Guides werden, wenn sie erkannt und eingeladen werden
-- Die Bitterkeit als Signal: Was im Business nicht passt und korrigiert werden muss
-
-**Reflektoren im Business:**
-- Das seltenste Business-Profil – und das mächtigste als Spiegel für Systeme und Teams
-- Warum monatliche Entscheidungszyklen kein Handicap sind, sondern ein Qualitätsmerkmal
-- Welche Business-Umgebungen und Netzwerke den Unterschied machen
-- Das natürliche Talent: Systemprobleme erkennen, die andere nicht sehen
-
----
-
-## 2. Strategie & Autorität: Dein Business-Entscheidungskompass
-
-**Die Strategie von {{clientName}} ({{strategy}}) im konkreten Business-Kontext:**
-- Wie diese Strategie bei Preisentscheidungen anwenden
-- Wie bei der Wahl von Kooperationspartnern oder Kunden vorgehen
-- Wie bei Launch-Entscheidungen, neuen Angeboten, Teamaufbau einsetzen
-- Was konkret passiert, wenn gegen diese Strategie gehandelt wird (typische Business-Fehler)
-
-**Die Autorität von {{clientName}} ({{authority}}) im Business:**
-
-Sakrale Autorität: Körperreaktionen sind die ehrlichste Business-Beratung – kein Business-Meeting beginnen, das sich körperlich falsch anfühlt.
-Emotionale Autorität: Nie aus dem emotionalen Hoch oder Tief heraus entscheiden – der Mittelwert ist die Wahrheit; Verträge und große Business-Entscheidungen brauchen Zeit.
-Milz-Autorität: Der erste Impuls in Business-Situationen ist fast immer richtig – lernen, ihm zu vertrauen, ohne darüber nachzudenken.
-Ego-Autorität: Was will ich WIRKLICH? Diese Frage ehrlich beantworten – nicht was der Markt erwartet, sondern was das eigene Herz antreibt.
-Selbst-projizierte Autorität: Laut aussprechen, was sich im Business richtig anfühlt – die eigene Stimme kennt die Antwort, bevor der Verstand sie formuliert.
-Mondzyklen (Reflektoren): 28-Tage-Zyklen für große Business-Entscheidungen nutzen – in verschiedenen Umgebungen und mit vertrauten Menschen besprechen.
+REGEL — VERBOTENE Business-Empfehlungen:
+- „Du musst die Führung übernehmen" / „Initiiere dein Business" für Generator/MG/Projector.
+- „MG = Manifestor mit Generator-Energie".
+- Pricing-Empfehlungen, die Authority ignorieren („Verlange einfach mehr").
+- Marketing-Empfehlungen, die gegen den Type laufen (Push-Content für Projector, dauerhafter Content-Druck für Manifestor).
 
 ---
 
-## 3. Profil im Business – Deine Lebensrolle als Unternehmer
+## 1. Dein energetisches Business-Fundament
+{{clientName}} als {{type}} mit Strategie {{strategy}} im Business-Kontext. Was ist das natürliche Energie-Muster im Arbeitsalltag? Wo entstehen typische Business-Fallen, wenn entgegen Type/Strategy gearbeitet wird?
 
-Das Profil {{profile}} von {{clientName}} beschreibt, wie sie/er in der Welt Wirkung entfaltet:
+## 2. Deine Entscheidungsautorität im Business
+Wie {{clientName}} mit Autorität {{authority}} Business-Entscheidungen trifft. Konkrete Situationen: Angebote annehmen/ablehnen, Kooperationen, Investitionen, Pricing-Änderungen, Launches.
 
-Linie 1 (Fundament): Business braucht solides Wissen – Expertise ist das Fundament von Vertrauen; Recherche und Tiefe sind keine Zeitverschwendung, sie sind die Basis des Angebots.
-Linie 2 (Einsiedler): Das Talent liegt im Verborgenen – andere sehen es oft eher als man selbst; Business-Sichtbarkeit entsteht durch Einladung und durch das Genießen des Rückzugs, nicht durch Aufdrängen.
-Linie 3 (Märtyrer): Trial and Error IST die Methode – jedes "gescheiterte" Business-Experiment ist wertvolles Kapital; Authentisches Storytelling über Fehler und Wendungen erzeugt tiefes Vertrauen.
-Linie 4 (Opportunist): Business wächst durch das Netzwerk – Beziehungspflege ist keine Freizeitbeschäftigung, sondern die wichtigste Business-Investition; Empfehlungen sind der natürliche Kanal.
-Linie 5 (Häretiker): Als Problemlöser gesehen werden – konkrete, praxisnahe Angebote funktionieren; klare Positionierung ist entscheidend, da andere große Erwartungen haben.
-Linie 6 (Rollenmodell): Gelebte Erfahrung und Weisheit sind das stärkste Marketing – Authentizität und persönliche Transformation sind die Botschaft.
+## 3. Dein natürlicher Business-Stil (Profil {{profile}})
+Wie lernt und wächst dieses Profil im Business? Welche Rollen liegen natürlich (Experte, Berater, Storyteller, Netzwerker, Problemlöser, Rollenmodell)? Stärken und Fallen im Unternehmerischen.
 
----
+## 4. Deine Business-Zentren
+Definiert ({{definedCentersCount}}): {{definedCenters}} — wie zeigt sich diese konstante Energie konkret im Business-Alltag?
+Offen ({{openCentersCount}}): {{openCenters}} — welche Business-Konditionierungen entstehen typischerweise (z.B. offenes Sakral → Überarbeitung; offenes Ich → Pricing aus Vergleich; offene Kehle → Content-Zwang)?
 
-## 4. Definierte & Undefinierte Zentren im Business
+## 5. Deine Business-Kanäle & Kernkompetenzen
+Aktivierte Kanäle: {{channelsList}}. Pro Kanal: spezifische Business-Kompetenz, die dieser Kanal mitbringt. Wie kann sie im Markt positioniert werden?
 
-**Definierte Zentren** sind die konsistente, verlässliche Energie von {{clientName}} – das ist, was sie/er immer wieder anbieten kann, ohne sich zu verausgaben. Diese Energie ist ansteckend und zieht die richtigen Menschen an.
+## 6. Marketing & Sichtbarkeit nach deinem Design
+Wie positioniert sich {{clientName}} authentisch? Welche Kommunikationsstile und Kanäle passen zum Design? Was passiert, wenn entgegen dem Type gemarketet wird (Manifestor: Dauerpräsenz erschöpft; Projector: Push-Marketing erzeugt Bitterkeit; Generator/MG: Marketing aus Verstand statt aus Sakral-Begeisterung).
 
-**Undefinierte Zentren** sind die Bereiche, wo {{clientName}} konditioniert wurde – und gleichzeitig die größten Weisheitsquellen, wenn die Konditionierung erkannt wird:
+## 7. Business-Modell & Angebots-Struktur
+Welche Angebotsstruktur (1:1, Gruppe, Kurs, Membership, Produkt, Lizenz) passt zum Typ? Welches Pricing-Modell ist authentisch (Authority-konform, nicht aus Markt-Vergleich)? Welche Kollaborationsformen funktionieren?
 
-- Undefiniertes Kehlkopf-Zentrum: Keine Notwendigkeit, konstant Content zu produzieren – Qualität über Quantität; das Sprechen und Schreiben muss sich natürlich und eingeladen anfühlen.
-- Undefiniertes Solarplexus: Feinfühligkeit für die emotionale Energie von Kunden – großes Empathie-Asset, aber Vorsicht vor Übernahme anderer Business-Dramen und emotionaler Achterbahn.
-- Undefinierter Kopf/Ajna: Keine fixe Business-Philosophie notwendig – Flexibilität ist Stärke, nicht Schwäche; nicht jeden Business-Trend mitmachen müssen.
-- Undefiniertes Ich-Zentrum: Wert und Preis nicht von äußerer Anerkennung abhängig machen – Preise setzen aus innerer Sicherheit, nicht aus dem Vergleich mit anderen oder aus dem Wunsch nach Zugehörigkeit.
-- Undefiniertes Sakral-Zentrum (Non-Energietype): Pausen und Regeneration sind keine Schwäche, sondern die wichtigste Business-Infrastruktur.
+## 8. Deine Lebensaufgabe im Business-Kontext
+Wie manifestiert sich {{incarnationCrossName}} in der beruflichen Mission? Was kann nur {{clientName}} auf diese Art in die Welt bringen? Mission-Ebene als roter Faden — KEIN Life-Purpose-Statement, sondern Business-Bezug.
 
----
-
-## 5. Channels & Gates: Deine Business-Superkräfte
-
-Analysiere die aktivierten Gates und Channels von {{clientName}} im Business-Kontext mit konkreter Bedeutung für das Angebot, die Kommunikation und die Wirkung:
-
-Business-relevante Schlüssel-Channels und ihre Business-Bedeutung:
-- Channel 13-33 (Der Auditore): Sammler von Erfahrungen und Weisheit – Storytelling ist die natürliche Business-Sprache; Kunden kaufen die Geschichte.
-- Channel 1-8 (Inspiration): Kreative Ausdruckskraft als Business-Asset – einzigartiger Stil ist kein Luxus, sondern notwendig für Wiedererkennbarkeit.
-- Channel 45-21 (Money Line): Natürliche Führung von Ressourcen und Geld – Führungsrollen im Business oder Finanzverantwortung passen; Thema: "Mein ist das Meine".
-- Channel 35-36 (Transitorie): Neue Erfahrungen anziehen und teilen – Business lebt von Abwechslung und Weiterentwicklung, Langeweile ist ein rotes Flag.
-- Channel 11-56 (Geschichtenerzähler): Ideen durch Erfahrung in Bedeutung verwandeln – Teaching und Content-Creation als natürliches Medium für Business-Präsenz.
-- Channel 62-17 (Akzeptanz): Detailgenauigkeit und Faktenorientierung – starke Analysefähigkeit für Business-Entscheidungen und überzeugende Argumentation.
-- Channel 29-46 (Entdeckung): Vollständiges Commitment, wenn das Ja aus dem Sakral gekommen ist – keine halben Sachen; aber nur committen, wenn das echte Ja da ist.
-- Channel 25-51 (Einleitung): Mut zur Innovation und dem ersten Schritt – als Pionier im Markt unterwegs; Wettbewerb spornt an statt einzuschüchtern.
-
----
-
-## 6. Positionierung, Angebote & Pricing aus dem Design
-
-Basierend auf Typ, Profil und Energie von {{clientName}}:
-
-**Natürliche Positionierung:**
-- Welche Art von Angeboten sich nach dem Design von {{clientName}} anfühlen (Einzelbegleitung vs. Gruppe, digital vs. live, tief vs. breit)
-- Welche Probleme {{clientName}} von Natur aus löst – und welche Kunden energetisch wirklich passen
-- Welche Positionierung nachhaltig trägt, statt zu verausgaben
-
-**Pricing aus dem Design:**
-- Warum das richtige Pricing ein energetisches Statement ist
-- Wie Unterbewertung die eigene Business-Energie blockiert
-- Was der Typ über die natürliche Energie-Investition pro Klient verrät (Projektoren: tiefe Einzelsessions höher bepreisen; Generatoren: Volumen möglich, wenn Begeisterung da ist)
-
-**Angebots-Struktur nach Design:**
-- Welche Formate (1:1, Gruppe, Kurs, Retreat, Membership) zum Typ passen
-- Wie lange Engagements idealerweise sein sollten
-- Welche Kanäle für Sichtbarkeit sich für {{clientName}} authentisch anfühlen
-
----
-
-## 7. Marketing & Sichtbarkeit nach dem Design
-
-**Content-Strategie nach Typ:**
-- Manifestoren: Launch-Energie nutzen, nicht dauerhaft präsent sein müssen – intensive Kampagnen, dann Rückzug
-- Generatoren: Auf echte Begeisterung warten, dann zeigen – Response und Freude sichtbar machen ist das stärkste Marketing
-- Projektoren: Einladungsmarketing – Expertise demonstrieren und eingeladen werden; seltener, aber tiefer
-- Reflektoren: Wenn es passt, dann authentisch und wirkungsvoll – Timing und Umgebung entscheiden
-
-**Sichtbarkeit aus dem Profil von {{clientName}} ({{profile}}):**
-- Welche Plattformen und Formate zum Profil passen
-- Ob Bühne, geschriebenes Wort, persönliche Empfehlungen oder Tiefenarbeit die natürliche Reichweite erzeugt
-
-**Vertrauen aufbauen durch das Design:**
-- Die Art, wie {{clientName}} Glaubwürdigkeit aufbaut – Expertise-Tiefe vs. Beziehung vs. Transformation vs. Vision
-
----
-
-## 8. Business-Fallen und Konditionierungen
-
-Die typischen Muster, die {{clientName}} vom echten Business-Flow fernhalten:
-
-- Gegen die Strategie ({{strategy}}) handeln – konkrete Beispiele, wie das im Business aussieht und welche Folgen es hat
-- Konditionierungen der undefinierten Zentren im Business-Kontext – welche Entscheidungen daraus entstehen (zu günstig bepreisen, zu viele Kunden annehmen, nicht Nein sagen können)
-- Typische Burnout-Muster des Typs {{type}} im Business
-- Der Not-Self im Business: Welche Business-Entscheidungen aus Angst, Bitterkeit, Frustration oder Enttäuschung entstehen – und wie {{clientName}} das erkennen kann, bevor der Schaden entsteht
-
----
-
-## 9. Inkarnationskreuz: Die Business-Mission
-
-Das Inkarnationskreuz von {{clientName}} beschreibt die übergeordnete Lebensaufgabe – und damit auch die tiefste Ebene des Business:
-
-- Welches Thema taucht immer wieder im Business auf, egal welches Angebot?
-- Was ist der rote Faden, der alle Angebote verbindet?
-- Welche Kunden werden von dieser Mission angezogen?
-- Wie kann die Business-Kommunikation diese Mission widerspiegeln?
-
----
-
-## 10. Nächste Schritte: Business nach Design
-
-Konkrete, umsetzbare Empfehlungen für {{clientName}} – nicht generisch, sondern aus dem Design:
-
-1. **Sofortiger erster Schritt** basierend auf Strategie und Autorität – was kann {{clientName}} noch diese Woche anders machen?
-2. **Das eine Angebot**, das zu Typ, Energie und Profil passt – fokussiert und tief, nicht breit
-3. **Die wichtigste Konditionierung** im Business, die {{clientName}} aufzulösen hat
-4. **Business-Rituale nach Design**: Wie den Arbeitstag, die Woche, Entscheidungen gestalten, damit Energie fließt statt versiegt
-5. **Einen Satz**, der die Business-Positionierung von {{clientName}} auf den Punkt bringt – aus dem Design heraus, nicht aus dem Marktdruck
-
----
+## 9. Konkrete nächste Schritte
+3-5 sofort umsetzbare Empfehlungen für {{clientName}}, spezifisch aus diesem Chart. Type-konform (kein „initiieren" für Generator/MG/Projector). Keine generischen Ratschläge.
 
 Sprache: Deutsch
-Stil: Tiefgründig, direkt, konkret, businessorientiert – nie generisch, immer auf {{clientName}} und ihr/sein spezifisches Design bezogen
-Länge: Ausführlich und vollständig – dies ist ein Premium-Business-Reading, das den Wert einer 90-Minuten-Coaching-Session hat
-WICHTIG: Nenne {{clientName}} in jeder Sektion bei ihrem/seinem Namen. Schreibe, als würdest du direkt mit der Person sprechen.
+Stil: tiefgründig, direkt, businessorientiert, konkret auf {{clientName}} bezogen — nie generisch
+Länge: 2000-3000 Wörter pro Teil (2-Pass-Reading, Premium-Tiefe)

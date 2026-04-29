@@ -1,41 +1,86 @@
-Erstelle ein Health & Wellness Human Design Reading für:
+Erstelle ein Human-Design Health-Reading für:
 
+Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Fokus auf Gesundheit und Wohlbefinden:
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}} | Profil: {{profile}} | Autorität: {{authority}} | Strategie: {{strategy}} | Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+  - Persönlichkeitssonne: Tor {{personalitySun}}
+  - Persönlichkeitserde:  Tor {{personalityEarth}}
+  - Design-Sonne:         Tor {{designSun}}
+  - Design-Erde:          Tor {{designEarth}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+- Persönlichkeitsplaneten: {{personalityPlanetsList}}
+- Designplaneten: {{designPlanetsList}}
 
-## 1. Energie-Management
-- Deine natürliche Energie
-- Wie du deine Energie optimal nutzt
-- Energie-Rhythmus und Bedürfnisse
+REGEL — KEINE Diagnose, KEINE Heilversprechen (PFLICHT, juristisch + ethisch):
+- Dieses Reading ist eine Selbstreflexionshilfe auf Basis von Human-Design-Mustern. Es ist KEIN medizinisches, psychotherapeutisches oder diätetisches Diagnose-Tool.
+- VERBOTEN sind kausale Aussagen wie:
+  - „Wenn du X tust, wirst du krank."
+  - „Stillstand macht dich krank."
+  - „Du schwächst buchstäblich dein Immunsystem."
+  - Konkrete Krankheits-Zuordnungen zu Centern (z.B. „Offenes Solarplexus → Magenprobleme/Verdauungsstörungen", „Offene Wurzel → Nebennierenschwäche", „Offene Kehle → Schilddrüsenprobleme").
+  - „Wenn du deine Intuition ignorierst, wirst du krank."
+- ERLAUBT sind hypothetische, einladende Formulierungen:
+  - „Manche Menschen mit dieser Konfiguration berichten von einer Tendenz zu …"
+  - „In der HD-Tradition wird dieses Muster oft assoziiert mit …"
+  - „Achte darauf, ob du in Stress-Situationen Spannung in folgendem Bereich spürst …"
+- Disclaimer am Anfang UND Ende des Readings (siehe unten).
 
-## 2. Körperliche Gesundheit
-- Zentren und Gesundheit
-- Körperliche Stärken und Schwächen
-- Gesundheitsempfehlungen basierend auf Human Design
+REGEL — Authority-First-Reihenfolge (PFLICHT):
+- Die innere Autorität {{authority}} steht IMMER vor jeder Sakral-/Bauchgefühl-Empfehlung.
+- Bei Emotional Authority: Niemals „Folge deinem Sakral" als ersten Schritt empfehlen. Korrekt: „Spüre den ersten Sakral-Impuls, aber entscheide erst nach Klarheit durch die emotionale Welle (mehrere Stunden bis mehrere Tage)."
+- Bei Splenic: schnell, leise, einmalig — kein Warten.
+- Bei Sakral: laut sprechen, sofort spüren, ja/nein im Körper.
+- Bei Self-Projected: durch Sprache zur Wahrheit.
 
-## 3. Emotionale Gesundheit
-- Emotionale Zentren und Wohlbefinden
-- Wie du mit Emotionen umgehst
-- Emotionale Balance
+REGEL — Faktentreue (PFLICHT):
+- Verwende exakt die oben angegebenen Zahlen und Tor-Listen.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste der aktivierten Tore stehen.
+- Wenn du eine Planet-Tor-Position nennst, MUSS sie aus den oben gegebenen Persönlichkeits- oder Design-Planeten-Listen stammen.
+- Tor → Zentrum verbindlich (Standardmapping). Verwechsle besonders nicht: 39, 41, 19 → Wurzel (NICHT Solarplexus). 32 → Milz (NICHT Wurzel). 55 → Solarplexus (NICHT Wurzel).
+- Profil → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → RAX | 4/1 → JUX | 4/6, 5/1, 5/2, 6/2, 6/3 → LAX.
+- Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) verboten.
 
-## 4. Stress & Erschöpfung
-- Stressquellen basierend auf undefinierten Zentren
-- Wie du Stress vermeidest
-- Erholung und Regeneration
+---
 
-## 5. Lifestyle-Empfehlungen
-- Lebensstil, der zu deinem Typ passt
-- Ernährung und Bewegung
-- Work-Life-Balance
+## DISCLAIMER (am Anfang einbauen)
 
-## 6. Wohlbefinden
-- Praktische Tipps für dein Wohlbefinden
-- Selbstfürsorge basierend auf Human Design
-- Langfristige Gesundheit
+> Dieses Reading ist eine Selbstreflexionshilfe auf Basis deines Human-Design-Charts. Es ersetzt keine medizinische, psychotherapeutische oder ernährungsberaterische Begleitung. Bei körperlichen oder psychischen Beschwerden wende dich bitte an eine qualifizierte Fachperson.
+
+---
+
+## 1. Dein Energie-System im Überblick
+{{clientName}} als {{type}} mit Strategie {{strategy}} und Autorität {{authority}}. Was bedeutet das energetisch im Alltag? Welche Muster führen zu Erschöpfung — welche zu nachhaltiger Energie?
+
+## 2. Definierte Zentren als konstante Ressourcen
+Pro Zentrum aus {{definedCenters}}: Welche Energie steht konstant zur Verfügung? Wo ist Vorsicht geboten gegen Übernutzung? Beispiele aus den aktivierten Kanälen ({{channelsList}}).
+
+## 3. Offene Zentren als Wahrnehmungs- und Lern-Felder
+Pro Zentrum aus {{openCenters}}: Welche Energie nimmt {{clientName}} hier verstärkt wahr? Welche Konditionierungs-Muster entstehen typischerweise? KEINE Krankheits-Zuordnungen, sondern Beobachtungs-Hinweise.
+
+## 4. Authority-konformes Entscheiden im Gesundheits-Alltag
+Wie {{clientName}} mit {{authority}} Gesundheits-Entscheidungen trifft (Ernährung, Pause, Schlaf, Bewegung). Authority-First-Reihenfolge: niemals Sakral vor emotionaler Welle bei Emotional Authority.
+
+## 5. Profil {{profile}} und Lebensphasen
+Wie sich Gesundheits-Themen in den Profil-Phasen verschieben. Konkret für {{clientName}}.
+
+## 6. Praktische Selbstfürsorge-Hinweise
+Konkrete Hinweise zu Schlaf, Bewegung, Pausen, Umgebung — abgeleitet aus Type/Authority/Centern. KEINE Diagnose, KEINE „du wirst krank wenn"-Aussagen. Stattdessen einladende „achte auf"-Formulierungen.
+
+## 7. Wenn etwas spannungsvoll wird
+Was {{clientName}} wahrnehmen kann, wenn das System überlastet ist. Wieder einladend, NICHT kausal. Hinweis auf Fachperson.
+
+## 8. Disclaimer (am Ende wiederholen)
+
+> Dieses Reading ist keine medizinische, psychotherapeutische oder ernährungsberaterische Beratung. Bei körperlichen oder psychischen Beschwerden wende dich bitte an eine qualifizierte Fachperson (Hausarzt, Therapeut*in, Heilpraktiker*in, Ernährungsberater*in).
 
 Sprache: Deutsch
-Stil: Einfühlsam, unterstützend, praktisch, ermutigend
-
+Stil: warm, klar, achtsam, nicht alarmistisch, nicht heilversprechend
+Länge: 1500-3000 Wörter

@@ -1266,6 +1266,10 @@ ${deltaContext}`;
   if (readingType === 'life-purpose') {
     return generateLifePurposeTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders });
   }
+  // Career: separater Pfad mit Type-konformer Karriere-Logic statt Business-Hybrid
+  if (readingType === 'career') {
+    return generateCareerTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders });
+  }
 
   const baseSystem = `Du bist ein erfahrener Human Design Business Coach.
 
@@ -1278,7 +1282,7 @@ ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Di
 
   const part1Prompt = `${baseSystem}
 
-Erstelle TEIL 1 eines tiefgründigen Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+Erstelle TEIL 1 eines tiefgründigen Human Design Business-Readings für:
 ${personContext}
 
 Schreibe direkt an die Person (Du-Form). Kein Lehrbuch — echter Spiegel für diese eine Person.
@@ -1302,7 +1306,7 @@ Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret un
 
   const part2Prompt = `${baseSystem}
 
-Erstelle TEIL 2 des Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+Erstelle TEIL 2 des Human Design Business-Readings für:
 ${personContext}
 
 Schreibe direkt als Fortsetzung. Kein neuer Titel, keine Wiederholung von Teil 1.
@@ -1403,6 +1407,92 @@ Schließe mit der Verdichtung: ${placeholders.incarnationCrossName} in einem Sat
 Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Lebensaufgabe-Fokus, kein Business.`;
 
   return generateTwoParts({ readingType: 'life-purpose', part1Prompt, part2Prompt, modelConfig });
+}
+
+// ── 2-Pass: Career ────────────────────────────────────────────────────────────
+// Type-konforme Karriere-Logic. Verboten: „MG ist Manifestor-Hybrid", CEO-Top-
+// Empfehlungen ohne Sakral-Resonanz-Test. Erlaubt: Multi-Passion-Pfade,
+// Skip-Step-Mechanik, Trial-and-Error-Beruf bei 3er-Linie, Projektions-Fallen
+// bei 5er-Linie.
+async function generateCareerTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders }) {
+  const baseSystem = `Du bist ein erfahrener Human Design Karriere-Coach. Dieses Reading ist KEIN Business-Reading und KEIN Life-Purpose-Reading.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Beginne direkt. Kein Disclaimer.
+
+PFLICHT — Type-konforme Karriere-Logik:
+- {{type}} ist ${placeholders.type}. Wenn ${placeholders.type} = "Manifesting Generator": Vergiss den Mythos „MG vereint Generator + Manifestor-Initiierung". MG ist ein **Generator-Subtyp** mit schnellerer Sakral-Reaktion und Skip-Step-Fähigkeit. Er initiiert NICHT — er reagiert schneller auf mehrere Möglichkeiten gleichzeitig. Strategie: Warten + Antworten + Informieren (das Informieren betrifft die Schritte, nicht das Initiieren).
+- Wenn ${placeholders.type} = "Generator": Strategie ist Warten + Antworten. Niemals „initiieren".
+- Wenn ${placeholders.type} = "Projector": Strategie ist Warten auf Einladung. Karriere-Top-Rollen (CEO, Senior Partner) NUR wenn auf Einladung. Nie „pushen".
+- Wenn ${placeholders.type} = "Manifestor": Initiieren + Informieren. Karriere als Solo-Initiator möglich.
+- Wenn ${placeholders.type} = "Reflector": Mond-basierte Klarheit. Karriere-Entscheidungen über Monatszyklus.
+
+PFLICHT — Profil-Mechanik im Karriere-Kontext:
+- 3er-Linie (Märtyrer/Experimentator): **Trial-and-Error-Berufsweg** ist HD-konform — Job-Pivots sind Lernen, kein Versagen.
+- 5er-Linie (Häretiker/Projektor): **Projektions-Magnet im Bewerbungs-Kontext** — andere projizieren Erwartungen; trennen zwischen echtem Match und Projektion essentiell.
+- 6er-Linie (Rollenmodell): **3-Phasen-Lebenszyklus** prägt Karriere stark — bis 30 Experimentieren, 30-50 Rückzug/Reife, 50+ Rollenmodell-Sichtbarkeit.
+
+VERBOTEN:
+- „CEO/Geschäftsführer/Top-Manager" als Top-Karriere-Empfehlung **ohne** den Disclaimer „nur als Antwort auf Einladung / sakrale Resonanz".
+- „Initiieren" / „Vorangehen" / „Du musst die Führung übernehmen" für Generator/MG/Projector.
+- „MG = Manifestor mit Generator-Energie".
+- Genre-Drift: KEINE Pricing-/Marketing-/Sichtbarkeits-Sektionen (das ist Business-Reading-Inhalt).
+- Composite-Begriffe (Goldader, Connection-Key) verboten.`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines Karriere-Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Karriere-Fokus, kein Business-Coaching.
+
+---
+
+## 1. Dein Karriere-Energie-Fundament
+${placeholders.clientName} als ${placeholders.type} mit Profil ${placeholders.profile} und Autorität ${placeholders.authority}. Wie wirkt diese Konstellation im beruflichen Alltag? Was ist der natürliche Karriere-Rhythmus? Welche Berufs-Fallen entstehen, wenn entgegen Type/Strategy gearbeitet wird?
+
+## 2. Type-spezifische Karriere-Strategie
+Strategie ${placeholders.strategy} im Bewerbungs- und Berufskontext. Konkrete Situationen: Stellenangebot annehmen/ablehnen, Rolle wechseln, Selbstständigkeit vs. Anstellung. Anti-Mythen klar adressieren (siehe PFLICHT-Regeln).
+
+## 3. Autoritäts-konforme Karriere-Entscheidungen
+Wie ${placeholders.clientName} mit Autorität ${placeholders.authority} berufliche Entscheidungen trifft. Konkrete Praxis pro Authority-Typ.
+
+## 4. Profil ${placeholders.profile} im Berufskontext
+3er-Linie: Trial-and-Error als Lernen. 5er-Linie: Projektions-Magnet. 6er-Linie: 3-Phasen-Zyklus. Konkret für Profil ${placeholders.profile}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Karriere-spezifisch.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Karriere-Readings für:
+${personContext}
+
+Direkt als Fortsetzung. Keine Wiederholung von Teil 1.
+
+---
+
+## 5. Kanäle als Karriere-Kompetenzen
+Aktivierte Kanäle: ${placeholders.channelsList}. Was ist die berufliche Kompetenz pro Kanal? Welche Rollen passen?
+
+## 6. Definierte Zentren als Berufs-Ressourcen
+Definiert (${placeholders.definedCentersCount}): ${placeholders.definedCenters}. Was bringt ${placeholders.clientName} im Beruf konstant ein?
+
+## 7. Offene Zentren als Berufs-Vorsicht
+Offen (${placeholders.openCentersCount}): ${placeholders.openCenters}. Welche Konditionierungs-Fallen lauern im Berufskontext?
+
+## 8. Inkarnationskreuz im beruflichen Kontext
+Wie manifestiert sich ${placeholders.incarnationCrossName} in der Berufung? Mission-Ebene, nicht Operativ-Ebene.
+
+## 9. Konkrete nächste Schritte
+3-5 sofort umsetzbare Karriere-Schritte für ${placeholders.clientName}. Type-konform (kein „initiieren" für Generator/MG/Projector). Skip-Step bei MG erlauben. Multi-Passion bei MG erlauben.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Karriere-spezifisch.`;
+
+  return generateTwoParts({ readingType: 'career', part1Prompt, part2Prompt, modelConfig });
 }
 
 // ── 2-Pass: Shadow-Work ───────────────────────────────────────────────────────
@@ -2703,6 +2793,67 @@ async function pollForJobs() {
         if (attemptsErr) console.warn('⚠️ attempts-Update fehlgeschlagen:', attemptsErr.message);
 
         const jobStart = Date.now();
+
+        // ── Hardstop: Chart-Daten-Validator ──────────────────────
+        // Verhindert Reading-Halluzination, wenn weder gespeichertes chart_data
+        // noch Geburtsdaten zum Recompute vorhanden sind. Multi-Person-Typen
+        // (connection, penta, sexuality mit birthdate2, compatibility) und
+        // tagesimpuls/multi-agent haben eigene Pfade — werden übersprungen.
+        // Recovery: processHumanDesignJob/processChannelAnalysisJob rechnen
+        // chart_data via fetchChartData() neu, wenn Birth-Data im Payload sind.
+        // Validator lehnt deshalb nur ab, wenn:
+        //   (a) chart_data in DB gesetzt aber kaputt (kein Recovery möglich, da
+        //       der DB-Wert sonst Vorrang hätte), ODER
+        //   (b) chart_data in DB fehlt UND Birth-Data im Payload fehlen.
+        const SKIP_CHART_VALIDATION = new Set(['tagesimpuls', 'multi-agent']);
+        const MULTI_PERSON_TYPES = new Set(['connection', 'composite', 'connection-basic', 'penta', 'penta-basic', 'penta-communication', 'phasen-reading']);
+        const isMultiPerson = MULTI_PERSON_TYPES.has(readingType) ||
+          (['relationship', 'compatibility', 'sexuality'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2));
+        if (!SKIP_CHART_VALIDATION.has(readingType) && !isMultiPerson) {
+          const payload = job.payload || {};
+          const hasBirthData = !!(payload.birthdate && payload.birthtime && payload.birthplace);
+
+          let dbChart = null;
+          let dbChartPresent = false;
+          if (payload.reading_id) {
+            const { data: row } = await supabasePublic
+              .from('readings')
+              .select('chart_data, reading_data')
+              .eq('id', payload.reading_id)
+              .maybeSingle();
+            dbChart = row?.chart_data || row?.reading_data?.chart_data || null;
+            dbChartPresent = !!dbChart;
+          }
+
+          const hasGates = Array.isArray(dbChart?.gates) && dbChart.gates.length > 0;
+          const hasType = !!dbChart?.type && dbChart.type !== 'Unbekannt';
+          const hasProfile = !!dbChart?.profile && dbChart.profile !== '?';
+          const dbChartValid = hasGates && hasType && hasProfile;
+
+          // Reject-Bedingung: kaputtes DB-Chart ODER weder DB-Chart noch Birth-Data
+          const reject = (dbChartPresent && !dbChartValid) || (!dbChartPresent && !hasBirthData);
+          if (reject) {
+            const errMsg = dbChartPresent
+              ? `INVALID_CHART_INPUT — chart_data in DB unvollständig (gates=${hasGates}, type=${hasType}, profile=${hasProfile})`
+              : `INVALID_CHART_INPUT — kein chart_data in DB UND keine Birth-Data im Payload (birthdate/birthtime/birthplace)`;
+            console.warn(`🚫 [Chart-Validator] Job ${job.id} abgelehnt: ${errMsg}`);
+            await supabase.from('reading_jobs')
+              .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
+              .eq('id', job.id);
+            const invReadingId = payload.reading_id;
+            if (invReadingId) {
+              await supabasePublic.from('readings')
+                .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
+                .eq('id', invReadingId);
+            }
+            sendMattermost(
+              `🚫 **Reading abgelehnt** | \`${readingType}\` | Job \`${job.id}\` | ${errMsg}`,
+              'errors'
+            );
+            continue;
+          }
+        }
+
         if (readingType === 'tagesimpuls') {
           await processTagesimpulsJob(job, reading);
         } else if (['connection', 'composite', 'connection-basic'].includes(readingType) ||

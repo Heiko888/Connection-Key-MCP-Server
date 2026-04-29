@@ -33,34 +33,34 @@ REGEL — Faktentreue (PFLICHT):
 
 Erstelle das Reading in 8 Sektionen mit Lebensaufgabe-Fokus:
 
-## 1. {{clientName}}: Wer du auf der Seelen-Ebene bist
-Fundament: {{type}} mit Profil {{profile}} und Autorität {{authority}}. Keine Operativ-Ebene, sondern: was bringt {{clientName}} als Seele hier herein?
+## 1. Wer du bist — Type, Profil, Autorität als Lebensgrundlage
+{{clientName}} als {{type}} mit Profil {{profile}} und Autorität {{authority}}. Wie bilden diese drei zusammen das Fundament der Lebensaufgabe? Strategie {{strategy}} als Kern-Bewegung.
 
 ## 2. Dein Inkarnationskreuz: {{incarnationCrossName}}
-Beginne mit „{{clientName}}, dein Inkarnationskreuz ist {{incarnationCrossName}}." Entfalte die thematische Botschaft des Kreuzes auf 600+ Wörtern.
+Was bedeutet dieses Kreuz konkret? Welche Lebensaufgabe trägt es? Beginne mit dem Satz „{{clientName}}, dein Inkarnationskreuz ist {{incarnationCrossName}}." und entfalte die Mission auf 600+ Wörtern.
 
-## 3. Die vier IC-Tore und ihre Lebens-Botschaft
-- **Persönlichkeitssonne — Tor {{personalitySun}}**: das bewussteste Lebensthema von {{clientName}}.
+## 3. Die vier Tore deines Kreuzes
+- **Persönlichkeitssonne — Tor {{personalitySun}}**: das bewussteste Lebensthema.
 - **Persönlichkeitserde — Tor {{personalityEarth}}**: der bewusste Boden.
 - **Design-Sonne — Tor {{designSun}}**: das körperlich getragene Hauptthema.
 - **Design-Erde — Tor {{designEarth}}**: der unbewusste Boden.
-Pro Tor 200+ Wörter. Verbinde die vier zu einer kohärenten Mission.
+Verwechsle nicht: Tor {{personalitySun}} ist die Persönlichkeitssonne (NICHT die Design-Sonne).
 
 ## 4. Profil {{profile}} im Lebenszyklus
-Wie zeigt sich dieses Profil in den Lebensphasen? Linien-Mechanik konkret für {{clientName}}.
+Wie zeigt sich dieses Profil über die Lebensphasen? Linien-Mechanik konkret für {{clientName}}.
 
-## 5. Channels als Lebensaufgaben-Träger
-Aktivierte Kanäle {{channelsList}}. Welche Lebenskompetenzen / Mission-Aspekte tragen sie? Wie binden sie an {{incarnationCrossName}} an?
+## 5. Deine Channels als Lebensaufgaben-Träger
+Aktivierte Kanäle: {{channelsList}}. Welche Lebenskompetenzen / -aufgaben tragen diese Kanäle? Wie binden sie an das Inkarnationskreuz {{incarnationCrossName}} an?
 
 ## 6. Definierte vs. offene Zentren als Mission-Architektur
-Definiert ({{definedCentersCount}}): {{definedCenters}} — was {{clientName}} konstant in die Welt bringt.
-Offen ({{openCentersCount}}): {{openCenters}} — wo {{clientName}} fürs Kollektiv lernt und reflektiert.
+Definiert ({{definedCentersCount}}): {{definedCenters}} — was bringst du konstant in die Welt?
+Offen ({{openCentersCount}}): {{openCenters}} — wo lernst du fürs Kollektiv?
 
-## 7. Verkörperung der Mission im Alltag
-Konkrete Lebens-Schritte (nicht Business-Strategie). Wie lebt {{clientName}} die Mission in Beziehungen, in der eigenen Entwicklung, in der Welt?
+## 7. Die Verkörperung der Mission — Schritte für {{clientName}}
+Konkrete Lebens-Schritte (KEINE Business-Strategie). Wie lebt diese Person die Mission im Alltag, in Beziehungen, in der eigenen Entwicklung?
 
-## 8. Der Kern in einem Satz
-Verdichtung: {{incarnationCrossName}} in einem Satz für {{clientName}}.
+## 8. Was bleibt — der Kern in einem Satz
+Schließe mit der Verdichtung: {{incarnationCrossName}} in einem Satz für {{clientName}}.
 
 Sprache: Deutsch
 Stil: Inspirierend, tiefgreifend, transformierend, du-Form

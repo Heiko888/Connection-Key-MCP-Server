@@ -1,41 +1,94 @@
-Erstelle ein Career Human Design Reading für:
+Erstelle ein Human-Design Career-Reading für:
 
+Name: {{clientName}}
 Geburtsdatum: {{birthDate}}
 Geburtszeit: {{birthTime}}
 Geburtsort: {{birthPlace}}
 
-Fokus auf Karriere und berufliche Entwicklung:
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}} | Profil: {{profile}} | Autorität: {{authority}} | Strategie: {{strategy}} | Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+  - Persönlichkeitssonne: Tor {{personalitySun}}
+  - Persönlichkeitserde:  Tor {{personalityEarth}}
+  - Design-Sonne:         Tor {{designSun}}
+  - Design-Erde:          Tor {{designEarth}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+- Persönlichkeitsplaneten: {{personalityPlanetsList}}
+- Designplaneten: {{designPlanetsList}}
 
-## 1. Berufliche Talente
-- Natürliche Stärken im Beruf
-- Talente basierend auf Typ, Zentren und Channels
-- Einzigartige berufliche Fähigkeiten
+GENRE — Karriere, NICHT Business, NICHT Life-Purpose (PFLICHT):
+- Dieses Reading ist ein KARRIERE-Reading. Fokus: Berufsweg, Bewerbung, Rollenwahl, Anstellung vs. Selbstständigkeit, Berufs-Pivots.
+- VERBOTEN sind Business-Sektionen wie: Pricing, Marketing, Sichtbarkeit, Kundenakquise, Geschäftsmodell, Skalierung — das gehört in das Business-Reading.
+- VERBOTEN ist die Lebensaufgaben-Ebene (Inkarnationskreuz als „Lebensmission") als Hauptthema — das gehört in das Life-Purpose-Reading. Inkarnationskreuz hier nur im Berufs-Kontext.
+- VERBOTEN sind Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) — das gehört in Beziehungs-Readings.
 
-## 2. Ideale Arbeitsumgebung
-- Arbeitsbedingungen, die zu dir passen
-- Team-Dynamik und Zusammenarbeit
-- Arbeitsstil und Präferenzen
+REGEL — Type-konforme Karriere-Logik (PFLICHT, kein HD-Mythos):
+- {{type}} ist die Grundlage. Wenn {{type}} = "Manifesting Generator": Vergiss den Mythos „MG vereint Generator + Manifestor-Initiierung". MG ist ein **Generator-Subtyp** mit schnellerer Sakral-Reaktion und Skip-Step-Fähigkeit. Er initiiert NICHT — er reagiert schneller auf mehrere Möglichkeiten gleichzeitig. Strategie: Warten + Antworten + Informieren (das Informieren betrifft die Schritte, nicht das Initiieren).
+- Wenn {{type}} = "Generator": Strategie ist Warten + Antworten. Niemals „initiieren".
+- Wenn {{type}} = "Projector": Strategie ist Warten auf Einladung. Karriere-Top-Rollen (CEO, Senior Partner, Geschäftsführer) NUR wenn auf echte Einladung — nicht „pushen".
+- Wenn {{type}} = "Manifestor": Initiieren + Informieren. Karriere als Solo-Initiator möglich.
+- Wenn {{type}} = "Reflector": Mond-basierte Klarheit. Karriere-Entscheidungen über mind. einen Monatszyklus reifen lassen.
 
-## 3. Karriere-Empfehlungen
-- Berufsfelder, die zu deinem Typ passen
-- Rollen, die deine Talente nutzen
-- Karrierewege basierend auf Human Design
+REGEL — Profil-Mechanik im Karriere-Kontext (PFLICHT):
+- 3er-Linie (Märtyrer/Experimentator): **Trial-and-Error-Berufsweg** ist HD-konform. Job-Pivots sind Lernen, kein Versagen. Niemals als „Sprunghaftigkeit" abwerten.
+- 5er-Linie (Häretiker/Projektor-Linie): **Projektions-Magnet im Bewerbungs-Kontext** — andere projizieren Erwartungen auf {{clientName}}. Trennung zwischen echtem Match und Projektion ist essentiell.
+- 6er-Linie (Rollenmodell): **3-Phasen-Lebenszyklus** prägt Karriere stark — bis ca. 30 Experimentieren, 30-50 Rückzug/Reife („auf dem Dach"), 50+ Rollenmodell-Sichtbarkeit. Frühe Karriere-Drucksituationen mit dieser Mechanik einordnen.
+- 1er-Linie (Forscher): Tiefe + Expertise. 2er-Linie (Eremit): Berufung von außen erkannt. 4er-Linie (Opportunist): Netzwerk-Karriere.
 
-## 4. Leadership & Zusammenarbeit
-- Dein natürlicher Führungsansatz (wenn zutreffend)
-- Wie du mit verschiedenen Typen arbeitest
-- Team-Kompatibilität
+REGEL — Authority-First bei Karriere-Entscheidungen (PFLICHT):
+- Die innere Autorität {{authority}} steht IMMER vor jeder Sakral-/Bauchgefühl-Empfehlung.
+- Emotional Authority: Niemals „spür im Bauch" als ersten Schritt. Korrekt: „Spüre den ersten Impuls, aber entscheide erst nach Klarheit durch die emotionale Welle (Stunden bis Tage)." Stellenangebote nicht im Hoch oder Tief unterschreiben.
+- Sakral: laut sprechen, sofort im Körper spüren, Ja/Nein als Sound (Ahuh/Unhun).
+- Splenic: schnell, leise, einmalig — kein Warten.
+- Self-Projected (Projector): durch Sprache zur Wahrheit — laut über die Option reden.
+- Lunar (Reflector): mind. ein Mondzyklus.
 
-## 5. Karriere-Strategien
-- Wie du berufliche Entscheidungen triffst
-- Strategie für beruflichen Erfolg
-- Häufige Karriere-Fallen und wie vermeiden
+REGEL — Faktentreue (PFLICHT):
+- Verwende exakt die oben angegebenen Zahlen und Tor-Listen.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste der aktivierten Tore stehen.
+- Wenn du eine Planet-Tor-Position nennst, MUSS sie aus den oben gegebenen Persönlichkeits- oder Design-Planeten-Listen stammen.
+- Tor → Zentrum verbindlich (Standardmapping). Verwechsle besonders nicht: 39, 41, 19 → Wurzel (NICHT Solarplexus). 32 → Milz (NICHT Wurzel). 55 → Solarplexus (NICHT Wurzel).
+- Profil → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → RAX | 4/1 → JUX | 4/6, 5/1, 5/2, 6/2, 6/3 → LAX.
 
-## 6. Berufliche Entwicklung
-- Wachstumsbereiche im Beruf
-- Wie du deine Talente weiterentwickelst
-- Langfristige Karriere-Perspektiven
+REGEL — VERBOTENE Karriere-Empfehlungen:
+- „CEO/Geschäftsführer/Top-Manager" als Top-Karriere-Empfehlung **ohne** den Disclaimer „nur als Antwort auf Einladung / sakrale Resonanz".
+- „Initiieren" / „Vorangehen" / „Du musst die Führung übernehmen" für Generator/MG/Projector.
+- „MG = Manifestor mit Generator-Energie".
+- Pricing-/Marketing-/Sichtbarkeits-Sektionen (das ist Business-Reading-Inhalt).
+- „Du bist hier, um …" als Lebensaufgaben-Statement (das ist Life-Purpose-Reading).
+
+---
+
+## 1. Dein Karriere-Energie-Fundament
+{{clientName}} als {{type}} mit Profil {{profile}} und Autorität {{authority}}. Wie wirkt diese Konstellation im beruflichen Alltag? Was ist der natürliche Karriere-Rhythmus? Welche Berufs-Fallen entstehen, wenn entgegen Type/Strategy gearbeitet wird?
+
+## 2. Type-spezifische Karriere-Strategie
+Strategie {{strategy}} im Bewerbungs- und Berufskontext. Konkrete Situationen: Stellenangebot annehmen/ablehnen, Rolle wechseln, Selbstständigkeit vs. Anstellung. Anti-Mythen klar adressieren (siehe PFLICHT-Regeln).
+
+## 3. Autoritäts-konforme Karriere-Entscheidungen
+Wie {{clientName}} mit Autorität {{authority}} berufliche Entscheidungen trifft. Konkrete Praxis pro Authority-Typ.
+
+## 4. Profil {{profile}} im Berufskontext
+3er-Linie: Trial-and-Error als Lernen. 5er-Linie: Projektions-Magnet. 6er-Linie: 3-Phasen-Zyklus. Konkret für Profil {{profile}}.
+
+## 5. Kanäle als Karriere-Kompetenzen
+Aktivierte Kanäle: {{channelsList}}. Was ist die berufliche Kompetenz pro Kanal? Welche Rollen passen?
+
+## 6. Definierte Zentren als Berufs-Ressourcen
+Definiert ({{definedCentersCount}}): {{definedCenters}}. Was bringt {{clientName}} im Beruf konstant ein?
+
+## 7. Offene Zentren als Berufs-Vorsicht
+Offen ({{openCentersCount}}): {{openCenters}}. Welche Konditionierungs-Fallen lauern im Berufskontext?
+
+## 8. Inkarnationskreuz im beruflichen Kontext
+Wie manifestiert sich {{incarnationCrossName}} in der Berufung? Mission-Ebene, nicht Operativ-Ebene. KEIN Life-Purpose-Statement — nur Berufs-Bezug.
+
+## 9. Konkrete nächste Schritte
+3-5 sofort umsetzbare Karriere-Schritte für {{clientName}}. Type-konform (kein „initiieren" für Generator/MG/Projector). Skip-Step bei MG erlauben. Multi-Passion bei MG erlauben.
 
 Sprache: Deutsch
-Stil: Professionell, klar, ergebnisorientiert, motivierend
-
+Stil: klar, direkt, berufs-spezifisch, nicht motivations-poetisch, nicht business-coachig
+Länge: 2000-3000 Wörter pro Teil (2-Pass-Reading)

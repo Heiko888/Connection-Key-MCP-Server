@@ -664,10 +664,16 @@ export default function InstantResonanceAnalysis() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <Stepper activeStep={1} sx={{ mb: 4 }}>
+            <Stepper activeStep={1} sx={{
+              mb: 4,
+              '& .MuiStepIcon-root': { color: 'rgba(242, 159, 5, 0.3)' },
+              '& .MuiStepIcon-root.Mui-active': { color: '#F29F05' },
+              '& .MuiStepIcon-root.Mui-completed': { color: '#F29F05' },
+              '& .MuiStepConnector-line': { borderColor: 'rgba(242, 159, 5, 0.2)' },
+            }}>
               {steps.map((label) => (
                 <Step key={label}>
-                  <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' } }}>
+                  <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' }, '& .MuiStepLabel-label.Mui-active': { color: '#F29F05', fontWeight: 700 } }}>
                     {label}
                   </StepLabel>
                 </Step>
@@ -676,139 +682,337 @@ export default function InstantResonanceAnalysis() {
 
             <Card
               sx={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(20px)',
-                border: '2px solid rgba(242, 159, 5, 0.3)',
+                background: 'linear-gradient(135deg, rgba(242, 159, 5, 0.12) 0%, rgba(140, 29, 4, 0.08) 100%)',
+                backdropFilter: 'blur(25px)',
+                border: '2px solid rgba(242, 159, 5, 0.4)',
                 borderRadius: 4,
-                p: 4,
+                p: { xs: 3, md: 5 },
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 12px 40px rgba(242, 159, 5, 0.2)',
               }}
             >
-              <Typography variant="h5" sx={{ color: '#FFFFFF', fontWeight: 700, mb: 3 }}>
-                {analysisMode === 'connection' ? 'Verbindungsdaten eingeben' : 'Personendaten eingeben'}
-              </Typography>
+              {/* Dekorative Glow-Elemente */}
+              <Box sx={{
+                position: 'absolute', top: -60, right: -60, width: 180, height: 180, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(242, 159, 5, 0.08), transparent)', filter: 'blur(40px)',
+              }} />
+              <Box sx={{
+                position: 'absolute', bottom: -40, left: -40, width: 140, height: 140, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(140, 29, 4, 0.08), transparent)', filter: 'blur(30px)',
+              }} />
 
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={analysisMode === 'connection' ? 6 : 12}>
-                  <Typography variant="h6" sx={{ color: '#F29F05', mb: 2 }}>
-                    {analysisMode === 'connection' ? 'Person 1' : 'Person'}
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    label="Name *"
-                    value={person1.name}
-                    onChange={(e) => handlePerson1Change('name', e.target.value)}
-                    sx={{ mb: 2 }}
-                    InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
-                    inputProps={{ style: { color: '#FFFFFF' } }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Geburtsdatum *"
-                    type="date"
-                    value={person1.birthDate}
-                    onChange={(e) => handlePerson1Change('birthDate', e.target.value)}
-                    InputLabelProps={{ shrink: true, style: { color: 'rgba(255,255,255,0.7)' } }}
-                    inputProps={{ style: { color: '#FFFFFF' } }}
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Geburtszeit"
-                    type="time"
-                    value={person1.birthTime}
-                    onChange={(e) => handlePerson1Change('birthTime', e.target.value)}
-                    InputLabelProps={{ shrink: true, style: { color: 'rgba(255,255,255,0.7)' } }}
-                    inputProps={{ style: { color: '#FFFFFF' } }}
-                    sx={{ mb: 2 }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Geburtsort *"
-                    value={person1.birthPlace}
-                    onChange={(e) => handlePerson1Change('birthPlace', e.target.value)}
-                    InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
-                    inputProps={{ style: { color: '#FFFFFF' } }}
-                  />
+              <Box sx={{ position: 'relative', zIndex: 1 }}>
+                <Typography variant="h5" sx={{
+                  fontWeight: 800,
+                  mb: 1,
+                  background: 'linear-gradient(135deg, #F29F05, #8C1D04)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: { xs: '1.4rem', md: '1.8rem' },
+                }}>
+                  {analysisMode === 'connection' ? 'Verbindungsdaten eingeben' : 'Personendaten eingeben'}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 4 }}>
+                  {analysisMode === 'connection'
+                    ? 'Gib die Geburtsdaten beider Personen ein, um eure energetische Verbindung zu analysieren.'
+                    : 'Gib deine Geburtsdaten ein, um deine energetische Signatur zu berechnen.'}
+                </Typography>
+
+                <Grid container spacing={4}>
+                  <Grid item xs={12} md={analysisMode === 'connection' ? 6 : 12}>
+                    <Box sx={{
+                      p: { xs: 2.5, md: 3 },
+                      borderRadius: 3,
+                      background: 'rgba(242, 159, 5, 0.04)',
+                      border: '1px solid rgba(242, 159, 5, 0.15)',
+                    }}>
+                      <Typography variant="subtitle1" sx={{
+                        color: '#F29F05', fontWeight: 700, mb: 2.5, display: 'flex', alignItems: 'center', gap: 1,
+                      }}>
+                        <Box sx={{
+                          width: 28, height: 28, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #F29F05, #8C1D04)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.8rem', fontWeight: 800, color: '#fff',
+                        }}>1</Box>
+                        {analysisMode === 'connection' ? 'Person 1' : 'Person'}
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        label="Name"
+                        placeholder="Vorname"
+                        value={person1.name}
+                        onChange={(e) => handlePerson1Change('name', e.target.value)}
+                        sx={{
+                          mb: 2,
+                          '& .MuiOutlinedInput-root': {
+                            color: '#FFFFFF',
+                            '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                            '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#F29F05', borderWidth: '2px',
+                              boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'rgba(255,255,255,0.6)',
+                            '&.Mui-focused': { color: '#F29F05' },
+                          },
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Geburtsdatum"
+                        type="date"
+                        value={person1.birthDate}
+                        onChange={(e) => handlePerson1Change('birthDate', e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{
+                          mb: 2,
+                          '& .MuiOutlinedInput-root': {
+                            color: '#FFFFFF',
+                            '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                            '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#F29F05', borderWidth: '2px',
+                              boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'rgba(255,255,255,0.6)',
+                            '&.Mui-focused': { color: '#F29F05' },
+                          },
+                          '& input::-webkit-calendar-picker-indicator': { filter: 'invert(0.7) sepia(1) hue-rotate(0deg) saturate(3)' },
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Geburtszeit (optional)"
+                        type="time"
+                        value={person1.birthTime}
+                        onChange={(e) => handlePerson1Change('birthTime', e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        helperText="Falls unbekannt, wird 12:00 verwendet"
+                        sx={{
+                          mb: 2,
+                          '& .MuiOutlinedInput-root': {
+                            color: '#FFFFFF',
+                            '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                            '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#F29F05', borderWidth: '2px',
+                              boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'rgba(255,255,255,0.6)',
+                            '&.Mui-focused': { color: '#F29F05' },
+                          },
+                          '& .MuiFormHelperText-root': { color: 'rgba(255,255,255,0.4)' },
+                          '& input::-webkit-calendar-picker-indicator': { filter: 'invert(0.7) sepia(1) hue-rotate(0deg) saturate(3)' },
+                        }}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Geburtsort"
+                        placeholder="z.B. Berlin"
+                        value={person1.birthPlace}
+                        onChange={(e) => handlePerson1Change('birthPlace', e.target.value)}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            color: '#FFFFFF',
+                            '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                            '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: '#F29F05', borderWidth: '2px',
+                              boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                            },
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'rgba(255,255,255,0.6)',
+                            '&.Mui-focused': { color: '#F29F05' },
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  {analysisMode === 'connection' && (
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{
+                        p: { xs: 2.5, md: 3 },
+                        borderRadius: 3,
+                        background: 'rgba(140, 29, 4, 0.04)',
+                        border: '1px solid rgba(140, 29, 4, 0.15)',
+                      }}>
+                        <Typography variant="subtitle1" sx={{
+                          color: '#F29F05', fontWeight: 700, mb: 2.5, display: 'flex', alignItems: 'center', gap: 1,
+                        }}>
+                          <Box sx={{
+                            width: 28, height: 28, borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #8C1D04, #F29F05)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '0.8rem', fontWeight: 800, color: '#fff',
+                          }}>2</Box>
+                          Person 2
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          label="Name"
+                          placeholder="Vorname"
+                          value={person2.name}
+                          onChange={(e) => handlePerson2Change('name', e.target.value)}
+                          sx={{
+                            mb: 2,
+                            '& .MuiOutlinedInput-root': {
+                              color: '#FFFFFF',
+                              '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                              '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#F29F05', borderWidth: '2px',
+                                boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                              },
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255,255,255,0.6)',
+                              '&.Mui-focused': { color: '#F29F05' },
+                            },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Geburtsdatum"
+                          type="date"
+                          value={person2.birthDate}
+                          onChange={(e) => handlePerson2Change('birthDate', e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                          sx={{
+                            mb: 2,
+                            '& .MuiOutlinedInput-root': {
+                              color: '#FFFFFF',
+                              '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                              '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#F29F05', borderWidth: '2px',
+                                boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                              },
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255,255,255,0.6)',
+                              '&.Mui-focused': { color: '#F29F05' },
+                            },
+                            '& input::-webkit-calendar-picker-indicator': { filter: 'invert(0.7) sepia(1) hue-rotate(0deg) saturate(3)' },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Geburtszeit (optional)"
+                          type="time"
+                          value={person2.birthTime}
+                          onChange={(e) => handlePerson2Change('birthTime', e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                          helperText="Falls unbekannt, wird 12:00 verwendet"
+                          sx={{
+                            mb: 2,
+                            '& .MuiOutlinedInput-root': {
+                              color: '#FFFFFF',
+                              '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                              '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#F29F05', borderWidth: '2px',
+                                boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                              },
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255,255,255,0.6)',
+                              '&.Mui-focused': { color: '#F29F05' },
+                            },
+                            '& .MuiFormHelperText-root': { color: 'rgba(255,255,255,0.4)' },
+                            '& input::-webkit-calendar-picker-indicator': { filter: 'invert(0.7) sepia(1) hue-rotate(0deg) saturate(3)' },
+                          }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Geburtsort"
+                          placeholder="z.B. Berlin"
+                          value={person2.birthPlace}
+                          onChange={(e) => handlePerson2Change('birthPlace', e.target.value)}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              color: '#FFFFFF',
+                              '& fieldset': { borderColor: 'rgba(242, 159, 5, 0.25)' },
+                              '&:hover fieldset': { borderColor: 'rgba(242, 159, 5, 0.5)' },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#F29F05', borderWidth: '2px',
+                                boxShadow: '0 0 15px rgba(242, 159, 5, 0.3)',
+                              },
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255,255,255,0.6)',
+                              '&.Mui-focused': { color: '#F29F05' },
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                  )}
                 </Grid>
 
-                {analysisMode === 'connection' && (
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ color: '#F29F05', mb: 2 }}>
-                      Person 2
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      label="Name *"
-                      value={person2.name}
-                      onChange={(e) => handlePerson2Change('name', e.target.value)}
-                      sx={{ mb: 2 }}
-                      InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
-                      inputProps={{ style: { color: '#FFFFFF' } }}
-                    />
-                    <TextField
-                      fullWidth
-                      label="Geburtsdatum *"
-                      type="date"
-                      value={person2.birthDate}
-                      onChange={(e) => handlePerson2Change('birthDate', e.target.value)}
-                      InputLabelProps={{ shrink: true, style: { color: 'rgba(255,255,255,0.7)' } }}
-                      inputProps={{ style: { color: '#FFFFFF' } }}
-                      sx={{ mb: 2 }}
-                    />
-                    <TextField
-                      fullWidth
-                      label="Geburtszeit"
-                      type="time"
-                      value={person2.birthTime}
-                      onChange={(e) => handlePerson2Change('birthTime', e.target.value)}
-                      InputLabelProps={{ shrink: true, style: { color: 'rgba(255,255,255,0.7)' } }}
-                      inputProps={{ style: { color: '#FFFFFF' } }}
-                      sx={{ mb: 2 }}
-                    />
-                    <TextField
-                      fullWidth
-                      label="Geburtsort *"
-                      value={person2.birthPlace}
-                      onChange={(e) => handlePerson2Change('birthPlace', e.target.value)}
-                      InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
-                      inputProps={{ style: { color: '#FFFFFF' } }}
-                    />
-                  </Grid>
-                )}
-              </Grid>
-
-              <Box sx={{ display: 'flex', gap: 2, mt: 4, justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setActiveStep(0);
-                    setAnalysisMode(null);
-                  }}
-                  sx={{
-                    borderColor: 'rgba(242, 159, 5, 0.5)',
-                    color: '#F29F05',
-                  }}
-                >
-                  Zurück
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={startAnalysis}
-                  disabled={
-                    (analysisMode === 'connection' &&
-                      (!validatePersonData(person1) || !validatePersonData(person2))) ||
-                    (analysisMode === 'single' && !validatePersonData(person1))
-                  }
-                  sx={{
-                    background: 'linear-gradient(135deg, #F29F05, #8C1D04)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #8C1D04, #F29F05)',
-                    },
-                  }}
-                  startIcon={<Sparkles size={18} />}
-                >
-                  Analyse starten
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, mt: 4, justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setActiveStep(0);
+                      setAnalysisMode(null);
+                    }}
+                    sx={{
+                      borderColor: 'rgba(242, 159, 5, 0.5)',
+                      color: '#F29F05',
+                      borderWidth: 2,
+                      px: 3,
+                      '&:hover': {
+                        borderColor: '#F29F05',
+                        background: 'rgba(242, 159, 5, 0.1)',
+                        borderWidth: 2,
+                      },
+                    }}
+                  >
+                    Zurück
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={startAnalysis}
+                    disabled={
+                      (analysisMode === 'connection' &&
+                        (!validatePersonData(person1) || !validatePersonData(person2))) ||
+                      (analysisMode === 'single' && !validatePersonData(person1))
+                    }
+                    sx={{
+                      background: 'linear-gradient(135deg, #F29F05, #8C1D04)',
+                      fontWeight: 700,
+                      px: 4,
+                      py: 1.5,
+                      fontSize: '1rem',
+                      borderRadius: 3,
+                      boxShadow: '0 8px 25px rgba(242, 159, 5, 0.4)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #8C1D04, #F29F05)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 12px 35px rgba(242, 159, 5, 0.5)',
+                      },
+                      '&:disabled': {
+                        background: 'rgba(242, 159, 5, 0.2)',
+                        color: 'rgba(255,255,255,0.4)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                    startIcon={<Sparkles size={18} />}
+                  >
+                    Analyse starten
+                  </Button>
+                </Box>
               </Box>
             </Card>
           </motion.div>
@@ -822,10 +1026,16 @@ export default function InstantResonanceAnalysis() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <Stepper activeStep={2} sx={{ mb: 4 }}>
+            <Stepper activeStep={2} sx={{
+              mb: 4,
+              '& .MuiStepIcon-root': { color: 'rgba(242, 159, 5, 0.3)' },
+              '& .MuiStepIcon-root.Mui-active': { color: '#F29F05' },
+              '& .MuiStepIcon-root.Mui-completed': { color: '#F29F05' },
+              '& .MuiStepConnector-line': { borderColor: 'rgba(242, 159, 5, 0.2)' },
+            }}>
               {steps.map((label) => (
                 <Step key={label}>
-                  <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' } }}>
+                  <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' }, '& .MuiStepLabel-label.Mui-active': { color: '#F29F05', fontWeight: 700 } }}>
                     {label}
                   </StepLabel>
                 </Step>
@@ -1324,10 +1534,16 @@ export default function InstantResonanceAnalysis() {
             ) : isAuthenticated ? (
               /* Step 2 Content für authentifizierte Nutzer */
               <Box>
-                <Stepper activeStep={3} sx={{ mb: 4 }}>
+                <Stepper activeStep={3} sx={{
+                  mb: 4,
+                  '& .MuiStepIcon-root': { color: 'rgba(242, 159, 5, 0.3)' },
+                  '& .MuiStepIcon-root.Mui-active': { color: '#F29F05' },
+                  '& .MuiStepIcon-root.Mui-completed': { color: '#F29F05' },
+                  '& .MuiStepConnector-line': { borderColor: 'rgba(242, 159, 5, 0.2)' },
+                }}>
                   {steps.map((label) => (
                     <Step key={label}>
-                      <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' } }}>
+                      <StepLabel sx={{ '& .MuiStepLabel-label': { color: 'rgba(255,255,255,0.7)' }, '& .MuiStepLabel-label.Mui-active': { color: '#F29F05', fontWeight: 700 } }}>
                         {label}
                       </StepLabel>
                     </Step>

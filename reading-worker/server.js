@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
-import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
+import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
 import { classifyTwoPersonChannels, classifyCompositeConnections, HD_CHANNELS } from "./lib/composite-classification.js";
 import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from "./lib/facts-builder.js";
@@ -1699,7 +1699,11 @@ function buildChartPlaceholders(chartData, userData) {
   const gates = (chartData.gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
   const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
   const icGates = ic.gates || {};
-  const icName = ic.name_de || ic.name || '?';
+  // Vorrang: incarnation_crosses.json (deutsche Themen, 62 Kreuze inkl. Beschreibungen).
+  // Fallback: chartData.name_de aus chartCalculation.js (RAX_LAX_MAP/CROSS_THEMATIC_DE).
+  // Letzter Fallback: englischer Name oder '?'.
+  const icNameFromJson = getCrossNameDe(icGates.personalitySun, icGates.personalityEarth, icGates.designSun, icGates.designEarth, ic.type);
+  const icName = icNameFromJson || ic.name_de || ic.name || '?';
 
   const planetLabelDe = {
     sun: 'Sonne', earth: 'Erde', moon: 'Mond',

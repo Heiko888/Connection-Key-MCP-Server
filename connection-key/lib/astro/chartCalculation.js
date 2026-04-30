@@ -251,6 +251,10 @@ const CROSS_THEMATIC_DE = {
   "Mating":             "Intimitaet",
   "Money":              "Geldlinie",
   "Keeper of Keys":     "Hueter der Schluessel",
+  "Living Now":         "Im Jetzt",
+  "Obscuration":        "Verhuellung",
+  "Depth (LAX)":        "Tiefe",
+  "Fates (LAX)":        "Schicksale",
 };
 
 const SE_SUN       = 0;

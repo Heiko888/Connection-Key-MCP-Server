@@ -45,7 +45,7 @@ REGEL — Faktentreue (PFLICHT):
 - Verwende exakt die oben angegebenen Zahlen und Tor-Listen.
 - Wenn du ein Tor namentlich nennst, muss es in der Liste der aktivierten Tore stehen.
 - Wenn du eine Planet-Tor-Position nennst, MUSS sie aus den oben gegebenen Persönlichkeits- oder Design-Planeten-Listen stammen.
-- Tor → Zentrum verbindlich (Standardmapping). Verwechsle besonders nicht: 39, 41, 19 → Wurzel (NICHT Solarplexus). 32 → Milz (NICHT Wurzel). 55 → Solarplexus (NICHT Wurzel).
+- Tor → Zentrum verbindlich (Standardmapping). Verwechsle besonders nicht: 39, 41, 19 → Wurzel (NICHT Solarplexus). 32 → Milz (NICHT Wurzel). 55 → Solarplexus (NICHT Wurzel). 62 → Kehle (NICHT Ajna). 17 → Ajna (NICHT Kehle). 11 → Ajna (NICHT Kehle). 12 → Kehle (NICHT Ajna).
 - Profil → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → RAX | 4/1 → JUX | 4/6, 5/1, 5/2, 6/2, 6/3 → LAX.
 
 REGEL — VERBOTENE Business-Empfehlungen:

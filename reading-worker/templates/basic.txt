@@ -30,7 +30,7 @@ REGEL — Faktentreue (PFLICHT):
     Sakral:      3, 5, 9, 14, 27, 29, 34, 42, 59
     Milz:        18, 28, 32, 44, 48, 50, 57
     Wurzel:      19, 38, 39, 41, 52, 53, 54, 58, 60
-- Verwechsle besonders nicht: Tor 39, 41, 19 → Wurzel (NICHT Solarplexus, auch wenn ihre Kanäle dorthin führen). Tor 55 → Solarplexus (NICHT Wurzel). Tor 59 → Sakral (NICHT Solarplexus).
+- Verwechsle besonders nicht: Tor 39, 41, 19 → Wurzel (NICHT Solarplexus, auch wenn ihre Kanäle dorthin führen). Tor 55 → Solarplexus (NICHT Wurzel). Tor 59 → Sakral (NICHT Solarplexus). Tor 62 → Kehle (NICHT Ajna). Tor 17 → Ajna (NICHT Kehle). Tor 11 → Ajna (NICHT Kehle). Tor 12 → Kehle (NICHT Ajna).
 - Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) sind in einem Single-Person-Reading verboten.
 
 Erstelle das Reading kompakt mit folgenden Sektionen:

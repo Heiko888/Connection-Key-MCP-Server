@@ -2051,6 +2051,7 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
 
   if (modelConfig.provider === "openai") {
     const modelsToTry = modelConfig.models || [];
+    let lastErr;
     for (const modelId of modelsToTry) {
       try {
         console.log(`   Versuche OpenAI-Modell: ${modelId}`);
@@ -2062,10 +2063,29 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
         console.log(`   ✅ OpenAI (${modelId}) erfolgreich`);
         return result;
       } catch (openaiErr) {
+        lastErr = openaiErr;
         console.warn(`   ⚠️  OpenAI (${modelId}) fehlgeschlagen:`, openaiErr.message);
       }
     }
-    throw new Error("Alle OpenAI-Modelle fehlgeschlagen");
+    // Alle OpenAI-Modelle gescheitert → Claude-Fallback statt Job-Fail.
+    // Häufigster Grund: TPM-Rate-Limit (429) bei Tier-1-Accounts. Reading nicht
+    // verlieren, sondern mit Default-Claude-Modell weitermachen.
+    if (isClaudeAvailable()) {
+      const fallbackModelId = "claude-sonnet-4-6";
+      console.warn(`   🔁 OpenAI komplett fehlgeschlagen — Fallback auf Claude (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
+      try {
+        const result = await generateWithClaude(fullPrompt, {
+          model: fallbackModelId,
+          maxTokens,
+          temperature: 0.7,
+        });
+        console.log(`   ✅ Claude-Fallback (${fallbackModelId}) erfolgreich`);
+        return result;
+      } catch (claudeErr) {
+        console.warn(`   ⚠️  Claude-Fallback fehlgeschlagen:`, claudeErr.message);
+      }
+    }
+    throw new Error(`Alle OpenAI-Modelle und Claude-Fallback fehlgeschlagen: ${lastErr?.message || "?"}`);
   }
 
   throw new Error(`Unbekannter Provider: ${modelConfig.provider}`);

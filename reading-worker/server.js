@@ -805,6 +805,7 @@ ${entries}
 const KNOWLEDGE_MAP = {
   // Kern-Reading-Typen
   'detailed':         ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'channels-gates', 'profiles-detailed', 'incarnation-cross'],
+  'single':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed', 'centers-detailed', 'incarnation-cross'],
   'basic':            ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed'],
   'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
   'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
@@ -1804,6 +1805,7 @@ async function generateReading({ agentId, template, userData, chartData }) {
   // Template-Mapping: explizite Zuordnung reading_type → template-Datei
   const TEMPLATE_MAP = {
     'detailed': 'detailed',
+    'single': 'single',
     'depth-analysis': 'depth-analysis',
     'channel-analysis': 'channel-analysis',
     'shadow-work': 'shadow-work',

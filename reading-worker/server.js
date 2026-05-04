@@ -4870,6 +4870,114 @@ app.get("/api/readings/shadow-work/status/:job_id", async (req, res) => {
   }
 });
 
+app.post("/api/readings/phasen-reading/start", async (req, res) => {
+  try {
+    const {
+      reading_id,
+      name, birthdate, birthtime, birthplace,
+      name2, birthdate2, birthtime2, birthplace2,
+      relationshipStartDate,
+    } = req.body || {};
+
+    const missing = [];
+    if (!birthdate) missing.push("birthdate");
+    if (!birthtime) missing.push("birthtime");
+    if (!birthplace) missing.push("birthplace");
+    if (!birthdate2) missing.push("birthdate2");
+    if (!birthtime2) missing.push("birthtime2");
+    if (!birthplace2) missing.push("birthplace2");
+    if (!relationshipStartDate) missing.push("relationshipStartDate");
+    if (missing.length) {
+      return res.status(400).json({
+        success: false,
+        error: `Pflichtfelder fehlen: ${missing.join(", ")}`,
+      });
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(relationshipStartDate)) {
+      return res.status(400).json({
+        success: false,
+        error: "relationshipStartDate muss Format YYYY-MM-DD haben",
+      });
+    }
+
+    const payload = {
+      reading_type: "phasen-reading",
+      ...(reading_id ? { reading_id } : {}),
+      name: name || "Person A",
+      birthdate, birthtime, birthplace,
+      name2: name2 || "Person B",
+      birthdate2, birthtime2, birthplace2,
+      relationshipStartDate,
+    };
+
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .insert({ reading_type: "phasen-reading", payload, status: "pending" })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    console.log(`✅ [Phasen] Job erstellt: ${data.id}`);
+    return res.status(202).json({
+      success: true,
+      job_id: data.id,
+      status: "pending",
+      poll_url: `/api/readings/phasen-reading/status/${data.id}`,
+    });
+  } catch (err) {
+    console.error("[Phasen] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/phasen-reading/status/:job_id", async (req, res) => {
+  try {
+    const { job_id } = req.params;
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .select("id, status, payload, error, created_at, started_at, finished_at")
+      .eq("id", job_id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+      throw new Error(error.message);
+    }
+
+    let result = null;
+    if (data.status === "completed" && data.payload?.reading_id) {
+      const { data: reading } = await supabasePublic
+        .from("readings")
+        .select("reading_data")
+        .eq("id", data.payload.reading_id)
+        .maybeSingle();
+      if (reading?.reading_data?.text) {
+        result = {
+          text: reading.reading_data.text,
+          phase_info: reading.reading_data.phase_info || null,
+          reflexionsfragen: reading.reading_data.reflexionsfragen || null,
+        };
+      }
+    }
+
+    return res.json({
+      success: true,
+      job_id: data.id,
+      status: data.status,
+      error: data.error || null,
+      created_at: data.created_at,
+      started_at: data.started_at || null,
+      finished_at: data.finished_at || null,
+      ...(result ? { result } : {})
+    });
+  } catch (err) {
+    console.error("[Phasen] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ======================================================
 // Transit-Reading Endpoints
 // ======================================================

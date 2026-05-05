@@ -9,6 +9,11 @@
 import { config } from "../config.js";
 import { createClient } from "@supabase/supabase-js";
 
+// Public paths — externe Services rufen ohne Auth-Header an, prüfen eigene Signatur/Token
+const PUBLIC_API_PATHS = new Set([
+  "/api/telegram/webhook", // Telegram Bot API sendet keine Auth-Header
+]);
+
 // Supabase-Client für JWT-Verifikation (lazy init)
 let _supabase = null;
 function getSupabase() {
@@ -20,6 +25,9 @@ function getSupabase() {
 
 export const authMiddleware = async (req, res, next) => {
   if (!config.auth.enabled) return next();
+
+  const reqPath = req.originalUrl.split("?")[0];
+  if (PUBLIC_API_PATHS.has(reqPath)) return next();
 
   const apiKey = req.headers["x-api-key"];
   const authHeader = req.headers["authorization"];

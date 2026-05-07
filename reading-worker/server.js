@@ -6024,6 +6024,46 @@ async function postChannelHDWissen({ dryRun = false, force = false } = {}) {
 }
 
 /**
+ * Tägliche Begrüßung im #General-Topic der Community: kurze Tagesfrage,
+ * die zur Diskussion einlädt. Postet ohne message_thread_id (= General-Feed).
+ */
+async function postCommunityGreeting({ dryRun = false } = {}) {
+  if (!TELEGRAM_COMMUNITY_ID && !dryRun) {
+    console.warn('[Community] TELEGRAM_COMMUNITY_ID nicht gesetzt — überspringe');
+    return null;
+  }
+  console.log(`☀️  [Community] Generiere Tagesfrage${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+    const weekday = new Date().toLocaleDateString('de-DE', { weekday: 'long', timeZone: 'Europe/Berlin' });
+    const prompt = `Schreibe eine kurze, einladende Begrüßung für die Telegram-Community von "The Connection Key" am ${weekday}morgen.
+
+Stil:
+- Erste Zeile: kurzer Gruß (max 6 Wörter), gerne mit ✨ oder 🌅
+- Dann eine konkrete Tagesfrage zum Human-Design-Alltag, die zur Antwort einlädt
+- Frage soll persönlich sein, nicht abstrakt — z.B. "Welche Entscheidung steht heute an?", "Was ignoriert dein Bauch gerade?", "Wo sagst du heute Nein?"
+- Locker-direkter Ton, kein "Liebe Community", keine Floskeln
+- Schluss: 1 Satz, der zur Antwort im Chat ermuntert ("Sag's in den Kommentaren" o.ä.)
+- Kein Markdown, keine Hashtags
+- Maximal 60 Wörter`;
+    const text = await generateWithClaude(prompt, { maxTokens: 250, temperature: 0.95 });
+
+    if (!dryRun) {
+      // Kein message_thread_id → landet im General-Feed
+      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '');
+      console.log(`☀️  [Community] Begrüßung gepostet (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Community] Begrüßung-Entwurf erstellt (${text.length} Zeichen)`);
+    }
+    return { text: text.trim() };
+  } catch (err) {
+    console.error('[Community] Begrüßung Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Community-Begrüßung-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
+
+/**
  * Postet täglich um 21:00 CEST eine ruhige Abend-Reflexion mit einer Frage zum Tagesabschluss.
  */
 async function postChannelAbendReflexion({ dryRun = false } = {}) {
@@ -6095,6 +6135,9 @@ scheduleDailyAt(18, 0, async () => {
 
 // HD-Wissen jeden 2. Tag, 16:00 UTC (18:00 MESZ) — Funktion prüft intern dayOfYear%2
 scheduleDailyAt(16, 0, postChannelHDWissen);
+
+// Community-Begrüßung in #General täglich 06:00 UTC (08:00 MESZ)
+scheduleDailyAt(6, 0, postCommunityGreeting);
 
 // Abend-Reflexion täglich 19:00 UTC (21:00 CEST)
 scheduleDailyAt(19, 0, postChannelAbendReflexion);
@@ -6440,6 +6483,19 @@ app.post('/api/channel/post-transit-ausblick', async (req, res) => {
   }
   res.json({ success: true, message: 'Transit-Ausblick gestartet' });
   postWeeklyTransitOutlook(true).catch(e => console.error('[Transit] async:', e.message));
+});
+app.post('/api/community/post-greeting', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postCommunityGreeting({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Community-Begrüßung gestartet' });
+  postCommunityGreeting({ dryRun: false }).catch(e => console.error('[Community] Begrüßung async:', e.message));
 });
 app.post('/api/channel/post-business-tipp', async (req, res) => {
   const dryRun = !!(req.body && req.body.dryRun);

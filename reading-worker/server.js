@@ -50,6 +50,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '';
 const TELEGRAM_COMMUNITY_ID = process.env.TELEGRAM_COMMUNITY_ID || '';
 const TELEGRAM_HD_WISSEN_THREAD_ID = parseInt(process.env.TELEGRAM_HD_WISSEN_THREAD_ID || '0', 10) || null;
+const TELEGRAM_BUSINESS_HD_THREAD_ID = parseInt(process.env.TELEGRAM_BUSINESS_HD_THREAD_ID || '0', 10) || null;
 
 function escapeTgMd2(text) {
   if (!text) return '';
@@ -6372,21 +6373,25 @@ Kein Markdown. Reiner Text mit Zeilenumbrüchen.`;
 }
 
 /**
- * #4 Business-Tipp: Montags ein HD-Business-Tipp für den Channel.
+ * #4 Business-Tipp: jeden 2. (ungeraden) Tag um 18:00 MESZ in das
+ * #Business-HD Topic der Telegram-Community-Gruppe — versetzt zu HD-Wissen.
  */
 async function postWeeklyBusinessTip(force = false, { dryRun = false } = {}) {
-  const day = new Date().getUTCDay();
-  if (!force && !dryRun && day !== 1) return null;
-  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
-  console.log(`💼 [Business] Generiere wöchentlichen Business-Tipp${dryRun ? ' (Entwurf)' : ''}...`);
+  if (!TELEGRAM_COMMUNITY_ID && !dryRun) return null;
+  const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+  // Nur an ungeraden Tagen (versetzt zu HD-Wissen) — ausser dryRun oder force
+  if (!dryRun && !force && dayOfYear % 2 !== 1) {
+    console.log(`[Business] Business-Tipp: nur ungerade Tage (heute dayOfYear=${dayOfYear}, gerade → skip)`);
+    return null;
+  }
+  console.log(`💼 [Business] Generiere Business-Tipp${dryRun ? ' (Entwurf)' : ''}...`);
   try {
     const BUSINESS_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-business.json'), 'utf-8'));
-    const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
     const topic = BUSINESS_TOPICS[dayOfYear % BUSINESS_TOPICS.length];
 
-    const prompt = `Du bist ein Human Design Business Coach. Schreibe einen kurzen Business-Tipp für den öffentlichen Telegram-Kanal.
+    const prompt = `Du bist ein Human Design Business Coach. Schreibe einen kurzen Business-Tipp für die öffentliche Telegram-Community.
 
-Thema diese Woche: ${topic}
+Thema: ${topic}
 
 Struktur (120-150 Wörter):
 1. Eine provozierende Eröffnungsaussage (kein Emoji, direkt)
@@ -6399,7 +6404,7 @@ Kein Markdown. Kein "Liebe Community". Direkte Sprache.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.88 });
 
-    if (!dryRun) await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+    if (!dryRun) await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_BUSINESS_HD_THREAD_ID);
     const { row } = await generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic, { dryRun });
     console.log(`💼 [Business] Business-Tipp ${dryRun ? 'Entwurf erstellt' : 'gepostet'}: ${topic}`);
     if (!dryRun) sendMattermost(`💼 **Business-Tipp gepostet** | ${topic}`, 'business');
@@ -6416,10 +6421,11 @@ function escHtmlGlobal(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Montags 08:00 UTC (10:00 CEST): Transit-Ausblick + Business-Tipp + Video-Konzept — alle deaktiviert (User-Wunsch 2026-04-27)
+// Montags 08:00 UTC (10:00 CEST): Transit-Ausblick + Video-Konzept — deaktiviert (User-Wunsch 2026-04-27)
 // scheduleDailyAt(8, 0, postWeeklyTransitOutlook);
-// scheduleDailyAt(8, 15, postWeeklyBusinessTip);
 // scheduleDailyAt(8, 30, postWeeklyVideoConcept);
+// Business-HD: jeden 2. (ungeraden) Tag, 16:00 UTC (= 18:00 MESZ) — versetzt zu HD-Wissen
+scheduleDailyAt(16, 0, () => postWeeklyBusinessTip(false));
 
 // Manuelle Trigger
 app.post('/api/channel/post-transit-ausblick', async (req, res) => {

@@ -185,7 +185,15 @@ router.post("/webhook", async (req, res) => {
   const chatId = message.chat.id;
   const text = message.text.trim();
   const firstName = message.from?.first_name || "du";
-  console.log(`[Telegram] Nachricht von ${chatId}${message.message_thread_id ? ` thread=${message.message_thread_id}` : ''}${message.is_topic_message ? ' (topic)' : ''}: ${text.substring(0, 50)}`);
+  const isPrivateChat = message.chat?.type === 'private';
+  console.log(`[Telegram] Nachricht von ${chatId}${message.message_thread_id ? ` thread=${message.message_thread_id}` : ''}${message.is_topic_message ? ' (topic)' : ''} (${message.chat?.type}): ${text.substring(0, 50)}`);
+
+  // In Gruppen/Channels NUR auf /start mit Code reagieren — sonst Spam.
+  // Bot-Privacy filtert die meisten Group-Messages, aber Replies auf eigene
+  // Posts kommen durch.
+  if (!isPrivateChat && !text.startsWith('/start ')) {
+    return;
+  }
 
   if (!supabase) {
     console.error("[Telegram] Webhook: Supabase nicht verfügbar");

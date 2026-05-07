@@ -166,6 +166,8 @@ services:
       # relativ zu /app → /content-topics. Volume-Mount, damit JSON-Änderungen
       # ohne Rebuild wirken.
       - ./content-topics:/content-topics:ro
+      # Statische Bilder für Telegram-Community-Posts (pro Topic-Kategorie)
+      - ./reading-worker/images:/app/images:ro
     restart: unless-stopped
     networks:
       - app-network

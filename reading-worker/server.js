@@ -57,6 +57,76 @@ function escapeTgMd2(text) {
   return String(text).replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
 }
 
+/**
+ * Wählt ein zufälliges Bild aus /app/images/<category>/ — oder null wenn der
+ * Ordner leer ist (text-only fallback).
+ */
+function pickRandomImagePath(category) {
+  try {
+    const dir = path.join('/app/images', category);
+    if (!fs.existsSync(dir)) return null;
+    const files = fs.readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    if (files.length === 0) return null;
+    return path.join(dir, files[Math.floor(Math.random() * files.length)]);
+  } catch (e) {
+    console.warn(`[Telegram] pickRandomImagePath(${category}) error:`, e.message);
+    return null;
+  }
+}
+
+/**
+ * Sendet ein Foto via multipart/form-data an Telegram. Caption max 1024 Zeichen
+ * (vom Aufrufer einzuhalten).
+ */
+async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadId = null) {
+  if (!TELEGRAM_BOT_TOKEN || !chatId || !imagePath) return;
+  try {
+    const buf = fs.readFileSync(imagePath);
+    const fileName = path.basename(imagePath);
+    const blob = new Blob([buf]);
+    const fd = new FormData();
+    fd.append('chat_id', String(chatId));
+    if (caption) fd.append('caption', caption);
+    if (messageThreadId) fd.append('message_thread_id', String(messageThreadId));
+    fd.append('photo', blob, fileName);
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+      method: 'POST',
+      body: fd,
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.warn(`[Telegram] sendPhoto failed (${res.status}): ${body.substring(0, 150)}`);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.warn('[Telegram] sendPhoto error:', e.message);
+    return false;
+  }
+}
+
+/**
+ * Sendet Text + Bild kombiniert. Wenn Bild vorhanden:
+ *  - Text ≤ 1024: Foto mit Caption
+ *  - Text > 1024: Foto ohne Caption + Text-Nachricht danach
+ * Ohne Bild: nur Text-Nachricht.
+ */
+async function sendTelegramTextWithImage(chatId, text, imageCategory, messageThreadId = null, parseMode = '') {
+  const imagePath = imageCategory ? pickRandomImagePath(imageCategory) : null;
+  if (imagePath) {
+    if (text.length <= 1024) {
+      const ok = await sendTelegramPhoto(chatId, imagePath, text, messageThreadId);
+      if (ok) return;
+      // Fallback bei sendPhoto-Fehler: text-only senden
+    } else {
+      await sendTelegramPhoto(chatId, imagePath, '', messageThreadId);
+      // → fällt durch zu sendTelegramMessage unten
+    }
+  }
+  await sendTelegramMessage(chatId, text, parseMode, messageThreadId);
+}
+
 async function sendTelegramMessage(chatId, text, parseMode = 'MarkdownV2', messageThreadId = null) {
   if (!TELEGRAM_BOT_TOKEN || !chatId) return;
   try {
@@ -6008,7 +6078,7 @@ async function postChannelHDWissen({ dryRun = false, force = false } = {}) {
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
 
     if (!dryRun) {
-      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_HD_WISSEN_THREAD_ID);
+      await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'hd-wissen', TELEGRAM_HD_WISSEN_THREAD_ID);
       console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen, thread=${TELEGRAM_HD_WISSEN_THREAD_ID})`);
     } else {
       console.log(`📝 [Channel] HD-Wissen-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
@@ -6050,7 +6120,7 @@ Stil:
 
     if (!dryRun) {
       // Kein message_thread_id → landet im General-Feed
-      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '');
+      await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'general', null);
       console.log(`☀️  [Community] Begrüßung gepostet (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Community] Begrüßung-Entwurf erstellt (${text.length} Zeichen)`);
@@ -6447,7 +6517,7 @@ Kein Markdown. Kein "Liebe Community". Direkte Sprache.`;
 
     const text = await generateWithClaude(prompt, { maxTokens: 400, temperature: 0.88 });
 
-    if (!dryRun) await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_BUSINESS_HD_THREAD_ID);
+    if (!dryRun) await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'business-hd', TELEGRAM_BUSINESS_HD_THREAD_ID);
     const { row } = await generateAndSaveInstagramCaption(text.trim(), 'business-tipp', topic, { dryRun });
     console.log(`💼 [Business] Business-Tipp ${dryRun ? 'Entwurf erstellt' : 'gepostet'}: ${topic}`);
     if (!dryRun) sendMattermost(`💼 **Business-Tipp gepostet** | ${topic}`, 'business');

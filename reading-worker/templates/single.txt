@@ -1,0 +1,159 @@
+Erstelle ein persönliches, mittel-tiefes Human Design Reading für:
+
+Name: {{clientName}}
+Geburtsdatum: {{birthDate}}
+Geburtszeit: {{birthTime}}
+Geburtsort: {{birthPlace}}
+
+VERBINDLICHE FAKTEN (mechanisch berechnet, NICHT halluzinieren):
+- Type: {{type}}
+- Profil: {{profile}}
+- Autorität: {{authority}}
+- Strategie: {{strategy}}
+- Definition: {{definition}}
+- {{definedCentersCount}} definierte Zentren: {{definedCenters}}
+- {{openCentersCount}} offene Zentren: {{openCenters}}
+- Aktivierte Kanäle ({{channelsCount}}): {{channelsList}}
+- Inkarnationskreuz: {{incarnationCrossName}}
+- Aktivierte Tore ({{gatesCount}}): {{gatesList}}
+
+REGEL — Faktentreue (PFLICHT):
+- Verwende die oben angegebenen Zahlen exakt. Halluziniere keine andere Center-Anzahl, keine andere Channel-Anzahl, keine anderen Tore.
+- Wenn du ein Tor namentlich nennst, muss es in der Liste aktivierter Tore stehen.
+- Tor → Zentrum-Zuordnung verbindlich:
+    Krone:       61, 63, 64
+    Ajna:        4, 11, 17, 24, 43, 47
+    Kehle:       8, 12, 16, 20, 23, 31, 33, 35, 45, 56, 62
+    G-Zentrum:   1, 2, 7, 10, 13, 15, 25, 46
+    Herz/Ego:    21, 26, 40, 51
+    Solarplexus: 6, 22, 30, 36, 37, 49, 55
+    Sakral:      3, 5, 9, 14, 27, 29, 34, 42, 59
+    Milz:        18, 28, 32, 44, 48, 50, 57
+    Wurzel:      19, 38, 39, 41, 52, 53, 54, 58, 60
+- Verwechsle besonders nicht: Tor 39, 41, 19 → Wurzel (NICHT Solarplexus, auch wenn ihre Kanäle dorthin führen). Tor 55 → Solarplexus (NICHT Wurzel). Tor 59 → Sakral (NICHT Solarplexus). Tor 62 → Kehle (NICHT Ajna). Tor 17 → Ajna (NICHT Kehle). Tor 11 → Ajna (NICHT Kehle). Tor 12 → Kehle (NICHT Ajna).
+- Composite-Begriffe (Goldader, Connection-Key, Resonanzachse) sind in einem Single-Person-Reading verboten.
+
+Schreibe dieses Reading direkt an {{clientName}} gerichtet — persönlich, fundiert, konkret. Beginne jede Sektion mit dem Namen {{clientName}} oder einer direkten Anrede. Kein generisches Human-Design-Lehrbuch. Acht Sektionen, jeweils mit echter inhaltlicher Substanz, aber kompakter als ein Premium-Tiefenreading.
+
+---
+
+## 1. Dein Energietyp und deine Strategie
+
+{{clientName}}, du bist ein {{type}}. Erkläre, was dieser Typ in der Welt bedeutet — nicht als Etikett, sondern als Art und Weise, wie {{clientName}} Energie aufnimmt, hält und in die Welt trägt.
+
+- Wie die Energie von {{clientName}} auf andere Menschen wirkt
+- Der Unterschied zwischen diesem Typ und den anderen vier Typen — kurz, klar, alltagstauglich
+- **Strategie: {{strategy}}** — warum genau diese Strategie das wichtigste Werkzeug ist. Konkrete Alltagssituationen, in denen {{clientName}} sie anwenden kann. Was passiert, wenn gegen die Strategie gehandelt wird
+- Die Not-Self-Emotion (Frustration / Bitterkeit / Wut / Enttäuschung — abhängig vom Typ) als Frühwarnsystem
+- Die Signatur des Typs (Zufriedenheit / Erfolg / Frieden / Überraschung) als Zielzustand
+
+---
+
+## 2. Deine Autorität — dein innerer Kompass
+
+Die Autorität ist das präziseste Instrument für richtige Entscheidungen — wichtiger als der Verstand.
+
+**Die Autorität von {{clientName}}: {{authority}}**
+
+- Wie diese Autorität in {{clientName}} funktioniert — die körperliche Mechanik dahinter
+- Woran {{clientName}} erkennt, dass eine Entscheidung aus der Autorität kommt — und nicht aus Angst, Druck oder Konditionierung
+- Die häufigsten Fallen: Wie der Verstand sich einschaltet und die Autorität überschreibt
+- Eine konkrete Mini-Praxis für den Alltag: Wie {{clientName}} die Autorität bei kleinen Entscheidungen testet
+- Die Rolle des Verstandes: Beobachter, Reflektor, Kommunikator — aber nicht Entscheider
+
+---
+
+## 3. Dein Profil {{profile}} — deine Lebensrolle
+
+Das Profil beschreibt, wie {{clientName}} in der Welt lernt, agiert und gesehen wird.
+
+- Die beiden Linien des Profils {{profile}} — was jede Linie über die Lebensweise und das Lernmuster sagt
+- Wie die beiden Linien zusammenwirken — Spannungsfeld, Synergie, typische Muster
+- Wie sich das Profil in Beziehungen zeigt
+- Wie sich das Profil in der Arbeit / im Beruf zeigt — welche Rollen natürlich entstehen
+- Die größte Stärke und die größte Herausforderung, die mit Profil {{profile}} verbunden sind
+
+Die Linien-Bedeutungen als Anker (nutze nur die zwei Linien des konkreten Profils {{profile}}):
+- 1: Forscher — Fundament, Wissen, Sicherheit durch Vorbereitung
+- 2: Einsiedler — Talent wird von außen gesehen, bevor {{clientName}} es selbst erkennt
+- 3: Märtyrer — Lernen durch Erfahrung; „Fehler" sind Lehrmeister
+- 4: Opportunist — Netzwerke und Beziehungen sind die Lebensader
+- 5: Häretiker — Praktische Lösungen für andere; Projektion ist Hauptthema
+- 6: Rollenmodell — Drei Lebensphasen, Weisheit reift in der dritten
+
+---
+
+## 4. Definierte Zentren — was {{clientName}} konstant ausstrahlt
+
+{{clientName}} hat {{definedCentersCount}} definierte Zentren: {{definedCenters}}.
+
+Für jedes definierte Zentrum (geh die Liste durch, eines nach dem anderen):
+- Die spezifische Energie, die {{clientName}} konstant in die Welt trägt
+- Das Geschenk dieses Zentrums — was es {{clientName}} ermöglicht
+- Wie andere Menschen diese Energie spüren, wenn sie mit {{clientName}} zusammen sind
+- Die aktivierten Tore in diesem Zentrum (nimm sie aus der Tor-Liste oben)
+
+Halte dich pro Zentrum kurz: 3–4 Sätze reichen, wenn sie auf den Punkt sind.
+
+---
+
+## 5. Offene Zentren — Konditionierung und Weisheit
+
+{{clientName}} hat {{openCentersCount}} offene Zentren: {{openCenters}}.
+
+Offene Zentren sind keine Schwächen — sie sind die Orte, an denen {{clientName}} Konditionierung aufnimmt UND wo Weisheit entstehen kann.
+
+Für jedes offene Zentrum:
+- Welche Konditionierung typischerweise dort entsteht — die Botschaften aus Kindheit, Gesellschaft, Beziehungen
+- Die Weisheit, die durch das Nicht-Fixiert-Sein wachsen kann
+- Die Schlüsselfrage, die {{clientName}} sich in diesem Bereich stellen kann („Ist das wirklich meine Energie — oder habe ich sie aufgenommen?")
+
+Heb am Ende dieser Sektion **das eine offene Zentrum** hervor, das im Leben von {{clientName}} die stärkste Wirkung hat — und warum.
+
+---
+
+## 6. Deine Kanäle — deine einzigartige Signatur
+
+{{clientName}} hat {{channelsCount}} aktivierte Kanäle: {{channelsList}}.
+
+Die Kanäle sind das, was {{clientName}} unverwechselbar macht. Sie sind keine Liste, sondern eine Komposition.
+
+Für jeden aktivierten Kanal:
+- Die Themenenergie dieses Kanals — was er über die Person aussagt
+- Welche Talente und Fähigkeiten durch diesen Kanal in die Welt kommen
+- Wie sich diese Energie konkret im Alltag von {{clientName}} zeigt
+- Die Schattenseite oder Herausforderung — was passiert, wenn dieser Kanal aus Konditionierung statt aus der Strategie heraus gelebt wird
+
+Wenn es viele Kanäle sind, fokussiere auf die zwei oder drei wichtigsten und beschreibe die anderen kürzer. Wenn es wenige sind (1–2), geh dafür tiefer.
+
+---
+
+## 7. Dein Inkarnationskreuz — der Kontext deines Lebens
+
+Das Inkarnationskreuz von {{clientName}} ist: **{{incarnationCrossName}}**.
+
+- Die Essenz dieses Kreuzes — das übergeordnete Thema, das sich durch das Leben von {{clientName}} zieht
+- Wie sich dieses Kreuz im Alltag zeigt — nicht als Auftrag, sondern als Energie, die hindurchfließt, wenn {{clientName}} sich selbst treu lebt
+- Die Verbindung zwischen Inkarnationskreuz und Profil {{profile}} — wie beide zusammenwirken
+- Was {{clientName}} in die Welt bringt, das kein anderer Mensch auf dieselbe Art bringen kann
+- Die Evolution: Wie das Kreuz im Laufe des Lebens tiefer und ehrlicher gelebt werden kann
+
+---
+
+## 8. Persönliche Integration — wie {{clientName}} dieses Design lebt
+
+Drei Erkenntnisse, die {{clientName}} aus diesem Reading mitnehmen sollte:
+
+1. **Das Geschenk** — was das Design von {{clientName}} mitbringt, das oft übersehen oder bekämpft wird
+2. **Die größte Herausforderung** — und wie sie zur Stärke wird, wenn {{clientName}} sie als Information statt als Problem behandelt
+3. **Der eine Satz** — eine Zeile, die das Design von {{clientName}} auf den Punkt bringt
+
+**Eine Einladung zum Schluss:**
+Schreibe abschließend eine kurze, persönliche Einladung an {{clientName}}, das eigene Design als Experiment anzunehmen — ohne Perfektionismus, mit Neugier und Selbstmitgefühl. Drei bis fünf Sätze, direkt und warm, ohne Pathos.
+
+---
+
+Sprache: Deutsch
+Stil: Persönlich, fundiert, poetisch wo angemessen, konkret wo nötig — direkt an {{clientName}} gerichtet
+Länge: ungefähr 3000 Wörter — Mid-Tier-Reading. Mehr Tiefe als ein Basis-Reading, aber nicht der vollständige Premium-Umfang. Wenn du knapper wirst, geht der Wert verloren; wenn du länger wirst, wird das Persönliche-Reading vom Ausführlichen Reading ununterscheidbar.
+WICHTIG: Nenne {{clientName}} regelmäßig in jeder Sektion. Kein Lehrbuch — ein Spiegel.

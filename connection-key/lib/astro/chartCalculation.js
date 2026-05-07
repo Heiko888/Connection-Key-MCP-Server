@@ -251,6 +251,11 @@ const CROSS_THEMATIC_DE = {
   "Mating":             "Intimitaet",
   "Money":              "Geldlinie",
   "Keeper of Keys":     "Hueter der Schluessel",
+  "Living Now":         "Im Jetzt",
+  "Planning":           "Planung",
+  "Obscuration":        "Verhuellung",
+  "Depth (LAX)":        "Tiefe",
+  "Fates (LAX)":        "Schicksale",
 };
 
 const SE_SUN       = 0;
@@ -507,8 +512,8 @@ const RAX_LAX_MAP = {
   "1-2-4-49":    "Masks",
 
   // Education
-  "9-16-37-40":  "Education",
-  "9-16-40-37":  "Education",
+  "9-16-37-40":  "Planning",
+  "9-16-40-37":  "Planning",
 
   // Industry
   "29-30-32-42": "Industry",

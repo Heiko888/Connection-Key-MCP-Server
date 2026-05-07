@@ -152,7 +152,7 @@ export default function AppFooter() {
                 </Box>
                 <Box
                   component="a"
-                  href="https://t.me/The_Connection_Key"
+                  href="https://the-connection-key.de/telegram-community"
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{

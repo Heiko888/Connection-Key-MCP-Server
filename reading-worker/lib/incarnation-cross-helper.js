@@ -29,6 +29,24 @@ export function getCrossName(ps, pe, ds, de, crossType) {
   return (crossType + ' of ' + psName + ' / ' + dsName).trim();
 }
 
+// Deutsche Variante: schaut in incarnation_crosses.json und liefert
+// "RAX/LAX/Juxtaposition der <Themenname>" — Themen sind in der JSON deutsch.
+// Returns null wenn weder direkter Schluessel noch alt-Schluessel (P/D vertauscht)
+// in der JSON gefunden wird, damit der Caller auf chartData.name_de fallback'en kann.
+export function getCrossNameDe(ps, pe, ds, de, crossType) {
+  if (!ps || !pe || !ds || !de) return null;
+  const data = loadCrossesData();
+  const k1 = ps + '-' + pe + '-' + ds + '-' + de;
+  const k2 = ds + '-' + de + '-' + ps + '-' + pe;
+  const entry = (data.crosses || {})[k1] || (data.crosses || {})[k2];
+  if (!entry || !entry.name) return null;
+  const prefix = crossType === 'Juxtaposition' ? 'Juxtaposition der'
+    : crossType === 'Right Angle' ? 'RAX der'
+    : crossType === 'Left Angle' ? 'LAX der'
+    : '';
+  return prefix ? (prefix + ' ' + entry.name) : entry.name;
+}
+
 export function buildCrossPromptFragment(chart, mode) {
   mode = mode || 'gates';
   const data = loadCrossesData();

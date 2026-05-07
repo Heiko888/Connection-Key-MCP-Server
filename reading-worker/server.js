@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
-import { getCrossName, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
+import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
 import { classifyTwoPersonChannels, classifyCompositeConnections, HD_CHANNELS } from "./lib/composite-classification.js";
 import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from "./lib/facts-builder.js";
@@ -348,7 +348,7 @@ const redis = new IORedis({
 });
 
 // ======================================================
-// KI-Modell-Konfiguration (nur Claude)
+// KI-Modell-Konfiguration (Claude + OpenAI)
 // ======================================================
 const MODEL_CONFIG = {
   "claude-sonnet": {
@@ -365,6 +365,16 @@ const MODEL_CONFIG = {
     provider: "claude",
     models: ["claude-haiku-4-5-20251001", "claude-sonnet-4-6"],
     maxTokens: 8000,
+  },
+  "gpt-4o": {
+    provider: "openai",
+    models: ["gpt-4o", "gpt-4o-2024-11-20", "gpt-4o-2024-08-06"],
+    maxTokens: 16000,
+  },
+  "gpt-4o-mini": {
+    provider: "openai",
+    models: ["gpt-4o-mini", "gpt-4o-mini-2024-07-18"],
+    maxTokens: 16000,
   },
 };
 
@@ -388,7 +398,26 @@ function isClaudeAvailable() {
   return !!anthropicClient;
 }
 
+let openaiClient = null;
+try {
+  const OpenAI = (await import("openai")).default;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (apiKey) {
+    openaiClient = new OpenAI({ apiKey });
+    console.log("✅ OpenAI API verfügbar");
+  } else {
+    console.warn("⚠️  OPENAI_API_KEY nicht gesetzt – GPT-Modelle nicht verfügbar");
+  }
+} catch (e) {
+  console.warn("⚠️  openai SDK nicht installiert:", e.message);
+}
+
+function isOpenAIAvailable() {
+  return !!openaiClient;
+}
+
 const CLAUDE_TIMEOUT_MS = parseInt(process.env.CLAUDE_TIMEOUT_MS || "120000", 10);
+const OPENAI_TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT_MS || "120000", 10);
 
 // ── BullMQ Worker-Lifecycle ────────────────────────────────────────────────
 // lockDuration: max. Zeit die ein Job einen Worker "sperrt" bevor ein anderer
@@ -446,6 +475,54 @@ async function generateWithClaude(prompt, options = {}) {
 
   if (!fullContent) throw new Error("Claude lieferte leere Antwort");
   if (totalOutputTokens > 0) console.log(`   [Claude] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} output_tokens`);
+  return fullContent;
+}
+
+async function generateWithOpenAI(prompt, options = {}) {
+  if (!openaiClient) {
+    throw new Error("OpenAI API nicht konfiguriert. OPENAI_API_KEY setzen.");
+  }
+  const model = options.model || "gpt-4o";
+  const maxTokens = options.maxTokens || 8000;
+  const temperature = options.temperature ?? 0.8;
+
+  console.log(`   [OpenAI] Start ${model}, max_tokens=${maxTokens}, timeout=${OPENAI_TIMEOUT_MS / 1000}s`);
+
+  const messages = [{ role: "user", content: prompt }];
+  let fullContent = "";
+  let totalOutputTokens = 0;
+  const MAX_CONTINUATIONS = 3;
+
+  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+    const apiCall = openaiClient.chat.completions.create({
+      model,
+      max_tokens: maxTokens,
+      temperature,
+      messages,
+    });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`OpenAI Timeout nach ${OPENAI_TIMEOUT_MS / 1000}s`)), OPENAI_TIMEOUT_MS);
+    });
+
+    const response = await Promise.race([apiCall, timeoutPromise]);
+    const choice = response.choices?.[0] || {};
+    const chunk = choice.message?.content || "";
+    const finishReason = choice.finish_reason;
+    totalOutputTokens += response.usage?.completion_tokens || 0;
+    fullContent += chunk;
+
+    console.log(`   [OpenAI] Antwort erhalten (${chunk.length} Zeichen, finish_reason=${finishReason}, completion_tokens=${response.usage?.completion_tokens})`);
+
+    if (finishReason !== "length" || attempt >= MAX_CONTINUATIONS) break;
+
+    console.log(`   [OpenAI] ⚠️  length erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
+    messages.push({ role: "assistant", content: chunk });
+    messages.push({ role: "user", content: "Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie 'Ich fahre fort' — einfach weiterschreiben." });
+  }
+
+  if (!fullContent) throw new Error("OpenAI lieferte leere Antwort");
+  if (totalOutputTokens > 0) console.log(`   [OpenAI] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} completion_tokens`);
   return fullContent;
 }
 
@@ -728,6 +805,7 @@ ${entries}
 const KNOWLEDGE_MAP = {
   // Kern-Reading-Typen
   'detailed':         ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'channels-gates', 'profiles-detailed', 'incarnation-cross'],
+  'single':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed', 'centers-detailed', 'incarnation-cross'],
   'basic':            ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed'],
   'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
   'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
@@ -1182,7 +1260,17 @@ Geburtsort: ${userData.birth_location || 'Unbekannt'}
 ${chartInfo}
 ${transitOverlay}
 ${deltaContext}`;
-  const templateContent = templates[readingType] || templates['business'] || '';
+  const placeholders = buildChartPlaceholders(chartData, userData);
+  const templateContent = applyPlaceholders(templates[readingType] || templates['business'] || '', placeholders);
+
+  // Life-Purpose: separater Pfad ohne hart-codierte Business-Sections
+  if (readingType === 'life-purpose') {
+    return generateLifePurposeTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders });
+  }
+  // Career: separater Pfad mit Type-konformer Karriere-Logic statt Business-Hybrid
+  if (readingType === 'career') {
+    return generateCareerTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders });
+  }
 
   const baseSystem = `Du bist ein erfahrener Human Design Business Coach.
 
@@ -1195,7 +1283,7 @@ ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Di
 
   const part1Prompt = `${baseSystem}
 
-Erstelle TEIL 1 eines tiefgründigen Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+Erstelle TEIL 1 eines tiefgründigen Human Design Business-Readings für:
 ${personContext}
 
 Schreibe direkt an die Person (Du-Form). Kein Lehrbuch — echter Spiegel für diese eine Person.
@@ -1219,7 +1307,7 @@ Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret un
 
   const part2Prompt = `${baseSystem}
 
-Erstelle TEIL 2 des Human Design ${readingType === 'career' ? 'Karriere' : readingType === 'life-purpose' ? 'Lebensaufgabe' : 'Business'}-Readings für:
+Erstelle TEIL 2 des Human Design Business-Readings für:
 ${personContext}
 
 Schreibe direkt als Fortsetzung. Kein neuer Titel, keine Wiederholung von Teil 1.
@@ -1246,6 +1334,168 @@ Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Business-Kontext, konkret un
   return generateTwoParts({ readingType, part1Prompt, part2Prompt, modelConfig });
 }
 
+// ── 2-Pass: Life-Purpose ──────────────────────────────────────────────────────
+// Eigener Pfad ohne hart-codierte Business-Sections. Das life-purpose-Template
+// trägt die Sections, der Wrapper liefert nur Faktenkontext + Pflicht-Anker.
+async function generateLifePurposeTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders }) {
+  const baseSystem = `Du bist ein erfahrener Human Design Coach. Spezialisierung: Lebensaufgabe und Inkarnationskreuze. Dieses Reading ist KEIN Business-Reading — es geht um die seelische Mission.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Die Chart-Daten sind via Swiss Ephemeris berechnet. Beginne direkt. Kein Disclaimer.
+
+PFLICHT — Kerntreue Life-Purpose:
+- Das Inkarnationskreuz ${placeholders.incarnationCrossName} ist der ROTE FADEN. Nenne den Kreuznamen mehrfach (mindestens 5×) und leite die Lebensaufgabe daraus ab.
+- Die vier IC-Tore (PSon ${placeholders.personalitySun}, PErd ${placeholders.personalityEarth}, DSon ${placeholders.designSun}, DErd ${placeholders.designEarth}) müssen jeweils einen eigenen Abschnitt bekommen.
+- Profil ${placeholders.profile} → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle (persönliches Schicksal); 4/1 → Juxtaposition (festes Schicksal); 4/6, 5/1, 5/2, 6/2, 6/3 → Left Angle (transpersonal).
+- KEIN Business-Coaching: Marketing, Pricing, Angebotsstruktur, Sichtbarkeit, Kunden, Skalieren — diese Themen gehören NICHT in dieses Reading. Wenn Lebensaufgabe sich auch im Beruflichen zeigt, bleibe auf der Mission-Ebene, nicht auf der Operativ-Ebene.
+- Halluziniere keine Planeten-Positionen. Wenn Reading eine Planet-Tor-Aussage macht, MUSS sie aus diesen Listen kommen:
+  Persönlichkeitsplaneten: ${placeholders.personalityPlanetsList}
+  Designplaneten:          ${placeholders.designPlanetsList}`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines tiefgründigen Human Design Lebensaufgabe-Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Kein Lehrbuch, kein Business — echter Spiegel der Lebensaufgabe.
+
+---
+
+## 1. Wer du bist — Type, Profil, Autorität als Lebensgrundlage
+${placeholders.clientName} als ${placeholders.type} mit Profil ${placeholders.profile} und Autorität ${placeholders.authority}. Wie bilden diese drei zusammen das Fundament der Lebensaufgabe? Strategie ${placeholders.strategy} als Kern-Bewegung.
+
+## 2. Dein Inkarnationskreuz: ${placeholders.incarnationCrossName}
+Was bedeutet dieses Kreuz konkret? Welche Lebensaufgabe trägt es? Beginne mit dem Satz „${placeholders.clientName}, dein Inkarnationskreuz ist ${placeholders.incarnationCrossName}." und entfalte die Mission auf 600+ Wörtern.
+
+## 3. Die vier Tore deines Kreuzes
+- **Persönlichkeitssonne — Tor ${placeholders.personalitySun}**: das bewussteste Lebensthema.
+- **Persönlichkeitserde — Tor ${placeholders.personalityEarth}**: der bewusste Boden.
+- **Design-Sonne — Tor ${placeholders.designSun}**: das körperlich getragene Hauptthema.
+- **Design-Erde — Tor ${placeholders.designEarth}**: der unbewusste Boden.
+Verwechsle nicht: Tor ${placeholders.personalitySun} ist die Persönlichkeitssonne (NICHT die Design-Sonne).
+
+## 4. Profil ${placeholders.profile} im Lebenszyklus
+Wie zeigt sich dieses Profil über die Lebensphasen? Linien-Mechanik konkret für ${placeholders.clientName}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Lebensaufgabe-Fokus.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Lebensaufgabe-Readings für:
+${personContext}
+
+Direkt als Fortsetzung. Keine Wiederholung von Teil 1.
+
+---
+
+## 5. Deine Channels als Lebensaufgaben-Träger
+Aktivierte Kanäle: ${placeholders.channelsList}. Welche Lebenskompetenzen / -aufgaben tragen diese Kanäle? Wie binden sie an das Inkarnationskreuz ${placeholders.incarnationCrossName} an?
+
+## 6. Definierte vs. offene Zentren als Mission-Architektur
+Definiert (${placeholders.definedCentersCount}): ${placeholders.definedCenters} — was bringst du konstant in die Welt?
+Offen (${placeholders.openCentersCount}): ${placeholders.openCenters} — wo lernst du fürs Kollektiv?
+
+## 7. Die Verkörperung der Mission — Schritte für ${placeholders.clientName}
+Konkrete Lebens-Schritte (KEINE Business-Strategie). Wie lebt diese Person die Mission im Alltag, in Beziehungen, in der eigenen Entwicklung?
+
+## 8. Was bleibt — der Kern in einem Satz
+Schließe mit der Verdichtung: ${placeholders.incarnationCrossName} in einem Satz für ${placeholders.clientName}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Lebensaufgabe-Fokus, kein Business.`;
+
+  return generateTwoParts({ readingType: 'life-purpose', part1Prompt, part2Prompt, modelConfig });
+}
+
+// ── 2-Pass: Career ────────────────────────────────────────────────────────────
+// Type-konforme Karriere-Logic. Verboten: „MG ist Manifestor-Hybrid", CEO-Top-
+// Empfehlungen ohne Sakral-Resonanz-Test. Erlaubt: Multi-Passion-Pfade,
+// Skip-Step-Mechanik, Trial-and-Error-Beruf bei 3er-Linie, Projektions-Fallen
+// bei 5er-Linie.
+async function generateCareerTwoParts({ userData, chartData, modelConfig, knowledgeText, personContext, templateContent, placeholders }) {
+  const baseSystem = `Du bist ein erfahrener Human Design Karriere-Coach. Dieses Reading ist KEIN Business-Reading und KEIN Life-Purpose-Reading.
+
+${templateContent}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Beginne direkt. Kein Disclaimer.
+
+PFLICHT — Type-konforme Karriere-Logik:
+- {{type}} ist ${placeholders.type}. Wenn ${placeholders.type} = "Manifesting Generator": Vergiss den Mythos „MG vereint Generator + Manifestor-Initiierung". MG ist ein **Generator-Subtyp** mit schnellerer Sakral-Reaktion und Skip-Step-Fähigkeit. Er initiiert NICHT — er reagiert schneller auf mehrere Möglichkeiten gleichzeitig. Strategie: Warten + Antworten + Informieren (das Informieren betrifft die Schritte, nicht das Initiieren).
+- Wenn ${placeholders.type} = "Generator": Strategie ist Warten + Antworten. Niemals „initiieren".
+- Wenn ${placeholders.type} = "Projector": Strategie ist Warten auf Einladung. Karriere-Top-Rollen (CEO, Senior Partner) NUR wenn auf Einladung. Nie „pushen".
+- Wenn ${placeholders.type} = "Manifestor": Initiieren + Informieren. Karriere als Solo-Initiator möglich.
+- Wenn ${placeholders.type} = "Reflector": Mond-basierte Klarheit. Karriere-Entscheidungen über Monatszyklus.
+
+PFLICHT — Profil-Mechanik im Karriere-Kontext:
+- 3er-Linie (Märtyrer/Experimentator): **Trial-and-Error-Berufsweg** ist HD-konform — Job-Pivots sind Lernen, kein Versagen.
+- 5er-Linie (Häretiker/Projektor): **Projektions-Magnet im Bewerbungs-Kontext** — andere projizieren Erwartungen; trennen zwischen echtem Match und Projektion essentiell.
+- 6er-Linie (Rollenmodell): **3-Phasen-Lebenszyklus** prägt Karriere stark — bis 30 Experimentieren, 30-50 Rückzug/Reife, 50+ Rollenmodell-Sichtbarkeit.
+
+VERBOTEN:
+- „CEO/Geschäftsführer/Top-Manager" als Top-Karriere-Empfehlung **ohne** den Disclaimer „nur als Antwort auf Einladung / sakrale Resonanz".
+- „Initiieren" / „Vorangehen" / „Du musst die Führung übernehmen" für Generator/MG/Projector.
+- „MG = Manifestor mit Generator-Energie".
+- Genre-Drift: KEINE Pricing-/Marketing-/Sichtbarkeits-Sektionen (das ist Business-Reading-Inhalt).
+- Composite-Begriffe (Goldader, Connection-Key) verboten.`;
+
+  const part1Prompt = `${baseSystem}
+
+Erstelle TEIL 1 eines Karriere-Readings für:
+${personContext}
+
+Schreibe direkt an die Person (Du-Form). Karriere-Fokus, kein Business-Coaching.
+
+---
+
+## 1. Dein Karriere-Energie-Fundament
+${placeholders.clientName} als ${placeholders.type} mit Profil ${placeholders.profile} und Autorität ${placeholders.authority}. Wie wirkt diese Konstellation im beruflichen Alltag? Was ist der natürliche Karriere-Rhythmus? Welche Berufs-Fallen entstehen, wenn entgegen Type/Strategy gearbeitet wird?
+
+## 2. Type-spezifische Karriere-Strategie
+Strategie ${placeholders.strategy} im Bewerbungs- und Berufskontext. Konkrete Situationen: Stellenangebot annehmen/ablehnen, Rolle wechseln, Selbstständigkeit vs. Anstellung. Anti-Mythen klar adressieren (siehe PFLICHT-Regeln).
+
+## 3. Autoritäts-konforme Karriere-Entscheidungen
+Wie ${placeholders.clientName} mit Autorität ${placeholders.authority} berufliche Entscheidungen trifft. Konkrete Praxis pro Authority-Typ.
+
+## 4. Profil ${placeholders.profile} im Berufskontext
+3er-Linie: Trial-and-Error als Lernen. 5er-Linie: Projektions-Magnet. 6er-Linie: 3-Phasen-Zyklus. Konkret für Profil ${placeholders.profile}.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Karriere-spezifisch.`;
+
+  const part2Prompt = `${baseSystem}
+
+Erstelle TEIL 2 des Karriere-Readings für:
+${personContext}
+
+Direkt als Fortsetzung. Keine Wiederholung von Teil 1.
+
+---
+
+## 5. Kanäle als Karriere-Kompetenzen
+Aktivierte Kanäle: ${placeholders.channelsList}. Was ist die berufliche Kompetenz pro Kanal? Welche Rollen passen?
+
+## 6. Definierte Zentren als Berufs-Ressourcen
+Definiert (${placeholders.definedCentersCount}): ${placeholders.definedCenters}. Was bringt ${placeholders.clientName} im Beruf konstant ein?
+
+## 7. Offene Zentren als Berufs-Vorsicht
+Offen (${placeholders.openCentersCount}): ${placeholders.openCenters}. Welche Konditionierungs-Fallen lauern im Berufskontext?
+
+## 8. Inkarnationskreuz im beruflichen Kontext
+Wie manifestiert sich ${placeholders.incarnationCrossName} in der Berufung? Mission-Ebene, nicht Operativ-Ebene.
+
+## 9. Konkrete nächste Schritte
+3-5 sofort umsetzbare Karriere-Schritte für ${placeholders.clientName}. Type-konform (kein „initiieren" für Generator/MG/Projector). Skip-Step bei MG erlauben. Multi-Passion bei MG erlauben.
+
+Schreibe mindestens 2000 Wörter. Deutsch, Du-Form, Karriere-spezifisch.`;
+
+  return generateTwoParts({ readingType: 'career', part1Prompt, part2Prompt, modelConfig });
+}
+
 // ── 2-Pass: Shadow-Work ───────────────────────────────────────────────────────
 async function generateShadowWorkTwoParts({ userData, chartData, modelConfig }) {
   const knowledgeText = buildReadingKnowledge('shadow-work');
@@ -1257,7 +1507,8 @@ async function generateShadowWorkTwoParts({ userData, chartData, modelConfig }) 
   const personContext = `Name: ${userData.client_name || 'Unbekannt'}
 ${chartInfo}
 ${deltaContext}`;
-  const templateContent = templates['shadow-work'] || '';
+  const placeholders = buildChartPlaceholders(chartData, userData);
+  const templateContent = applyPlaceholders(templates['shadow-work'] || '', placeholders);
 
   const baseSystem = `Du bist ein erfahrener Human Design Coach mit Fokus auf Schattenarbeit und Dekonditionierung.
 
@@ -1431,15 +1682,113 @@ function buildTuningInstructions({ tone, length, audience } = {}) {
   return lines.length > 0 ? `\n\n🎛️ TUNING-PARAMETER:\n${lines.join('\n')}` : '';
 }
 
+// ── Helper: Chart-Fakten als Placeholder-Map zurückgeben ──────────────────────
+// Wird von allen Single-Person-Pfaden genutzt, damit Modell harte Fakten
+// (Zentren, IC-Tore, Kanäle, Gates, Planeten) nicht halluzinieren muss.
+function buildChartPlaceholders(chartData, userData) {
+  if (!chartData) return {};
+  const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
+  const centers = chartData.centers || {};
+  const definedNames = Object.entries(centers).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
+  const openNames    = Object.entries(centers).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
+  const channels = (chartData.channels || []);
+  const channelsList = channels.map(c => {
+    const gates = (c.gates || []).join('-');
+    const name = c.name_de || c.name || '';
+    return name ? `${gates} (${name})` : gates;
+  }).filter(Boolean).join(', ') || 'keine';
+  const gates = (chartData.gates || []).map(g => typeof g === 'object' ? g.number : g).filter(Boolean);
+  const ic = chartData.incarnationCross || chartData.incarnation_cross || {};
+  const icGates = ic.gates || {};
+  // Vorrang: incarnation_crosses.json (deutsche Themen, 62 Kreuze inkl. Beschreibungen).
+  // Fallback: chartData.name_de aus chartCalculation.js (RAX_LAX_MAP/CROSS_THEMATIC_DE).
+  // Letzter Fallback: englischer Name oder '?'.
+  const icNameFromJson = getCrossNameDe(icGates.personalitySun, icGates.personalityEarth, icGates.designSun, icGates.designEarth, ic.type);
+  const icName = icNameFromJson || ic.name_de || ic.name || '?';
+
+  const planetLabelDe = {
+    sun: 'Sonne', earth: 'Erde', moon: 'Mond',
+    'north-node': 'Nordknoten', 'south-node': 'Südknoten',
+    northNode: 'Nordknoten', southNode: 'Südknoten',
+    mercury: 'Merkur', venus: 'Venus', mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn',
+    uranus: 'Uranus', neptune: 'Neptun', pluto: 'Pluto', chiron: 'Chiron', lilith: 'Lilith',
+  };
+  const formatPlanetList = (arr) => {
+    if (!Array.isArray(arr) || arr.length === 0) return '(keine Daten)';
+    return arr.map(p => {
+      const planet = planetLabelDe[p.planet] || p.planet || '?';
+      const gate = p.gate ?? '?';
+      const line = p.line != null ? `.${p.line}` : '';
+      return `${planet} ${gate}${line}`;
+    }).join(', ');
+  };
+  const personalityPlanetsList = formatPlanetList(chartData.personalityPlanets || (chartData.personality && chartData.personality.planets) || []);
+  const designPlanetsList      = formatPlanetList(chartData.designPlanets      || (chartData.design      && chartData.design.planets)      || []);
+
+  // Jahres-Transit-Daten aus ai_config (falls vorhanden)
+  const cfg = userData?.ai_config || {};
+  const yearTransitsList = cfg.year_transits
+    ? Object.entries(cfg.year_transits).map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join('; ').slice(0, 1500)
+    : '(keine Jahres-Transit-Daten verfügbar — KEINE konkreten Transit-Aussagen erlauben)';
+  const transitGatesList = Array.isArray(cfg.transit_gates) && cfg.transit_gates.length
+    ? cfg.transit_gates.map(t => `${t.planet || '?'} ${t.gate ?? '?'}${t.line != null ? '.' + t.line : ''}${t.date ? ' (' + t.date + ')' : ''}`).join(', ')
+    : '(keine konkreten Transit-Gates verfügbar)';
+  const currentYear = String(cfg.year || new Date().getFullYear());
+
+  return {
+    clientName: userData?.client_name || 'die Person',
+    birthDate: userData?.birth_date || userData?.birthdate || 'Unbekannt',
+    birthTime: userData?.birth_time || userData?.birthtime || 'Unbekannt',
+    birthPlace: userData?.birth_location || userData?.birthplace || 'Unbekannt',
+    type: chartData.type || 'Unbekannt',
+    profile: chartData.profile || '?',
+    authority: chartData.authority || '?',
+    strategy: chartData.strategy || '?',
+    definition: chartData.definition || '?',
+    notSelf: ({ Generator: 'Frustration', 'Manifesting Generator': 'Frustration', Manifestor: 'Wut', Projector: 'Bitterkeit', Reflector: 'Enttäuschung' })[chartData.type] || 'Not-Self-Emotion',
+    definedCentersCount: String(definedNames.length),
+    definedCenters: definedNames.join(', ') || '(keine)',
+    openCentersCount: String(openNames.length),
+    openCenters: openNames.join(', ') || '(keine)',
+    channelsCount: String(channels.length),
+    channelsList,
+    gatesCount: String(gates.length),
+    gatesList: gates.sort((a,b) => a-b).join(', ') || '(keine)',
+    incarnationCrossName: icName,
+    personalitySun: String(icGates.personalitySun ?? '?'),
+    personalityEarth: String(icGates.personalityEarth ?? '?'),
+    designSun: String(icGates.designSun ?? '?'),
+    designEarth: String(icGates.designEarth ?? '?'),
+    personalityPlanetsList,
+    designPlanetsList,
+    yearTransitsList,
+    transitGatesList,
+    currentYear,
+  };
+}
+
+function applyPlaceholders(template, placeholders) {
+  let out = template;
+  for (const [key, val] of Object.entries(placeholders || {})) {
+    out = out.split(`{{${key}}}`).join(String(val));
+  }
+  return out;
+}
+
 async function generateReading({ agentId, template, userData, chartData }) {
   const rawModelId = userData?.ai_model || DEFAULT_MODEL;
   // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
-  const selectedModelId = MODEL_CONFIG[rawModelId]
+  let selectedModelId = MODEL_CONFIG[rawModelId]
     ? rawModelId
     : Object.keys(MODEL_CONFIG).find(k => rawModelId.startsWith(k)) || DEFAULT_MODEL;
   let modelConfig = MODEL_CONFIG[selectedModelId] || MODEL_CONFIG[DEFAULT_MODEL];
   const maxTokens = userData?.ai_config?.max_tokens || modelConfig.maxTokens;
 
+  if (modelConfig.provider === "openai" && !isOpenAIAvailable()) {
+    console.warn(`⚠️  OpenAI nicht verfügbar — fallback auf claude-sonnet`);
+    selectedModelId = "claude-sonnet";
+    modelConfig = MODEL_CONFIG[selectedModelId];
+  }
   if (modelConfig.provider === "claude" && !isClaudeAvailable()) {
     throw new Error(`Claude (${selectedModelId}) nicht verfügbar`);
   }
@@ -1456,6 +1805,7 @@ async function generateReading({ agentId, template, userData, chartData }) {
   // Template-Mapping: explizite Zuordnung reading_type → template-Datei
   const TEMPLATE_MAP = {
     'detailed': 'detailed',
+    'single': 'single',
     'depth-analysis': 'depth-analysis',
     'channel-analysis': 'channel-analysis',
     'shadow-work': 'shadow-work',
@@ -1488,6 +1838,11 @@ async function generateReading({ agentId, template, userData, chartData }) {
       .replace(/\{\{memberCount\}\}/g, String(memberCount))
       .replace(/\{\{groupName\}\}/g, userData.groupName || 'Gruppe')
       .replace(/\{\{memberNames\}\}/g, memberNames);
+  }
+
+  // Single-Person-Templates: Chart-Fakten als Placeholder injizieren
+  if (chartData && !userData.members && !(userData.personA && userData.personB)) {
+    templateContent = applyPlaceholders(templateContent, buildChartPlaceholders(chartData, userData));
   }
 
   const knowledgeText = buildReadingKnowledge(agentId);
@@ -1694,6 +2049,45 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
       }
     }
     throw new Error("Alle Claude-Modelle fehlgeschlagen");
+  }
+
+  if (modelConfig.provider === "openai") {
+    const modelsToTry = modelConfig.models || [];
+    let lastErr;
+    for (const modelId of modelsToTry) {
+      try {
+        console.log(`   Versuche OpenAI-Modell: ${modelId}`);
+        const result = await generateWithOpenAI(fullPrompt, {
+          model: modelId,
+          maxTokens,
+          temperature: 0.7,
+        });
+        console.log(`   ✅ OpenAI (${modelId}) erfolgreich`);
+        return result;
+      } catch (openaiErr) {
+        lastErr = openaiErr;
+        console.warn(`   ⚠️  OpenAI (${modelId}) fehlgeschlagen:`, openaiErr.message);
+      }
+    }
+    // Alle OpenAI-Modelle gescheitert → Claude-Fallback statt Job-Fail.
+    // Häufigster Grund: TPM-Rate-Limit (429) bei Tier-1-Accounts. Reading nicht
+    // verlieren, sondern mit Default-Claude-Modell weitermachen.
+    if (isClaudeAvailable()) {
+      const fallbackModelId = "claude-sonnet-4-6";
+      console.warn(`   🔁 OpenAI komplett fehlgeschlagen — Fallback auf Claude (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
+      try {
+        const result = await generateWithClaude(fullPrompt, {
+          model: fallbackModelId,
+          maxTokens,
+          temperature: 0.7,
+        });
+        console.log(`   ✅ Claude-Fallback (${fallbackModelId}) erfolgreich`);
+        return result;
+      } catch (claudeErr) {
+        console.warn(`   ⚠️  Claude-Fallback fehlgeschlagen:`, claudeErr.message);
+      }
+    }
+    throw new Error(`Alle OpenAI-Modelle und Claude-Fallback fehlgeschlagen: ${lastErr?.message || "?"}`);
   }
 
   throw new Error(`Unbekannter Provider: ${modelConfig.provider}`);
@@ -2425,6 +2819,67 @@ async function pollForJobs() {
         if (attemptsErr) console.warn('⚠️ attempts-Update fehlgeschlagen:', attemptsErr.message);
 
         const jobStart = Date.now();
+
+        // ── Hardstop: Chart-Daten-Validator ──────────────────────
+        // Verhindert Reading-Halluzination, wenn weder gespeichertes chart_data
+        // noch Geburtsdaten zum Recompute vorhanden sind. Multi-Person-Typen
+        // (connection, penta, sexuality mit birthdate2, compatibility) und
+        // tagesimpuls/multi-agent haben eigene Pfade — werden übersprungen.
+        // Recovery: processHumanDesignJob/processChannelAnalysisJob rechnen
+        // chart_data via fetchChartData() neu, wenn Birth-Data im Payload sind.
+        // Validator lehnt deshalb nur ab, wenn:
+        //   (a) chart_data in DB gesetzt aber kaputt (kein Recovery möglich, da
+        //       der DB-Wert sonst Vorrang hätte), ODER
+        //   (b) chart_data in DB fehlt UND Birth-Data im Payload fehlen.
+        const SKIP_CHART_VALIDATION = new Set(['tagesimpuls', 'multi-agent']);
+        const MULTI_PERSON_TYPES = new Set(['connection', 'composite', 'connection-basic', 'penta', 'penta-basic', 'penta-communication', 'phasen-reading']);
+        const isMultiPerson = MULTI_PERSON_TYPES.has(readingType) ||
+          (['relationship', 'compatibility', 'sexuality'].includes(readingType) && (job.payload?.personA || job.payload?.birthdate2));
+        if (!SKIP_CHART_VALIDATION.has(readingType) && !isMultiPerson) {
+          const payload = job.payload || {};
+          const hasBirthData = !!(payload.birthdate && payload.birthtime && payload.birthplace);
+
+          let dbChart = null;
+          let dbChartPresent = false;
+          if (payload.reading_id) {
+            const { data: row } = await supabasePublic
+              .from('readings')
+              .select('chart_data, reading_data')
+              .eq('id', payload.reading_id)
+              .maybeSingle();
+            dbChart = row?.chart_data || row?.reading_data?.chart_data || null;
+            dbChartPresent = !!dbChart;
+          }
+
+          const hasGates = Array.isArray(dbChart?.gates) && dbChart.gates.length > 0;
+          const hasType = !!dbChart?.type && dbChart.type !== 'Unbekannt';
+          const hasProfile = !!dbChart?.profile && dbChart.profile !== '?';
+          const dbChartValid = hasGates && hasType && hasProfile;
+
+          // Reject-Bedingung: kaputtes DB-Chart ODER weder DB-Chart noch Birth-Data
+          const reject = (dbChartPresent && !dbChartValid) || (!dbChartPresent && !hasBirthData);
+          if (reject) {
+            const errMsg = dbChartPresent
+              ? `INVALID_CHART_INPUT — chart_data in DB unvollständig (gates=${hasGates}, type=${hasType}, profile=${hasProfile})`
+              : `INVALID_CHART_INPUT — kein chart_data in DB UND keine Birth-Data im Payload (birthdate/birthtime/birthplace)`;
+            console.warn(`🚫 [Chart-Validator] Job ${job.id} abgelehnt: ${errMsg}`);
+            await supabase.from('reading_jobs')
+              .update({ status: 'failed', error: errMsg, finished_at: new Date().toISOString() })
+              .eq('id', job.id);
+            const invReadingId = payload.reading_id;
+            if (invReadingId) {
+              await supabasePublic.from('readings')
+                .update({ status: 'failed', error: errMsg, updated_at: new Date().toISOString() })
+                .eq('id', invReadingId);
+            }
+            sendMattermost(
+              `🚫 **Reading abgelehnt** | \`${readingType}\` | Job \`${job.id}\` | ${errMsg}`,
+              'errors'
+            );
+            continue;
+          }
+        }
+
         if (readingType === 'tagesimpuls') {
           await processTagesimpulsJob(job, reading);
         } else if (['connection', 'composite', 'connection-basic'].includes(readingType) ||
@@ -2434,6 +2889,8 @@ async function pollForJobs() {
           await processChannelAnalysisJob(job, reading);
         } else if (readingType === 'sexuality' && job.payload?.birthdate2) {
           await processSexualityJob(job, reading);
+        } else if (readingType === 'phasen-reading') {
+          await processPhasenReadingJob(job, reading);
         } else if (readingType === 'penta' || readingType === 'penta-communication' || readingType === 'penta-basic') {
           await processPentaJob(job, reading);
         } else if (readingType === 'multi-agent') {
@@ -3110,6 +3567,306 @@ async function processConnectionJob(job, reading) {
     .eq("id", job.id);
 
   console.log(`✅ [Connection] Job ${job.id} abgeschlossen (${content?.length} Zeichen, A=${nameA}, B=${nameB})`);
+}
+
+
+// ============================================================================
+// PHASEN-READING — 90-Tage-Phasenanalyse (Anziehung / Reibung / Wahrheit)
+// ============================================================================
+
+// Phasen-Berechnung anhand des Beziehungsstart-Datums
+function calculatePhase(relationshipStartDate) {
+  const start = new Date(relationshipStartDate);
+  if (isNaN(start.getTime())) {
+    throw new Error(`Ungültiges relationshipStartDate: ${relationshipStartDate}`);
+  }
+  const today = new Date();
+  const diffMs = today - start;
+  const currentDay = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
+
+  let currentPhase, phaseLabel;
+  if (currentDay <= 30) {
+    currentPhase = 'phase-1-anziehung';
+    phaseLabel = 'Phase 1 — Die Anziehung (Tag 1–30)';
+  } else if (currentDay <= 60) {
+    currentPhase = 'phase-2-reibung';
+    phaseLabel = 'Phase 2 — Die Reibung (Tag 31–60)';
+  } else if (currentDay <= 90) {
+    currentPhase = 'phase-3-wahrheit';
+    phaseLabel = 'Phase 3 — Die Wahrheit (Tag 61–90)';
+  } else {
+    currentPhase = 'post-90';
+    phaseLabel = `Beziehung läuft seit ${currentDay} Tagen — über die 90-Tage-Phase hinaus (retrospektive Analyse)`;
+  }
+
+  return { currentDay, currentPhase, phaseLabel };
+}
+
+// 2-Pass-Generierung für phasen-reading (analog generateConnectionReadingTwoParts)
+async function generatePhasenReadingTwoParts({ userData, personAChart, personBChart, modelConfig, phaseInfo }) {
+  const knowledgeText = buildReadingKnowledge('connection');
+  const nameA = userData.personA?.name || 'Person A';
+  const nameB = userData.personB?.name || 'Person B';
+
+  const chartAInfo = `${nameA}:\n${buildChartInfo(personAChart)}`;
+  const chartBInfo = `${nameB}:\n${buildChartInfo(personBChart)}`;
+  const compositeBlock = buildTwoPersonCompositeBlock(personAChart, personBChart, nameA, nameB);
+
+  // Template aus Memory mit Placeholdern füllen
+  let template = templates['phasen-reading'] || '';
+
+  // Hilfsfunktionen — Composite-Kanäle als Text (snake_case-Felder sind die Wahrheit;
+  // camelCase-Aliasse existieren nicht in dynamics, deshalb Fallback nötig).
+  const formatChannelList = (arr) => {
+    if (!Array.isArray(arr) || arr.length === 0) return 'keine';
+    return arr.map(c => (typeof c === 'string' ? c : (c.channel || (c.gate1 && c.gate2 ? `${c.gate1}-${c.gate2}` : '')))).filter(Boolean).join(', ') || 'keine';
+  };
+  const dyn = userData.dynamics || {};
+  const emList            = formatChannelList(dyn.electromagneticChannels || dyn.electromagnetic_channels);
+  const compromiseList    = formatChannelList(dyn.compromiseChannels      || dyn.compromise_channels);
+  const companionshipList = formatChannelList(dyn.companionshipChannels   || dyn.companionship_channels);
+  const parallelList      = formatChannelList(dyn.parallelChannels        || dyn.parallel_channels);
+
+  // Definierte Zentren explizit zählen + benennen, damit das Modell keine
+  // Off-by-One-Fehler macht.
+  const centerNamesDe = { head: 'Krone', ajna: 'Ajna', throat: 'Kehle', g: 'G-Zentrum', heart: 'Herz/Ego', spleen: 'Milz', 'solar-plexus': 'Solarplexus', sacral: 'Sakral', root: 'Wurzel' };
+  const summarizeCenters = (chart) => {
+    const c = chart?.centers || {};
+    const def = Object.entries(c).filter(([_, v]) => v).map(([k]) => centerNamesDe[k] || k);
+    const open = Object.entries(c).filter(([_, v]) => !v).map(([k]) => centerNamesDe[k] || k);
+    return { count: def.length, openCount: open.length, defNames: def.join(', ') || '(keine)', openNames: open.join(', ') || '(keine)' };
+  };
+  const sumA = summarizeCenters(personAChart);
+  const sumB = summarizeCenters(personBChart);
+
+  const placeholders = {
+    personAName: nameA,
+    personBName: nameB,
+    typeA: personAChart?.type || 'Unbekannt',
+    typeB: personBChart?.type || 'Unbekannt',
+    strategyA: personAChart?.strategy || '?',
+    strategyB: personBChart?.strategy || '?',
+    authorityA: personAChart?.authority || '?',
+    authorityB: personBChart?.authority || '?',
+    profileA: personAChart?.profile || '?',
+    profileB: personBChart?.profile || '?',
+    relationshipStartDate: userData.relationshipStartDate || '',
+    currentDay: String(phaseInfo.currentDay),
+    currentPhase: phaseInfo.phaseLabel,
+    electromagneticChannels: emList,
+    compromiseChannels: compromiseList,
+    companionshipChannels: companionshipList,
+    parallelChannels: parallelList,
+    // Legacy-Aliasse für ältere Templates — gleiche Inhalte, neue Begriffe sind Standard.
+    dominanceChannels: companionshipList,
+    compromiseGates: compromiseList,
+    // Center-Anzahl explizit, gegen Off-by-One-Halluzinationen
+    definedCentersCountA: String(sumA.count),
+    definedCentersCountB: String(sumB.count),
+    definedCentersA: sumA.defNames,
+    definedCentersB: sumB.defNames,
+    openCentersCountA: String(sumA.openCount),
+    openCentersCountB: String(sumB.openCount),
+    openCentersA: sumA.openNames,
+    openCentersB: sumB.openNames,
+  };
+  for (const [key, val] of Object.entries(placeholders)) {
+    template = template.split(`{{${key}}}`).join(String(val));
+  }
+
+  const baseSystem = `${template}
+
+Verwende folgendes Wissen:
+${knowledgeText}
+
+ANWEISUNG: Die Chart-Daten wurden via Swiss Ephemeris berechnet. Füge KEINEN Disclaimer ein. Beginne direkt mit "## 1. Wo ihr gerade steht".
+PFLICHT: Nenne BEIDE Personen (${nameA} UND ${nameB}) in JEDER Sektion explizit!
+PFLICHT: Beziehe jede Sektion auf den aktuellen Tag ${phaseInfo.currentDay} und die aktuelle Phase (${phaseInfo.phaseLabel}).`;
+
+  const part1Prompt = `${baseSystem}
+
+CHART PERSON A — ${chartAInfo}
+
+CHART PERSON B — ${chartBInfo}
+${compositeBlock}
+
+BEZIEHUNGSSTART: ${userData.relationshipStartDate}
+AKTUELLER TAG: ${phaseInfo.currentDay} von 90
+AKTUELLE PHASE: ${phaseInfo.phaseLabel}
+
+ERSTELLE NUR SEKTIONEN 1 BIS 5:
+## 1. Wo ihr gerade steht
+## 2. Phase 1 — Die Anziehung (Tag 1–30)
+## 3. Phase 2 — Die Reibung (Tag 31–60)
+## 4. Phase 3 — Die Wahrheit (Tag 61–90)
+## 5. Eure Composite-Dynamik im Detail
+
+Mindestlänge: 2500 Wörter. Beginne direkt mit "## 1. Wo ihr gerade steht". Deutsch, ihr/euch-Form, würdevoll und präzise.`;
+
+  const part2Prompt = `${baseSystem}
+
+CHART PERSON A — ${chartAInfo}
+
+CHART PERSON B — ${chartBInfo}
+${compositeBlock}
+
+BEZIEHUNGSSTART: ${userData.relationshipStartDate}
+AKTUELLER TAG: ${phaseInfo.currentDay} von 90
+AKTUELLE PHASE: ${phaseInfo.phaseLabel}
+
+ERSTELLE NUR SEKTIONEN 6 BIS 10 als Fortsetzung des Readings (kein neuer Titel):
+## 6. Eure Strategien und Autoritäten im 90-Tage-Rhythmus
+## 7. Konditionierungsmuster: Was ihr voneinander übernehmt
+## 8. Stärken und Wachstumsfeld eurer Konstellation
+## 9. Empfehlungen für die kommenden Tage bis Tag 90
+## 10. Das Muster, das bleibt
+
+Mindestlänge: 2500 Wörter. Beginne direkt mit "## 6.". Deutsch, ihr/euch-Form, würdevoll und präzise.`;
+
+  return generateTwoParts({ readingType: 'phasen-reading', part1Prompt, part2Prompt, modelConfig, tokensPerPart: 8000 });
+}
+
+// 5 Reflexionsfragen für das Paar in der aktuellen Phase
+async function generatePhasenReflexionsfragen(personAChart, personBChart, personAName, personBName, phaseInfo) {
+  if (!isClaudeAvailable()) return null;
+  const prompt = `Du bist ein erfahrener Human Design Coach. Erstelle 5 tiefe, persönliche Reflexionsfragen für dieses Paar (${personAName} & ${personBName}), basierend auf der spezifischen Composite-Konstellation und der aktuellen Phase (Tag ${phaseInfo.currentDay} — ${phaseInfo.phaseLabel}).
+
+${buildChartSummary(personAChart, personAName || 'Person A')}
+
+${buildChartSummary(personBChart, personBName || 'Person B')}
+
+Anforderungen:
+- Genau 5 Fragen
+- 1–2 Sätze pro Frage
+- keine Ja/Nein-Fragen
+- konkret zur aktuellen Phase passen
+- in der ihr-Form, einladend, nicht wertend
+
+Antworte NUR mit einem JSON-Array mit genau 5 Strings, ohne weiteren Text:
+["Frage 1", "Frage 2", "Frage 3", "Frage 4", "Frage 5"]`;
+  try {
+    const result = await generateWithClaude(prompt, { model: 'claude-sonnet-4-6', maxTokens: 1000, temperature: 0.8 });
+    const match = result.match(/\[[\s\S]*?\]/);
+    if (match) return JSON.parse(match[0]);
+    return null;
+  } catch (err) {
+    console.warn('⚠️ Phasen-Reflexionsfragen fehlgeschlagen:', err.message);
+    return null;
+  }
+}
+
+// Worker für phasen-reading Jobs (analog processConnectionJob)
+async function processPhasenReadingJob(job, reading) {
+  console.log(`🔄 [Phasen] Verarbeite Job ${job.id}`);
+  const payload = reading.client_data || job.payload || {};
+
+  const nameA = payload.name || payload.personA?.name || 'Person A';
+  const nameB = payload.name2 || payload.personB?.name || 'Person B';
+  const birthDateA = payload.birthdate || payload.personA?.birthDate;
+  const birthTimeA = payload.birthtime || payload.personA?.birthTime;
+  const birthPlaceA = payload.birthplace || payload.personA?.birthPlace;
+  const birthDateB = payload.birthdate2 || payload.personB?.birthDate;
+  const birthTimeB = payload.birthtime2 || payload.personB?.birthTime;
+  const birthPlaceB = payload.birthplace2 || payload.personB?.birthPlace;
+  const relationshipStartDate = payload.relationshipStartDate || payload.relationship_start_date;
+  const readingId = payload.reading_id;
+
+  // Pflichtfelder validieren
+  if (!birthDateB || !birthTimeB || !birthPlaceB) {
+    throw new Error('phasen-reading: zweite Person (birthdate2/birthtime2/birthplace2) ist Pflicht');
+  }
+  if (!relationshipStartDate) {
+    throw new Error('phasen-reading: relationshipStartDate ist Pflicht (Format YYYY-MM-DD)');
+  }
+
+  const phaseInfo = calculatePhase(relationshipStartDate);
+  console.log(`   [Phasen] Tag ${phaseInfo.currentDay} | ${phaseInfo.phaseLabel}`);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ status: 'processing', progress: 10 }).eq('id', readingId);
+  }
+
+  // Charts laden (Geburtsdaten → Chart-API, Fallback existing reading_data)
+  let existingReadingData = {};
+  if (readingId) {
+    const { data: row } = await supabasePublic.from('readings').select('reading_data').eq('id', readingId).maybeSingle();
+    if (row?.reading_data) existingReadingData = row.reading_data;
+  }
+
+  const personAChart = await fetchChartData(birthDateA, birthTimeA, birthPlaceA)
+    || existingReadingData.chart_data || { type: 'Unbekannt', gates: [], centers: {} };
+  const personBChart = await fetchChartData(birthDateB, birthTimeB, birthPlaceB)
+    || existingReadingData.chart_data2 || { type: 'Unbekannt', gates: [], centers: {} };
+
+  console.log(`   [Phasen] Charts: A=${personAChart.type || '?'}, B=${personBChart.type || '?'}`);
+
+  const dynamics = analyzeConnectionDynamics(personAChart, personBChart, nameA, nameB);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ progress: 30 }).eq('id', readingId);
+  }
+
+  // 2-Pass + Reflexionsfragen parallel
+  const [rawContent, reflexionsfragen] = await Promise.all([
+    generatePhasenReadingTwoParts({
+      userData: {
+        personA: { name: nameA, birthDate: birthDateA },
+        personB: { name: nameB, birthDate: birthDateB },
+        relationshipStartDate,
+        dynamics,
+      },
+      personAChart,
+      personBChart,
+      modelConfig: MODEL_CONFIG[DEFAULT_MODEL],
+      phaseInfo,
+    }),
+    generatePhasenReflexionsfragen(personAChart, personBChart, nameA, nameB, phaseInfo),
+  ]);
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({ progress: 80 }).eq('id', readingId);
+  }
+
+  // Pipeline-Validierung (analog Connection)
+  let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };
+  let content = rawContent;
+  try {
+    const pipeline = await runReadingPipeline(rawContent, personAChart);
+    content = pipeline.text;
+    pipelineInfo = { validated: pipeline.validated, corrected: pipeline.corrected, errorCount: pipeline.errorCount };
+  } catch (pipelineErr) {
+    console.warn('[Pipeline] [Phasen] Fehler — Fallback auf Original:', pipelineErr.message);
+  }
+
+  // Reading speichern
+  const newReadingData = {
+    ...existingReadingData,
+    text: content,
+    chart_data: personAChart,
+    chart_data2: personBChart,
+    personA: { name: nameA },
+    personB: { name: nameB },
+    phase_info: phaseInfo,
+    relationship_start_date: relationshipStartDate,
+    ...(reflexionsfragen ? { reflexionsfragen } : {}),
+    _pipeline: pipelineInfo,
+  };
+
+  if (readingId) {
+    await supabasePublic.from('readings').update({
+      status: 'completed',
+      progress: 100,
+      reading_data: newReadingData,
+      updated_at: new Date().toISOString(),
+    }).eq('id', readingId);
+  }
+
+  await supabase.from('reading_jobs').update({
+    status: 'completed',
+    finished_at: new Date().toISOString(),
+  }).eq('id', job.id);
+
+  console.log(`✅ [Phasen] Job ${job.id} abgeschlossen (${content?.length} Zeichen, Tag ${phaseInfo.currentDay})`);
 }
 
 
@@ -4111,6 +4868,114 @@ app.get("/api/readings/shadow-work/status/:job_id", async (req, res) => {
     });
   } catch (err) {
     console.error("[Shadow Work] Status fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post("/api/readings/phasen-reading/start", async (req, res) => {
+  try {
+    const {
+      reading_id,
+      name, birthdate, birthtime, birthplace,
+      name2, birthdate2, birthtime2, birthplace2,
+      relationshipStartDate,
+    } = req.body || {};
+
+    const missing = [];
+    if (!birthdate) missing.push("birthdate");
+    if (!birthtime) missing.push("birthtime");
+    if (!birthplace) missing.push("birthplace");
+    if (!birthdate2) missing.push("birthdate2");
+    if (!birthtime2) missing.push("birthtime2");
+    if (!birthplace2) missing.push("birthplace2");
+    if (!relationshipStartDate) missing.push("relationshipStartDate");
+    if (missing.length) {
+      return res.status(400).json({
+        success: false,
+        error: `Pflichtfelder fehlen: ${missing.join(", ")}`,
+      });
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(relationshipStartDate)) {
+      return res.status(400).json({
+        success: false,
+        error: "relationshipStartDate muss Format YYYY-MM-DD haben",
+      });
+    }
+
+    const payload = {
+      reading_type: "phasen-reading",
+      ...(reading_id ? { reading_id } : {}),
+      name: name || "Person A",
+      birthdate, birthtime, birthplace,
+      name2: name2 || "Person B",
+      birthdate2, birthtime2, birthplace2,
+      relationshipStartDate,
+    };
+
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .insert({ reading_type: "phasen-reading", payload, status: "pending" })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    console.log(`✅ [Phasen] Job erstellt: ${data.id}`);
+    return res.status(202).json({
+      success: true,
+      job_id: data.id,
+      status: "pending",
+      poll_url: `/api/readings/phasen-reading/status/${data.id}`,
+    });
+  } catch (err) {
+    console.error("[Phasen] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/phasen-reading/status/:job_id", async (req, res) => {
+  try {
+    const { job_id } = req.params;
+    const { data, error } = await supabase
+      .from("reading_jobs")
+      .select("id, status, payload, error, created_at, started_at, finished_at")
+      .eq("id", job_id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Job nicht gefunden" });
+      throw new Error(error.message);
+    }
+
+    let result = null;
+    if (data.status === "completed" && data.payload?.reading_id) {
+      const { data: reading } = await supabasePublic
+        .from("readings")
+        .select("reading_data")
+        .eq("id", data.payload.reading_id)
+        .maybeSingle();
+      if (reading?.reading_data?.text) {
+        result = {
+          text: reading.reading_data.text,
+          phase_info: reading.reading_data.phase_info || null,
+          reflexionsfragen: reading.reading_data.reflexionsfragen || null,
+        };
+      }
+    }
+
+    return res.json({
+      success: true,
+      job_id: data.id,
+      status: data.status,
+      error: data.error || null,
+      created_at: data.created_at,
+      started_at: data.started_at || null,
+      finished_at: data.finished_at || null,
+      ...(result ? { result } : {})
+    });
+  } catch (err) {
+    console.error("[Phasen] Status fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

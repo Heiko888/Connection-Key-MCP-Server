@@ -36,16 +36,36 @@ CHECK 3 – TOR-MAPPING (Kanäle)
 - Prüfe die Zentren-Zuordnung jedes Tores (z.B. Tor 18 gehört zur Milz, sucht Tor 58 an der Wurzel – NICHT Tor 17 am Ajna).
 - Fehler: Falsch genannte Gegentore oder falsche Zentren-Zuordnungen.
 
-CHECK 4 – INKARNATIONSKREUZ
+CHECK 4 – INKARNATIONSKREUZ (Tore + Selbstwiderspruch + Kreuztyp)
 - Die korrekten Gate-Werte stehen im chartData-Block unter "SOLAR- UND ERD-GATES".
-  Lies die 4 Werte von dort: Persönlichkeitssonne, Persönlichkeitserde, Design-Sonne, Design-Erde.
-- Prüfe im Reading: Wird das korrekte Kreuz beschrieben? Werden die richtigen 4 Tore genannt?
-- Fehler: Wenn das Reading ein anderes Kreuz oder andere Tore beschreibt.
-- KRITISCH: Prüfe ob Design-Sonne und Design-Erde NICHT vertauscht wurden.
-  Design-Sonne ≠ Persönlichkeitssonne. Design-Erde ≠ Persönlichkeitserde.
-  Häufiger Fehler: Das Reading nennt Tor X als "Design-Sonne", aber laut chartData
-  ist Tor X die "Persönlichkeitssonne". Prüfe jeden der 4 Gate-Werte einzeln.
-  Fehler melden wenn ein Gate-Wert im Reading nicht exakt dem entsprechenden Feld in chartData entspricht.
+  Lies die 4 Werte von dort: Persönlichkeitssonne (PSon), Persönlichkeitserde (PErd),
+  Design-Sonne (DSon), Design-Erde (DErd).
+- TEIL A – TOR-POSITIONS-KONSISTENZ:
+  Für JEDE Aussage im Reading der Form "Tor X ist {seine|ihre|deine} {Persönlichkeitssonne|
+  Persönlichkeitserde|Design-Sonne|Design-Erde}" oder "{PSon|PErd|DSon|DErd} ist Tor X":
+  Vergleiche Tor X mit dem entsprechenden chartData-Feld der jeweiligen Person.
+  Fehler (severity: critical) wenn die Werte nicht exakt übereinstimmen.
+  Häufige Verwechslungen, gezielt prüfen:
+    - Persönlichkeitssonne ↔ Design-Sonne
+    - Persönlichkeitssonne ↔ Persönlichkeitserde
+    - Design-Sonne ↔ Design-Erde
+- TEIL B – SELBSTWIDERSPRUCH (kritisch):
+  Wenn dasselbe Tor im Reading-Text gleichzeitig zwei verschiedene IC-Positionen
+  zugeschrieben bekommt (z.B. "Tor 37 als Persönlichkeitssonne und Persönlichkeitserde"),
+  ist das ein logischer Widerspruch. Severity: critical.
+- TEIL C – KREUZTYP-PROFIL-KONSISTENZ:
+  Verbindliche Tabelle (Personality-Linie bestimmt primär):
+    1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle Cross (RAX)
+    4/1                          → Juxtaposition Cross (JUX, Sonderfall)
+    4/6, 5/1, 5/2, 6/2, 6/3      → Left Angle Cross (LAX)
+  Fehler (severity: critical) wenn:
+    a) Reading nennt "Right Angle" bei Profil 4/1, 4/6, 5/1, 5/2, 6/2 oder 6/3
+    b) Reading nennt "Left Angle" bei Profil 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 oder 4/1
+    c) Reading nennt "Juxtaposition" bei einem anderen Profil als 4/1
+- TEIL D – ERWÄHNUNG:
+  Bei Readings ab ~30k Zeichen Länge (Connection / Detailed / Phasen / Relationship):
+  Fehlt das Inkarnationskreuz vollständig (kein Kreuzname genannt, kein Kreuztyp,
+  keine PSon/PErd-Reflexion), severity: major.
 
 CHECK 5 – TOR-VOLLSTÄNDIGKEIT
 - Extrahiere alle aktivierten Tore aus chartData.
@@ -144,6 +164,36 @@ CHECK 14 – WHITELIST-VERSTOSS (strikt)
   auf der Whitelist ist.
 - Ausnahmen: Transit-Gates (nur bei Transit/Jahres/Tagesimpuls-Readings).
 
+CHECK 15 – TOR → ZENTRUM-KONSISTENZ
+- Verbindliche Zuordnung jedes Tors zu genau einem Zentrum:
+    Krone:       61, 63, 64
+    Ajna:        4, 11, 17, 24, 43, 47
+    Kehle:       8, 12, 16, 20, 23, 31, 33, 35, 45, 56, 62
+    G-Zentrum:   1, 2, 7, 10, 13, 15, 25, 46
+    Herz/Ego:    21, 26, 40, 51
+    Solarplexus: 6, 22, 30, 36, 37, 49, 55
+    Sakral:      3, 5, 9, 14, 27, 29, 34, 42, 59
+    Milz:        18, 28, 32, 44, 48, 50, 57
+    Wurzel:      19, 38, 39, 41, 52, 53, 54, 58, 60
+- Wenn der Reading-Text ein Tor explizit unter einem Zentrum nennt
+  (Formen wie "Tor 39 in deinem Solarplexus", "Tor 41 ist ein Solarplexus-Tor",
+  "in der Wurzel: Tor 22"), prüfe gegen die Tabelle.
+- Fehler (severity: critical) wenn die Zuordnung nicht stimmt.
+- Häufige Verwechslungen aktiv prüfen: 39 nicht im Solarplexus (gehört Wurzel),
+  41 nicht im Solarplexus (gehört Wurzel), 19 nicht im Solarplexus (gehört Wurzel),
+  55 nicht in der Wurzel (gehört Solarplexus), 59 nicht im Solarplexus (gehört Sakral),
+  6 nicht im Sakral (gehört Solarplexus), 18 nicht in der Wurzel (gehört Milz).
+
+CHECK 16 – ZENTREN-ANZAHL KONSISTENZ
+- Lies aus chartData für jede Person die Anzahl definierter Zentren.
+- Wenn der Reading-Text eine Aussage der Form "Person X hat N definierte Zentren"
+  enthält, prüfe N gegen chartData.
+- Fehler (severity: major) wenn N nicht stimmt.
+- Häufiger Fehler: Off-by-One (z.B. "sieben definierte Zentren" obwohl es sechs sind).
+- Zusätzlich: Wenn das Reading an einer Stelle 6 offene Zentren auflistet
+  und an anderer Stelle "7 definierte" für dieselbe Person sagt, ist das
+  ein interner Widerspruch (severity: major).
+
 ---
 
 AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
@@ -153,7 +203,7 @@ AUSGABE – antworte NUR mit diesem JSON, ohne Erklärungen davor oder danach:
   "errorCount": 0,
   "errors": [
     {
-      "check": "CHECK 1-14",
+      "check": "CHECK 1-16",
       "severity": "critical|major",
       "description": "Was ist falsch",
       "expected": "Was laut chartData korrekt wäre",

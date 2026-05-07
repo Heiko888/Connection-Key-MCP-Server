@@ -6209,6 +6209,33 @@ scheduleDailyAt(16, 0, postChannelHDWissen);
 // Community-Begrüßung in #General täglich 06:00 UTC (08:00 MESZ)
 scheduleDailyAt(6, 0, postCommunityGreeting);
 
+// Workshop-Reminder-Mails: täglich 07:00 UTC (09:00 MESZ) — triggert
+// /api/workshops/send-reminders auf .167 (frontend Resend-Pfad)
+scheduleDailyAt(7, 0, async () => {
+  const url = process.env.WORKSHOP_REMINDER_URL;
+  const secret = process.env.CRON_SECRET;
+  if (!url || !secret) {
+    console.warn('[Workshop-Reminder] WORKSHOP_REMINDER_URL oder CRON_SECRET fehlt — überspringe');
+    return;
+  }
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-cron-secret': secret },
+      signal: AbortSignal.timeout(60_000),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data?.success) {
+      console.log(`📅 [Workshop-Reminder] today=${data.today} events=${data.eventsToday} sent=${data.sent} failed=${data.failed || 0}`);
+      if ((data.sent || 0) > 0) sendMattermost(`📅 **Workshop-Reminder** | ${data.eventsToday} Event(s) heute, ${data.sent} Mails verschickt`, 'channel');
+    } else {
+      console.warn('[Workshop-Reminder] response:', data);
+    }
+  } catch (err) {
+    console.error('[Workshop-Reminder] error:', err.message);
+  }
+});
+
 // Abend-Reflexion täglich 19:00 UTC (21:00 CEST)
 scheduleDailyAt(19, 0, postChannelAbendReflexion);
 

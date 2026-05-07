@@ -145,6 +145,10 @@ services:
       - TELEGRAM_HD_WISSEN_THREAD_ID=${TELEGRAM_HD_WISSEN_THREAD_ID}
       - TELEGRAM_BUSINESS_HD_THREAD_ID=${TELEGRAM_BUSINESS_HD_THREAD_ID}
 
+      # Cron-Secret (geteilt mit .167 frontend, /api/workshops/send-reminders)
+      - CRON_SECRET=${CRON_SECRET}
+      - WORKSHOP_REMINDER_URL=${WORKSHOP_REMINDER_URL:-https://the-connection-key.de/api/workshops/send-reminders}
+
       # Mattermost (Coach-Benachrichtigungen)
       - MATTERMOST_WEBHOOK_URL=${MATTERMOST_WEBHOOK_URL}
       - MATTERMOST_WEBHOOK_READINGS=${MATTERMOST_WEBHOOK_READINGS}

@@ -48,19 +48,23 @@ const CHART_SERVICE_URL = process.env.CHART_SERVICE_URL || "http://connection-ke
 // ── Telegram Hilfsfunktionen ─────────────────────────────────────────────────
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '';
+const TELEGRAM_COMMUNITY_ID = process.env.TELEGRAM_COMMUNITY_ID || '';
+const TELEGRAM_HD_WISSEN_THREAD_ID = parseInt(process.env.TELEGRAM_HD_WISSEN_THREAD_ID || '0', 10) || null;
 
 function escapeTgMd2(text) {
   if (!text) return '';
   return String(text).replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, '\\$&');
 }
 
-async function sendTelegramMessage(chatId, text, parseMode = 'MarkdownV2') {
+async function sendTelegramMessage(chatId, text, parseMode = 'MarkdownV2', messageThreadId = null) {
   if (!TELEGRAM_BOT_TOKEN || !chatId) return;
   try {
+    const payload = { chat_id: chatId, text, parse_mode: parseMode, disable_web_page_preview: true };
+    if (messageThreadId) payload.message_thread_id = messageThreadId;
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: parseMode, disable_web_page_preview: true }),
+      body: JSON.stringify(payload),
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) {
@@ -5975,23 +5979,23 @@ async function postChannelBeziehung({ dryRun = false } = {}) {
 }
 
 /**
- * Postet Mo–Fr einen HD-Wissen-Beitrag in den Telegram-Kanal.
+ * Postet jeden 2. Tag um 18:00 MESZ einen HD-Wissen-Beitrag in das #HD-Wissen
+ * Topic der Telegram-Community-Gruppe.
  */
-async function postChannelHDWissen({ dryRun = false } = {}) {
-  if (!TELEGRAM_CHANNEL_ID && !dryRun) {
-    console.warn('[Channel] TELEGRAM_CHANNEL_ID nicht gesetzt — überspringe');
+async function postChannelHDWissen({ dryRun = false, force = false } = {}) {
+  if (!TELEGRAM_COMMUNITY_ID && !dryRun) {
+    console.warn('[Channel] TELEGRAM_COMMUNITY_ID nicht gesetzt — überspringe');
     return null;
   }
-  // Nur Sonntag (0) — ausser dryRun (Coach kann jederzeit einen Entwurf bauen)
-  const day = new Date().getUTCDay();
-  if (!dryRun && day !== 0) {
-    console.log(`[Channel] HD-Wissen: nur sonntags (heute Wochentag ${day})`);
+  // Topic anhand des Datums rotieren — und gleichzeitig als Tag-Filter nutzen.
+  const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+  // Nur jeden 2. Tag (gerade Tagesnummer im Jahr) — ausser dryRun oder force
+  if (!dryRun && !force && dayOfYear % 2 !== 0) {
+    console.log(`[Channel] HD-Wissen: nur jeden 2. Tag (heute dayOfYear=${dayOfYear}, ungerade → skip)`);
     return null;
   }
   console.log(`📚 [Channel] Generiere HD-Wissen-Post${dryRun ? ' (Entwurf)' : ''}...`);
   try {
-    // Topic anhand des Datums rotieren
-    const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
     const { topic, topicHashtag } = HD_WISSEN_TOPICS[dayOfYear % HD_WISSEN_TOPICS.length];
 
     const templateText = templates['channel-hd-wissen'] || '';
@@ -6003,8 +6007,8 @@ async function postChannelHDWissen({ dryRun = false } = {}) {
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
 
     if (!dryRun) {
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
-      console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen)`);
+      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_HD_WISSEN_THREAD_ID);
+      console.log(`📚 [Channel] HD-Wissen gepostet: ${topic} (${text.length} Zeichen, thread=${TELEGRAM_HD_WISSEN_THREAD_ID})`);
     } else {
       console.log(`📝 [Channel] HD-Wissen-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
     }
@@ -6088,8 +6092,8 @@ scheduleDailyAt(18, 0, async () => {
   return postChannelBeziehung();
 });
 
-// HD-Wissen nur sonntags 15:00 UTC (17:00 CEST) — Funktion prüft intern den Wochentag
-scheduleDailyAt(15, 0, postChannelHDWissen);
+// HD-Wissen jeden 2. Tag, 16:00 UTC (18:00 MESZ) — Funktion prüft intern dayOfYear%2
+scheduleDailyAt(16, 0, postChannelHDWissen);
 
 // Abend-Reflexion täglich 19:00 UTC (21:00 CEST)
 scheduleDailyAt(19, 0, postChannelAbendReflexion);
@@ -6142,6 +6146,7 @@ app.post('/api/channel/post-tagesimpuls', async (req, res) => {
 app.post('/api/channel/post-hd-wissen', async (req, res) => {
   const { topic } = req.body || {};
   const dryRun = !!(req.body && req.body.dryRun);
+  const force = !!(req.body && req.body.force);
   if (dryRun) {
     try {
       const row = await postChannelHDWissen({ dryRun: true });
@@ -6159,13 +6164,13 @@ app.post('/api/channel/post-hd-wissen', async (req, res) => {
       const prompt = templateText.replace(/\{\{topic\}\}/g, topic).replace(/\{\{topicHashtag\}\}/g, topicHashtag)
         + `\n\nErstelle jetzt den HD-Wissen-Post über: ${topic}`;
       const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_HD_WISSEN_THREAD_ID);
       console.log(`📚 [Channel] HD-Wissen (manuell) gepostet: ${topic}`);
     } catch (err) {
       console.error('[Channel] HD-Wissen Fehler:', err.message);
     }
   } else {
-    postChannelHDWissen({ dryRun: false }).catch(e => console.error('[Channel] HD-Wissen async:', e.message));
+    postChannelHDWissen({ dryRun: false, force }).catch(e => console.error('[Channel] HD-Wissen async:', e.message));
   }
 });
 

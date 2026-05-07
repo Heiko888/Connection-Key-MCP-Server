@@ -185,7 +185,7 @@ router.post("/webhook", async (req, res) => {
   const chatId = message.chat.id;
   const text = message.text.trim();
   const firstName = message.from?.first_name || "du";
-  console.log(`[Telegram] Nachricht von ${chatId}: ${text.substring(0, 50)}`);
+  console.log(`[Telegram] Nachricht von ${chatId}${message.message_thread_id ? ` thread=${message.message_thread_id}` : ''}${message.is_topic_message ? ' (topic)' : ''}: ${text.substring(0, 50)}`);
 
   if (!supabase) {
     console.error("[Telegram] Webhook: Supabase nicht verfügbar");

@@ -40,3 +40,6 @@ reading-engine-138-*.txt
 # Backup-Dateien
 *.bak
 *.backup
+
+# Lokales Scratch-Verzeichnis (Einmal-Skripte, Parsing-Tools)
+data/

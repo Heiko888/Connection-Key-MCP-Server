@@ -51,6 +51,7 @@ const TELEGRAM_CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || '';
 const TELEGRAM_COMMUNITY_ID = process.env.TELEGRAM_COMMUNITY_ID || '';
 const TELEGRAM_HD_WISSEN_THREAD_ID = parseInt(process.env.TELEGRAM_HD_WISSEN_THREAD_ID || '0', 10) || null;
 const TELEGRAM_BUSINESS_HD_THREAD_ID = parseInt(process.env.TELEGRAM_BUSINESS_HD_THREAD_ID || '0', 10) || null;
+const TELEGRAM_CONNECTION_KEY_THREAD_ID = parseInt(process.env.TELEGRAM_CONNECTION_KEY_THREAD_ID || '0', 10) || null;
 
 function escapeTgMd2(text) {
   if (!text) return '';
@@ -5909,6 +5910,14 @@ app.post('/api/channel/content/:id/send-telegram', requireAdminAuth, async (req,
 // ======================================================
 
 const HD_WISSEN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-wissen.json'), 'utf-8'));
+const CONNECTION_KEY_TOPICS = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-connection-key.json'), 'utf-8'));
+  } catch (e) {
+    console.warn('[Channel] connection-key topics laden fehlgeschlagen:', e.message);
+    return [];
+  }
+})();
 
 /**
  * Lädt Transit-Daten für heute aus Supabase oder API.
@@ -6094,6 +6103,57 @@ async function postChannelHDWissen({ dryRun = false, force = false } = {}) {
 }
 
 /**
+ * Postet jeden 3. Tag um 19:00 MESZ einen Verbindungs-/Beziehungs-Beitrag in das
+ * #Connection-Key Topic der Telegram-Community-Gruppe.
+ */
+async function postCommunityConnectionKey({ dryRun = false, force = false } = {}) {
+  if (!TELEGRAM_COMMUNITY_ID && !dryRun) {
+    console.warn('[Channel] TELEGRAM_COMMUNITY_ID nicht gesetzt — überspringe');
+    return null;
+  }
+  if (!TELEGRAM_CONNECTION_KEY_THREAD_ID && !dryRun) {
+    console.warn('[Channel] TELEGRAM_CONNECTION_KEY_THREAD_ID nicht gesetzt — überspringe');
+    return null;
+  }
+  if (!CONNECTION_KEY_TOPICS.length) {
+    console.warn('[Channel] CONNECTION_KEY_TOPICS leer — überspringe');
+    return null;
+  }
+  const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+  // Nur jeden 3. Tag (dayOfYear teilbar durch 3) — ausser dryRun oder force
+  if (!dryRun && !force && dayOfYear % 3 !== 0) {
+    console.log(`[Channel] Connection-Key: nur jeden 3. Tag (heute dayOfYear=${dayOfYear}, mod3=${dayOfYear % 3} → skip)`);
+    return null;
+  }
+  console.log(`🔗 [Channel] Generiere Connection-Key-Post${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    const { topic, topicHashtag } = CONNECTION_KEY_TOPICS[dayOfYear % CONNECTION_KEY_TOPICS.length];
+
+    const templateText = templates['channel-connection-key'] || '';
+    const filledTemplate = templateText
+      .replace(/\{\{topic\}\}/g, topic)
+      .replace(/\{\{topicHashtag\}\}/g, topicHashtag);
+
+    const prompt = `${filledTemplate}\n\nErstelle jetzt den Connection-Key-Post über: ${topic}`;
+    const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
+
+    if (!dryRun) {
+      await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'connection-key', TELEGRAM_CONNECTION_KEY_THREAD_ID);
+      console.log(`🔗 [Channel] Connection-Key gepostet: ${topic} (${text.length} Zeichen, thread=${TELEGRAM_CONNECTION_KEY_THREAD_ID})`);
+    } else {
+      console.log(`📝 [Channel] Connection-Key-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'connection-key', topic, { dryRun });
+    if (!dryRun) sendMattermost(`🔗 **Connection-Key gepostet** | ${topic}`, 'channel');
+    return row;
+  } catch (err) {
+    console.error('[Channel] Connection-Key Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Connection-Key-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
+
+/**
  * Tägliche Begrüßung im #General-Topic der Community: kurze Tagesfrage,
  * die zur Diskussion einlädt. Postet ohne message_thread_id (= General-Feed).
  */
@@ -6206,6 +6266,10 @@ scheduleDailyAt(18, 0, async () => {
 // HD-Wissen jeden 2. Tag, 16:00 UTC (18:00 MESZ) — Funktion prüft intern dayOfYear%2
 scheduleDailyAt(16, 0, postChannelHDWissen);
 
+// Connection-Key (Verbindungs-Wissen) jeden 3. Tag, 17:00 UTC (19:00 MESZ)
+// — Funktion prüft intern dayOfYear%3
+scheduleDailyAt(17, 0, postCommunityConnectionKey);
+
 // Community-Begrüßung in #General täglich 06:00 UTC (08:00 MESZ)
 scheduleDailyAt(6, 0, postCommunityGreeting);
 
@@ -6313,6 +6377,21 @@ app.post('/api/channel/post-hd-wissen', async (req, res) => {
   } else {
     postChannelHDWissen({ dryRun: false, force }).catch(e => console.error('[Channel] HD-Wissen async:', e.message));
   }
+});
+
+app.post('/api/channel/post-connection-key', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  const force = !!(req.body && req.body.force);
+  if (dryRun) {
+    try {
+      const row = await postCommunityConnectionKey({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Connection-Key-Post gestartet' });
+  postCommunityConnectionKey({ dryRun: false, force }).catch(e => console.error('[Channel] Connection-Key async:', e.message));
 });
 
 // ======================================================

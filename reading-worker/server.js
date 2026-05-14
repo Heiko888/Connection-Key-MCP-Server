@@ -6303,6 +6303,34 @@ scheduleDailyAt(7, 0, async () => {
 // Abend-Reflexion täglich 19:00 UTC (21:00 CEST)
 scheduleDailyAt(19, 0, postChannelAbendReflexion);
 
+// Community-Digest täglich 18:30 UTC (20:30 MESZ) — triggert
+// /api/community/digest auf .167 (Resend-Pfad). Sammelt alle ungelesenen
+// Notifications und schickt pro Empfänger eine Zusammenfassung.
+scheduleDailyAt(18, 30, async () => {
+  const url = process.env.COMMUNITY_DIGEST_URL || 'https://the-connection-key.de/api/community/digest';
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.warn('[Community-Digest] CRON_SECRET fehlt — überspringe');
+    return;
+  }
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-cron-secret': secret },
+      signal: AbortSignal.timeout(60_000),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data?.success) {
+      console.log(`📬 [Community-Digest] queued=${data.queued || 0} sent=${data.sent || 0}`);
+      if ((data.sent || 0) > 0) sendMattermost(`📬 **Community-Digest** | ${data.sent} Mail(s) verschickt für ${data.queued} Notifications`, 'channel');
+    } else {
+      console.warn('[Community-Digest] response:', data);
+    }
+  } catch (err) {
+    console.error('[Community-Digest] error:', err.message);
+  }
+});
+
 // Manueller Trigger für Abend-Reflexion (Coach-UI / curl)
 app.post('/api/channel/post-abend-reflexion', async (req, res) => {
   const dryRun = !!(req.body && req.body.dryRun);

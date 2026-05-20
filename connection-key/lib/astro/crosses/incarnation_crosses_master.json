@@ -1,0 +1,5879 @@
+{
+  "_meta": {
+    "version": "3.1",
+    "generated_at": "2026-05-20T17:48:37Z",
+    "source": "Konsolidierung aus knowledge/incarnation-cross.txt (Master) + data/incarnation_crosses.json (Position-Keys, Q2-Fallback)",
+    "format": "Key 'pSun-pEarth-dSun-dEarth' -> cross_id, plus crosses-Map mit Vollmetadaten",
+    "key_convention": "Positionsspezifisch — KEINE min/max-Normalisierung. pSun und pEarth sind 180° gegenueber, ebenso dSun/dEarth. Lookup enthaelt 8 Permutationen pro Thema (pSun<->pEarth × dSun<->dEarth × P<->D-Swap), um umgekehrte Achsenkonventionen in der Datenquelle abzudecken. Disambiguierung bei Mehrfachtreffern erfolgt via Profil im Konsumenten.",
+    "total_themes_unique": 136,
+    "themes_q3_master": 112,
+    "themes_q2_fallback": 24,
+    "permutations_per_theme": 8,
+    "pd_axis_validated_count": 6,
+    "pd_axis_unvalidated_count": 42,
+    "changelog": [
+      "3.0: Initiale Konsolidierung Q3+Q2 mit 4 Permutationen.",
+      "3.1: 8 Permutationen (inkl. P<->D-Swap) + Q2-Fallback-Themen + pd_axis_q2_validated-Annotation."
+    ]
+  },
+  "gate_polarities": {
+    "1": 2,
+    "2": 1,
+    "3": 50,
+    "4": 49,
+    "5": 35,
+    "6": 36,
+    "7": 13,
+    "8": 14,
+    "9": 16,
+    "10": 15,
+    "11": 12,
+    "12": 11,
+    "13": 7,
+    "14": 8,
+    "15": 10,
+    "16": 9,
+    "17": 18,
+    "18": 17,
+    "19": 33,
+    "20": 34,
+    "21": 48,
+    "22": 47,
+    "23": 43,
+    "24": 44,
+    "25": 46,
+    "26": 45,
+    "27": 28,
+    "28": 27,
+    "29": 30,
+    "30": 29,
+    "31": 41,
+    "32": 42,
+    "33": 19,
+    "34": 20,
+    "35": 5,
+    "36": 6,
+    "37": 40,
+    "38": 39,
+    "39": 38,
+    "40": 37,
+    "41": 31,
+    "42": 32,
+    "43": 23,
+    "44": 24,
+    "45": 26,
+    "46": 25,
+    "47": 22,
+    "48": 21,
+    "49": 4,
+    "50": 3,
+    "51": 57,
+    "52": 58,
+    "53": 54,
+    "54": 53,
+    "55": 59,
+    "56": 60,
+    "57": 51,
+    "58": 52,
+    "59": 55,
+    "60": 56,
+    "61": 62,
+    "62": 61,
+    "63": 64,
+    "64": 63
+  },
+  "themes": {
+    "rax_sphinx": {
+      "id": "rax_sphinx",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Sphinx",
+      "name_en": "Sphinx",
+      "full_name_de": "RAX der Sphinx",
+      "full_name_en": "Right Angle Cross of the Sphinx",
+      "gates": [
+        1,
+        2,
+        7,
+        13
+      ],
+      "personality_pair": [
+        1,
+        2
+      ],
+      "design_pair": [
+        7,
+        13
+      ],
+      "life_theme": "Suche nach Antworten auf tiefe Fragen der Identität und Richtung.",
+      "description": "Diese Person ist dazu berufen, in die Tiefe zu gehen — zu hinterfragen, zu erforschen, das Wesen der Dinge zu verstehen. Ihre Energie zieht Menschen an, die Antworten suchen. Erfüllung entsteht, wenn sie das eigene Leben als spirituelle Forschungsreise begreift, nicht als Problem, das gelöst werden muss. Die Sphinx stellt mehr Fragen als sie beantwortet — das ist ihre Kraft.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "1-2"
+    },
+    "rax_vessel_of_love": {
+      "id": "rax_vessel_of_love",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Liebesgefaess",
+      "name_en": "Vessel of Love",
+      "full_name_de": "RAX des Liebesgefäßes",
+      "full_name_en": "Right Angle Cross of the Vessel of Love",
+      "gates": [
+        10,
+        15,
+        25,
+        46
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        25,
+        46
+      ],
+      "life_theme": "Selbstliebe als Fundament aller Verbindungen.",
+      "description": "Diese Person trägt eine außergewöhnliche Fähigkeit zur Liebe in sich — nicht romantisch, sondern universal. Ihre Aufgabe ist es, durch konsequentes Selbst-Sein eine Art magnetisches Feld zu erzeugen, das andere in die eigene Liebe einlädt. Wenn sie sich selbst vollständig annimmt (Tor 10), fließt Liebe durch sie hindurch zu allen Lebewesen (Tor 15). Erdfühligkeit, Körperlichkeit und Freude am Sein sind ihre heiligen Ressourcen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "15-10"
+    },
+    "rax_the_four_ways": {
+      "id": "rax_the_four_ways",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Vier Wege",
+      "name_en": "The Four Ways",
+      "full_name_de": "RAX der Vier Wege",
+      "full_name_en": "Right Angle Cross of the The Four Ways",
+      "gates": [
+        7,
+        13,
+        23,
+        43
+      ],
+      "personality_pair": [
+        7,
+        13
+      ],
+      "design_pair": [
+        23,
+        43
+      ],
+      "life_theme": "Führung durch stille Weisheit und die Kraft des Zuhörens.",
+      "description": "Die Person mit diesem Kreuz weiß intuitiv, welcher Weg der richtige ist — für sich selbst und für andere. Sie verarbeitet die Geschichten der Menschen (Tor 13) und wandelt kollektive Erfahrung in individuelle Einsicht um (Tor 43). Ihre vier Wege sind nicht äußere Pfade, sondern innere: Hören, Verstehen, Umwandeln, Weiterleiten. Führung entsteht bei ihr ohne Streben.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_eden": {
+      "id": "rax_eden",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Eden",
+      "name_en": "Eden",
+      "full_name_de": "RAX des Edens",
+      "full_name_en": "Right Angle Cross of the Eden",
+      "gates": [
+        5,
+        35,
+        6,
+        36
+      ],
+      "personality_pair": [
+        5,
+        35
+      ],
+      "design_pair": [
+        6,
+        36
+      ],
+      "life_theme": "Erfahrungssammlung als Weg zur Weisheit.",
+      "description": "Eden war der Ort vor dem Wissen — dieses Kreuz trägt die Sehnsucht nach der gelebten Erfahrung. Diese Person muss durch das Leben, durch Krisen, durch intensive emotionale Zustände gehen, um ihre Weisheit zu erlangen. Tor 35 sammelt Erfahrungen, Tor 36 verarbeitet die emotionale Tiefe dahinter. Ihr \"Eden\" ist kein Paradies ohne Schmerz — es ist die vollständige Akzeptanz des menschlichen Erlebens.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_sleeping_phoenix": {
+      "id": "rax_sleeping_phoenix",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Schlafender Phoenix",
+      "name_en": "Sleeping Phoenix",
+      "full_name_de": "RAX des schlafenden Phönix",
+      "full_name_en": "Right Angle Cross of the Sleeping Phoenix",
+      "gates": [
+        4,
+        49,
+        55,
+        59
+      ],
+      "personality_pair": [
+        4,
+        49
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Transformation durch Loslassen alter Muster und Systeme.",
+      "description": "Wie der Phönix stirbt diese Person (metaphorisch) immer wieder — verlässt Beziehungen, Strukturen, Überzeugungen — und wird neu geboren. Tor 49 bringt die Fähigkeit zur radikalen Veränderung, Tor 55 die emotionale Tiefe dahinter. Die Herausforderung: nicht zu früh aufzuwachen, sondern den Wandel vollständig zu durchleben. Stärke kommt aus dem Mut zur vollständigen Erneuerung.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_penetration": {
+      "id": "rax_penetration",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Durchdringung",
+      "name_en": "Penetration",
+      "full_name_de": "RAX der Durchdringung",
+      "full_name_en": "Right Angle Cross of the Penetration",
+      "gates": [
+        20,
+        34,
+        51,
+        57
+      ],
+      "personality_pair": [
+        20,
+        34
+      ],
+      "design_pair": [
+        51,
+        57
+      ],
+      "life_theme": "Präsenz als transformative Kraft.",
+      "description": "Diese Person durchdringt alles mit ihrer bloßen Anwesenheit. Tor 57 bringt eine messerscharfe intuitive Wahrnehmung, Tor 34 eine massive Sacral-Energie. Zusammen schaffen sie eine Präsenz, die andere wachrüttelt. Ihre Aufgabe ist es, vollständig im Jetzt zu sein (Tor 20) — als Schock, als Erweckung, als Erinnerung an das Lebendige.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_maya": {
+      "id": "rax_maya",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Maya",
+      "name_en": "Maya",
+      "full_name_de": "RAX der Maya",
+      "full_name_en": "Right Angle Cross of the Maya",
+      "gates": [
+        3,
+        50,
+        11,
+        12
+      ],
+      "personality_pair": [
+        3,
+        50
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": "Die Illusion des Lebens durchschauen und anderen neue Perspektiven öffnen.",
+      "description": "Maya bedeutet Illusion — diese Person ist dazu berufen, durch den Schleier der Realität zu sehen. Tor 11 generiert ständig neue Ideen, Tor 3 trägt die Energie der Mutation. Ihr Leben ist geprägt von Umbrüchen und Erkenntnismomenten. Ihre Gabe ist es, anderen zu helfen, ihre eigenen mentalen Konstrukte zu erkennen und zu transformieren.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_rulership": {
+      "id": "rax_rulership",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Herrschaft",
+      "name_en": "Rulership",
+      "full_name_de": "RAX der Herrschaft",
+      "full_name_en": "Right Angle Cross of the Rulership",
+      "gates": [
+        21,
+        48,
+        26,
+        45
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": "Verantwortungsvolle Führung und Ressourcenmanagement.",
+      "description": "Diese Person ist mit natürlicher Autorität ausgestattet — nicht durch Dominanz, sondern durch Kompetenz (Tor 48) und Tiefe. Tor 21 bringt den Willen zur Kontrolle, Tor 45 die Fähigkeit, Gemeinschaften zu führen. Die Herausforderung: Führen, ohne zu kontrollieren. Herrschaft entsteht, wenn andere freiwillig folgen, weil die Person echte Stärke verkörpert.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "21-48"
+    },
+    "rax_tension": {
+      "id": "rax_tension",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Spannung",
+      "name_en": "Tension",
+      "full_name_de": "RAX der Spannung",
+      "full_name_en": "Right Angle Cross of the Tension",
+      "gates": [
+        27,
+        28,
+        38,
+        39
+      ],
+      "personality_pair": [
+        27,
+        28
+      ],
+      "design_pair": [
+        38,
+        39
+      ],
+      "life_theme": "Im Kampf die Würde bewahren und anderen den Mut zum Kämpfen geben.",
+      "description": "Dieses Kreuz trägt die Energie des Ringens — mit dem Leben, mit sich selbst, mit Bedeutung. Tor 38 ist der Krieger, Tor 28 kämpft gegen Sinnlosigkeit. Die Spannung ist nicht Problem, sondern Zweck. Diese Person inspiriert andere, ihren eigenen Kampf nicht aufzugeben. Ihre Stärke: im Angesicht des Widerstands nicht zu kapitulieren.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "28-27"
+    },
+    "rax_service": {
+      "id": "rax_service",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Dienst",
+      "name_en": "Service",
+      "full_name_de": "RAX des Dienstes",
+      "full_name_en": "Right Angle Cross of the Service",
+      "gates": [
+        17,
+        18,
+        61,
+        62
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        61,
+        62
+      ],
+      "life_theme": "Durch präzise Korrektheit der Welt dienen.",
+      "description": "Diese Person sieht, was nicht stimmt — und weiß, wie es besser geht. Tor 18 ist die Korrektorin, Tor 17 formuliert Meinungen und Lösungen. Ihr Dienst ist nicht Unterwürfigkeit, sondern Exzellenz. Sie verbessert, verfeinert, optimiert — und findet darin tiefe Erfüllung. Herausforderung: nur korrigieren, wenn eingeladen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_explanation": {
+      "id": "rax_explanation",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Erklaerung",
+      "name_en": "Explanation",
+      "full_name_de": "RAX der Erklärung",
+      "full_name_en": "Right Angle Cross of the Explanation",
+      "gates": [
+        8,
+        14,
+        23,
+        43
+      ],
+      "personality_pair": [
+        8,
+        14
+      ],
+      "design_pair": [
+        23,
+        43
+      ],
+      "life_theme": "Das Individuelle in verständliche Sprache übersetzen.",
+      "description": "Diese Person hat eine seltene Fähigkeit: individuelle Einsichten und Mutationsimpulse so zu kommunizieren, dass andere sie verstehen und annehmen können. Tor 23 assimiliert Neues, Tor 43 transformiert es in Erkenntnis, Tor 8 bringt es als Beitrag in die Welt. Sie sind Übersetzer zwischen dem Unbekannten und dem Verständlichen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_articulation": {
+      "id": "rax_articulation",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Artikulation",
+      "name_en": "Articulation",
+      "full_name_de": "RAX der Artikulation",
+      "full_name_en": "Right Angle Cross of the Articulation",
+      "gates": [
+        11,
+        12,
+        56,
+        60
+      ],
+      "personality_pair": [
+        11,
+        12
+      ],
+      "design_pair": [
+        56,
+        60
+      ],
+      "life_theme": "Ideen und Geschichten in fesselnde Sprache bringen.",
+      "description": "Wo andere verstummen, beginnt diese Person zu sprechen. Tor 56 ist der Geschichtenerzähler, Tor 11 der Ideengenerator. Zusammen erzeugen sie eine Fähigkeit zur Kommunikation, die Menschen in ihren Bann zieht. Die Herausforderung: nicht jede Idee aussprechen, sondern auf die richtigen Momente warten, in denen Worte wirklich wirken.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_cycles": {
+      "id": "rax_cycles",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Zyklen",
+      "name_en": "Cycles",
+      "full_name_de": "RAX der Zyklen",
+      "full_name_en": "Right Angle Cross of the Cycles",
+      "gates": [
+        32,
+        42,
+        53,
+        54
+      ],
+      "personality_pair": [
+        32,
+        42
+      ],
+      "design_pair": [
+        53,
+        54
+      ],
+      "life_theme": "Prozesse beginnen, vollenden und weitergeben.",
+      "description": "Diese Person ist eine meisterhafte Hüterin von Zyklen. Tor 53 beginnt, Tor 42 vollendet — sie verstehen intuitiv, wie Dinge anfangen und enden müssen. Tor 54 bringt den Antrieb, Tor 32 das Bewusstsein für Bewahrung. Ihre Aufgabe: nichts halb zu tun, sondern Dinge vollständig zu durchleben und die gewonnene Weisheit weiterzugeben.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_determination": {
+      "id": "rax_determination",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Entschlossenheit",
+      "name_en": "Determination",
+      "full_name_de": "RAX der Entschlossenheit",
+      "full_name_en": "Right Angle Cross of the Determination",
+      "gates": [
+        25,
+        46,
+        29,
+        30
+      ],
+      "personality_pair": [
+        25,
+        46
+      ],
+      "design_pair": [
+        29,
+        30
+      ],
+      "life_theme": "Vollständiges Ja zum Leben und zu Erfahrungen, die sich richtig anfühlen.",
+      "description": "Diese Person committet sich vollständig — oder gar nicht. Tor 29 ist das \"Ja\" des Sakrals, Tor 30 trägt die Leidenschaft für Erfahrungen. Ihre Stärke liegt in der bedingungslosen Hingabe an das, was sie begeistert. Herausforderung: sicherzustellen, dass das Commitment aus dem Bauch kommt, nicht aus äußerem Druck.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_migration": {
+      "id": "rax_migration",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Migration",
+      "name_en": "Migration",
+      "full_name_de": "RAX der Migration",
+      "full_name_en": "Right Angle Cross of the Migration",
+      "gates": [
+        9,
+        16,
+        52,
+        58
+      ],
+      "personality_pair": [
+        9,
+        16
+      ],
+      "design_pair": [
+        52,
+        58
+      ],
+      "life_theme": "Neues etablieren und verbreiten, was der Welt gut tut.",
+      "description": "Diese Person hat eine Begabung dafür, Dinge, die funktionieren, zu erkennen, zu perfektionieren und weiterzugeben. Tor 9 bringt Fokus, Tor 16 Begeisterung für das Lernen von Fertigkeiten, Tor 58 Lebensfreude und Vitalität. Migration bedeutet nicht Ruhelosigkeit — es bedeutet, Gutes in neue Kontexte zu tragen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "rax_community": {
+      "id": "rax_community",
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "name_de": "Gemeinschaft",
+      "name_en": "Community",
+      "full_name_de": "RAX der Gemeinschaft",
+      "full_name_en": "Right Angle Cross of the Community",
+      "gates": [
+        37,
+        40,
+        63,
+        64
+      ],
+      "personality_pair": [
+        37,
+        40
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Gemeinschaft aufbauen durch Freundschaft und geteilte Werte.",
+      "description": "Diese Person ist ein natürlicher Gemeinschaftsbildner. Tor 37 schafft Verbindungen durch Freundschaft, Tor 40 durch das Prinzip \"Ich gebe, du gibst zurück\". Tor 63 und 64 bringen das Bewusstsein für das, was eine Gesellschaft trägt. Ihre Aufgabe: Strukturen zu schaffen, in denen Menschen füreinander da sein können.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_alpha": {
+      "id": "lax_alpha",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Alpha",
+      "name_en": "Alpha",
+      "full_name_de": "LAX des Alpha",
+      "full_name_en": "Left Angle Cross of the Alpha",
+      "gates": [
+        7,
+        13,
+        31,
+        41
+      ],
+      "personality_pair": [
+        7,
+        13
+      ],
+      "design_pair": [
+        31,
+        41
+      ],
+      "life_theme": "Führung durch natürliche Autorität — gerufen, nicht gewählt.",
+      "description": "Diese Person verkörpert Führung, ob sie es will oder nicht. Andere orientieren sich automatisch an ihr. Tor 31 ist die Stimme der Führung, Tor 41 der Träumer, der neue Richtungen spürt. Die Herausforderung: Führung anzunehmen, ohne sie zu suchen — und die Verantwortung zu tragen, die damit kommt.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "7-13"
+    },
+    "lax_separation": {
+      "id": "lax_separation",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Trennung",
+      "name_en": "Separation",
+      "full_name_de": "LAX der Trennung",
+      "full_name_en": "Left Angle Cross of the Separation",
+      "gates": [
+        11,
+        12,
+        5,
+        35
+      ],
+      "personality_pair": [
+        5,
+        35
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": "Durch Loslassen und Anderssein neue Wege öffnen.",
+      "description": "Diese Person unterscheidet sich — und muss es. Trennung ist hier kein Verlust, sondern ein schöpferischer Akt. Durch das Heraustreten aus kollektiven Mustern schafft sie Raum für Neues. Ihre Andersartigkeit ist eine Einladung an andere, auch auszubrechen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_defiance": {
+      "id": "lax_defiance",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Trotz",
+      "name_en": "Defiance",
+      "full_name_de": "LAX des Trotzes",
+      "full_name_en": "Left Angle Cross of the Defiance",
+      "gates": [
+        27,
+        28,
+        19,
+        33
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        27,
+        28
+      ],
+      "life_theme": "Im Widerstand gegen Sinnlosigkeit die eigene Wahrheit leben.",
+      "description": "Diese Person kann nicht anders als gegen das anzukämpfen, was ihr falsch erscheint — auch wenn es unbequem ist. Tor 38 (Opposition) und Tor 28 (Kampf) geben ihr die Kraft, standzuhalten. Ihr Trotz ist kein Eigensinn, sondern ein Dienst: sie hält Räume für das offen, wofür andere nicht kämpfen würden.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_revolution": {
+      "id": "lax_revolution",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Revolution",
+      "name_en": "Revolution",
+      "full_name_de": "LAX der Revolution",
+      "full_name_en": "Left Angle Cross of the Revolution",
+      "gates": [
+        4,
+        49,
+        23,
+        43
+      ],
+      "personality_pair": [
+        4,
+        49
+      ],
+      "design_pair": [
+        23,
+        43
+      ],
+      "life_theme": "Bestehende Systeme transformieren durch radikale Erneuerung.",
+      "description": "Diese Person ist eine Katalysatorin für Wandel. Tor 49 bringt die Bereitschaft, Altes loszulassen, Tor 23 assimiliert das Neue. Zusammen schaffen sie einen Impuls, der Systeme auf den Kopf stellen kann. Die Revolution muss nicht laut sein — sie kann still, konsequent und vollständig sein.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_obscuration": {
+      "id": "lax_obscuration",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Verschleierung",
+      "name_en": "Obscuration",
+      "full_name_de": "LAX der Verschleierung",
+      "full_name_en": "Left Angle Cross of the Obscuration",
+      "gates": [
+        7,
+        13,
+        22,
+        47
+      ],
+      "personality_pair": [
+        7,
+        13
+      ],
+      "design_pair": [
+        22,
+        47
+      ],
+      "life_theme": "Das Verborgene sichtbar machen — für sich und andere.",
+      "description": "Hinter Masken, hinter Worten, hinter Gesten — diese Person sieht das Wesentliche. Tor 22 bringt emotionale Tiefe und Anmut, Tor 47 die Fähigkeit, Sinn aus Chaos zu destillieren. Ihre Aufgabe: nicht nur zu sehen, was verborgen ist, sondern den richtigen Moment zu wählen, es zu benennen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_dedication": {
+      "id": "lax_dedication",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Hingabe",
+      "name_en": "Dedication",
+      "full_name_de": "LAX der Hingabe",
+      "full_name_en": "Left Angle Cross of the Dedication",
+      "gates": [
+        10,
+        15,
+        17,
+        18
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        17,
+        18
+      ],
+      "life_theme": "Sich einem höheren Dienst oder Prinzip vollständig widmen.",
+      "description": "Diese Person findet ihre Erfüllung nicht im Ego, sondern im Dienst. Tor 17 formuliert Prinzipien, Tor 18 korrigiert, was nicht stimmt. Zusammen mit Tor 10 (authentisches Selbst) und Tor 15 (Liebe zum Menschlichen) entsteht eine tiefe Hingabe an das, was wirklich wichtig ist.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_strategy": {
+      "id": "lax_strategy",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Strategie",
+      "name_en": "Strategy",
+      "full_name_de": "LAX der Strategie",
+      "full_name_en": "Left Angle Cross of the Strategy",
+      "gates": [
+        21,
+        48,
+        38,
+        39
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        38,
+        39
+      ],
+      "life_theme": "Ressourcen klug einsetzen und andere durch strategisches Denken stärken.",
+      "description": "Diese Person denkt immer einen Schritt voraus. Tor 48 bringt die Tiefe des Wissens, Tor 21 den Willen zur Kontrolle, Tor 38 den Mut, für das Richtige zu kämpfen. Ihre Strategie dient nicht dem Eigennutz — sie ist ein Werkzeug, um anderen zu helfen, ihr Potenzial zu entfalten.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_confrontation": {
+      "id": "lax_confrontation",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Konfrontation",
+      "name_en": "Confrontation",
+      "full_name_de": "LAX der Konfrontation",
+      "full_name_en": "Left Angle Cross of the Confrontation",
+      "gates": [
+        5,
+        35,
+        22,
+        47
+      ],
+      "personality_pair": [
+        5,
+        35
+      ],
+      "design_pair": [
+        22,
+        47
+      ],
+      "life_theme": "Wachstum durch direkte Begegnung mit der Wahrheit.",
+      "description": "Diese Person bringt Dinge ans Licht, die andere lieber im Dunkeln lassen würden. Tor 35 sammelt Erfahrungen, Tor 22 bringt die nötige Anmut, um Konfrontation zu ermöglichen ohne zu verletzen. Ihr Weg: nicht ausweichen, nicht glätten — sondern klar sein, auch wenn es unbequem ist.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_refinement": {
+      "id": "lax_refinement",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Verfeinerung",
+      "name_en": "Refinement",
+      "full_name_de": "LAX der Verfeinerung",
+      "full_name_en": "Left Angle Cross of the Refinement",
+      "gates": [
+        24,
+        44,
+        31,
+        41
+      ],
+      "personality_pair": [
+        24,
+        44
+      ],
+      "design_pair": [
+        31,
+        41
+      ],
+      "life_theme": "Rohmaterial in etwas Edles verwandeln — in sich und in anderen.",
+      "description": "Diese Person ist eine Meisterin der Transformation durch Wiederholung und Reflexion. Tor 24 rationalisiert und überdenkt, Tor 44 bringt instinktives Wissen aus der Vergangenheit. Zusammen erschaffen sie einen Prozess der Verfeinerung, der sowohl sich selbst als auch das Umfeld betrifft.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_prevention": {
+      "id": "lax_prevention",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Vorbeugung",
+      "name_en": "Prevention",
+      "full_name_de": "LAX der Vorbeugung",
+      "full_name_en": "Left Angle Cross of the Prevention",
+      "gates": [
+        17,
+        18,
+        38,
+        39
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        38,
+        39
+      ],
+      "life_theme": "Schäden abwenden und Systeme schützen, bevor Probleme entstehen.",
+      "description": "Diese Person hat einen sechsten Sinn für das, was schiefgehen könnte. Tor 18 erkennt Fehler, Tor 17 formuliert Lösungen, Tor 38 kämpft für Schutz. Ihr transpersonales Schicksal: nicht nur zu korrigieren, was kaputt ist, sondern zu verhindern, dass es kaputtgeht.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_uncertainty": {
+      "id": "lax_uncertainty",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Ungewissheit",
+      "name_en": "Uncertainty",
+      "full_name_de": "LAX der Ungewissheit",
+      "full_name_en": "Left Angle Cross of the Uncertainty",
+      "gates": [
+        22,
+        47,
+        63,
+        64
+      ],
+      "personality_pair": [
+        22,
+        47
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Im Nicht-Wissen die tiefste Weisheit finden.",
+      "description": "Diese Person lebt im Dialog mit dem Unbekannten. Tor 63 zweifelt, Tor 64 ringt mit Verwirrung, Tor 47 sucht Sinn — und Tor 22 bringt die Gnade, die nötig ist, um damit zu Frieden zu kommen. Ihr Geschenk: anderen zu zeigen, dass man im Zweifel leben kann, ohne sich aufzulösen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_ambition": {
+      "id": "lax_ambition",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Ehrgeiz",
+      "name_en": "Ambition",
+      "full_name_de": "LAX des Ehrgeizes",
+      "full_name_en": "Left Angle Cross of the Ambition",
+      "gates": [
+        32,
+        42,
+        53,
+        54
+      ],
+      "personality_pair": [
+        32,
+        42
+      ],
+      "design_pair": [
+        53,
+        54
+      ],
+      "life_theme": "Aufstieg durch Beharrlichkeit und das Vollenden von Prozessen.",
+      "description": "Diese Person ist bereit, zu arbeiten, zu wachsen und Dinge zu Ende zu bringen — nicht für äußere Anerkennung, sondern weil sie die tiefe Erfüllung des Vollendeten kennt. Tor 54 bringt den Antrieb zum Aufstieg, Tor 32 das Bewusstsein für das, was erhalten werden sollte.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_wishes": {
+      "id": "lax_wishes",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Wuensche",
+      "name_en": "Wishes",
+      "full_name_de": "LAX der Wünsche",
+      "full_name_en": "Left Angle Cross of the Wishes",
+      "gates": [
+        29,
+        30,
+        31,
+        41
+      ],
+      "personality_pair": [
+        29,
+        30
+      ],
+      "design_pair": [
+        31,
+        41
+      ],
+      "life_theme": "Träumen, wagen und andere inspirieren, das zu wollen, was sie wirklich wollen.",
+      "description": "Diese Person ist eine Träumerin mit Sacral-Kraft. Tor 41 generiert Sehnsüchte, Tor 30 entzündet Leidenschaft, Tor 29 gibt das vollständige Ja. Ihre Gabe: andere zu inspirieren, hinter ihre eigenen Hemmungen zu schauen und das wirklich Gewünschte zu benennen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_consciousness": {
+      "id": "lax_consciousness",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Bewusstsein",
+      "name_en": "Consciousness",
+      "full_name_de": "LAX des Bewusstseins",
+      "full_name_en": "Left Angle Cross of the Consciousness",
+      "gates": [
+        4,
+        49,
+        63,
+        64
+      ],
+      "personality_pair": [
+        4,
+        49
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Das kollektive Bewusstsein heben durch kritisches Hinterfragen.",
+      "description": "Diese Person fragt sich — und andere — immer: Warum? Wozu? Was liegt dahinter? Tor 63 (Zweifel) und Tor 4 (Formulierung von Antworten) bilden einen unablässigen Strom des Hinterfragens. Tor 49 bringt die Bereitschaft, alte Antworten loszulassen, wenn neue auftauchen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_prosperity": {
+      "id": "lax_prosperity",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Wohlstand",
+      "name_en": "Prosperity",
+      "full_name_de": "LAX des Wohlstands",
+      "full_name_en": "Left Angle Cross of the Prosperity",
+      "gates": [
+        8,
+        14,
+        26,
+        45
+      ],
+      "personality_pair": [
+        8,
+        14
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": "Materielle und spirituelle Fülle schaffen und teilen.",
+      "description": "Diese Person ist mit einem natürlichen Sinn für Ressourcen ausgestattet. Tor 14 ist die Hüterin der Schlüssel zur Kraft und zu materiellen Mitteln, Tor 45 führt Gemeinschaften in Richtung Wohlstand. Ihr transpersonaler Auftrag: Wohlstand nicht zu horten, sondern als Werkzeug zu nutzen, das anderen zugute kommt.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_masks": {
+      "id": "lax_masks",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Masken",
+      "name_en": "Masks",
+      "full_name_de": "LAX der Masken",
+      "full_name_en": "Left Angle Cross of the Masks",
+      "gates": [
+        1,
+        2,
+        4,
+        49
+      ],
+      "personality_pair": [
+        1,
+        2
+      ],
+      "design_pair": [
+        4,
+        49
+      ],
+      "life_theme": "Authentizität inmitten sozialer Rollen und Erwartungen.",
+      "description": "Diese Person kennt viele Gesichter — nicht aus Unehrlichkeit, sondern weil sie die Fähigkeit hat, sich in verschiedenen Kontexten unterschiedlich auszudrücken. Ihre Herausforderung: hinter den Masken das eigene Wesen nicht zu verlieren, sondern es als Kern zu bewahren.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_education": {
+      "id": "lax_education",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Erziehung",
+      "name_en": "Education",
+      "full_name_de": "LAX der Erziehung",
+      "full_name_en": "Left Angle Cross of the Education",
+      "gates": [
+        9,
+        16,
+        37,
+        40
+      ],
+      "personality_pair": [
+        9,
+        16
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": "Wissen und Fertigkeiten weitergeben, die das Leben der anderen verbessern.",
+      "description": "Diese Person ist eine natürliche Lehrerin — nicht durch Theorie, sondern durch das Zeigen des Wegs. Tor 16 liebt das Meistern von Fertigkeiten, Tor 9 bringt Fokus und Ausdauer, Tor 37 verbindet durch Freundschaft und Vertrauen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_industry": {
+      "id": "lax_industry",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Industrie",
+      "name_en": "Industry",
+      "full_name_de": "LAX der Industrie",
+      "full_name_en": "Left Angle Cross of the Industry",
+      "gates": [
+        29,
+        30,
+        32,
+        42
+      ],
+      "personality_pair": [
+        29,
+        30
+      ],
+      "design_pair": [
+        32,
+        42
+      ],
+      "life_theme": "Durch beharrliche Arbeit und vollendete Prozesse Bleibendes erschaffen.",
+      "description": "Diese Person versteht die Tugend der Arbeit tief. Es ist nicht Pflicht, sondern Ausdruck. Tor 29 committet, Tor 42 vollendet, Tor 32 bewahrt und Tor 30 bringt Leidenschaft für das, was erschaffen wird. Ergebnis: Werke, die bleiben.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_awakening": {
+      "id": "lax_awakening",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Erweckung",
+      "name_en": "Awakening",
+      "full_name_de": "LAX der Erweckung",
+      "full_name_en": "Left Angle Cross of the Awakening",
+      "gates": [
+        10,
+        15,
+        51,
+        57
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        51,
+        57
+      ],
+      "life_theme": "Andere wachrütteln — durch Schock, Klarheit oder die eigene Präsenz.",
+      "description": "Tor 51 ist der Schock, Tor 57 die intuitive Schärfe, Tor 10 die Authentizität des Seins. Diese Person erweckt — manchmal sanft, manchmal dramatisch — andere aus dem Schlaf ihrer Gewohnheiten. Ihre Anwesenheit selbst kann transformativ sein.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_transmission": {
+      "id": "lax_transmission",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Uebertragung",
+      "name_en": "Transmission",
+      "full_name_de": "LAX der Übertragung",
+      "full_name_en": "Left Angle Cross of the Transmission",
+      "gates": [
+        19,
+        33,
+        24,
+        44
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        24,
+        44
+      ],
+      "life_theme": "Wissen, Erinnerungen und Energie zwischen Generationen übertragen.",
+      "description": "Diese Person ist eine Hüterin von Weisheit. Tor 44 trägt instinktives Wissen aus der Vergangenheit, Tor 33 verarbeitet Erfahrungen als Rückzug, Tor 19 fühlt, was gebraucht wird. Zusammen entsteht die Fähigkeit, das Wertvollste des Vergangenen in die Zukunft zu tragen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_grace": {
+      "id": "lax_grace",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Anmut",
+      "name_en": "Grace",
+      "full_name_de": "LAX der Anmut",
+      "full_name_en": "Left Angle Cross of the Grace",
+      "gates": [
+        22,
+        47,
+        55,
+        59
+      ],
+      "personality_pair": [
+        22,
+        47
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Schönheit, Stimmung und Tiefe als Geschenk an die Welt.",
+      "description": "Diese Person ist eine Künstlerin der Seele. Tor 22 bringt Anmut im Ausdruck, Tor 55 die emotionale Tiefe und Spiritualität, Tor 59 die Fähigkeit zur intimen Verbindung. Ihre Aufgabe: das Schöne, das Tiefe, das Stimmungsvolle nicht zu verbergen, sondern zum Leuchten zu bringen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_healing": {
+      "id": "lax_healing",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Heilung",
+      "name_en": "Healing",
+      "full_name_de": "LAX der Heilung",
+      "full_name_en": "Left Angle Cross of the Healing",
+      "gates": [
+        17,
+        18,
+        25,
+        46
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        25,
+        46
+      ],
+      "life_theme": "Heilung — von sich selbst und anderen — durch Präsenz und Korrektur.",
+      "description": "Tor 25 trägt die universale Liebe, Tor 46 die Freude am Körper und am Sein, Tor 18 erkennt, was geheilt werden muss, Tor 17 formtuliert den Weg. Diese Person ist eine natürliche Heilerin — nicht als Beruf, sondern als Energiepräsenz, die andere genesen lässt.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_duality": {
+      "id": "lax_duality",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Dualitaet",
+      "name_en": "Duality",
+      "full_name_de": "LAX der Dualität",
+      "full_name_en": "Left Angle Cross of the Duality",
+      "gates": [
+        37,
+        40,
+        55,
+        59
+      ],
+      "personality_pair": [
+        37,
+        40
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Polaritäten halten und darin die Einheit erfahren.",
+      "description": "Diese Person lebt in Spannungsfeldern — zwischen Geben und Nehmen (Tore 37/40), zwischen Sehnsucht und Erfüllung (Tore 55/59). Ihre Aufgabe ist nicht die Auflösung dieser Dualitäten, sondern das bewusste Halten beider Seiten. Darin liegt eine tiefe Weisheit.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_bargain": {
+      "id": "lax_bargain",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Handel",
+      "name_en": "Bargain",
+      "full_name_de": "LAX des Handels",
+      "full_name_en": "Left Angle Cross of the Bargain",
+      "gates": [
+        3,
+        50,
+        37,
+        40
+      ],
+      "personality_pair": [
+        3,
+        50
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": "Verbindungen aufbauen, die auf gegenseitigem Nutzen und Vertrauen basieren.",
+      "description": "Jede Verbindung ist für diese Person ein Austausch — von Energie, Ressourcen, Fürsorge. Tor 50 hält Werte aufrecht, Tor 37 schafft Verbindung, Tor 40 kennt den Preis des Gebens. Ihre Gabe: faire, nachhaltige Beziehungen zu gestalten, die beiden Seiten nützen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_endeavor": {
+      "id": "lax_endeavor",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Streben",
+      "name_en": "Endeavor",
+      "full_name_de": "LAX des Strebens",
+      "full_name_en": "Left Angle Cross of the Endeavor",
+      "gates": [
+        21,
+        48,
+        52,
+        58
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        52,
+        58
+      ],
+      "life_theme": "Durch stilles Streben und fokussierte Energie Dauerhaftes erschaffen.",
+      "description": "Diese Person arbeitet tief. Tor 48 sucht Tiefe und Perfektion, Tor 52 kennt die Stille der Konzentration, Tor 58 bringt die Freude an der Arbeit selbst. Ihr Streben ist kein Ehrgeiz — es ist eine ruhige, unaufhaltsame Bewegung in Richtung Exzellenz.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_judgment": {
+      "id": "lax_judgment",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Urteil",
+      "name_en": "Judgment",
+      "full_name_de": "LAX des Urteils",
+      "full_name_en": "Left Angle Cross of the Judgment",
+      "gates": [
+        17,
+        18,
+        52,
+        58
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        52,
+        58
+      ],
+      "life_theme": "Gerechtes Urteilen und Korrigieren mit Weisheit und Sorgfalt.",
+      "description": "Diese Person trägt ein inneres Richteramt. Tor 18 erkennt Fehler, Tor 52 hält inne, bevor sie urteilt, Tor 17 formuliert das Urteil klar, Tor 58 freut sich, wenn Dinge richtig sind. Ihre Herausforderung: nicht zu urteilen, wenn nicht eingeladen — und das Urteil mit Mitgefühl zu verbinden.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_depth": {
+      "id": "lax_depth",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Tiefe",
+      "name_en": "Depth",
+      "full_name_de": "LAX der Tiefe",
+      "full_name_en": "Left Angle Cross of the Depth",
+      "gates": [
+        21,
+        48,
+        51,
+        57
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        51,
+        57
+      ],
+      "life_theme": "In die Tiefe gehen — von Wissen, Erfahrung und Bewusstsein.",
+      "description": "Diese Person kann nicht an der Oberfläche bleiben. Tor 48 taucht tief in Wissen ein, Tor 57 durchdringt mit Intuition, Tor 51 bringt den Schock der Erkenntnis, Tor 21 die Fähigkeit, das Erarbeitete zu nutzen. Ihr Dienst: das Tiefe zugänglich zu machen für alle, die bereit sind.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_contagion": {
+      "id": "lax_contagion",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Ansteckung",
+      "name_en": "Contagion",
+      "full_name_de": "LAX der Ansteckung",
+      "full_name_en": "Left Angle Cross of the Contagion",
+      "gates": [
+        19,
+        33,
+        20,
+        34
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        20,
+        34
+      ],
+      "life_theme": "Die eigene Energie überträgt sich unweigerlich auf andere.",
+      "description": "Diese Person kann nicht nicht anstecken. Ihre Begeisterung, ihre Tiefe, ihre Ruhe — was auch immer sie in sich trägt, überträgt sich. Tor 20 ist vollständig im Jetzt, Tor 34 hat enorme Sacral-Kraft, Tor 33 hat Erfahrungsweisheit, Tor 19 spürt Bedürfnisse. Diese Energie ist ein Geschenk — wenn sie aus dem wahren Selbst kommt.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_rulership": {
+      "id": "lax_rulership",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Herrschaft",
+      "name_en": "Rulership",
+      "full_name_de": "LAX der Herrschaft — transpersonal",
+      "full_name_en": "Left Angle Cross of the Rulership (transpersonal)",
+      "gates": [
+        21,
+        48,
+        26,
+        45
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": "Führung übernehmen, wenn andere es brauchen — nicht um Kontrolle.",
+      "description": "Ähnlich dem RAX der Herrschaft, aber transpersonal: diese Person führt nicht für sich, sondern weil andere es brauchen. Ihr Führungsimpuls kommt von außen — durch Einladung, durch Notwendigkeit. Wenn sie führt, ohne eingeladen zu werden, verliert sie ihre Wirksamkeit.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": true,
+      "q2_personality_pair_observed": "21-48"
+    },
+    "lax_thinking": {
+      "id": "lax_thinking",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Denken",
+      "name_en": "Thinking",
+      "full_name_de": "LAX des Denkens",
+      "full_name_en": "Left Angle Cross of the Thinking",
+      "gates": [
+        17,
+        18,
+        63,
+        64
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Denken als Weg zur kollektiven Erkenntnis.",
+      "description": "Diese Person denkt — immer, tief, weitreichend. Tor 63 zweifelt, Tor 64 ringt um Klarheit, Tor 17 formuliert Meinungen, Tor 18 testet sie gegen die Realität. Ihr transpersonales Schicksal: das Denken nicht privat zu halten, sondern als Ressource für kollektive Lösungsfindung einzusetzen.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_abstraction": {
+      "id": "lax_abstraction",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Abstraktion",
+      "name_en": "Abstraction",
+      "full_name_de": "LAX der Abstraktion",
+      "full_name_en": "Left Angle Cross of the Abstraction",
+      "gates": [
+        22,
+        47,
+        63,
+        64
+      ],
+      "personality_pair": [
+        22,
+        47
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Das Konkrete ins Universelle übersetzen.",
+      "description": "Diese Person denkt in Mustern, in Systemen, in übergeordneten Zusammenhängen. Tor 64 hält viele Möglichkeiten gleichzeitig offen, Tor 63 testet sie auf Kohärenz, Tor 47 findet den tieferen Sinn, Tor 22 bringt die Eleganz des Ausdrucks. Ihre Gabe: Komplexes so zu vereinfachen, dass andere es begreifen und nutzen können.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "lax_fates": {
+      "id": "lax_fates",
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "name_de": "Schicksale",
+      "name_en": "Fates",
+      "full_name_de": "LAX der Schicksale",
+      "full_name_en": "Left Angle Cross of the Fates",
+      "gates": [
+        29,
+        30,
+        55,
+        59
+      ],
+      "personality_pair": [
+        29,
+        30
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Das Schicksal anderer mitgestalten durch das eigene Commitment.",
+      "description": "Diese Person zieht Schicksale an — ihre eigenen und die anderer. Tor 29 committet vollständig, Tor 30 brennt für Erfahrungen, Tor 55 trägt tiefe emotionale und spirituelle Energie, Tor 59 öffnet sich für intime Verbindungen. Ihr Weg: vollständig Ja zu sagen zu dem, was erscheint — und darin das Schicksal mitzugestalten.",
+      "source": "q3_master",
+      "axis_source": "q2",
+      "pd_axis_q2_validated": false
+    },
+    "jux_self_expression": {
+      "id": "jux_self_expression",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Selbstausdruck",
+      "name_en": "Self-Expression",
+      "full_name_de": "Juxtaposition des Selbstausdrucks",
+      "full_name_en": "Juxtaposition Cross of Self-Expression",
+      "gates": [
+        1,
+        2,
+        4,
+        49
+      ],
+      "personality_pair": [
+        1,
+        2
+      ],
+      "design_pair": [
+        4,
+        49
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist hier, um sich vollständig und authentisch auszudrücken — nicht um andere zu überzeugen, sondern um die eigene schöpferische Essenz zu verkörpern. Kreativität ist nicht Luxus, sondern Lebensnotwendigkeit.",
+      "source": "q3_master"
+    },
+    "jux_driver": {
+      "id": "jux_driver",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Fahrer",
+      "name_en": "Driver",
+      "full_name_de": "Juxtaposition des Fahrers",
+      "full_name_en": "Juxtaposition Cross of Driver",
+      "gates": [
+        2,
+        1,
+        4,
+        49
+      ],
+      "personality_pair": [
+        2,
+        1
+      ],
+      "design_pair": [
+        4,
+        49
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch führt durch stille innere Ausrichtung. Die Richtung ist bekannt — sie muss nur gelebt werden. Führung kommt natürlich, ohne Streben, als Ausdruck des eigenen Wesens.",
+      "source": "q3_master"
+    },
+    "jux_mutation": {
+      "id": "jux_mutation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Mutation",
+      "name_en": "Mutation",
+      "full_name_de": "Juxtaposition der Mutation",
+      "full_name_en": "Juxtaposition Cross of Mutation",
+      "gates": [
+        3,
+        50,
+        11,
+        12
+      ],
+      "personality_pair": [
+        3,
+        50
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": null,
+      "description": "Das Leben dieses Menschen ist von Transformation durchzogen. Was stabil scheint, verändert sich. Diese Instabilität ist kein Fehler — sie ist der Weg, durch den Neues in die Welt kommt.",
+      "source": "q3_master"
+    },
+    "jux_formulization": {
+      "id": "jux_formulization",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Formulierung",
+      "name_en": "Formulization",
+      "full_name_de": "Juxtaposition der Formulierung",
+      "full_name_en": "Juxtaposition Cross of Formulization",
+      "gates": [
+        4,
+        49,
+        8,
+        14
+      ],
+      "personality_pair": [
+        4,
+        49
+      ],
+      "design_pair": [
+        8,
+        14
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch denkt Lösungen. Er formuliert Antworten auf Fragen, die noch niemand gestellt hat. Seine Gabe ist konzeptionelles Denken — Ideen in klare, umsetzbare Formen bringen.",
+      "source": "q3_master"
+    },
+    "jux_fixed_patterns": {
+      "id": "jux_fixed_patterns",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "fester Muster",
+      "name_en": "Fixed Patterns",
+      "full_name_de": "Juxtaposition fester Muster",
+      "full_name_en": "Juxtaposition Cross of Fixed Patterns",
+      "gates": [
+        5,
+        35,
+        6,
+        36
+      ],
+      "personality_pair": [
+        5,
+        35
+      ],
+      "design_pair": [
+        6,
+        36
+      ],
+      "life_theme": null,
+      "description": "Verlässlichkeit und Rhythmus sind die Stärken dieses Menschen. Durch konsequente Wiederholung entsteht das Fundament, auf dem andere aufbauen können.",
+      "source": "q3_master"
+    },
+    "jux_friction": {
+      "id": "jux_friction",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Reibung",
+      "name_en": "Friction",
+      "full_name_de": "Juxtaposition der Reibung",
+      "full_name_en": "Juxtaposition Cross of Friction",
+      "gates": [
+        6,
+        36,
+        11,
+        12
+      ],
+      "personality_pair": [
+        6,
+        36
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch lebt am Punkt der Begegnung — wo Gegensätze aufeinandertreffen. Aus dieser Reibung entsteht Kreativität, Nähe, Wachstum. Seine Herausforderung: Konflikte nicht zu vermeiden, sondern als schöpferische Kraft zu nutzen.",
+      "source": "q3_master"
+    },
+    "jux_interaction": {
+      "id": "jux_interaction",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Interaktion",
+      "name_en": "Interaction",
+      "full_name_de": "Juxtaposition der Interaktion",
+      "full_name_en": "Juxtaposition Cross of Interaction",
+      "gates": [
+        7,
+        13,
+        22,
+        47
+      ],
+      "personality_pair": [
+        7,
+        13
+      ],
+      "design_pair": [
+        22,
+        47
+      ],
+      "life_theme": null,
+      "description": "Führung entsteht durch Begegnung. Dieser Mensch weiß, wie man mit Menschen interagiert — er trägt natürliche Weisheit in der Frage, wer wohin geht und warum.",
+      "source": "q3_master"
+    },
+    "jux_contribution": {
+      "id": "jux_contribution",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Beitrag",
+      "name_en": "Contribution",
+      "full_name_de": "Juxtaposition des Beitrags",
+      "full_name_en": "Juxtaposition Cross of Contribution",
+      "gates": [
+        8,
+        14,
+        4,
+        49
+      ],
+      "personality_pair": [
+        8,
+        14
+      ],
+      "design_pair": [
+        4,
+        49
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, was er einzubringen hat — und tut es mit Würde und Eigenwilligkeit. Sein Beitrag ist einzigartig; er folgt keinem Standard.",
+      "source": "q3_master"
+    },
+    "jux_focus": {
+      "id": "jux_focus",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Foku",
+      "name_en": "Focus",
+      "full_name_de": "Juxtaposition des Fokus",
+      "full_name_en": "Juxtaposition Cross of Focus",
+      "gates": [
+        9,
+        16,
+        37,
+        40
+      ],
+      "personality_pair": [
+        9,
+        16
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": null,
+      "description": "Konzentration ist die Superkraft dieses Menschen. Wenn er sich auf etwas einlässt, lässt er es vollständig. Seine Tiefe und Beharrlichkeit sind das, was Dinge zum Funktionieren bringt.",
+      "source": "q3_master"
+    },
+    "jux_behavior": {
+      "id": "jux_behavior",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Verhalten",
+      "name_en": "Behavior",
+      "full_name_de": "Juxtaposition des Verhaltens",
+      "full_name_en": "Juxtaposition Cross of Behavior",
+      "gates": [
+        10,
+        15,
+        17,
+        18
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        17,
+        18
+      ],
+      "life_theme": null,
+      "description": "Authentizität ist der Weg. Dieser Mensch inspiriert durch die Art, wie er lebt — nicht durch Lehren, sondern durch Sein. Er liebt sich selbst und damit alle anderen.",
+      "source": "q3_master"
+    },
+    "jux_ideas": {
+      "id": "jux_ideas",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Ideen",
+      "name_en": "Ideas",
+      "full_name_de": "Juxtaposition der Ideen",
+      "full_name_en": "Juxtaposition Cross of Ideas",
+      "gates": [
+        11,
+        12,
+        26,
+        45
+      ],
+      "personality_pair": [
+        11,
+        12
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": null,
+      "description": "Ein endloser Strom von Ideen und Möglichkeiten — das ist das Wesen dieses Menschen. Sein Auftrag: die richtigen Ideen zur richtigen Zeit mit den richtigen Menschen zu teilen.",
+      "source": "q3_master"
+    },
+    "jux_caution": {
+      "id": "jux_caution",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Vorsicht",
+      "name_en": "Caution",
+      "full_name_de": "Juxtaposition der Vorsicht",
+      "full_name_en": "Juxtaposition Cross of Caution",
+      "gates": [
+        12,
+        11,
+        26,
+        45
+      ],
+      "personality_pair": [
+        12,
+        11
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch spricht wenig — aber wenn er spricht, hat es Gewicht. Stille und Zurückhaltung sind nicht Schwäche, sondern die Vorbereitung auf bedeutungsvolle Kommunikation.",
+      "source": "q3_master"
+    },
+    "jux_listener": {
+      "id": "jux_listener",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Zuhörer",
+      "name_en": "Listener",
+      "full_name_de": "Juxtaposition des Zuhörers",
+      "full_name_en": "Juxtaposition Cross of Listener",
+      "gates": [
+        13,
+        7,
+        1,
+        2
+      ],
+      "personality_pair": [
+        13,
+        7
+      ],
+      "design_pair": [
+        1,
+        2
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch trägt die Geschichten aller, die ihm begegnen. Er hört zu — wirklich zu — und verwandelt das Gehörte in Weisheit, die er weitergeben kann.",
+      "source": "q3_master"
+    },
+    "jux_power_skills": {
+      "id": "jux_power_skills",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Kraftfertigkeiten",
+      "name_en": "Power Skills",
+      "full_name_de": "Juxtaposition der Kraftfertigkeiten",
+      "full_name_en": "Juxtaposition Cross of Power Skills",
+      "gates": [
+        14,
+        8,
+        29,
+        30
+      ],
+      "personality_pair": [
+        14,
+        8
+      ],
+      "design_pair": [
+        29,
+        30
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, wie man Ressourcen zum Blühen bringt. Materieller Überfluss fließt durch ihn — nicht für ihn, sondern als Werkzeug im Dienst des richtigen Zwecks.",
+      "source": "q3_master"
+    },
+    "jux_extremes": {
+      "id": "jux_extremes",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Extreme",
+      "name_en": "Extremes",
+      "full_name_de": "Juxtaposition der Extreme",
+      "full_name_en": "Juxtaposition Cross of Extremes",
+      "gates": [
+        15,
+        10,
+        46,
+        25
+      ],
+      "personality_pair": [
+        15,
+        10
+      ],
+      "design_pair": [
+        46,
+        25
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch liebt in Extremen — und liebt das Extreme. Er verkörpert die ganze Bandbreite menschlichen Ausdrucks und inspiriert andere zur Akzeptanz ihrer eigenen Gegensätze.",
+      "source": "q3_master"
+    },
+    "jux_skills": {
+      "id": "jux_skills",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Fertigkeiten",
+      "name_en": "Skills",
+      "full_name_de": "Juxtaposition der Fertigkeiten",
+      "full_name_en": "Juxtaposition Cross of Skills",
+      "gates": [
+        16,
+        9,
+        37,
+        40
+      ],
+      "personality_pair": [
+        16,
+        9
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": null,
+      "description": "Begeisterung für das Meistern von Fähigkeiten ist der Motor dieses Menschen. Er lernt, er übt, er meistert — und zieht andere mit seiner Begeisterung in Lernprozesse hinein.",
+      "source": "q3_master"
+    },
+    "jux_opinions": {
+      "id": "jux_opinions",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Meinungen",
+      "name_en": "Opinions",
+      "full_name_de": "Juxtaposition der Meinungen",
+      "full_name_en": "Juxtaposition Cross of Opinions",
+      "gates": [
+        17,
+        18,
+        19,
+        33
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        19,
+        33
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hat Meinungen — und er äußert sie. Seine Gabe: Komplexes klar formulieren und Perspektiven anbieten, die andere noch nicht gesehen haben.",
+      "source": "q3_master"
+    },
+    "jux_correction": {
+      "id": "jux_correction",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Korrektur",
+      "name_en": "Correction",
+      "full_name_de": "Juxtaposition der Korrektur",
+      "full_name_en": "Juxtaposition Cross of Correction",
+      "gates": [
+        18,
+        17,
+        19,
+        33
+      ],
+      "personality_pair": [
+        18,
+        17
+      ],
+      "design_pair": [
+        19,
+        33
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch sieht, was nicht stimmt — in Systemen, in Situationen, in Menschen. Seine Gabe ist die kritische Wahrnehmung, die der Verbesserung dient. Herausforderung: nur korrigieren, wenn man eingeladen ist.",
+      "source": "q3_master"
+    },
+    "jux_wanting": {
+      "id": "jux_wanting",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Wollen",
+      "name_en": "Wanting",
+      "full_name_de": "Juxtaposition des Wollens",
+      "full_name_en": "Juxtaposition Cross of Wanting",
+      "gates": [
+        19,
+        33,
+        20,
+        34
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        20,
+        34
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch spürt Bedürfnisse — seine eigenen und die anderer. Er ist zutiefst mit dem verbunden, was Menschen brauchen, um zu gedeihen. Fürsorge und Sensibilität sind sein Ausdruck.",
+      "source": "q3_master"
+    },
+    "jux_now": {
+      "id": "jux_now",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Jetzt",
+      "name_en": "Now",
+      "full_name_de": "Juxtaposition des Jetzt",
+      "full_name_en": "Juxtaposition Cross of Now",
+      "gates": [
+        20,
+        34,
+        10,
+        15
+      ],
+      "personality_pair": [
+        20,
+        34
+      ],
+      "design_pair": [
+        10,
+        15
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch lebt vollständig im gegenwärtigen Moment. Vergangenheit und Zukunft verblassen — nur das Jetzt hat Substanz. Seine Präsenz ist ein Geschenk an alle, die ihm begegnen.",
+      "source": "q3_master"
+    },
+    "jux_control": {
+      "id": "jux_control",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Kontrolle",
+      "name_en": "Control",
+      "full_name_de": "Juxtaposition der Kontrolle",
+      "full_name_en": "Juxtaposition Cross of Control",
+      "gates": [
+        21,
+        48,
+        26,
+        45
+      ],
+      "personality_pair": [
+        21,
+        48
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch muss das Steuer in der Hand halten — nicht aus Machtbedürfnis, sondern weil er weiß, wie es geht. Wenn er führt, funktioniert es. Sein Weg: klare Grenzen und Strukturen.",
+      "source": "q3_master"
+    },
+    "jux_openness": {
+      "id": "jux_openness",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Offenheit",
+      "name_en": "Openness",
+      "full_name_de": "Juxtaposition der Offenheit",
+      "full_name_en": "Juxtaposition Cross of Openness",
+      "gates": [
+        22,
+        47,
+        55,
+        59
+      ],
+      "personality_pair": [
+        22,
+        47
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": null,
+      "description": "Anmut im Ausdruck — das ist die Gabe dieses Menschen. Er weiß, wie man kommuniziert, verbindet, bewegt. Seine Offenheit für emotionale Tiefe lässt andere tiefer atmen.",
+      "source": "q3_master"
+    },
+    "jux_assimilation": {
+      "id": "jux_assimilation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Assimilation",
+      "name_en": "Assimilation",
+      "full_name_de": "Juxtaposition der Assimilation",
+      "full_name_en": "Juxtaposition Cross of Assimilation",
+      "gates": [
+        23,
+        43,
+        29,
+        30
+      ],
+      "personality_pair": [
+        23,
+        43
+      ],
+      "design_pair": [
+        29,
+        30
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch absorbiert Neues und macht es verdaulich. Er übersetzt das Fremde, das Avantgardistische, das Schwierige in etwas, das andere annehmen können.",
+      "source": "q3_master"
+    },
+    "jux_rationalization": {
+      "id": "jux_rationalization",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Rationalisierung",
+      "name_en": "Rationalization",
+      "full_name_de": "Juxtaposition der Rationalisierung",
+      "full_name_en": "Juxtaposition Cross of Rationalization",
+      "gates": [
+        24,
+        44,
+        31,
+        41
+      ],
+      "personality_pair": [
+        24,
+        44
+      ],
+      "design_pair": [
+        31,
+        41
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch denkt und denkt — bis das Denken sich auflöst und echte Erkenntnis entsteht. Das Kreisen der Gedanken ist kein Problem, sondern der Prozess.",
+      "source": "q3_master"
+    },
+    "jux_innocence": {
+      "id": "jux_innocence",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Unschuld",
+      "name_en": "Innocence",
+      "full_name_de": "Juxtaposition der Unschuld",
+      "full_name_en": "Juxtaposition Cross of Innocence",
+      "gates": [
+        25,
+        46,
+        10,
+        15
+      ],
+      "personality_pair": [
+        25,
+        46
+      ],
+      "design_pair": [
+        10,
+        15
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch trägt eine spirituelle Unschuld in sich — eine Liebe, die nichts erwartet und nichts fordert. Seine Gabe ist die universelle, bedingungslose Wärme.",
+      "source": "q3_master"
+    },
+    "jux_trickster": {
+      "id": "jux_trickster",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Trickster",
+      "name_en": "Trickster",
+      "full_name_de": "Juxtaposition des Tricksters",
+      "full_name_en": "Juxtaposition Cross of Trickster",
+      "gates": [
+        26,
+        45,
+        21,
+        48
+      ],
+      "personality_pair": [
+        26,
+        45
+      ],
+      "design_pair": [
+        21,
+        48
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, wie man überzeugt — durch Humor, durch List, durch das Erzählen von Geschichten, die mehr enthalten als man zunächst sieht.",
+      "source": "q3_master"
+    },
+    "jux_caring": {
+      "id": "jux_caring",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Fürsorge",
+      "name_en": "Caring",
+      "full_name_de": "Juxtaposition der Fürsorge",
+      "full_name_en": "Juxtaposition Cross of Caring",
+      "gates": [
+        27,
+        28,
+        38,
+        39
+      ],
+      "personality_pair": [
+        27,
+        28
+      ],
+      "design_pair": [
+        38,
+        39
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist ein natürlicher Nurturer — er pflegt, ernährt, beschützt. Seine Gabe ist die Fähigkeit, anderen zu geben, was sie brauchen, ohne sich dabei zu verlieren.",
+      "source": "q3_master"
+    },
+    "jux_struggle": {
+      "id": "jux_struggle",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Kampf",
+      "name_en": "Struggle",
+      "full_name_de": "Juxtaposition des Kampfes",
+      "full_name_en": "Juxtaposition Cross of Struggle",
+      "gates": [
+        28,
+        27,
+        38,
+        39
+      ],
+      "personality_pair": [
+        28,
+        27
+      ],
+      "design_pair": [
+        38,
+        39
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ringt mit dem Leben um Bedeutung. Sinn zu finden — das ist sein Weg. Jede Herausforderung ist eine Einladung, tiefer zu gehen.",
+      "source": "q3_master"
+    },
+    "jux_commitment": {
+      "id": "jux_commitment",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Verpflichtung",
+      "name_en": "Commitment",
+      "full_name_de": "Juxtaposition der Verpflichtung",
+      "full_name_en": "Juxtaposition Cross of Commitment",
+      "gates": [
+        29,
+        30,
+        14,
+        8
+      ],
+      "personality_pair": [
+        29,
+        30
+      ],
+      "design_pair": [
+        14,
+        8
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch committet sich vollständig — wenn das Sakral Ja sagt. Dann gibt er alles. Seine Stärke: nicht halbherzig, sondern mit ganzer Kraft dabei zu sein.",
+      "source": "q3_master"
+    },
+    "jux_fates": {
+      "id": "jux_fates",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Schicksale",
+      "name_en": "Fates",
+      "full_name_de": "Juxtaposition der Schicksale",
+      "full_name_en": "Juxtaposition Cross of Fates",
+      "gates": [
+        30,
+        29,
+        14,
+        8
+      ],
+      "personality_pair": [
+        30,
+        29
+      ],
+      "design_pair": [
+        14,
+        8
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist von Leidenschaften angetrieben. Er hält Leidenschaften — seine eigenen und die anderer — und gibt ihnen Raum, sich vollständig zu entfalten.",
+      "source": "q3_master"
+    },
+    "jux_influence": {
+      "id": "jux_influence",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Einflus",
+      "name_en": "Influence",
+      "full_name_de": "Juxtaposition des Einflusses",
+      "full_name_en": "Juxtaposition Cross of Influence",
+      "gates": [
+        31,
+        41,
+        7,
+        13
+      ],
+      "personality_pair": [
+        31,
+        41
+      ],
+      "design_pair": [
+        7,
+        13
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch führt durch Kommunikation. Seine Stimme hat Gewicht. Wenn er spricht, hören Menschen zu — und folgen.",
+      "source": "q3_master"
+    },
+    "jux_conservation": {
+      "id": "jux_conservation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Bewahrung",
+      "name_en": "Conservation",
+      "full_name_de": "Juxtaposition der Bewahrung",
+      "full_name_en": "Juxtaposition Cross of Conservation",
+      "gates": [
+        32,
+        42,
+        51,
+        57
+      ],
+      "personality_pair": [
+        32,
+        42
+      ],
+      "design_pair": [
+        51,
+        57
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, was erhaltenswert ist. Er schützt Traditionen, Strukturen, Verbindungen — nicht aus Angst vor Veränderung, sondern aus Respekt vor dem, was funktioniert.",
+      "source": "q3_master"
+    },
+    "jux_retreat": {
+      "id": "jux_retreat",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Rückzug",
+      "name_en": "Retreat",
+      "full_name_de": "Juxtaposition des Rückzugs",
+      "full_name_en": "Juxtaposition Cross of Retreat",
+      "gates": [
+        33,
+        19,
+        20,
+        34
+      ],
+      "personality_pair": [
+        33,
+        19
+      ],
+      "design_pair": [
+        20,
+        34
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch braucht regelmäßig Einsamkeit — nicht als Flucht, sondern als Kraftquelle. Aus der Stille zieht er Weisheit, die er dann teilt.",
+      "source": "q3_master"
+    },
+    "jux_power": {
+      "id": "jux_power",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Kraft",
+      "name_en": "Power",
+      "full_name_de": "Juxtaposition der Kraft",
+      "full_name_en": "Juxtaposition Cross of Power",
+      "gates": [
+        34,
+        20,
+        10,
+        15
+      ],
+      "personality_pair": [
+        34,
+        20
+      ],
+      "design_pair": [
+        10,
+        15
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist ein Kraftfeld. Wenn er mit dem beschäftigt ist, was ihn begeistert, entsteht eine magnetische Energie, die andere anzieht und bewegt.",
+      "source": "q3_master"
+    },
+    "jux_experience": {
+      "id": "jux_experience",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Erfahrung",
+      "name_en": "Experience",
+      "full_name_de": "Juxtaposition der Erfahrung",
+      "full_name_en": "Juxtaposition Cross of Experience",
+      "gates": [
+        35,
+        5,
+        56,
+        60
+      ],
+      "personality_pair": [
+        35,
+        5
+      ],
+      "design_pair": [
+        56,
+        60
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch sucht neue Erfahrungen — und sammelt sie ohne Urteil. Sein Reichtum ist die Vielfalt des Erlebten; sein Dienst die Weisheit, die er daraus zieht.",
+      "source": "q3_master"
+    },
+    "jux_crisis": {
+      "id": "jux_crisis",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Krise",
+      "name_en": "Crisis",
+      "full_name_de": "Juxtaposition der Krise",
+      "full_name_en": "Juxtaposition Cross of Crisis",
+      "gates": [
+        36,
+        6,
+        11,
+        12
+      ],
+      "personality_pair": [
+        36,
+        6
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": null,
+      "description": "Krisen sind für diesen Menschen kein Ausnahmezustand, sondern Normalität. Er ist mit emotionaler Tiefe vertraut und kann anderen helfen, durch dunkle Phasen zu navigieren.",
+      "source": "q3_master"
+    },
+    "jux_friendship": {
+      "id": "jux_friendship",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Freundschaft",
+      "name_en": "Friendship",
+      "full_name_de": "Juxtaposition der Freundschaft",
+      "full_name_en": "Juxtaposition Cross of Friendship",
+      "gates": [
+        37,
+        40,
+        9,
+        16
+      ],
+      "personality_pair": [
+        37,
+        40
+      ],
+      "design_pair": [
+        9,
+        16
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch schafft Gemeinschaft durch Warmherzigkeit und das Gefühl der Zugehörigkeit. Er weiß, wie man Verbindungen hält, die über Zeit und Distanz bestehen.",
+      "source": "q3_master"
+    },
+    "jux_opposition": {
+      "id": "jux_opposition",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Opposition",
+      "name_en": "Opposition",
+      "full_name_de": "Juxtaposition der Opposition",
+      "full_name_en": "Juxtaposition Cross of Opposition",
+      "gates": [
+        38,
+        39,
+        28,
+        27
+      ],
+      "personality_pair": [
+        38,
+        39
+      ],
+      "design_pair": [
+        28,
+        27
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, wofür es sich lohnt zu kämpfen. Er stellt sich gegen das Sinnlose und schützt das Bedeutungsvolle. Sein Widerstand ist ein Geschenk.",
+      "source": "q3_master"
+    },
+    "jux_provocation": {
+      "id": "jux_provocation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Provokation",
+      "name_en": "Provocation",
+      "full_name_de": "Juxtaposition der Provokation",
+      "full_name_en": "Juxtaposition Cross of Provocation",
+      "gates": [
+        39,
+        38,
+        55,
+        59
+      ],
+      "personality_pair": [
+        39,
+        38
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch rüttelt auf — nicht aus Bosheit, sondern um Energie zu bewegen. Seine Provokationen öffnen Türen, die sonst geschlossen blieben.",
+      "source": "q3_master"
+    },
+    "jux_denial": {
+      "id": "jux_denial",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Verleugnung",
+      "name_en": "Denial",
+      "full_name_de": "Juxtaposition der Verleugnung",
+      "full_name_en": "Juxtaposition Cross of Denial",
+      "gates": [
+        40,
+        37,
+        63,
+        64
+      ],
+      "personality_pair": [
+        40,
+        37
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, wann er Nein sagen muss. Er kennt den Preis des Gebens und setzt Grenzen, die ihn nachhaltig handlungsfähig halten.",
+      "source": "q3_master"
+    },
+    "jux_fantasy": {
+      "id": "jux_fantasy",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Fantasie",
+      "name_en": "Fantasy",
+      "full_name_de": "Juxtaposition der Fantasie",
+      "full_name_en": "Juxtaposition Cross of Fantasy",
+      "gates": [
+        41,
+        31,
+        7,
+        13
+      ],
+      "personality_pair": [
+        41,
+        31
+      ],
+      "design_pair": [
+        7,
+        13
+      ],
+      "life_theme": null,
+      "description": "Träume und Sehnsüchte bewegen diesen Menschen. Er gibt anderen die Erlaubnis zu träumen — und zeigt, dass Träume der Anfang von allem sind.",
+      "source": "q3_master"
+    },
+    "jux_growth": {
+      "id": "jux_growth",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Wachstum",
+      "name_en": "Growth",
+      "full_name_de": "Juxtaposition des Wachstums",
+      "full_name_en": "Juxtaposition Cross of Growth",
+      "gates": [
+        42,
+        32,
+        53,
+        54
+      ],
+      "personality_pair": [
+        42,
+        32
+      ],
+      "design_pair": [
+        53,
+        54
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch vollendet Prozesse. Er bringt Dinge zum Abschluss — und trägt dabei die Weisheit in sich, wann ein Zyklus wirklich endet.",
+      "source": "q3_master"
+    },
+    "jux_insight": {
+      "id": "jux_insight",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Einsicht",
+      "name_en": "Insight",
+      "full_name_de": "Juxtaposition der Einsicht",
+      "full_name_en": "Juxtaposition Cross of Insight",
+      "gates": [
+        43,
+        23,
+        49,
+        4
+      ],
+      "personality_pair": [
+        43,
+        23
+      ],
+      "design_pair": [
+        49,
+        4
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hat Geistesblitze — plötzliche, individuelle Erkenntnisse, die niemand sonst hat. Seine Herausforderung: diese Einsichten zu teilen, bevor sie sich verflüchtigen.",
+      "source": "q3_master"
+    },
+    "jux_alertness": {
+      "id": "jux_alertness",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Wachsamkeit",
+      "name_en": "Alertness",
+      "full_name_de": "Juxtaposition der Wachsamkeit",
+      "full_name_en": "Juxtaposition Cross of Alertness",
+      "gates": [
+        44,
+        24,
+        19,
+        33
+      ],
+      "personality_pair": [
+        44,
+        24
+      ],
+      "design_pair": [
+        19,
+        33
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch spürt, was kommt — er hat instinktive Verbindung zur Vergangenheit und daraus gespeiste Intuition für die Zukunft. Sein Radar für Muster und Risiken ist außergewöhnlich.",
+      "source": "q3_master"
+    },
+    "jux_ownership": {
+      "id": "jux_ownership",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Eigentum",
+      "name_en": "Ownership",
+      "full_name_de": "Juxtaposition des Eigentums",
+      "full_name_en": "Juxtaposition Cross of Ownership",
+      "gates": [
+        45,
+        26,
+        21,
+        48
+      ],
+      "personality_pair": [
+        45,
+        26
+      ],
+      "design_pair": [
+        21,
+        48
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch weiß, wie man Ressourcen sammelt, hält und verwaltet — für die Gemeinschaft. Führung durch materielle Stärke ist sein natürlicher Ausdruck.",
+      "source": "q3_master"
+    },
+    "jux_serendipity": {
+      "id": "jux_serendipity",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "glücklichen Fügung",
+      "name_en": "Serendipity",
+      "full_name_de": "Juxtaposition der glücklichen Fügung",
+      "full_name_en": "Juxtaposition Cross of Serendipity",
+      "gates": [
+        46,
+        25,
+        15,
+        10
+      ],
+      "personality_pair": [
+        46,
+        25
+      ],
+      "design_pair": [
+        15,
+        10
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hat eine tiefe Liebe zum Körper, zur Erde, zum physischen Leben. Serendipität folgt ihm, wenn er im Körper lebt — vollständig präsent im Jetzt.",
+      "source": "q3_master"
+    },
+    "jux_realization": {
+      "id": "jux_realization",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Erkenntni",
+      "name_en": "Realization",
+      "full_name_de": "Juxtaposition der Erkenntnis",
+      "full_name_en": "Juxtaposition Cross of Realization",
+      "gates": [
+        47,
+        22,
+        17,
+        18
+      ],
+      "personality_pair": [
+        47,
+        22
+      ],
+      "design_pair": [
+        17,
+        18
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch findet Sinn im Rückblick. Erst wenn etwas vorbei ist, erkennt er die Bedeutung. Diese Gabe macht ihn zu einem tiefen Deuter von Erfahrungen.",
+      "source": "q3_master"
+    },
+    "jux_depth": {
+      "id": "jux_depth",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Tiefe",
+      "name_en": "Depth",
+      "full_name_de": "Juxtaposition der Tiefe",
+      "full_name_en": "Juxtaposition Cross of Depth",
+      "gates": [
+        48,
+        21,
+        26,
+        45
+      ],
+      "personality_pair": [
+        48,
+        21
+      ],
+      "design_pair": [
+        26,
+        45
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist ein Wissensbrunnen. Er taucht tief — immer tiefer — und bleibt, bis er wirklich versteht. Untiefe ist ihm fremd.",
+      "source": "q3_master"
+    },
+    "jux_principles": {
+      "id": "jux_principles",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Prinzipien",
+      "name_en": "Principles",
+      "full_name_de": "Juxtaposition der Prinzipien",
+      "full_name_en": "Juxtaposition Cross of Principles",
+      "gates": [
+        49,
+        4,
+        19,
+        33
+      ],
+      "personality_pair": [
+        49,
+        4
+      ],
+      "design_pair": [
+        19,
+        33
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch lebt nach Prinzipien — und hält daran fest, auch wenn es kostet. Was stimmt, ist stimmt; was nicht stimmt, muss gehen. Radikale Ehrlichkeit ist sein Weg.",
+      "source": "q3_master"
+    },
+    "jux_values": {
+      "id": "jux_values",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Werte",
+      "name_en": "Values",
+      "full_name_de": "Juxtaposition der Werte",
+      "full_name_en": "Juxtaposition Cross of Values",
+      "gates": [
+        50,
+        3,
+        11,
+        12
+      ],
+      "personality_pair": [
+        50,
+        3
+      ],
+      "design_pair": [
+        11,
+        12
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hütet Werte — gesellschaftliche, familiäre, moralische. Er ist ein Anker in Zeiten des Wandels: das, was wirklich wichtig ist, geht durch ihn nicht verloren.",
+      "source": "q3_master"
+    },
+    "jux_shock": {
+      "id": "jux_shock",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Schock",
+      "name_en": "Shock",
+      "full_name_de": "Juxtaposition des Schocks",
+      "full_name_en": "Juxtaposition Cross of Shock",
+      "gates": [
+        51,
+        57,
+        32,
+        42
+      ],
+      "personality_pair": [
+        51,
+        57
+      ],
+      "design_pair": [
+        32,
+        42
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist dazu berufen, zu erwecken — manchmal durch Schock, immer durch Originalität. Er geht dorthin, wo andere nicht hingehen, und kehrt verändert zurück.",
+      "source": "q3_master"
+    },
+    "jux_stillness": {
+      "id": "jux_stillness",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Stille",
+      "name_en": "Stillness",
+      "full_name_de": "Juxtaposition der Stille",
+      "full_name_en": "Juxtaposition Cross of Stillness",
+      "gates": [
+        52,
+        58,
+        61,
+        62
+      ],
+      "personality_pair": [
+        52,
+        58
+      ],
+      "design_pair": [
+        61,
+        62
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch findet Kraft in der Unbeweglichkeit. Aus der Stille heraus entsteht bei ihm die tiefste Klarheit. Produktivität ohne innere Ruhe ist nicht sein Weg.",
+      "source": "q3_master"
+    },
+    "jux_beginnings": {
+      "id": "jux_beginnings",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Anfänge",
+      "name_en": "Beginnings",
+      "full_name_de": "Juxtaposition der Anfänge",
+      "full_name_en": "Juxtaposition Cross of Beginnings",
+      "gates": [
+        53,
+        54,
+        42,
+        32
+      ],
+      "personality_pair": [
+        53,
+        54
+      ],
+      "design_pair": [
+        42,
+        32
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist ein Pionier. Er liebt den Anfang — das Unbekannte, das Neue, das noch Ungeformte. Seine Energie zündet Prozesse, die ohne ihn nicht begonnen hätten.",
+      "source": "q3_master"
+    },
+    "jux_drive": {
+      "id": "jux_drive",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Antrieb",
+      "name_en": "Drive",
+      "full_name_de": "Juxtaposition des Antriebs",
+      "full_name_en": "Juxtaposition Cross of Drive",
+      "gates": [
+        54,
+        53,
+        42,
+        32
+      ],
+      "personality_pair": [
+        54,
+        53
+      ],
+      "design_pair": [
+        42,
+        32
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch besitzt einen tiefen Antrieb zum Aufstieg — nicht aus Eitelkeit, sondern weil er das Potenzial in sich spürt und es verwirklichen will. Die Leiter aufwärts ist sein natürliches Terrain.",
+      "source": "q3_master"
+    },
+    "jux_moods": {
+      "id": "jux_moods",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Stimmungen",
+      "name_en": "Moods",
+      "full_name_de": "Juxtaposition der Stimmungen",
+      "full_name_en": "Juxtaposition Cross of Moods",
+      "gates": [
+        55,
+        59,
+        9,
+        16
+      ],
+      "personality_pair": [
+        55,
+        59
+      ],
+      "design_pair": [
+        9,
+        16
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch lebt in einer tiefen emotionalen und spirituellen Welt. Stimmungen sind seine Sprache; Fülle ist sein Potential. In der Klarheit des Herzens liegt seine Stärke.",
+      "source": "q3_master"
+    },
+    "jux_stimulation": {
+      "id": "jux_stimulation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Stimulation",
+      "name_en": "Stimulation",
+      "full_name_de": "Juxtaposition der Stimulation",
+      "full_name_en": "Juxtaposition Cross of Stimulation",
+      "gates": [
+        56,
+        60,
+        27,
+        28
+      ],
+      "personality_pair": [
+        56,
+        60
+      ],
+      "design_pair": [
+        27,
+        28
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch erzählt Geschichten, die stimulieren und inspirieren. Er nimmt Erfahrungen und verwandelt sie in Narrative, die andere berühren.",
+      "source": "q3_master"
+    },
+    "jux_intuition": {
+      "id": "jux_intuition",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Intuition",
+      "name_en": "Intuition",
+      "full_name_de": "Juxtaposition der Intuition",
+      "full_name_en": "Juxtaposition Cross of Intuition",
+      "gates": [
+        57,
+        51,
+        32,
+        42
+      ],
+      "personality_pair": [
+        57,
+        51
+      ],
+      "design_pair": [
+        32,
+        42
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hat eine messerscharfe Intuition für das Jetzt. Er spürt, was ist — nicht was war oder sein wird. Dieses Geschenk hält ihn am Leben und führt andere durch Unsicherheit.",
+      "source": "q3_master"
+    },
+    "jux_vitality": {
+      "id": "jux_vitality",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Vitalität",
+      "name_en": "Vitality",
+      "full_name_de": "Juxtaposition der Vitalität",
+      "full_name_en": "Juxtaposition Cross of Vitality",
+      "gates": [
+        58,
+        52,
+        17,
+        18
+      ],
+      "personality_pair": [
+        58,
+        52
+      ],
+      "design_pair": [
+        17,
+        18
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch liebt das Leben — die Schönheit darin, die Freude, die Bewegung. Seine Vitalität ist ansteckend; er erinnert andere daran, dass das Leben es wert ist, gelebt zu werden.",
+      "source": "q3_master"
+    },
+    "jux_sexuality": {
+      "id": "jux_sexuality",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Sexualität",
+      "name_en": "Sexuality",
+      "full_name_de": "Juxtaposition der Sexualität",
+      "full_name_en": "Juxtaposition Cross of Sexuality",
+      "gates": [
+        59,
+        55,
+        9,
+        16
+      ],
+      "personality_pair": [
+        59,
+        55
+      ],
+      "design_pair": [
+        9,
+        16
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch öffnet sich für intime Verbindungen — auf einer Ebene, die über das Körperliche hinausgeht. Er ist ein Meister der Intimität, der tiefen Zweisamkeit.",
+      "source": "q3_master"
+    },
+    "jux_limitation": {
+      "id": "jux_limitation",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Beschränkung",
+      "name_en": "Limitation",
+      "full_name_de": "Juxtaposition der Beschränkung",
+      "full_name_en": "Juxtaposition Cross of Limitation",
+      "gates": [
+        60,
+        56,
+        28,
+        27
+      ],
+      "personality_pair": [
+        60,
+        56
+      ],
+      "design_pair": [
+        28,
+        27
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch kennt die Kraft der Grenzen. Innerhalb von Beschränkungen entsteht für ihn das Kreativste, das Tiefste, das Bleibendste. Limitierungen sind kein Hindernis, sondern Brennpunkt.",
+      "source": "q3_master"
+    },
+    "jux_mystery": {
+      "id": "jux_mystery",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Mysterium",
+      "name_en": "Mystery",
+      "full_name_de": "Juxtaposition des Mysteriums",
+      "full_name_en": "Juxtaposition Cross of Mystery",
+      "gates": [
+        61,
+        62,
+        3,
+        50
+      ],
+      "personality_pair": [
+        61,
+        62
+      ],
+      "design_pair": [
+        3,
+        50
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch ist von innerer Wahrheit berührt — von dem, was sich nicht vollständig erklären lässt. Er ist ein Hüter des Heiligen, des Unaussprechlichen.",
+      "source": "q3_master"
+    },
+    "jux_detail": {
+      "id": "jux_detail",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Detail",
+      "name_en": "Detail",
+      "full_name_de": "Juxtaposition des Details",
+      "full_name_en": "Juxtaposition Cross of Detail",
+      "gates": [
+        62,
+        61,
+        3,
+        50
+      ],
+      "personality_pair": [
+        62,
+        61
+      ],
+      "design_pair": [
+        3,
+        50
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch liebt das Konkrete, das Präzise, das Überprüfbare. Im Detail liegt für ihn die Wahrheit — und er findet darin etwas, das andere übersehen.",
+      "source": "q3_master"
+    },
+    "jux_doubt": {
+      "id": "jux_doubt",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Zweifel",
+      "name_en": "Doubt",
+      "full_name_de": "Juxtaposition des Zweifels",
+      "full_name_en": "Juxtaposition Cross of Doubt",
+      "gates": [
+        63,
+        64,
+        5,
+        35
+      ],
+      "personality_pair": [
+        63,
+        64
+      ],
+      "design_pair": [
+        5,
+        35
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch lebt mit Fragen. Sein Zweifel ist kein Makel, sondern ein Werkzeug — er verhindert vorschnelle Antworten und öffnet Raum für tiefere Wahrheit.",
+      "source": "q3_master"
+    },
+    "jux_confusion": {
+      "id": "jux_confusion",
+      "type": "Juxtaposition",
+      "type_short": "JUX",
+      "name_de": "Verwirrung",
+      "name_en": "Confusion",
+      "full_name_de": "Juxtaposition der Verwirrung",
+      "full_name_en": "Juxtaposition Cross of Confusion",
+      "gates": [
+        64,
+        63,
+        5,
+        35
+      ],
+      "personality_pair": [
+        64,
+        63
+      ],
+      "design_pair": [
+        5,
+        35
+      ],
+      "life_theme": null,
+      "description": "Dieser Mensch hält viele Möglichkeiten gleichzeitig — und lernt, in der Verwirrung zu ruhen. Klarheit kommt nicht durch Auflösung der Komplexität, sondern durch das Aushalten von ihr.",
+      "source": "q3_master"
+    },
+    "q2_four_lights": {
+      "id": "q2_four_lights",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Four Lights",
+      "name_en": "Four Lights",
+      "full_name_de": "Innere Wahrheit und Mutation",
+      "full_name_en": "Cross of Four Lights",
+      "gates": [
+        3,
+        50,
+        61,
+        62
+      ],
+      "personality_pair": [
+        3,
+        50
+      ],
+      "design_pair": [
+        61,
+        62
+      ],
+      "life_theme": "Innere Wahrheit und Mutation",
+      "description": "Mutation (Gate 3) und Werte (Gate 50) als Persönlichkeitskraft — genährt von innerer Wahrheit (Gate 61) und Präzision (Gate 62).",
+      "source": "q2_fallback",
+      "q2_key": "3-50-61-62"
+    },
+    "q2_explanation_4_8_14_49": {
+      "id": "q2_explanation_4_8_14_49",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Explanation",
+      "name_en": "Explanation",
+      "full_name_de": "Formeln, Antworten und Beitrag",
+      "full_name_en": "Cross of Explanation",
+      "gates": [
+        4,
+        49,
+        8,
+        14
+      ],
+      "personality_pair": [
+        4,
+        49
+      ],
+      "design_pair": [
+        8,
+        14
+      ],
+      "life_theme": "Formeln, Antworten und Beitrag",
+      "description": "Das Kreuz der Erklärung: Mentale Lösungen (Gate 4) und revolutionäre Prinzipien (Gate 49) verbinden sich mit einzigartigem Beitrag (Gate 8) und materieller Kraft (Gate 14).",
+      "source": "q2_fallback",
+      "q2_key": "4-49-8-14"
+    },
+    "q2_consciousness_5_35_63_64": {
+      "id": "q2_consciousness_5_35_63_64",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Consciousness",
+      "name_en": "Consciousness",
+      "full_name_de": "Fragen, Zweifel und Erfahrung",
+      "full_name_en": "Cross of Consciousness",
+      "gates": [
+        5,
+        35,
+        63,
+        64
+      ],
+      "personality_pair": [
+        5,
+        35
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Fragen, Zweifel und Erfahrung",
+      "description": "Kosmischer Takt (Gate 5) und Fortschritt (Gate 35) als Persönlichkeitskraft — angetrieben durch mentalen Druck (Gate 63) und Inspiration aus dem Chaos (Gate 64).",
+      "source": "q2_fallback",
+      "q2_key": "5-35-63-64"
+    },
+    "q2_planning": {
+      "id": "q2_planning",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Planning",
+      "name_en": "Planning",
+      "full_name_de": "Gemeinschaft, Fokus und Planung",
+      "full_name_en": "Cross of Planning",
+      "gates": [
+        9,
+        16,
+        37,
+        40
+      ],
+      "personality_pair": [
+        9,
+        16
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": "Gemeinschaft, Fokus und Planung",
+      "description": "Konzentration (Gate 9) und Begeisterung (Gate 16) als Persönlichkeitskraft — entfaltet durch Familie (Gate 37) und Befreiung (Gate 40).",
+      "source": "q2_fallback",
+      "q2_key": "9-16-37-40"
+    },
+    "q2_sleeping_phoenix_9_16_55_59": {
+      "id": "q2_sleeping_phoenix_9_16_55_59",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Sleeping Phoenix",
+      "name_en": "Sleeping Phoenix",
+      "full_name_de": "Geist, Überfluss und neues Bewusstsein",
+      "full_name_en": "Cross of Sleeping Phoenix",
+      "gates": [
+        9,
+        16,
+        55,
+        59
+      ],
+      "personality_pair": [
+        9,
+        16
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Geist, Überfluss und neues Bewusstsein",
+      "description": "Konzentration (Gate 9) und Enthusiasmus (Gate 16) als bewusste Kraft — tief genährt von spirituellem Überfluss (Gate 55) und Intimität (Gate 59).",
+      "source": "q2_fallback",
+      "q2_key": "9-16-55-59"
+    },
+    "q2_clarion": {
+      "id": "q2_clarion",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Clarion",
+      "name_en": "Clarion",
+      "full_name_de": "Gegenwärtigkeit, Kraft und Empowerment",
+      "full_name_en": "Cross of Clarion",
+      "gates": [
+        10,
+        15,
+        20,
+        34
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        20,
+        34
+      ],
+      "life_theme": "Gegenwärtigkeit, Kraft und Empowerment",
+      "description": "Authentisches Sein (Gate 10) und Bescheidenheit (Gate 15) als Persönlichkeitskraft — genährt von Gegenwärtigkeit (Gate 20) und Sacral-Kraft (Gate 34).",
+      "source": "q2_fallback",
+      "q2_key": "10-15-20-34"
+    },
+    "q2_healing_10_15_25_46": {
+      "id": "q2_healing_10_15_25_46",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Healing",
+      "name_en": "Healing",
+      "full_name_de": "Unschuld, Heilung und Selbstliebe",
+      "full_name_en": "Cross of Healing",
+      "gates": [
+        10,
+        15,
+        25,
+        46
+      ],
+      "personality_pair": [
+        10,
+        15
+      ],
+      "design_pair": [
+        25,
+        46
+      ],
+      "life_theme": "Unschuld, Heilung und Selbstliebe",
+      "description": "Authentisches Sein (Gate 10) und Bescheidenheit (Gate 15) als Persönlichkeitskraft — genährt von Unschuld (Gate 25) und Körperliebe (Gate 46).",
+      "source": "q2_fallback",
+      "q2_key": "10-15-25-46"
+    },
+    "q2_eden_6_11_12_36": {
+      "id": "q2_eden_6_11_12_36",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Eden",
+      "name_en": "Eden",
+      "full_name_de": "Erfahrungssuche, Krise und kreative Expression",
+      "full_name_en": "Cross of Eden",
+      "gates": [
+        11,
+        12,
+        36,
+        6
+      ],
+      "personality_pair": [
+        11,
+        12
+      ],
+      "design_pair": [
+        36,
+        6
+      ],
+      "life_theme": "Erfahrungssuche, Krise und kreative Expression",
+      "description": "Ideen (Gate 11) und vorsichtiger Ausdruck (Gate 12) als Persönlichkeitskraft — tief verwurzelt in emotionaler Erfahrung (Gate 36) und Reibung (Gate 6).",
+      "source": "q2_fallback",
+      "q2_key": "11-12-36-6"
+    },
+    "q2_industriousness": {
+      "id": "q2_industriousness",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Industriousness",
+      "name_en": "Industriousness",
+      "full_name_de": "Sacral-Kraft, Hingabe und Beitrag",
+      "full_name_en": "Cross of Industriousness",
+      "gates": [
+        14,
+        8,
+        29,
+        30
+      ],
+      "personality_pair": [
+        14,
+        8
+      ],
+      "design_pair": [
+        29,
+        30
+      ],
+      "life_theme": "Sacral-Kraft, Hingabe und Beitrag",
+      "description": "Reichtum (Gate 14) und Beitrag (Gate 8) als Persönlichkeitskraft — angetrieben durch Hingabe (Gate 29) und Verlangen (Gate 30).",
+      "source": "q2_fallback",
+      "q2_key": "14-8-29-30"
+    },
+    "q2_four_ways": {
+      "id": "q2_four_ways",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Four Ways",
+      "name_en": "Four Ways",
+      "full_name_de": "Logik, Korrektur und Verbesserung",
+      "full_name_en": "Cross of Four Ways",
+      "gates": [
+        17,
+        18,
+        47,
+        22
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        47,
+        22
+      ],
+      "life_theme": "Logik, Korrektur und Verbesserung",
+      "description": "Das Kreuz der Vier Wege verbindet logische Überzeugungen (Gate 17), Korrektur (Gate 18), Realisierung (Gate 47) und emotionale Offenheit (Gate 22) zu einer Lebensaufgabe der systematischen Verbesserung.",
+      "source": "q2_fallback",
+      "q2_key": "17-18-47-22"
+    },
+    "q2_service_17_18_52_58": {
+      "id": "q2_service_17_18_52_58",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Service",
+      "name_en": "Service",
+      "full_name_de": "Dienst durch freudige Verbesserung",
+      "full_name_en": "Cross of Service",
+      "gates": [
+        17,
+        18,
+        58,
+        52
+      ],
+      "personality_pair": [
+        17,
+        18
+      ],
+      "design_pair": [
+        58,
+        52
+      ],
+      "life_theme": "Dienst durch freudige Verbesserung",
+      "description": "Das Kreuz des Dienstes: Meinungen (Gate 17) und Korrektur (Gate 18) verbinden sich mit tiefer Lebensfreude (Gate 58) und stiller Konzentration (Gate 52) zu einem Lebensweg durch freudige Verbesserung.",
+      "source": "q2_fallback",
+      "q2_key": "17-18-58-52"
+    },
+    "q2_duality_19_24_33_44": {
+      "id": "q2_duality_19_24_33_44",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Duality",
+      "name_en": "Duality",
+      "full_name_de": "Rückzug, Erinnerung und Bedürfnisse",
+      "full_name_en": "Cross of Duality",
+      "gates": [
+        19,
+        33,
+        44,
+        24
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        44,
+        24
+      ],
+      "life_theme": "Rückzug, Erinnerung und Bedürfnisse",
+      "description": "Das Kreuz der Dualität: Sensibilität für Bedürfnisse (Gate 19) und Rückzug (Gate 33) verbinden sich mit Mustern aus der Vergangenheit (Gate 44) und Rationalisierung (Gate 24).",
+      "source": "q2_fallback",
+      "q2_key": "19-33-44-24"
+    },
+    "q2_revolution_4_19_33_49": {
+      "id": "q2_revolution_4_19_33_49",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Revolution",
+      "name_en": "Revolution",
+      "full_name_de": "Prinzipien, Sensibilität und Rückzug",
+      "full_name_en": "Cross of Revolution",
+      "gates": [
+        19,
+        33,
+        49,
+        4
+      ],
+      "personality_pair": [
+        19,
+        33
+      ],
+      "design_pair": [
+        49,
+        4
+      ],
+      "life_theme": "Prinzipien, Sensibilität und Rückzug",
+      "description": "Sensibilität (Gate 19) und Rückzug (Gate 33) als Persönlichkeitskraft — angetrieben durch Revolution (Gate 49) und Formeln (Gate 4).",
+      "source": "q2_fallback",
+      "q2_key": "19-33-49-4"
+    },
+    "q2_separation_20_29_30_34": {
+      "id": "q2_separation_20_29_30_34",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Separation",
+      "name_en": "Separation",
+      "full_name_de": "Hingabe, Präsenz und Kraft",
+      "full_name_en": "Cross of Separation",
+      "gates": [
+        20,
+        34,
+        29,
+        30
+      ],
+      "personality_pair": [
+        20,
+        34
+      ],
+      "design_pair": [
+        29,
+        30
+      ],
+      "life_theme": "Hingabe, Präsenz und Kraft",
+      "description": "Das Jetzt (Gate 20) und reine Kraft (Gate 34) als Persönlichkeitskraft — genährt durch Hingabe (Gate 29) und Leidenschaft (Gate 30).",
+      "source": "q2_fallback",
+      "q2_key": "20-34-29-30"
+    },
+    "q2_dominion": {
+      "id": "q2_dominion",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Dominion",
+      "name_en": "Dominion",
+      "full_name_de": "Führung durch Einfluss und neue Anfänge",
+      "full_name_en": "Cross of Dominion",
+      "gates": [
+        24,
+        44,
+        31,
+        41
+      ],
+      "personality_pair": [
+        24,
+        44
+      ],
+      "design_pair": [
+        31,
+        41
+      ],
+      "life_theme": "Führung durch Einfluss und neue Anfänge",
+      "description": "Rationalisierung (Gate 24) und Zusammenkommen (Gate 44) als Persönlichkeitskraft — entfaltet durch Einfluss (Gate 31) und emotionalen Hunger (Gate 41).",
+      "source": "q2_fallback",
+      "q2_key": "24-44-31-41"
+    },
+    "q2_maya_27_28_56_60": {
+      "id": "q2_maya_27_28_56_60",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Maya",
+      "name_en": "Maya",
+      "full_name_de": "Überzeugung, Grenzen und Fürsorge",
+      "full_name_en": "Cross of Maya",
+      "gates": [
+        27,
+        28,
+        56,
+        60
+      ],
+      "personality_pair": [
+        27,
+        28
+      ],
+      "design_pair": [
+        56,
+        60
+      ],
+      "life_theme": "Überzeugung, Grenzen und Fürsorge",
+      "description": "Ernährung (Gate 27) und Sinn (Gate 28) als Persönlichkeitskraft — genährt durch Stimulation (Gate 56) und Transformation durch Grenzen (Gate 60).",
+      "source": "q2_fallback",
+      "q2_key": "27-28-56-60"
+    },
+    "q2_laws": {
+      "id": "q2_laws",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Laws",
+      "name_en": "Laws",
+      "full_name_de": "Kontinuität, Vollendung und Initiation",
+      "full_name_en": "Cross of Laws",
+      "gates": [
+        32,
+        42,
+        51,
+        57
+      ],
+      "personality_pair": [
+        32,
+        42
+      ],
+      "design_pair": [
+        51,
+        57
+      ],
+      "life_theme": "Kontinuität, Vollendung und Initiation",
+      "description": "Das Kreuz der Gesetze: Kontinuität (Gate 32) und Vollendung (Gate 42) verbinden sich mit Initiative (Gate 51) und Körperintuition (Gate 57) — Lebensaufgabe: Was hat Bestand?",
+      "source": "q2_fallback",
+      "q2_key": "32-42-51-57"
+    },
+    "q2_migration_5_35_56_60": {
+      "id": "q2_migration_5_35_56_60",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Migration",
+      "name_en": "Migration",
+      "full_name_de": "Wanderung, Erfahrung und Stimulation",
+      "full_name_en": "Cross of Migration",
+      "gates": [
+        35,
+        5,
+        56,
+        60
+      ],
+      "personality_pair": [
+        35,
+        5
+      ],
+      "design_pair": [
+        56,
+        60
+      ],
+      "life_theme": "Wanderung, Erfahrung und Stimulation",
+      "description": "Fortschritt (Gate 35) und feste Rhythmen (Gate 5) als Persönlichkeitskraft — genährt durch Wanderung (Gate 56) und Transformation durch Grenzen (Gate 60).",
+      "source": "q2_fallback",
+      "q2_key": "35-5-56-60"
+    },
+    "q2_obscuration_6_36_37_40": {
+      "id": "q2_obscuration_6_36_37_40",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Obscuration",
+      "name_en": "Obscuration",
+      "full_name_de": "Krise, Gemeinschaft und Befreiung",
+      "full_name_en": "Cross of Obscuration",
+      "gates": [
+        36,
+        6,
+        37,
+        40
+      ],
+      "personality_pair": [
+        36,
+        6
+      ],
+      "design_pair": [
+        37,
+        40
+      ],
+      "life_theme": "Krise, Gemeinschaft und Befreiung",
+      "description": "Das Kreuz der Verdunkelung: Krise als Wachstum (Gate 36) und emotionale Grenzen (Gate 6) verbinden sich mit Familie (Gate 37) und Befreiung durch Alleinsein (Gate 40).",
+      "source": "q2_fallback",
+      "q2_key": "36-6-37-40"
+    },
+    "q2_moods_38_39_55_59": {
+      "id": "q2_moods_38_39_55_59",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Moods",
+      "name_en": "Moods",
+      "full_name_de": "Geist, Intimität und sinnvoller Kampf",
+      "full_name_en": "Cross of Moods",
+      "gates": [
+        39,
+        38,
+        55,
+        59
+      ],
+      "personality_pair": [
+        39,
+        38
+      ],
+      "design_pair": [
+        55,
+        59
+      ],
+      "life_theme": "Geist, Intimität und sinnvoller Kampf",
+      "description": "Provokation (Gate 39) und Kämpfergeist (Gate 38) als Persönlichkeitskraft — genährt von spirituellem Überfluss (Gate 55) und Intimität (Gate 59).",
+      "source": "q2_fallback",
+      "q2_key": "39-38-55-59"
+    },
+    "q2_aloofness": {
+      "id": "q2_aloofness",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Aloofness",
+      "name_en": "Aloofness",
+      "full_name_de": "Einsamkeit, Gemeinschaft und mentale Auflösung",
+      "full_name_en": "Cross of Aloofness",
+      "gates": [
+        40,
+        37,
+        63,
+        64
+      ],
+      "personality_pair": [
+        40,
+        37
+      ],
+      "design_pair": [
+        63,
+        64
+      ],
+      "life_theme": "Einsamkeit, Gemeinschaft und mentale Auflösung",
+      "description": "Das Kreuz der Distanz: Alleinsein (Gate 40) und Familie (Gate 37) spannen den Bogen zwischen Einsamkeit und Gemeinschaft, unterstützt durch Zweifel (Gate 63) und Verwirrung (Gate 64).",
+      "source": "q2_fallback",
+      "q2_key": "40-37-63-64"
+    },
+    "q2_plane": {
+      "id": "q2_plane",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Plane",
+      "name_en": "Plane",
+      "full_name_de": "Zyklen, Beginn und Vollendung",
+      "full_name_en": "Cross of Plane",
+      "gates": [
+        42,
+        32,
+        53,
+        54
+      ],
+      "personality_pair": [
+        42,
+        32
+      ],
+      "design_pair": [
+        53,
+        54
+      ],
+      "life_theme": "Zyklen, Beginn und Vollendung",
+      "description": "Vollendung (Gate 42) und Kontinuität (Gate 32) als bewusste Kraft — genährt von Entwicklung (Gate 53) und Aufstieg (Gate 54).",
+      "source": "q2_fallback",
+      "q2_key": "42-32-53-54"
+    },
+    "q2_penetrating_sword": {
+      "id": "q2_penetrating_sword",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Penetrating Sword",
+      "name_en": "Penetrating Sword",
+      "full_name_de": "Durchbruch, Einsicht und Transformation",
+      "full_name_en": "Cross of Penetrating Sword",
+      "gates": [
+        43,
+        23,
+        49,
+        4
+      ],
+      "personality_pair": [
+        43,
+        23
+      ],
+      "design_pair": [
+        49,
+        4
+      ],
+      "life_theme": "Durchbruch, Einsicht und Transformation",
+      "description": "Das Kreuz des durchdringenden Schwertes bringt revolutionäre Einsichten (Gate 43) in die Welt, übersetzt sie in Sprache (Gate 23) und verbindet sie mit tiefgreifendem Wandel (Gate 49) und logischen Lösungen (Gate 4).",
+      "source": "q2_fallback",
+      "q2_key": "43-23-49-4"
+    },
+    "q2_unexpected": {
+      "id": "q2_unexpected",
+      "type": "Q2-Fallback",
+      "type_short": "Q2",
+      "name_de": "Unexpected",
+      "name_en": "Unexpected",
+      "full_name_de": "Initiation, Schock und innere Wahrheit",
+      "full_name_en": "Cross of Unexpected",
+      "gates": [
+        51,
+        57,
+        61,
+        62
+      ],
+      "personality_pair": [
+        51,
+        57
+      ],
+      "design_pair": [
+        61,
+        62
+      ],
+      "life_theme": "Initiation, Schock und innere Wahrheit",
+      "description": "Das Kreuz des Unerwarteten: Erschütterung (Gate 51) und Körperintuition (Gate 57) verbinden sich mit innerer Wahrheit (Gate 61) und präzisen Details (Gate 62) zu einer Kraft die andere durch Überraschung aufweckt.",
+      "source": "q2_fallback",
+      "q2_key": "51-57-61-62"
+    }
+  },
+  "lookup": {
+    "1-2-4-49": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "1-2-7-13": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "1-2-13-7": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "1-2-49-4": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "2-1-4-49": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "2-1-7-13": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "2-1-13-7": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "2-1-49-4": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "3-50-11-12": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "3-50-12-11": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "3-50-37-40": [
+      "lax_bargain"
+    ],
+    "3-50-40-37": [
+      "lax_bargain"
+    ],
+    "3-50-61-62": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "3-50-62-61": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "4-49-1-2": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "4-49-2-1": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "4-49-8-14": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "4-49-14-8": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "4-49-19-33": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "4-49-23-43": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "4-49-33-19": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "4-49-43-23": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "4-49-55-59": [
+      "rax_sleeping_phoenix"
+    ],
+    "4-49-59-55": [
+      "rax_sleeping_phoenix"
+    ],
+    "4-49-63-64": [
+      "lax_consciousness"
+    ],
+    "4-49-64-63": [
+      "lax_consciousness"
+    ],
+    "5-35-6-36": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "5-35-11-12": [
+      "lax_separation"
+    ],
+    "5-35-12-11": [
+      "lax_separation"
+    ],
+    "5-35-22-47": [
+      "lax_confrontation"
+    ],
+    "5-35-36-6": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "5-35-47-22": [
+      "lax_confrontation"
+    ],
+    "5-35-56-60": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "5-35-60-56": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "5-35-63-64": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "5-35-64-63": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "6-36-5-35": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "6-36-11-12": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "6-36-12-11": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "6-36-35-5": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "6-36-37-40": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "6-36-40-37": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "7-13-1-2": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "7-13-2-1": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "7-13-22-47": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "7-13-23-43": [
+      "rax_the_four_ways"
+    ],
+    "7-13-31-41": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "7-13-41-31": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "7-13-43-23": [
+      "rax_the_four_ways"
+    ],
+    "7-13-47-22": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "8-14-4-49": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "8-14-23-43": [
+      "rax_explanation"
+    ],
+    "8-14-26-45": [
+      "lax_prosperity"
+    ],
+    "8-14-29-30": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "8-14-30-29": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "8-14-43-23": [
+      "rax_explanation"
+    ],
+    "8-14-45-26": [
+      "lax_prosperity"
+    ],
+    "8-14-49-4": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "9-16-37-40": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "9-16-40-37": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "9-16-52-58": [
+      "rax_migration"
+    ],
+    "9-16-55-59": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "9-16-58-52": [
+      "rax_migration"
+    ],
+    "9-16-59-55": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "10-15-17-18": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "10-15-18-17": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "10-15-20-34": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "10-15-25-46": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "10-15-34-20": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "10-15-46-25": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "10-15-51-57": [
+      "lax_awakening"
+    ],
+    "10-15-57-51": [
+      "lax_awakening"
+    ],
+    "11-12-3-50": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "11-12-5-35": [
+      "lax_separation"
+    ],
+    "11-12-6-36": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "11-12-26-45": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "11-12-35-5": [
+      "lax_separation"
+    ],
+    "11-12-36-6": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "11-12-45-26": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "11-12-50-3": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "11-12-56-60": [
+      "rax_articulation"
+    ],
+    "11-12-60-56": [
+      "rax_articulation"
+    ],
+    "12-11-3-50": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "12-11-5-35": [
+      "lax_separation"
+    ],
+    "12-11-6-36": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "12-11-26-45": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "12-11-35-5": [
+      "lax_separation"
+    ],
+    "12-11-36-6": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "12-11-45-26": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "12-11-50-3": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "12-11-56-60": [
+      "rax_articulation"
+    ],
+    "12-11-60-56": [
+      "rax_articulation"
+    ],
+    "13-7-1-2": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "13-7-2-1": [
+      "rax_sphinx",
+      "jux_listener"
+    ],
+    "13-7-22-47": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "13-7-23-43": [
+      "rax_the_four_ways"
+    ],
+    "13-7-31-41": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "13-7-41-31": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "13-7-43-23": [
+      "rax_the_four_ways"
+    ],
+    "13-7-47-22": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "14-8-4-49": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "14-8-23-43": [
+      "rax_explanation"
+    ],
+    "14-8-26-45": [
+      "lax_prosperity"
+    ],
+    "14-8-29-30": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "14-8-30-29": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "14-8-43-23": [
+      "rax_explanation"
+    ],
+    "14-8-45-26": [
+      "lax_prosperity"
+    ],
+    "14-8-49-4": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "15-10-17-18": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "15-10-18-17": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "15-10-20-34": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "15-10-25-46": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "15-10-34-20": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "15-10-46-25": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "15-10-51-57": [
+      "lax_awakening"
+    ],
+    "15-10-57-51": [
+      "lax_awakening"
+    ],
+    "16-9-37-40": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "16-9-40-37": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "16-9-52-58": [
+      "rax_migration"
+    ],
+    "16-9-55-59": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "16-9-58-52": [
+      "rax_migration"
+    ],
+    "16-9-59-55": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "17-18-10-15": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "17-18-15-10": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "17-18-19-33": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "17-18-22-47": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "17-18-25-46": [
+      "lax_healing"
+    ],
+    "17-18-33-19": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "17-18-38-39": [
+      "lax_prevention"
+    ],
+    "17-18-39-38": [
+      "lax_prevention"
+    ],
+    "17-18-46-25": [
+      "lax_healing"
+    ],
+    "17-18-47-22": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "17-18-52-58": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "17-18-58-52": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "17-18-61-62": [
+      "rax_service"
+    ],
+    "17-18-62-61": [
+      "rax_service"
+    ],
+    "17-18-63-64": [
+      "lax_thinking"
+    ],
+    "17-18-64-63": [
+      "lax_thinking"
+    ],
+    "18-17-10-15": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "18-17-15-10": [
+      "lax_dedication",
+      "jux_behavior"
+    ],
+    "18-17-19-33": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "18-17-22-47": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "18-17-25-46": [
+      "lax_healing"
+    ],
+    "18-17-33-19": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "18-17-38-39": [
+      "lax_prevention"
+    ],
+    "18-17-39-38": [
+      "lax_prevention"
+    ],
+    "18-17-46-25": [
+      "lax_healing"
+    ],
+    "18-17-47-22": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "18-17-52-58": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "18-17-58-52": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "18-17-61-62": [
+      "rax_service"
+    ],
+    "18-17-62-61": [
+      "rax_service"
+    ],
+    "18-17-63-64": [
+      "lax_thinking"
+    ],
+    "18-17-64-63": [
+      "lax_thinking"
+    ],
+    "19-33-4-49": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "19-33-17-18": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "19-33-18-17": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "19-33-20-34": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "19-33-24-44": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "19-33-27-28": [
+      "lax_defiance"
+    ],
+    "19-33-28-27": [
+      "lax_defiance"
+    ],
+    "19-33-34-20": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "19-33-44-24": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "19-33-49-4": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "20-34-10-15": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "20-34-15-10": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "20-34-19-33": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "20-34-29-30": [
+      "q2_separation_20_29_30_34"
+    ],
+    "20-34-30-29": [
+      "q2_separation_20_29_30_34"
+    ],
+    "20-34-33-19": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "20-34-51-57": [
+      "rax_penetration"
+    ],
+    "20-34-57-51": [
+      "rax_penetration"
+    ],
+    "21-48-26-45": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "21-48-38-39": [
+      "lax_strategy"
+    ],
+    "21-48-39-38": [
+      "lax_strategy"
+    ],
+    "21-48-45-26": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "21-48-51-57": [
+      "lax_depth"
+    ],
+    "21-48-52-58": [
+      "lax_endeavor"
+    ],
+    "21-48-57-51": [
+      "lax_depth"
+    ],
+    "21-48-58-52": [
+      "lax_endeavor"
+    ],
+    "22-47-5-35": [
+      "lax_confrontation"
+    ],
+    "22-47-7-13": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "22-47-13-7": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "22-47-17-18": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "22-47-18-17": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "22-47-35-5": [
+      "lax_confrontation"
+    ],
+    "22-47-55-59": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "22-47-59-55": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "22-47-63-64": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "22-47-64-63": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "23-43-4-49": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "23-43-7-13": [
+      "rax_the_four_ways"
+    ],
+    "23-43-8-14": [
+      "rax_explanation"
+    ],
+    "23-43-13-7": [
+      "rax_the_four_ways"
+    ],
+    "23-43-14-8": [
+      "rax_explanation"
+    ],
+    "23-43-29-30": [
+      "jux_assimilation"
+    ],
+    "23-43-30-29": [
+      "jux_assimilation"
+    ],
+    "23-43-49-4": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "24-44-19-33": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "24-44-31-41": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "24-44-33-19": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "24-44-41-31": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "25-46-10-15": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "25-46-15-10": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "25-46-17-18": [
+      "lax_healing"
+    ],
+    "25-46-18-17": [
+      "lax_healing"
+    ],
+    "25-46-29-30": [
+      "rax_determination"
+    ],
+    "25-46-30-29": [
+      "rax_determination"
+    ],
+    "26-45-8-14": [
+      "lax_prosperity"
+    ],
+    "26-45-11-12": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "26-45-12-11": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "26-45-14-8": [
+      "lax_prosperity"
+    ],
+    "26-45-21-48": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "26-45-48-21": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "27-28-19-33": [
+      "lax_defiance"
+    ],
+    "27-28-33-19": [
+      "lax_defiance"
+    ],
+    "27-28-38-39": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "27-28-39-38": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "27-28-56-60": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "27-28-60-56": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "28-27-19-33": [
+      "lax_defiance"
+    ],
+    "28-27-33-19": [
+      "lax_defiance"
+    ],
+    "28-27-38-39": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "28-27-39-38": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "28-27-56-60": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "28-27-60-56": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "29-30-8-14": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "29-30-14-8": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "29-30-20-34": [
+      "q2_separation_20_29_30_34"
+    ],
+    "29-30-23-43": [
+      "jux_assimilation"
+    ],
+    "29-30-25-46": [
+      "rax_determination"
+    ],
+    "29-30-31-41": [
+      "lax_wishes"
+    ],
+    "29-30-32-42": [
+      "lax_industry"
+    ],
+    "29-30-34-20": [
+      "q2_separation_20_29_30_34"
+    ],
+    "29-30-41-31": [
+      "lax_wishes"
+    ],
+    "29-30-42-32": [
+      "lax_industry"
+    ],
+    "29-30-43-23": [
+      "jux_assimilation"
+    ],
+    "29-30-46-25": [
+      "rax_determination"
+    ],
+    "29-30-55-59": [
+      "lax_fates"
+    ],
+    "29-30-59-55": [
+      "lax_fates"
+    ],
+    "30-29-8-14": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "30-29-14-8": [
+      "jux_power_skills",
+      "jux_commitment",
+      "jux_fates",
+      "q2_industriousness"
+    ],
+    "30-29-20-34": [
+      "q2_separation_20_29_30_34"
+    ],
+    "30-29-23-43": [
+      "jux_assimilation"
+    ],
+    "30-29-25-46": [
+      "rax_determination"
+    ],
+    "30-29-31-41": [
+      "lax_wishes"
+    ],
+    "30-29-32-42": [
+      "lax_industry"
+    ],
+    "30-29-34-20": [
+      "q2_separation_20_29_30_34"
+    ],
+    "30-29-41-31": [
+      "lax_wishes"
+    ],
+    "30-29-42-32": [
+      "lax_industry"
+    ],
+    "30-29-43-23": [
+      "jux_assimilation"
+    ],
+    "30-29-46-25": [
+      "rax_determination"
+    ],
+    "30-29-55-59": [
+      "lax_fates"
+    ],
+    "30-29-59-55": [
+      "lax_fates"
+    ],
+    "31-41-7-13": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "31-41-13-7": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "31-41-24-44": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "31-41-29-30": [
+      "lax_wishes"
+    ],
+    "31-41-30-29": [
+      "lax_wishes"
+    ],
+    "31-41-44-24": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "32-42-29-30": [
+      "lax_industry"
+    ],
+    "32-42-30-29": [
+      "lax_industry"
+    ],
+    "32-42-51-57": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "32-42-53-54": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "32-42-54-53": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "32-42-57-51": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "33-19-4-49": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "33-19-17-18": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "33-19-18-17": [
+      "jux_opinions",
+      "jux_correction"
+    ],
+    "33-19-20-34": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "33-19-24-44": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "33-19-27-28": [
+      "lax_defiance"
+    ],
+    "33-19-28-27": [
+      "lax_defiance"
+    ],
+    "33-19-34-20": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "33-19-44-24": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "33-19-49-4": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "34-20-10-15": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "34-20-15-10": [
+      "jux_now",
+      "jux_power",
+      "q2_clarion"
+    ],
+    "34-20-19-33": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "34-20-29-30": [
+      "q2_separation_20_29_30_34"
+    ],
+    "34-20-30-29": [
+      "q2_separation_20_29_30_34"
+    ],
+    "34-20-33-19": [
+      "lax_contagion",
+      "jux_wanting",
+      "jux_retreat"
+    ],
+    "34-20-51-57": [
+      "rax_penetration"
+    ],
+    "34-20-57-51": [
+      "rax_penetration"
+    ],
+    "35-5-6-36": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "35-5-11-12": [
+      "lax_separation"
+    ],
+    "35-5-12-11": [
+      "lax_separation"
+    ],
+    "35-5-22-47": [
+      "lax_confrontation"
+    ],
+    "35-5-36-6": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "35-5-47-22": [
+      "lax_confrontation"
+    ],
+    "35-5-56-60": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "35-5-60-56": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "35-5-63-64": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "35-5-64-63": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "36-6-5-35": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "36-6-11-12": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "36-6-12-11": [
+      "jux_friction",
+      "jux_crisis",
+      "q2_eden_6_11_12_36"
+    ],
+    "36-6-35-5": [
+      "rax_eden",
+      "jux_fixed_patterns"
+    ],
+    "36-6-37-40": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "36-6-40-37": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "37-40-3-50": [
+      "lax_bargain"
+    ],
+    "37-40-6-36": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "37-40-9-16": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "37-40-16-9": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "37-40-36-6": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "37-40-50-3": [
+      "lax_bargain"
+    ],
+    "37-40-55-59": [
+      "lax_duality"
+    ],
+    "37-40-59-55": [
+      "lax_duality"
+    ],
+    "37-40-63-64": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "37-40-64-63": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "38-39-17-18": [
+      "lax_prevention"
+    ],
+    "38-39-18-17": [
+      "lax_prevention"
+    ],
+    "38-39-21-48": [
+      "lax_strategy"
+    ],
+    "38-39-27-28": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "38-39-28-27": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "38-39-48-21": [
+      "lax_strategy"
+    ],
+    "38-39-55-59": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "38-39-59-55": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "39-38-17-18": [
+      "lax_prevention"
+    ],
+    "39-38-18-17": [
+      "lax_prevention"
+    ],
+    "39-38-21-48": [
+      "lax_strategy"
+    ],
+    "39-38-27-28": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "39-38-28-27": [
+      "rax_tension",
+      "jux_caring",
+      "jux_struggle",
+      "jux_opposition"
+    ],
+    "39-38-48-21": [
+      "lax_strategy"
+    ],
+    "39-38-55-59": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "39-38-59-55": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "40-37-3-50": [
+      "lax_bargain"
+    ],
+    "40-37-6-36": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "40-37-9-16": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "40-37-16-9": [
+      "lax_education",
+      "jux_focus",
+      "jux_skills",
+      "jux_friendship",
+      "q2_planning"
+    ],
+    "40-37-36-6": [
+      "q2_obscuration_6_36_37_40"
+    ],
+    "40-37-50-3": [
+      "lax_bargain"
+    ],
+    "40-37-55-59": [
+      "lax_duality"
+    ],
+    "40-37-59-55": [
+      "lax_duality"
+    ],
+    "40-37-63-64": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "40-37-64-63": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "41-31-7-13": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "41-31-13-7": [
+      "lax_alpha",
+      "jux_influence",
+      "jux_fantasy"
+    ],
+    "41-31-24-44": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "41-31-29-30": [
+      "lax_wishes"
+    ],
+    "41-31-30-29": [
+      "lax_wishes"
+    ],
+    "41-31-44-24": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "42-32-29-30": [
+      "lax_industry"
+    ],
+    "42-32-30-29": [
+      "lax_industry"
+    ],
+    "42-32-51-57": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "42-32-53-54": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "42-32-54-53": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "42-32-57-51": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "43-23-4-49": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "43-23-7-13": [
+      "rax_the_four_ways"
+    ],
+    "43-23-8-14": [
+      "rax_explanation"
+    ],
+    "43-23-13-7": [
+      "rax_the_four_ways"
+    ],
+    "43-23-14-8": [
+      "rax_explanation"
+    ],
+    "43-23-29-30": [
+      "jux_assimilation"
+    ],
+    "43-23-30-29": [
+      "jux_assimilation"
+    ],
+    "43-23-49-4": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "44-24-19-33": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "44-24-31-41": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "44-24-33-19": [
+      "lax_transmission",
+      "jux_alertness",
+      "q2_duality_19_24_33_44"
+    ],
+    "44-24-41-31": [
+      "lax_refinement",
+      "jux_rationalization",
+      "q2_dominion"
+    ],
+    "45-26-8-14": [
+      "lax_prosperity"
+    ],
+    "45-26-11-12": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "45-26-12-11": [
+      "jux_ideas",
+      "jux_caution"
+    ],
+    "45-26-14-8": [
+      "lax_prosperity"
+    ],
+    "45-26-21-48": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "45-26-48-21": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "46-25-10-15": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "46-25-15-10": [
+      "rax_vessel_of_love",
+      "jux_extremes",
+      "jux_innocence",
+      "jux_serendipity",
+      "q2_healing_10_15_25_46"
+    ],
+    "46-25-17-18": [
+      "lax_healing"
+    ],
+    "46-25-18-17": [
+      "lax_healing"
+    ],
+    "46-25-29-30": [
+      "rax_determination"
+    ],
+    "46-25-30-29": [
+      "rax_determination"
+    ],
+    "47-22-5-35": [
+      "lax_confrontation"
+    ],
+    "47-22-7-13": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "47-22-13-7": [
+      "lax_obscuration",
+      "jux_interaction"
+    ],
+    "47-22-17-18": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "47-22-18-17": [
+      "jux_realization",
+      "q2_four_ways"
+    ],
+    "47-22-35-5": [
+      "lax_confrontation"
+    ],
+    "47-22-55-59": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "47-22-59-55": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "47-22-63-64": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "47-22-64-63": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "48-21-26-45": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "48-21-38-39": [
+      "lax_strategy"
+    ],
+    "48-21-39-38": [
+      "lax_strategy"
+    ],
+    "48-21-45-26": [
+      "rax_rulership",
+      "lax_rulership",
+      "jux_control",
+      "jux_trickster",
+      "jux_ownership",
+      "jux_depth"
+    ],
+    "48-21-51-57": [
+      "lax_depth"
+    ],
+    "48-21-52-58": [
+      "lax_endeavor"
+    ],
+    "48-21-57-51": [
+      "lax_depth"
+    ],
+    "48-21-58-52": [
+      "lax_endeavor"
+    ],
+    "49-4-1-2": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "49-4-2-1": [
+      "lax_masks",
+      "jux_self_expression",
+      "jux_driver"
+    ],
+    "49-4-8-14": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "49-4-14-8": [
+      "jux_formulization",
+      "jux_contribution",
+      "q2_explanation_4_8_14_49"
+    ],
+    "49-4-19-33": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "49-4-23-43": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "49-4-33-19": [
+      "jux_principles",
+      "q2_revolution_4_19_33_49"
+    ],
+    "49-4-43-23": [
+      "lax_revolution",
+      "jux_insight",
+      "q2_penetrating_sword"
+    ],
+    "49-4-55-59": [
+      "rax_sleeping_phoenix"
+    ],
+    "49-4-59-55": [
+      "rax_sleeping_phoenix"
+    ],
+    "49-4-63-64": [
+      "lax_consciousness"
+    ],
+    "49-4-64-63": [
+      "lax_consciousness"
+    ],
+    "50-3-11-12": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "50-3-12-11": [
+      "rax_maya",
+      "jux_mutation",
+      "jux_values"
+    ],
+    "50-3-37-40": [
+      "lax_bargain"
+    ],
+    "50-3-40-37": [
+      "lax_bargain"
+    ],
+    "50-3-61-62": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "50-3-62-61": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "51-57-10-15": [
+      "lax_awakening"
+    ],
+    "51-57-15-10": [
+      "lax_awakening"
+    ],
+    "51-57-20-34": [
+      "rax_penetration"
+    ],
+    "51-57-21-48": [
+      "lax_depth"
+    ],
+    "51-57-32-42": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "51-57-34-20": [
+      "rax_penetration"
+    ],
+    "51-57-42-32": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "51-57-48-21": [
+      "lax_depth"
+    ],
+    "51-57-61-62": [
+      "q2_unexpected"
+    ],
+    "51-57-62-61": [
+      "q2_unexpected"
+    ],
+    "52-58-9-16": [
+      "rax_migration"
+    ],
+    "52-58-16-9": [
+      "rax_migration"
+    ],
+    "52-58-17-18": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "52-58-18-17": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "52-58-21-48": [
+      "lax_endeavor"
+    ],
+    "52-58-48-21": [
+      "lax_endeavor"
+    ],
+    "52-58-61-62": [
+      "jux_stillness"
+    ],
+    "52-58-62-61": [
+      "jux_stillness"
+    ],
+    "53-54-32-42": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "53-54-42-32": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "54-53-32-42": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "54-53-42-32": [
+      "rax_cycles",
+      "lax_ambition",
+      "jux_growth",
+      "jux_beginnings",
+      "jux_drive",
+      "q2_plane"
+    ],
+    "55-59-4-49": [
+      "rax_sleeping_phoenix"
+    ],
+    "55-59-9-16": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "55-59-16-9": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "55-59-22-47": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "55-59-29-30": [
+      "lax_fates"
+    ],
+    "55-59-30-29": [
+      "lax_fates"
+    ],
+    "55-59-37-40": [
+      "lax_duality"
+    ],
+    "55-59-38-39": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "55-59-39-38": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "55-59-40-37": [
+      "lax_duality"
+    ],
+    "55-59-47-22": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "55-59-49-4": [
+      "rax_sleeping_phoenix"
+    ],
+    "56-60-5-35": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "56-60-11-12": [
+      "rax_articulation"
+    ],
+    "56-60-12-11": [
+      "rax_articulation"
+    ],
+    "56-60-27-28": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "56-60-28-27": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "56-60-35-5": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "57-51-10-15": [
+      "lax_awakening"
+    ],
+    "57-51-15-10": [
+      "lax_awakening"
+    ],
+    "57-51-20-34": [
+      "rax_penetration"
+    ],
+    "57-51-21-48": [
+      "lax_depth"
+    ],
+    "57-51-32-42": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "57-51-34-20": [
+      "rax_penetration"
+    ],
+    "57-51-42-32": [
+      "jux_conservation",
+      "jux_shock",
+      "jux_intuition",
+      "q2_laws"
+    ],
+    "57-51-48-21": [
+      "lax_depth"
+    ],
+    "57-51-61-62": [
+      "q2_unexpected"
+    ],
+    "57-51-62-61": [
+      "q2_unexpected"
+    ],
+    "58-52-9-16": [
+      "rax_migration"
+    ],
+    "58-52-16-9": [
+      "rax_migration"
+    ],
+    "58-52-17-18": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "58-52-18-17": [
+      "lax_judgment",
+      "jux_vitality",
+      "q2_service_17_18_52_58"
+    ],
+    "58-52-21-48": [
+      "lax_endeavor"
+    ],
+    "58-52-48-21": [
+      "lax_endeavor"
+    ],
+    "58-52-61-62": [
+      "jux_stillness"
+    ],
+    "58-52-62-61": [
+      "jux_stillness"
+    ],
+    "59-55-4-49": [
+      "rax_sleeping_phoenix"
+    ],
+    "59-55-9-16": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "59-55-16-9": [
+      "jux_moods",
+      "jux_sexuality",
+      "q2_sleeping_phoenix_9_16_55_59"
+    ],
+    "59-55-22-47": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "59-55-29-30": [
+      "lax_fates"
+    ],
+    "59-55-30-29": [
+      "lax_fates"
+    ],
+    "59-55-37-40": [
+      "lax_duality"
+    ],
+    "59-55-38-39": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "59-55-39-38": [
+      "jux_provocation",
+      "q2_moods_38_39_55_59"
+    ],
+    "59-55-40-37": [
+      "lax_duality"
+    ],
+    "59-55-47-22": [
+      "lax_grace",
+      "jux_openness"
+    ],
+    "59-55-49-4": [
+      "rax_sleeping_phoenix"
+    ],
+    "60-56-5-35": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "60-56-11-12": [
+      "rax_articulation"
+    ],
+    "60-56-12-11": [
+      "rax_articulation"
+    ],
+    "60-56-27-28": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "60-56-28-27": [
+      "jux_stimulation",
+      "jux_limitation",
+      "q2_maya_27_28_56_60"
+    ],
+    "60-56-35-5": [
+      "jux_experience",
+      "q2_migration_5_35_56_60"
+    ],
+    "61-62-3-50": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "61-62-17-18": [
+      "rax_service"
+    ],
+    "61-62-18-17": [
+      "rax_service"
+    ],
+    "61-62-50-3": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "61-62-51-57": [
+      "q2_unexpected"
+    ],
+    "61-62-52-58": [
+      "jux_stillness"
+    ],
+    "61-62-57-51": [
+      "q2_unexpected"
+    ],
+    "61-62-58-52": [
+      "jux_stillness"
+    ],
+    "62-61-3-50": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "62-61-17-18": [
+      "rax_service"
+    ],
+    "62-61-18-17": [
+      "rax_service"
+    ],
+    "62-61-50-3": [
+      "jux_mystery",
+      "jux_detail",
+      "q2_four_lights"
+    ],
+    "62-61-51-57": [
+      "q2_unexpected"
+    ],
+    "62-61-52-58": [
+      "jux_stillness"
+    ],
+    "62-61-57-51": [
+      "q2_unexpected"
+    ],
+    "62-61-58-52": [
+      "jux_stillness"
+    ],
+    "63-64-4-49": [
+      "lax_consciousness"
+    ],
+    "63-64-5-35": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "63-64-17-18": [
+      "lax_thinking"
+    ],
+    "63-64-18-17": [
+      "lax_thinking"
+    ],
+    "63-64-22-47": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "63-64-35-5": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "63-64-37-40": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "63-64-40-37": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "63-64-47-22": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "63-64-49-4": [
+      "lax_consciousness"
+    ],
+    "64-63-4-49": [
+      "lax_consciousness"
+    ],
+    "64-63-5-35": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "64-63-17-18": [
+      "lax_thinking"
+    ],
+    "64-63-18-17": [
+      "lax_thinking"
+    ],
+    "64-63-22-47": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "64-63-35-5": [
+      "jux_doubt",
+      "jux_confusion",
+      "q2_consciousness_5_35_63_64"
+    ],
+    "64-63-37-40": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "64-63-40-37": [
+      "rax_community",
+      "jux_denial",
+      "q2_aloofness"
+    ],
+    "64-63-47-22": [
+      "lax_uncertainty",
+      "lax_abstraction"
+    ],
+    "64-63-49-4": [
+      "lax_consciousness"
+    ]
+  }
+}

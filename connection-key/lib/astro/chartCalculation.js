@@ -9,11 +9,36 @@ import { find } from "geo-tz";
 import { DateTime } from "luxon";
 import { createRequire } from "module";
 import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 // Ephemeris-Pfad setzen damit Chiron (seas_18.se1) und andere Asteroiden-Daten gefunden werden
 const require = createRequire(import.meta.url);
 const swissephPath = path.dirname(require.resolve("swisseph/package.json"));
 swisseph.swe_set_ephe_path(path.join(swissephPath, "ephe"));
+
+// ─── Inkarnationskreuz-Master (Single Source of Truth) ─────────────────────
+// Gebaut via scripts/incarnation-crosses/build_incarnation_crosses.py aus
+// Q3 (knowledge/incarnation-cross.txt) + Q2 (reading-worker/data/...).
+// 136 Themen, 520 Lookup-Keys, positionsspezifisch (keine min/max-Norm).
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const CROSSES_MASTER_PATH = path.join(__dirname, "crosses", "incarnation_crosses_master.json");
+
+let _crossesMaster = null;
+function loadCrossesMaster() {
+  if (_crossesMaster) return _crossesMaster;
+  try {
+    _crossesMaster = JSON.parse(fs.readFileSync(CROSSES_MASTER_PATH, "utf8"));
+    const themes = Object.keys(_crossesMaster.themes || {}).length;
+    const keys   = Object.keys(_crossesMaster.lookup || {}).length;
+    console.log(`[Cross] Master geladen: ${themes} Themen, ${keys} Lookup-Keys`);
+  } catch (e) {
+    console.warn(`[Cross] Master-JSON nicht gefunden (${CROSSES_MASTER_PATH}):`, e.message);
+    _crossesMaster = { themes: {}, lookup: {} };
+  }
+  return _crossesMaster;
+}
 
 const GATE_SPANS = [
   { gate: 25, start: 358.25, span: 5.625 }, { gate: 17, start: 3.875, span: 5.625 }, { gate: 21, start: 9.5, span: 5.625 },
@@ -594,62 +619,93 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
   const dEarthGate = gateForLongitude(norm360(sunLonD + 180));
 
   const pSunLine = parseInt(profile.split("/")[0], 10);
-  const dSunLine = parseInt(profile.split("/")[1], 10);
 
-  let crossType;
-  if (profile === "4/1")         crossType = "Juxtaposition";
-  else if (pSunLine >= 1 && pSunLine <= 3) crossType = "Right Angle";
-  else                           crossType = "Left Angle";
-
-  let thematicName;
-  if (crossType === "Juxtaposition") {
-    thematicName = JUXTAPOSITION_NAMES[pSunGate] || `Gate ${pSunGate}`;
+  // Cross-Type aus Profil: 4/1 → Juxtaposition; Linie 1-3 → RAX; Linie 4-6 → LAX
+  let crossType, typeShort, typePrefixDe;
+  if (profile === "4/1") {
+    crossType = "Juxtaposition";
+    typeShort = "JUX";
+    typePrefixDe = "Juxtaposition der";
+  } else if (pSunLine >= 1 && pSunLine <= 3) {
+    crossType = "Right Angle";
+    typeShort = "RAX";
+    typePrefixDe = "RAX der";
   } else {
-    const key    = getCrossKey(pSunGate, pEarthGate, dSunGate, dEarthGate);
-    const altKey = getCrossKey(dSunGate, dEarthGate, pSunGate, pEarthGate);
-    thematicName = RAX_LAX_MAP[key] || RAX_LAX_MAP[altKey];
-    if (!thematicName) {
-      const pSunName = GATES.find((g) => g.number === pSunGate)?.name || `Gate ${pSunGate}`;
-      const dSunName = GATES.find((g) => g.number === dSunGate)?.name || `Gate ${dSunGate}`;
-      thematicName = `${pSunName} / ${dSunName}`;
+    crossType = "Left Angle";
+    typeShort = "LAX";
+    typePrefixDe = "LAX der";
+  }
+
+  // Master-Lookup mit Profil-Disambiguierung
+  const master    = loadCrossesMaster();
+  const key       = `${pSunGate}-${pEarthGate}-${dSunGate}-${dEarthGate}`;
+  const candidates = (master.lookup && master.lookup[key]) || [];
+
+  let theme = null;
+  // 1. Exakter Type-Match (gemaess Profil) bevorzugen
+  for (const id of candidates) {
+    const t = master.themes && master.themes[id];
+    if (t && t.type_short === typeShort) { theme = t; break; }
+  }
+  // 2. Q2-Fallback-Theme akzeptieren (`type_short="Q2"` — aus reading-worker/data/incarnation_crosses.json
+  //    ergaenzte Themen ohne klare RAX/LAX-Zuordnung, aber mit vollstaendiger Beschreibung)
+  if (!theme) {
+    for (const id of candidates) {
+      const t = master.themes && master.themes[id];
+      if (t && t.source === "q2_fallback") { theme = t; break; }
+    }
+  }
+  // 3. Notnagel: irgendein Match, dazu Warnung — vermutlich fehlt eine Quartal-Variante
+  if (!theme && candidates.length > 0) {
+    theme = master.themes && master.themes[candidates[0]];
+    if (theme) {
+      console.warn(`[Cross] Type-Mismatch fuer Key ${key} Profil ${profile}: erwartet ${typeShort}, gefunden ${theme.type_short} (${theme.id}) — vermutlich Quartal-Variante fehlt im Master`);
     }
   }
 
-  const typeLabel = crossType === "Right Angle" ? "RAX" : crossType === "Left Angle" ? "LAX" : "Juxtaposition";
-  const fullName = crossType === "Juxtaposition"
-    ? `Juxtaposition of ${thematicName}`
-    : `${typeLabel} of ${thematicName}`;
+  if (theme) {
+    // Q2-Fallback: nutze name_de + Profil-Prefix (`full_name_de` enthaelt dort
+    // den `life_theme`-Text, keinen Kreuz-Namen). Q3-Master hat sauberen full_name_*.
+    const isQ2Fallback = theme.source === "q2_fallback";
+    const fullName    = isQ2Fallback
+      ? `${typeShort} of ${theme.name_en || theme.name_de}`
+      : (theme.full_name_en || `${typeShort} of ${theme.name_en || theme.name_de}`);
+    const fullName_de = isQ2Fallback
+      ? `${typePrefixDe} ${theme.name_de}`
+      : (theme.full_name_de || `${typePrefixDe} ${theme.name_de}`);
 
-  // Deutscher Name: Themenstamm aus CROSS_THEMATIC_DE, Prefix aus Kreuz-Typ.
-  // Bei Single-Word-Thema (in RAX_LAX_MAP gelistet): direkte Uebersetzung.
-  // Bei Kombi-Fallback "Gate X / Gate Y": Gate-spezifische deutsche Namen aus
-  // JUXTAPOSITION_NAMES_DE zusammensetzen — so wird "Details / Growth"
-  // zu "Details / Vollendung" statt halb-deutsch zu bleiben.
-  let thematicDe;
-  if (CROSS_THEMATIC_DE[thematicName]) {
-    thematicDe = CROSS_THEMATIC_DE[thematicName];
-  } else if (crossType !== "Juxtaposition" && !RAX_LAX_MAP[getCrossKey(pSunGate, pEarthGate, dSunGate, dEarthGate)] && !RAX_LAX_MAP[getCrossKey(dSunGate, dEarthGate, pSunGate, pEarthGate)]) {
-    // Kombi-Fallback: baue den deutschen Namen aus den Gate-Themen
-    const pDe = JUXTAPOSITION_NAMES_DE[pSunGate] || JUXTAPOSITION_NAMES[pSunGate] || `Tor ${pSunGate}`;
-    const dDe = JUXTAPOSITION_NAMES_DE[dSunGate] || JUXTAPOSITION_NAMES[dSunGate] || `Tor ${dSunGate}`;
-    thematicDe = `${pDe} / ${dDe}`;
-  } else {
-    thematicDe = thematicName;
+    return {
+      name: fullName,
+      name_de: fullName_de,
+      thematicName: theme.name_en || theme.name_de,
+      thematicName_de: theme.name_de,
+      type: crossType,
+      fullName,
+      fullName_de,
+      profile,
+      gates: {
+        personalitySun:   pSunGate,
+        personalityEarth: pEarthGate,
+        designSun:        dSunGate,
+        designEarth:      dEarthGate,
+      },
+      themeId: theme.id,
+      source: theme.source || "q3_master",
+    };
   }
-  const typePrefixDe =
-    crossType === "Juxtaposition" ? "Juxtaposition der"
-    : crossType === "Right Angle" ? "RAX der"
-    : "LAX der";
-  const fullName_de = `${typePrefixDe} ${thematicDe}`;
 
+  // Kein Master-Treffer — ehrlicher Fallback ohne erfundenen Themen-Namen
+  console.warn(`[Cross] KEIN Master-Match fuer Key ${key} Profil ${profile} (Type=${typeShort}) — Master-Tabelle unvollstaendig`);
+  const unknownDe = `${typePrefixDe} unbekanntes Thema (Tore ${pSunGate}/${pEarthGate} | ${dSunGate}/${dEarthGate})`;
+  const unknownEn = `${typeShort} of unknown theme (gates ${pSunGate}/${pEarthGate} | ${dSunGate}/${dEarthGate})`;
   return {
-    name: fullName,
-    name_de: fullName_de,
-    thematicName,
-    thematicName_de: thematicDe,
+    name: unknownEn,
+    name_de: unknownDe,
+    thematicName: null,
+    thematicName_de: null,
     type: crossType,
-    fullName,
-    fullName_de,
+    fullName: unknownEn,
+    fullName_de: unknownDe,
     profile,
     gates: {
       personalitySun:   pSunGate,
@@ -657,6 +713,8 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
       designSun:        dSunGate,
       designEarth:      dEarthGate,
     },
+    themeId: null,
+    source: "unknown",
   };
 }
 

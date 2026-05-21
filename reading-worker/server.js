@@ -130,7 +130,12 @@ async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadI
   try {
     const buf = fs.readFileSync(imagePath);
     const fileName = path.basename(imagePath);
-    const blob = new Blob([buf]);
+    const ext = path.extname(fileName).toLowerCase();
+    const mime = ext === '.png' ? 'image/png'
+      : ext === '.webp' ? 'image/webp'
+      : ext === '.gif' ? 'image/gif'
+      : 'image/jpeg';
+    const blob = new Blob([buf], { type: mime });
     const fd = new FormData();
     fd.append('chat_id', String(chatId));
     if (caption) fd.append('caption', caption);

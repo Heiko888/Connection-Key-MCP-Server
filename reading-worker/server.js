@@ -7269,6 +7269,47 @@ app.delete('/api/admin/telegram-images/:topic/:filename', requireApiKey, (req, r
   }
 });
 
+// PATCH /api/admin/telegram-images/:topic/:filename  { toTopic }
+// Verschiebt ein Bild in eine andere Rubrik.
+app.patch('/api/admin/telegram-images/:topic/:filename', requireApiKey, (req, res) => {
+  try {
+    const { topic, filename } = req.params;
+    const { toTopic } = req.body || {};
+    if (!validateTopic(topic)) return res.status(400).json({ error: 'Ungueltiger Quell-Topic' });
+    if (!validateTopic(toTopic)) return res.status(400).json({ error: 'Ungueltiger Ziel-Topic' });
+    if (!validateFilename(filename)) return res.status(400).json({ error: 'Ungueltiger Dateiname' });
+    if (topic === toTopic) return res.json({ success: true, unchanged: true });
+
+    const src = path.join(TELEGRAM_IMAGE_ROOT, topic, filename);
+    if (!fs.existsSync(src)) return res.status(404).json({ error: 'Quelle nicht gefunden' });
+
+    const destDir = path.join(TELEGRAM_IMAGE_ROOT, toTopic);
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+
+    let destName = filename;
+    let dest = path.join(destDir, destName);
+    if (fs.existsSync(dest)) {
+      const stem = filename.replace(/\.[^.]+$/, '');
+      const ext = path.extname(filename);
+      destName = `${stem}-${Date.now()}${ext}`;
+      dest = path.join(destDir, destName);
+    }
+
+    try {
+      fs.renameSync(src, dest); // rename geht bei gleichem Mount in O(1)
+    } catch {
+      fs.copyFileSync(src, dest); // Fallback ueber Filesystem-Grenzen
+      fs.unlinkSync(src);
+    }
+
+    console.log(`[telegram-images] move: ${topic}/${filename} → ${toTopic}/${destName}`);
+    res.json({ success: true, topic: toTopic, filename: destName });
+  } catch (e) {
+    console.error('[telegram-images] move error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // GET /api/admin/telegram-images/:topic/:filename  (Vorschau-Stream)
 app.get('/api/admin/telegram-images/:topic/:filename', requireApiKey, (req, res) => {
   try {

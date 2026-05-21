@@ -129,12 +129,20 @@ Stil: Empathisch, klar, erkenntnisreich.`,
 
 ${ANTI_KONJUNKTIV_RULES}
 
+Begriffs-Regeln (zwingend einhalten):
+- Eine "Goldader" ist nur das, was in der Sektion "### Goldadern" der berechneten Fakten gelistet ist. Erfinde keine.
+- "Companionship"-Kanäle sind KEINE Goldadern (beide haben den vollen Kanal — beide Zentren bei beiden bereits definiert).
+- Bezeichne die Konstellation jeder Goldader (EM-Brücke / Dominanz / Kompromiss) klar und sage, welches offene Zentrum bei wem aktiviert wird.
+
 Struktur:
 ## Einleitung
 1–2 Sätze zum energetischen Grundton der Verbindung.
 
 ## Beziehungsdynamik
 2–3 Absätze. Gehe konkret auf die unten gelisteten Companionship-, Elektromagnetischen-, Dominanz- und Kompromiss-Kanäle ein. Bezeichne jeden Kanal mit ID + deutschem Namen + Zentren-Paar exakt wie in den Fakten gelistet. Erkläre die Energie sachlich, nicht spekulativ.
+
+## Goldadern in eurer Verbindung
+Wenn in den Fakten Goldadern gelistet sind: pro Goldader 1–2 Sätze, was sie konkret bedeutet — also welches Zentrum bei wem durch die Verbindung neu aktiviert wird und welche gemeinsame Qualität sich daraus entfaltet. Wenn keine Goldader gelistet ist: kurzer Satz, dass die Verbindung über andere Qualitäten wirkt, ohne Goldader zu erfinden.
 
 ## Kommunikationstipps
 3–5 Bullet Points, je 1–2 Sätze, direkt an beide Personen mit Namen.
@@ -192,7 +200,7 @@ export function buildRelationshipUserPrompt({ person1, chart1, person2, chart2 }
   const s1 = summarizeChart(n1, chart1 || {});
   const s2 = summarizeChart(n2, chart2 || {});
 
-  const facts = buildRelationshipFacts(chart1?.gates, chart2?.gates);
+  const facts = buildRelationshipFacts(chart1?.gates, chart1?.centers, chart2?.gates, chart2?.centers);
   const factsBlock = formatFactsForPrompt(facts, n1, n2);
 
   return `Erstelle ein kostenloses Verbindungs-Reading für ${n1} und ${n2}.

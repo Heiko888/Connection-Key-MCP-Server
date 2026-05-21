@@ -38,7 +38,9 @@ import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from 
 const READING_STRICT_MODE = (process.env.READING_STRICT_MODE || 'true').toLowerCase() !== 'false';
 
 const app = express();
-app.use(express.json());
+// 15MB Limit für JSON-Body — Coach-Admin-UI lädt Telegram-Bilder Base64-kodiert
+// (Bild max 10 MB, Base64-Overhead ~33% → ~13 MB). Reguläre JSON-Requests bleiben klein.
+app.use(express.json({ limit: '15mb' }));
 
 // ======================================================
 // Chart API - Proxy zu connection-key auf 138
@@ -63,14 +65,58 @@ function escapeTgMd2(text) {
  * Ordner leer ist (text-only fallback).
  */
 function pickRandomImagePath(category) {
+  return pickMatchingImage(category, '');
+}
+
+/**
+ * Thematisches Bild-Matching aus /app/images/<category>/ nach Dateiname-Tags.
+ *
+ * Dateiname-Konvention: tag1-tag2-...-NN.ext
+ *   z. B. "hd-wissen-generator-01.jpg", "business-hd-sales-04.png".
+ * Tags = Wörter zwischen "-" oder "_" (numerische Suffixe werden ignoriert).
+ *
+ * Algorithmus:
+ *   1. Tokenisiere postText (lowercase, Umlaut-Mapping, ≥3 Zeichen).
+ *   2. Pro Bild: Score = Anzahl Tags die im Token-Set vorkommen.
+ *   3. Random aus Bildern mit Max-Score; bei Max-Score=0 random aus allen.
+ *
+ * Bei leerem postText oder leerem Ordner: Random-Pick wie früher.
+ */
+function pickMatchingImage(category, postText = '') {
   try {
     const dir = path.join('/app/images', category);
     if (!fs.existsSync(dir)) return null;
-    const files = fs.readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    const files = fs.readdirSync(dir).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
     if (files.length === 0) return null;
-    return path.join(dir, files[Math.floor(Math.random() * files.length)]);
+
+    const normalize = (s) => String(s || '')
+      .toLowerCase()
+      .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+
+    const tokenized = normalize(postText).match(/[a-z0-9]+/g) || [];
+    const textTokens = new Set(tokenized.filter((w) => w.length >= 3));
+
+    let pool = files;
+    let matched = false;
+    if (textTokens.size > 0) {
+      const scored = files.map((f) => {
+        const base = f.replace(/\.[^.]+$/, '');
+        const tags = base.split(/[-_]/).map(normalize).filter((t) => t && !/^\d+$/.test(t));
+        const score = tags.filter((t) => textTokens.has(t)).length;
+        return { f, score };
+      });
+      const maxScore = Math.max(0, ...scored.map((s) => s.score));
+      if (maxScore > 0) {
+        pool = scored.filter((s) => s.score === maxScore).map((s) => s.f);
+        matched = true;
+      }
+    }
+
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    console.log(`[Telegram] pickMatchingImage(${category}): ${chosen} (${matched ? 'Tag-Match aus ' + pool.length + '/' + files.length : 'Random aus ' + files.length})`);
+    return path.join(dir, chosen);
   } catch (e) {
-    console.warn(`[Telegram] pickRandomImagePath(${category}) error:`, e.message);
+    console.warn(`[Telegram] pickMatchingImage(${category}) error:`, e.message);
     return null;
   }
 }
@@ -114,7 +160,9 @@ async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadI
  * Ohne Bild: nur Text-Nachricht.
  */
 async function sendTelegramTextWithImage(chatId, text, imageCategory, messageThreadId = null, parseMode = '') {
-  const imagePath = imageCategory ? pickRandomImagePath(imageCategory) : null;
+  // Thematisches Matching: Tags im Dateinamen werden gegen die wichtigen Wörter
+  // des Posts gematcht — random fallback wenn kein Tag matched.
+  const imagePath = imageCategory ? pickMatchingImage(imageCategory, text) : null;
   if (imagePath) {
     if (text.length <= 1024) {
       const ok = await sendTelegramPhoto(chatId, imagePath, text, messageThreadId);
@@ -7074,6 +7122,129 @@ app.post('/api/newsletter/generate-draft', requireAdminAuth, async (req, res) =>
   } catch (err) {
     console.error('[Newsletter] Fehler:', err.message);
     return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// Telegram-Image-Admin-API
+// Coach-Portal (frontend-coach /admin/telegram-images) verwaltet die Bilder
+// in /app/images/<topic>/ via diese Endpoints. Auth: x-api-key gegen API_KEY.
+// ======================================================
+const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key'];
+const TELEGRAM_IMAGE_ROOT = '/app/images';
+const TELEGRAM_IMAGE_MAX_BYTES = 10 * 1024 * 1024; // 10 MB Telegram-Limit
+const TELEGRAM_IMAGE_EXT_RE = /\.(jpe?g|png|webp)$/i;
+
+function requireApiKey(req, res, next) {
+  const key = req.get('x-api-key') || '';
+  if (!process.env.API_KEY || key !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
+
+function validateTopic(t) {
+  return TELEGRAM_IMAGE_TOPICS.includes(t);
+}
+
+function validateFilename(f) {
+  // nur sicheres Subset; verbietet .. und Slashes
+  return typeof f === 'string'
+    && /^[A-Za-z0-9._-]+$/.test(f)
+    && TELEGRAM_IMAGE_EXT_RE.test(f)
+    && !f.startsWith('.')
+    && f.length <= 120;
+}
+
+// GET /api/admin/telegram-images
+// Listet pro Topic alle Bilder mit Größe + mtime
+app.get('/api/admin/telegram-images', requireApiKey, (req, res) => {
+  try {
+    const out = {};
+    for (const topic of TELEGRAM_IMAGE_TOPICS) {
+      const dir = path.join(TELEGRAM_IMAGE_ROOT, topic);
+      if (!fs.existsSync(dir)) { out[topic] = []; continue; }
+      const files = fs.readdirSync(dir).filter((f) => TELEGRAM_IMAGE_EXT_RE.test(f));
+      out[topic] = files.map((f) => {
+        const fp = path.join(dir, f);
+        const st = fs.statSync(fp);
+        return { filename: f, size: st.size, mtime: st.mtimeMs };
+      }).sort((a, b) => b.mtime - a.mtime);
+    }
+    res.json({ success: true, topics: out });
+  } catch (e) {
+    console.error('[telegram-images] list error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// POST /api/admin/telegram-images/upload  { topic, filename, contentBase64 }
+app.post('/api/admin/telegram-images/upload', requireApiKey, (req, res) => {
+  try {
+    const { topic, filename, contentBase64 } = req.body || {};
+    if (!validateTopic(topic)) return res.status(400).json({ error: 'Ungueltiger Topic' });
+    if (!validateFilename(filename)) return res.status(400).json({ error: 'Ungueltiger Dateiname (nur a-zA-Z0-9._-, Endung .jpg/.png/.webp, max 120 Zeichen)' });
+    if (typeof contentBase64 !== 'string' || !contentBase64.length) return res.status(400).json({ error: 'contentBase64 erforderlich' });
+
+    // strip Data-URL-Prefix falls vorhanden
+    const b64 = contentBase64.replace(/^data:image\/[a-zA-Z+]+;base64,/, '');
+    const buf = Buffer.from(b64, 'base64');
+    if (buf.length === 0) return res.status(400).json({ error: 'Leerer Buffer (ungueltiges Base64?)' });
+    if (buf.length > TELEGRAM_IMAGE_MAX_BYTES) return res.status(413).json({ error: `Datei zu gross (${buf.length} Bytes, max ${TELEGRAM_IMAGE_MAX_BYTES})` });
+
+    // Magic-Bytes-Check fuer JPG/PNG/WebP (verhindert dass exe/script als .jpg umbenannt wird)
+    const magicJpg  = buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF;
+    const magicPng  = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47;
+    const magicWebp = buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 && buf[8] === 0x57 && buf[9] === 0x45;
+    if (!magicJpg && !magicPng && !magicWebp) {
+      return res.status(400).json({ error: 'Datei ist kein gueltiges JPG/PNG/WebP (Magic Bytes falsch)' });
+    }
+
+    const dir = path.join(TELEGRAM_IMAGE_ROOT, topic);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const target = path.join(dir, filename);
+    fs.writeFileSync(target, buf);
+    console.log(`[telegram-images] upload: ${topic}/${filename} (${buf.length} Bytes)`);
+    res.json({ success: true, topic, filename, size: buf.length });
+  } catch (e) {
+    console.error('[telegram-images] upload error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// DELETE /api/admin/telegram-images/:topic/:filename
+app.delete('/api/admin/telegram-images/:topic/:filename', requireApiKey, (req, res) => {
+  try {
+    const { topic, filename } = req.params;
+    if (!validateTopic(topic)) return res.status(400).json({ error: 'Ungueltiger Topic' });
+    if (!validateFilename(filename)) return res.status(400).json({ error: 'Ungueltiger Dateiname' });
+
+    const target = path.join(TELEGRAM_IMAGE_ROOT, topic, filename);
+    if (!fs.existsSync(target)) return res.status(404).json({ error: 'Datei nicht gefunden' });
+    fs.unlinkSync(target);
+    console.log(`[telegram-images] delete: ${topic}/${filename}`);
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[telegram-images] delete error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// GET /api/admin/telegram-images/:topic/:filename  (Vorschau-Stream)
+app.get('/api/admin/telegram-images/:topic/:filename', requireApiKey, (req, res) => {
+  try {
+    const { topic, filename } = req.params;
+    if (!validateTopic(topic) || !validateFilename(filename)) return res.status(400).end();
+    const target = path.join(TELEGRAM_IMAGE_ROOT, topic, filename);
+    if (!fs.existsSync(target)) return res.status(404).end();
+    const ext = (filename.match(/\.([a-z]+)$/i) || [, ''])[1].toLowerCase();
+    const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    fs.createReadStream(target).pipe(res);
+  } catch (e) {
+    console.error('[telegram-images] preview error:', e.message);
+    res.status(500).end();
   }
 });
 

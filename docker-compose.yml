@@ -92,6 +92,23 @@ services:
       - MATTERMOST_WEBHOOK_URL=${MATTERMOST_WEBHOOK_URL}
       - MATTERMOST_WEBHOOK_READINGS=${MATTERMOST_WEBHOOK_READINGS}
       - MATTERMOST_WEBHOOK_ERRORS=${MATTERMOST_WEBHOOK_ERRORS}
+      # Stripe
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_BASIC_PRICE_ID=${STRIPE_BASIC_PRICE_ID}
+      - STRIPE_PREMIUM_PRICE_ID=${STRIPE_PREMIUM_PRICE_ID}
+      - STRIPE_VIP_PRICE_ID=${STRIPE_VIP_PRICE_ID}
+      - STRIPE_CONNECTION_KEY_EINZEL=${STRIPE_CONNECTION_KEY_EINZEL}
+      - STRIPE_CONNECTION_KEY_DREI=${STRIPE_CONNECTION_KEY_DREI}
+      - STRIPE_CONNECTION_KEY_FUENF=${STRIPE_CONNECTION_KEY_FUENF}
+      - STRIPE_PENTA_EINZEL=${STRIPE_PENTA_EINZEL}
+      - STRIPE_PENTA_ERWEITERT=${STRIPE_PENTA_ERWEITERT}
+      - STRIPE_PENTA_PREMIUM=${STRIPE_PENTA_PREMIUM}
+      - STRIPE_HD_BASIS=${STRIPE_HD_BASIS}
+      - STRIPE_HD_ERWEITERT=${STRIPE_HD_ERWEITERT}
+      - STRIPE_HD_PREMIUM=${STRIPE_HD_PREMIUM}
+      - STRIPE_HD_PLANETEN=${STRIPE_HD_PLANETEN}
+      - STRIPE_PHASEN_READING=${STRIPE_PHASEN_READING}
     depends_on:
       - n8n
       - redis
@@ -171,8 +188,10 @@ services:
       # relativ zu /app → /content-topics. Volume-Mount, damit JSON-Änderungen
       # ohne Rebuild wirken.
       - ./content-topics:/content-topics:ro
-      # Statische Bilder für Telegram-Community-Posts (pro Topic-Kategorie)
-      - ./reading-worker/images:/app/images:ro
+      # Statische Bilder für Telegram-Community-Posts (pro Topic-Kategorie).
+      # Schreibbar (rw), damit das Coach-Admin-UI (frontend-coach /admin/telegram-images)
+      # neue Bilder via reading-worker-Endpoint hochladen kann.
+      - ./reading-worker/images:/app/images:rw
     restart: unless-stopped
     networks:
       - app-network

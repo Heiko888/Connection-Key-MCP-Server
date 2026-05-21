@@ -18,23 +18,37 @@ const swissephPath = path.dirname(require.resolve("swisseph/package.json"));
 swisseph.swe_set_ephe_path(path.join(swissephPath, "ephe"));
 
 // ─── Inkarnationskreuz-Master (Single Source of Truth) ─────────────────────
-// Gebaut via scripts/incarnation-crosses/build_incarnation_crosses.py aus
-// Q3 (knowledge/incarnation-cross.txt) + Q2 (reading-worker/data/...).
-// 136 Themen, 520 Lookup-Keys, positionsspezifisch (keine min/max-Norm).
+// PRIMÄR: incarnation_crosses_192.json — alle 192 unique HD-Crosses
+// (64 RAX + 64 LAX + 64 JUX), aus SharpAstrology.HumanDesign (Open Source).
+// Lookup: (pSunGate, AngleType) → CrossName.
+//
+// FALLBACK: incarnation_crosses_master.json — alte 4-Gate-basierte Tabelle
+// (nur falls 192er-Lookup keinen Treffer hat).
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
+const CROSSES_192_PATH    = path.join(__dirname, "crosses", "incarnation_crosses_192.json");
 const CROSSES_MASTER_PATH = path.join(__dirname, "crosses", "incarnation_crosses_master.json");
+
+let _crosses192 = null;
+function loadCrosses192() {
+  if (_crosses192) return _crosses192;
+  try {
+    _crosses192 = JSON.parse(fs.readFileSync(CROSSES_192_PATH, "utf8"));
+    const n = Object.keys(_crosses192.crosses || {}).length;
+    console.log(`[Cross] 192er-Lookup geladen: ${n} Crosses`);
+  } catch (e) {
+    console.warn(`[Cross] 192er-JSON nicht gefunden (${CROSSES_192_PATH}):`, e.message);
+    _crosses192 = { crosses: {} };
+  }
+  return _crosses192;
+}
 
 let _crossesMaster = null;
 function loadCrossesMaster() {
   if (_crossesMaster) return _crossesMaster;
   try {
     _crossesMaster = JSON.parse(fs.readFileSync(CROSSES_MASTER_PATH, "utf8"));
-    const themes = Object.keys(_crossesMaster.themes || {}).length;
-    const keys   = Object.keys(_crossesMaster.lookup || {}).length;
-    console.log(`[Cross] Master geladen: ${themes} Themen, ${keys} Lookup-Keys`);
   } catch (e) {
-    console.warn(`[Cross] Master-JSON nicht gefunden (${CROSSES_MASTER_PATH}):`, e.message);
     _crossesMaster = { themes: {}, lookup: {} };
   }
   return _crossesMaster;
@@ -634,6 +648,34 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
     crossType = "Left Angle";
     typeShort = "LAX";
     typePrefixDe = "LAX der";
+  }
+
+  // ─── PRIMÄR: 192er-Lookup (pSunGate × AngleType) ────────────────────────
+  // Open-Source-Tabelle (CReizner/SharpAstrology.HumanDesign) — alle 192
+  // unique HD-Crosses. Direkter Lookup via pSun + Angle aus Profile.
+  const lookup192 = loadCrosses192();
+  const key192 = `${pSunGate}-${crossType.replace(/\s+/g, "")}`;
+  const cross192 = lookup192.crosses && lookup192.crosses[key192];
+  if (cross192) {
+    return {
+      name: cross192.full_name_en,
+      name_de: cross192.full_name_de,
+      thematicName: cross192.topic_en,
+      thematicName_de: cross192.topic_de,
+      type: crossType,
+      fullName: cross192.full_name_en,
+      fullName_de: cross192.full_name_de,
+      profile,
+      gates: {
+        personalitySun:   pSunGate,
+        personalityEarth: pEarthGate,
+        designSun:        dSunGate,
+        designEarth:      dEarthGate,
+      },
+      themeId: `${cross192.type_short.toLowerCase()}_${(cross192.topic_en || "").toLowerCase().replace(/\s+/g, "_")}${cross192.variant > 1 ? "_v" + cross192.variant : ""}`,
+      variant: cross192.variant,
+      source: "crosses_192",
+    };
   }
 
   // Master-Lookup mit Profil-Disambiguierung

@@ -1,0 +1,1934 @@
+{
+  "_meta": {
+    "version": "5.0",
+    "source": "SharpAstrology.HumanDesign (github.com/CReizner) — open source",
+    "lookup_key": "(pSunGate)-(AngleType)",
+    "angle_from_profile": {
+      "Right Angle": "1/3, 1/4, 2/4, 2/5, 3/5, 3/6",
+      "Juxtaposition": "4/1",
+      "Left Angle": "4/6, 5/1, 5/2, 6/2, 6/3"
+    }
+  },
+  "crosses": {
+    "44-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Alertness",
+      "topic_de": "Wachsamkeit",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Alertness",
+      "full_name_de": "Juxtaposition Wachsamkeit",
+      "p_sun_gate": 44
+    },
+    "54-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Ambition",
+      "topic_de": "Ehrgeiz",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Ambition",
+      "full_name_de": "Juxtaposition Ehrgeiz",
+      "p_sun_gate": 54
+    },
+    "12-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Articulation",
+      "topic_de": "Artikulation",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Articulation",
+      "full_name_de": "Juxtaposition Artikulation",
+      "p_sun_gate": 12
+    },
+    "23-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Assimilation",
+      "topic_de": "Assimilation",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Assimilation",
+      "full_name_de": "Juxtaposition Assimilation",
+      "p_sun_gate": 23
+    },
+    "37-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Bargains",
+      "topic_de": "Handel",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Bargains",
+      "full_name_de": "Juxtaposition Handel",
+      "p_sun_gate": 37
+    },
+    "53-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Beginnings",
+      "topic_de": "Anfänge",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Beginnings",
+      "full_name_de": "Juxtaposition Anfänge",
+      "p_sun_gate": 53
+    },
+    "10-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Behavior",
+      "topic_de": "Verhalten",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Behavior",
+      "full_name_de": "Juxtaposition Verhalten",
+      "p_sun_gate": 10
+    },
+    "27-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Caring",
+      "topic_de": "Fürsorge",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Caring",
+      "full_name_de": "Juxtaposition Fürsorge",
+      "p_sun_gate": 27
+    },
+    "29-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Commitment",
+      "topic_de": "Verpflichtung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Commitment",
+      "full_name_de": "Juxtaposition Verpflichtung",
+      "p_sun_gate": 29
+    },
+    "42-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Completion",
+      "topic_de": "Vollendung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Completion",
+      "full_name_de": "Juxtaposition Vollendung",
+      "p_sun_gate": 42
+    },
+    "6-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Conflict",
+      "topic_de": "Konflikt",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Conflict",
+      "full_name_de": "Juxtaposition Konflikt",
+      "p_sun_gate": 6
+    },
+    "64-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Confusion",
+      "topic_de": "Verwirrung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Confusion",
+      "full_name_de": "Juxtaposition Verwirrung",
+      "p_sun_gate": 64
+    },
+    "32-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Conservation",
+      "topic_de": "Bewahrung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Conservation",
+      "full_name_de": "Juxtaposition Bewahrung",
+      "p_sun_gate": 32
+    },
+    "8-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Contribution",
+      "topic_de": "Beitrag",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Contribution",
+      "full_name_de": "Juxtaposition Beitrag",
+      "p_sun_gate": 8
+    },
+    "21-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Control",
+      "topic_de": "Kontrolle",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Control",
+      "full_name_de": "Juxtaposition Kontrolle",
+      "p_sun_gate": 21
+    },
+    "18-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Correction",
+      "topic_de": "Korrektur",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Correction",
+      "full_name_de": "Juxtaposition Korrektur",
+      "p_sun_gate": 18
+    },
+    "36-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Crisis",
+      "topic_de": "Krise",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Crisis",
+      "full_name_de": "Juxtaposition Krise",
+      "p_sun_gate": 36
+    },
+    "40-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Denial",
+      "topic_de": "Verleugnung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Denial",
+      "full_name_de": "Juxtaposition Verleugnung",
+      "p_sun_gate": 40
+    },
+    "48-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Depth",
+      "topic_de": "Tiefe",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Depth",
+      "full_name_de": "Juxtaposition Tiefe",
+      "p_sun_gate": 48
+    },
+    "62-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Detail",
+      "topic_de": "Details",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Detail",
+      "full_name_de": "Juxtaposition Details",
+      "p_sun_gate": 62
+    },
+    "63-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Doubts",
+      "topic_de": "Zweifel",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Doubts",
+      "full_name_de": "Juxtaposition Zweifel",
+      "p_sun_gate": 63
+    },
+    "14-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Empowering",
+      "topic_de": "Ermächtigung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Empowering",
+      "full_name_de": "Juxtaposition Ermächtigung",
+      "p_sun_gate": 14
+    },
+    "35-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Experience",
+      "topic_de": "Erfahrung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Experience",
+      "full_name_de": "Juxtaposition Erfahrung",
+      "p_sun_gate": 35
+    },
+    "16-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Experimentation",
+      "topic_de": "Experimentieren",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Experimentation",
+      "full_name_de": "Juxtaposition Experimentieren",
+      "p_sun_gate": 16
+    },
+    "15-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Extremes",
+      "topic_de": "Extreme",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Extremes",
+      "full_name_de": "Juxtaposition Extreme",
+      "p_sun_gate": 15
+    },
+    "41-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Fantasy",
+      "topic_de": "Fantasie",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Fantasy",
+      "full_name_de": "Juxtaposition Fantasie",
+      "p_sun_gate": 41
+    },
+    "30-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Fates",
+      "topic_de": "Schicksale",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Fates",
+      "full_name_de": "Juxtaposition Schicksale",
+      "p_sun_gate": 30
+    },
+    "9-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Focus",
+      "topic_de": "Fokus",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Focus",
+      "full_name_de": "Juxtaposition Fokus",
+      "p_sun_gate": 9
+    },
+    "4-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Formulization",
+      "topic_de": "Formulierung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Formulization",
+      "full_name_de": "Juxtaposition Formulierung",
+      "p_sun_gate": 4
+    },
+    "22-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Grace",
+      "topic_de": "Anmut",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Grace",
+      "full_name_de": "Juxtaposition Anmut",
+      "p_sun_gate": 22
+    },
+    "5-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Habits",
+      "topic_de": "Gewohnheiten",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Habits",
+      "full_name_de": "Juxtaposition Gewohnheiten",
+      "p_sun_gate": 5
+    },
+    "11-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Ideas",
+      "topic_de": "Ideen",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Ideas",
+      "full_name_de": "Juxtaposition Ideen",
+      "p_sun_gate": 11
+    },
+    "31-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Influence",
+      "topic_de": "Einfluss",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Influence",
+      "full_name_de": "Juxtaposition Einfluss",
+      "p_sun_gate": 31
+    },
+    "25-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Innocence",
+      "topic_de": "Unschuld",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Innocence",
+      "full_name_de": "Juxtaposition Unschuld",
+      "p_sun_gate": 25
+    },
+    "43-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Insight",
+      "topic_de": "Einsicht",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Insight",
+      "full_name_de": "Juxtaposition Einsicht",
+      "p_sun_gate": 43
+    },
+    "7-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Interaction",
+      "topic_de": "Interaktion",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Interaction",
+      "full_name_de": "Juxtaposition Interaktion",
+      "p_sun_gate": 7
+    },
+    "57-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Intuition",
+      "topic_de": "Intuition",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Intuition",
+      "full_name_de": "Juxtaposition Intuition",
+      "p_sun_gate": 57
+    },
+    "60-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Limitation",
+      "topic_de": "Begrenzung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Limitation",
+      "full_name_de": "Juxtaposition Begrenzung",
+      "p_sun_gate": 60
+    },
+    "13-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Listening",
+      "topic_de": "Zuhören",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Listening",
+      "full_name_de": "Juxtaposition Zuhören",
+      "p_sun_gate": 13
+    },
+    "55-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Moods",
+      "topic_de": "Stimmungen",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Moods",
+      "full_name_de": "Juxtaposition Stimmungen",
+      "p_sun_gate": 55
+    },
+    "3-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Mutation",
+      "topic_de": "Mutation",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Mutation",
+      "full_name_de": "Juxtaposition Mutation",
+      "p_sun_gate": 3
+    },
+    "19-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Need",
+      "topic_de": "Bedürfnis",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Need",
+      "full_name_de": "Juxtaposition Bedürfnis",
+      "p_sun_gate": 19
+    },
+    "17-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Opinions",
+      "topic_de": "Meinungen",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Opinions",
+      "full_name_de": "Juxtaposition Meinungen",
+      "p_sun_gate": 17
+    },
+    "38-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Opposition",
+      "topic_de": "Opposition",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Opposition",
+      "full_name_de": "Juxtaposition Opposition",
+      "p_sun_gate": 38
+    },
+    "47-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Oppression",
+      "topic_de": "Unterdrückung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Oppression",
+      "full_name_de": "Juxtaposition Unterdrückung",
+      "p_sun_gate": 47
+    },
+    "45-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Possession",
+      "topic_de": "Besitz",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Possession",
+      "full_name_de": "Juxtaposition Besitz",
+      "p_sun_gate": 45
+    },
+    "34-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Power",
+      "topic_de": "Kraft",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Power",
+      "full_name_de": "Juxtaposition Kraft",
+      "p_sun_gate": 34
+    },
+    "49-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Principles",
+      "topic_de": "Prinzipien",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Principles",
+      "full_name_de": "Juxtaposition Prinzipien",
+      "p_sun_gate": 49
+    },
+    "39-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Provocation",
+      "topic_de": "Provokation",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Provocation",
+      "full_name_de": "Juxtaposition Provokation",
+      "p_sun_gate": 39
+    },
+    "24-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Rationalization",
+      "topic_de": "Rationalisierung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Rationalization",
+      "full_name_de": "Juxtaposition Rationalisierung",
+      "p_sun_gate": 24
+    },
+    "33-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Retreat",
+      "topic_de": "Rückzug",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Retreat",
+      "full_name_de": "Juxtaposition Rückzug",
+      "p_sun_gate": 33
+    },
+    "28-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Risks",
+      "topic_de": "Risiken",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Risks",
+      "full_name_de": "Juxtaposition Risiken",
+      "p_sun_gate": 28
+    },
+    "1-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Self Expression",
+      "topic_de": "Selbstausdruck",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Self Expression",
+      "full_name_de": "Juxtaposition Selbstausdruck",
+      "p_sun_gate": 1
+    },
+    "46-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Serendipity",
+      "topic_de": "glückliche Fügung",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Serendipity",
+      "full_name_de": "Juxtaposition glückliche Fügung",
+      "p_sun_gate": 46
+    },
+    "51-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Shock",
+      "topic_de": "Schock",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Shock",
+      "full_name_de": "Juxtaposition Schock",
+      "p_sun_gate": 51
+    },
+    "52-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Stillness",
+      "topic_de": "Stille",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Stillness",
+      "full_name_de": "Juxtaposition Stille",
+      "p_sun_gate": 52
+    },
+    "56-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Stimulation",
+      "topic_de": "Stimulation",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Stimulation",
+      "full_name_de": "Juxtaposition Stimulation",
+      "p_sun_gate": 56
+    },
+    "59-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Strategy",
+      "topic_de": "Strategie",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Strategy",
+      "full_name_de": "Juxtaposition Strategie",
+      "p_sun_gate": 59
+    },
+    "61-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Thinking",
+      "topic_de": "Denken",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Thinking",
+      "full_name_de": "Juxtaposition Denken",
+      "p_sun_gate": 61
+    },
+    "50-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Values",
+      "topic_de": "Werte",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Values",
+      "full_name_de": "Juxtaposition Werte",
+      "p_sun_gate": 50
+    },
+    "58-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "Vitality",
+      "topic_de": "Vitalität",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of Vitality",
+      "full_name_de": "Juxtaposition Vitalität",
+      "p_sun_gate": 58
+    },
+    "2-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "the Driver",
+      "topic_de": "Fahrer",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of the Driver",
+      "full_name_de": "Juxtaposition Fahrer",
+      "p_sun_gate": 2
+    },
+    "20-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "the Now",
+      "topic_de": "Jetzt",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of the Now",
+      "full_name_de": "Juxtaposition Jetzt",
+      "p_sun_gate": 20
+    },
+    "26-Juxtaposition": {
+      "type": "Juxtaposition",
+      "type_short": "Juxtaposition",
+      "topic_en": "the Trickster",
+      "topic_de": "Trickster",
+      "variant": 1,
+      "full_name_en": "Juxtaposition Cross of the Trickster",
+      "full_name_de": "Juxtaposition Trickster",
+      "p_sun_gate": 26
+    },
+    "34-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Duality",
+      "topic_de": "Dualität",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Duality 2",
+      "full_name_de": "LAX Dualität 2",
+      "p_sun_gate": 34
+    },
+    "39-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Individualism",
+      "topic_de": "Individualismus",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Individualism",
+      "full_name_de": "LAX Individualismus",
+      "p_sun_gate": 39
+    },
+    "38-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Individualism",
+      "topic_de": "Individualismus",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Individualism 2",
+      "full_name_de": "LAX Individualismus 2",
+      "p_sun_gate": 38
+    },
+    "32-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Limitation",
+      "topic_de": "Begrenzung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Limitation 2",
+      "full_name_de": "LAX Begrenzung 2",
+      "p_sun_gate": 32
+    },
+    "33-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Refinement",
+      "topic_de": "Verfeinerung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Refinement",
+      "full_name_de": "LAX Verfeinerung",
+      "p_sun_gate": 33
+    },
+    "36-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Plane",
+      "topic_de": "Ebene",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of the Plane",
+      "full_name_de": "LAX Ebene",
+      "p_sun_gate": 36
+    },
+    "27-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Alignment",
+      "topic_de": "Ausrichtung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Alignment",
+      "full_name_de": "LAX Ausrichtung",
+      "p_sun_gate": 27
+    },
+    "28-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Alignment",
+      "topic_de": "Ausrichtung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Alignment 2",
+      "full_name_de": "LAX Ausrichtung 2",
+      "p_sun_gate": 28
+    },
+    "45-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Confrontation",
+      "topic_de": "Konfrontation",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Confrontation",
+      "full_name_de": "LAX Konfrontation",
+      "p_sun_gate": 45
+    },
+    "26-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Confrontation",
+      "topic_de": "Konfrontation",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Confrontation 2",
+      "full_name_de": "LAX Konfrontation 2",
+      "p_sun_gate": 26
+    },
+    "53-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Cycles",
+      "topic_de": "Zyklen",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Cycles",
+      "full_name_de": "LAX Zyklen",
+      "p_sun_gate": 53
+    },
+    "54-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Cycles",
+      "topic_de": "Zyklen",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Cycles 2",
+      "full_name_de": "LAX Zyklen 2",
+      "p_sun_gate": 54
+    },
+    "23-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Dedication",
+      "topic_de": "Hingabe",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Dedication",
+      "full_name_de": "LAX Hingabe",
+      "p_sun_gate": 23
+    },
+    "43-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Dedication",
+      "topic_de": "Hingabe",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Dedication 2",
+      "full_name_de": "LAX Hingabe 2",
+      "p_sun_gate": 43
+    },
+    "2-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Defiance",
+      "topic_de": "Trotz",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Defiance",
+      "full_name_de": "LAX Trotz",
+      "p_sun_gate": 2
+    },
+    "1-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Defiance",
+      "topic_de": "Trotz",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Defiance 2",
+      "full_name_de": "LAX Trotz 2",
+      "p_sun_gate": 1
+    },
+    "52-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Demands",
+      "topic_de": "Forderungen",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Demands",
+      "full_name_de": "LAX Forderungen",
+      "p_sun_gate": 52
+    },
+    "58-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Demands",
+      "topic_de": "Forderungen",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Demands 2",
+      "full_name_de": "LAX Forderungen 2",
+      "p_sun_gate": 58
+    },
+    "56-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Distraction",
+      "topic_de": "Ablenkung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Distraction",
+      "full_name_de": "LAX Ablenkung",
+      "p_sun_gate": 56
+    },
+    "60-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Distraction",
+      "topic_de": "Ablenkung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Distraction 2",
+      "full_name_de": "LAX Ablenkung 2",
+      "p_sun_gate": 60
+    },
+    "63-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Dominion",
+      "topic_de": "Vorherrschaft",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Dominion",
+      "full_name_de": "LAX Vorherrschaft",
+      "p_sun_gate": 63
+    },
+    "64-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Dominion",
+      "topic_de": "Vorherrschaft",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Dominion 2",
+      "full_name_de": "LAX Vorherrschaft 2",
+      "p_sun_gate": 64
+    },
+    "20-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Duality",
+      "topic_de": "Dualität",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Duality",
+      "full_name_de": "LAX Dualität",
+      "p_sun_gate": 20
+    },
+    "12-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Education",
+      "topic_de": "Erziehung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Education",
+      "full_name_de": "LAX Erziehung",
+      "p_sun_gate": 12
+    },
+    "11-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Education",
+      "topic_de": "Erziehung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Education 2",
+      "full_name_de": "LAX Erziehung 2",
+      "p_sun_gate": 11
+    },
+    "21-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Endeavour",
+      "topic_de": "Streben",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Endeavour",
+      "full_name_de": "LAX Streben",
+      "p_sun_gate": 21
+    },
+    "48-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Endeavour",
+      "topic_de": "Streben",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Endeavour 2",
+      "full_name_de": "LAX Streben 2",
+      "p_sun_gate": 48
+    },
+    "25-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Healing",
+      "topic_de": "Heilung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Healing",
+      "full_name_de": "LAX Heilung",
+      "p_sun_gate": 25
+    },
+    "46-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Healing",
+      "topic_de": "Heilung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Healing 2",
+      "full_name_de": "LAX Heilung 2",
+      "p_sun_gate": 46
+    },
+    "16-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Identification",
+      "topic_de": "Identifikation",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Identification",
+      "full_name_de": "LAX Identifikation",
+      "p_sun_gate": 16
+    },
+    "9-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Identification",
+      "topic_de": "Identifikation",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Identification 2",
+      "full_name_de": "LAX Identifikation 2",
+      "p_sun_gate": 9
+    },
+    "24-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Incarnation",
+      "topic_de": "Inkarnation",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Incarnation",
+      "full_name_de": "LAX Inkarnation",
+      "p_sun_gate": 24
+    },
+    "44-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Incarnation",
+      "topic_de": "Inkarnation",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Incarnation 2",
+      "full_name_de": "LAX Inkarnation 2",
+      "p_sun_gate": 44
+    },
+    "30-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Industry",
+      "topic_de": "Industrie",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Industry",
+      "full_name_de": "LAX Industrie",
+      "p_sun_gate": 30
+    },
+    "29-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Industry",
+      "topic_de": "Industrie",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Industry 2",
+      "full_name_de": "LAX Industrie 2",
+      "p_sun_gate": 29
+    },
+    "22-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Informing",
+      "topic_de": "Informieren",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Informing",
+      "full_name_de": "LAX Informieren",
+      "p_sun_gate": 22
+    },
+    "47-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Informing",
+      "topic_de": "Informieren",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Informing 2",
+      "full_name_de": "LAX Informieren 2",
+      "p_sun_gate": 47
+    },
+    "42-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Limitation",
+      "topic_de": "Begrenzung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Limitation",
+      "full_name_de": "LAX Begrenzung",
+      "p_sun_gate": 42
+    },
+    "13-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Masks",
+      "topic_de": "Masken",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Masks",
+      "full_name_de": "LAX Masken",
+      "p_sun_gate": 13
+    },
+    "7-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Masks",
+      "topic_de": "Masken",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Masks 2",
+      "full_name_de": "LAX Masken 2",
+      "p_sun_gate": 7
+    },
+    "37-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Migration",
+      "topic_de": "Wanderung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Migration",
+      "full_name_de": "LAX Wanderung",
+      "p_sun_gate": 37
+    },
+    "40-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Migration",
+      "topic_de": "Wanderung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Migration 2",
+      "full_name_de": "LAX Wanderung 2",
+      "p_sun_gate": 40
+    },
+    "62-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Obscuration",
+      "topic_de": "Verdunkelung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Obscuration",
+      "full_name_de": "LAX Verdunkelung",
+      "p_sun_gate": 62
+    },
+    "61-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Obscuration",
+      "topic_de": "Verdunkelung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Obscuration 2",
+      "full_name_de": "LAX Verdunkelung 2",
+      "p_sun_gate": 61
+    },
+    "15-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Prevention",
+      "topic_de": "Vorbeugung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Prevention",
+      "full_name_de": "LAX Vorbeugung",
+      "p_sun_gate": 15
+    },
+    "10-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Prevention",
+      "topic_de": "Vorbeugung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Prevention 2",
+      "full_name_de": "LAX Vorbeugung 2",
+      "p_sun_gate": 10
+    },
+    "19-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Refinement",
+      "topic_de": "Verfeinerung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Refinement 2",
+      "full_name_de": "LAX Verfeinerung 2",
+      "p_sun_gate": 19
+    },
+    "49-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Revolution",
+      "topic_de": "Revolution",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Revolution",
+      "full_name_de": "LAX Revolution",
+      "p_sun_gate": 49
+    },
+    "4-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Revolution",
+      "topic_de": "Revolution",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Revolution 2",
+      "full_name_de": "LAX Revolution 2",
+      "p_sun_gate": 4
+    },
+    "35-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Separation",
+      "topic_de": "Trennung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Separation",
+      "full_name_de": "LAX Trennung",
+      "p_sun_gate": 35
+    },
+    "5-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Separation",
+      "topic_de": "Trennung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Separation 2",
+      "full_name_de": "LAX Trennung 2",
+      "p_sun_gate": 5
+    },
+    "55-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Spirit",
+      "topic_de": "Geist",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Spirit",
+      "full_name_de": "LAX Geist",
+      "p_sun_gate": 55
+    },
+    "59-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Spirit",
+      "topic_de": "Geist",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Spirit 2",
+      "full_name_de": "LAX Geist 2",
+      "p_sun_gate": 59
+    },
+    "8-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Uncertainty",
+      "topic_de": "Ungewissheit",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Uncertainty",
+      "full_name_de": "LAX Ungewissheit",
+      "p_sun_gate": 8
+    },
+    "14-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Uncertainty",
+      "topic_de": "Ungewissheit",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Uncertainty 2",
+      "full_name_de": "LAX Ungewissheit 2",
+      "p_sun_gate": 14
+    },
+    "17-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Upheaval",
+      "topic_de": "Umwälzung",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Upheaval",
+      "full_name_de": "LAX Umwälzung",
+      "p_sun_gate": 17
+    },
+    "18-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Upheaval",
+      "topic_de": "Umwälzung",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Upheaval 2",
+      "full_name_de": "LAX Umwälzung 2",
+      "p_sun_gate": 18
+    },
+    "3-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Wishes",
+      "topic_de": "Wünsche",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of Wishes",
+      "full_name_de": "LAX Wünsche",
+      "p_sun_gate": 3
+    },
+    "50-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "Wishes",
+      "topic_de": "Wünsche",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of Wishes 2",
+      "full_name_de": "LAX Wünsche 2",
+      "p_sun_gate": 50
+    },
+    "31-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Alpha",
+      "topic_de": "Alpha",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of the Alpha",
+      "full_name_de": "LAX Alpha",
+      "p_sun_gate": 31
+    },
+    "41-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Alpha",
+      "topic_de": "Alpha",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of the Alpha 2",
+      "full_name_de": "LAX Alpha 2",
+      "p_sun_gate": 41
+    },
+    "51-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Clarion",
+      "topic_de": "Klarion",
+      "variant": 1,
+      "full_name_en": "Left Angle Cross of the Clarion",
+      "full_name_de": "LAX Klarion",
+      "p_sun_gate": 51
+    },
+    "57-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Clarion",
+      "topic_de": "Klarion",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of the Clarion 2",
+      "full_name_de": "LAX Klarion 2",
+      "p_sun_gate": 57
+    },
+    "6-LeftAngle": {
+      "type": "Left Angle",
+      "type_short": "LAX",
+      "topic_en": "the Plane",
+      "topic_de": "Ebene",
+      "variant": 2,
+      "full_name_en": "Left Angle Cross of the Plane 2",
+      "full_name_de": "LAX Ebene 2",
+      "p_sun_gate": 6
+    },
+    "63-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Consciousness",
+      "topic_de": "Bewusstsein",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Consciousness",
+      "full_name_de": "RAX Bewusstsein",
+      "p_sun_gate": 63
+    },
+    "35-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Consciousness",
+      "topic_de": "Bewusstsein",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Consciousness 2",
+      "full_name_de": "RAX Bewusstsein 2",
+      "p_sun_gate": 35
+    },
+    "64-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Consciousness",
+      "topic_de": "Bewusstsein",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Consciousness 3",
+      "full_name_de": "RAX Bewusstsein 3",
+      "p_sun_gate": 64
+    },
+    "5-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Consciousness",
+      "topic_de": "Bewusstsein",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Consciousness 4",
+      "full_name_de": "RAX Bewusstsein 4",
+      "p_sun_gate": 5
+    },
+    "30-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Contagion",
+      "topic_de": "Ansteckung",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Contagion",
+      "full_name_de": "RAX Ansteckung",
+      "p_sun_gate": 30
+    },
+    "8-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Contagion",
+      "topic_de": "Ansteckung",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Contagion 2",
+      "full_name_de": "RAX Ansteckung 2",
+      "p_sun_gate": 8
+    },
+    "29-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Contagion",
+      "topic_de": "Ansteckung",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Contagion 3",
+      "full_name_de": "RAX Ansteckung 3",
+      "p_sun_gate": 29
+    },
+    "14-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Contagion",
+      "topic_de": "Ansteckung",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Contagion 4",
+      "full_name_de": "RAX Ansteckung 4",
+      "p_sun_gate": 14
+    },
+    "12-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Eden",
+      "topic_de": "Eden",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Eden 2",
+      "full_name_de": "RAX Eden 2",
+      "p_sun_gate": 12
+    },
+    "6-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Eden",
+      "topic_de": "Eden",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Eden 3",
+      "full_name_de": "RAX Eden 3",
+      "p_sun_gate": 6
+    },
+    "11-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Eden",
+      "topic_de": "Eden",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Eden 4",
+      "full_name_de": "RAX Eden 4",
+      "p_sun_gate": 11
+    },
+    "49-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Explanation",
+      "topic_de": "Erklärung",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Explanation",
+      "full_name_de": "RAX Erklärung",
+      "p_sun_gate": 49
+    },
+    "23-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Explanation",
+      "topic_de": "Erklärung",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Explanation 2",
+      "full_name_de": "RAX Erklärung 2",
+      "p_sun_gate": 23
+    },
+    "4-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Explanation",
+      "topic_de": "Erklärung",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Explanation 3",
+      "full_name_de": "RAX Erklärung 3",
+      "p_sun_gate": 4
+    },
+    "43-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Explanation",
+      "topic_de": "Erklärung",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Explanation 4",
+      "full_name_de": "RAX Erklärung 4",
+      "p_sun_gate": 43
+    },
+    "3-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Laws",
+      "topic_de": "Gesetze",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Laws",
+      "full_name_de": "RAX Gesetze",
+      "p_sun_gate": 3
+    },
+    "56-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Laws",
+      "topic_de": "Gesetze",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Laws 2",
+      "full_name_de": "RAX Gesetze 2",
+      "p_sun_gate": 56
+    },
+    "50-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Laws",
+      "topic_de": "Gesetze",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Laws 3",
+      "full_name_de": "RAX Gesetze 3",
+      "p_sun_gate": 50
+    },
+    "60-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Laws",
+      "topic_de": "Gesetze",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Laws 4",
+      "full_name_de": "RAX Gesetze 4",
+      "p_sun_gate": 60
+    },
+    "42-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Maya",
+      "topic_de": "Maya",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Maya",
+      "full_name_de": "RAX Maya",
+      "p_sun_gate": 42
+    },
+    "62-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Maya",
+      "topic_de": "Maya",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Maya 2",
+      "full_name_de": "RAX Maya 2",
+      "p_sun_gate": 62
+    },
+    "32-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Maya",
+      "topic_de": "Maya",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Maya 3",
+      "full_name_de": "RAX Maya 3",
+      "p_sun_gate": 32
+    },
+    "61-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Maya",
+      "topic_de": "Maya",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Maya 4",
+      "full_name_de": "RAX Maya 4",
+      "p_sun_gate": 61
+    },
+    "51-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Penetration",
+      "topic_de": "Durchdringung",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Penetration",
+      "full_name_de": "RAX Durchdringung",
+      "p_sun_gate": 51
+    },
+    "53-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Penetration",
+      "topic_de": "Durchdringung",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Penetration 2",
+      "full_name_de": "RAX Durchdringung 2",
+      "p_sun_gate": 53
+    },
+    "57-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Penetration",
+      "topic_de": "Durchdringung",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Penetration 3",
+      "full_name_de": "RAX Durchdringung 3",
+      "p_sun_gate": 57
+    },
+    "54-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Penetration",
+      "topic_de": "Durchdringung",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Penetration 4",
+      "full_name_de": "RAX Durchdringung 4",
+      "p_sun_gate": 54
+    },
+    "37-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Planning",
+      "topic_de": "Planung",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Planning",
+      "full_name_de": "RAX Planung",
+      "p_sun_gate": 37
+    },
+    "16-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Planning",
+      "topic_de": "Planung",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Planning 2",
+      "full_name_de": "RAX Planung 2",
+      "p_sun_gate": 16
+    },
+    "40-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Planning",
+      "topic_de": "Planung",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Planning 3",
+      "full_name_de": "RAX Planung 3",
+      "p_sun_gate": 40
+    },
+    "9-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Planning",
+      "topic_de": "Planung",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Planning 4",
+      "full_name_de": "RAX Planung 4",
+      "p_sun_gate": 9
+    },
+    "22-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Rulership",
+      "topic_de": "Herrschaft",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Rulership",
+      "full_name_de": "RAX Herrschaft",
+      "p_sun_gate": 22
+    },
+    "45-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Rulership",
+      "topic_de": "Herrschaft",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Rulership 2",
+      "full_name_de": "RAX Herrschaft 2",
+      "p_sun_gate": 45
+    },
+    "47-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Rulership",
+      "topic_de": "Herrschaft",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Rulership 3",
+      "full_name_de": "RAX Herrschaft 3",
+      "p_sun_gate": 47
+    },
+    "26-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Rulership",
+      "topic_de": "Herrschaft",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Rulership 4",
+      "full_name_de": "RAX Herrschaft 4",
+      "p_sun_gate": 26
+    },
+    "17-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Service",
+      "topic_de": "Dienst",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Service",
+      "full_name_de": "RAX Dienst",
+      "p_sun_gate": 17
+    },
+    "52-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Service",
+      "topic_de": "Dienst",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Service 2",
+      "full_name_de": "RAX Dienst 2",
+      "p_sun_gate": 52
+    },
+    "18-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Service",
+      "topic_de": "Dienst",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Service 3",
+      "full_name_de": "RAX Dienst 3",
+      "p_sun_gate": 18
+    },
+    "58-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Service",
+      "topic_de": "Dienst",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Service 4",
+      "full_name_de": "RAX Dienst 4",
+      "p_sun_gate": 58
+    },
+    "21-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Tension",
+      "topic_de": "Spannung",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of Tension",
+      "full_name_de": "RAX Spannung",
+      "p_sun_gate": 21
+    },
+    "39-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Tension",
+      "topic_de": "Spannung",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of Tension 2",
+      "full_name_de": "RAX Spannung 2",
+      "p_sun_gate": 39
+    },
+    "48-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Tension",
+      "topic_de": "Spannung",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of Tension 3",
+      "full_name_de": "RAX Spannung 3",
+      "p_sun_gate": 48
+    },
+    "38-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Tension",
+      "topic_de": "Spannung",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Tension 4",
+      "full_name_de": "RAX Spannung 4",
+      "p_sun_gate": 38
+    },
+    "10-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "Vessel Of Love",
+      "topic_de": "Liebesgefäß",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of Vessel Of Love 4",
+      "full_name_de": "RAX Liebesgefäß 4",
+      "p_sun_gate": 10
+    },
+    "36-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Eden",
+      "topic_de": "Eden",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Eden",
+      "full_name_de": "RAX Eden",
+      "p_sun_gate": 36
+    },
+    "24-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Four Ways",
+      "topic_de": "Vier Wege",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Four Ways",
+      "full_name_de": "RAX Vier Wege",
+      "p_sun_gate": 24
+    },
+    "33-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Four Ways",
+      "topic_de": "Vier Wege",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of the Four Ways 2",
+      "full_name_de": "RAX Vier Wege 2",
+      "p_sun_gate": 33
+    },
+    "44-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Four Ways",
+      "topic_de": "Vier Wege",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of the Four Ways 3",
+      "full_name_de": "RAX Vier Wege 3",
+      "p_sun_gate": 44
+    },
+    "19-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Four Ways",
+      "topic_de": "Vier Wege",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of the Four Ways 4",
+      "full_name_de": "RAX Vier Wege 4",
+      "p_sun_gate": 19
+    },
+    "55-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sleeping Phoenix",
+      "topic_de": "Schlafender Phönix",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Sleeping Phoenix",
+      "full_name_de": "RAX Schlafender Phönix",
+      "p_sun_gate": 55
+    },
+    "20-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sleeping Phoenix",
+      "topic_de": "Schlafender Phönix",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of the Sleeping Phoenix 2",
+      "full_name_de": "RAX Schlafender Phönix 2",
+      "p_sun_gate": 20
+    },
+    "59-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sleeping Phoenix",
+      "topic_de": "Schlafender Phönix",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of the Sleeping Phoenix 3",
+      "full_name_de": "RAX Schlafender Phönix 3",
+      "p_sun_gate": 59
+    },
+    "34-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sleeping Phoenix",
+      "topic_de": "Schlafender Phönix",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of the Sleeping Phoenix 4",
+      "full_name_de": "RAX Schlafender Phönix 4",
+      "p_sun_gate": 34
+    },
+    "13-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sphinx",
+      "topic_de": "Sphinx",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Sphinx",
+      "full_name_de": "RAX Sphinx",
+      "p_sun_gate": 13
+    },
+    "2-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sphinx",
+      "topic_de": "Sphinx",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of the Sphinx 2",
+      "full_name_de": "RAX Sphinx 2",
+      "p_sun_gate": 2
+    },
+    "7-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sphinx",
+      "topic_de": "Sphinx",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of the Sphinx 3",
+      "full_name_de": "RAX Sphinx 3",
+      "p_sun_gate": 7
+    },
+    "1-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Sphinx",
+      "topic_de": "Sphinx",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of the Sphinx 4",
+      "full_name_de": "RAX Sphinx 4",
+      "p_sun_gate": 1
+    },
+    "27-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Unexpected",
+      "topic_de": "Unerwartete",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Unexpected",
+      "full_name_de": "RAX Unerwartete",
+      "p_sun_gate": 27
+    },
+    "31-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Unexpected",
+      "topic_de": "Unerwartete",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of the Unexpected 2",
+      "full_name_de": "RAX Unerwartete 2",
+      "p_sun_gate": 31
+    },
+    "28-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Unexpected",
+      "topic_de": "Unerwartete",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of the Unexpected 3",
+      "full_name_de": "RAX Unerwartete 3",
+      "p_sun_gate": 28
+    },
+    "41-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Unexpected",
+      "topic_de": "Unerwartete",
+      "variant": 4,
+      "full_name_en": "Right Angle Cross of the Unexpected 4",
+      "full_name_de": "RAX Unerwartete 4",
+      "p_sun_gate": 41
+    },
+    "25-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Vessel Of Love",
+      "topic_de": "Liebesgefäß",
+      "variant": 1,
+      "full_name_en": "Right Angle Cross of the Vessel Of Love",
+      "full_name_de": "RAX Liebesgefäß",
+      "p_sun_gate": 25
+    },
+    "15-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Vessel Of Love",
+      "topic_de": "Liebesgefäß",
+      "variant": 2,
+      "full_name_en": "Right Angle Cross of the Vessel Of Love 2",
+      "full_name_de": "RAX Liebesgefäß 2",
+      "p_sun_gate": 15
+    },
+    "46-RightAngle": {
+      "type": "Right Angle",
+      "type_short": "RAX",
+      "topic_en": "the Vessel Of Love",
+      "topic_de": "Liebesgefäß",
+      "variant": 3,
+      "full_name_en": "Right Angle Cross of the Vessel Of Love 3",
+      "full_name_de": "RAX Liebesgefäß 3",
+      "p_sun_gate": 46
+    }
+  }
+}

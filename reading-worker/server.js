@@ -6445,7 +6445,7 @@ app.post('/api/channel/post-hd-wissen', async (req, res) => {
       const prompt = templateText.replace(/\{\{topic\}\}/g, topic).replace(/\{\{topicHashtag\}\}/g, topicHashtag)
         + `\n\nErstelle jetzt den HD-Wissen-Post über: ${topic}`;
       const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
-      await sendTelegramMessage(TELEGRAM_COMMUNITY_ID, text.trim(), '', TELEGRAM_HD_WISSEN_THREAD_ID);
+      await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'hd-wissen', TELEGRAM_HD_WISSEN_THREAD_ID);
       console.log(`📚 [Channel] HD-Wissen (manuell) gepostet: ${topic}`);
     } catch (err) {
       console.error('[Channel] HD-Wissen Fehler:', err.message);

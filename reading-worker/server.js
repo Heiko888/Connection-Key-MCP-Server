@@ -125,16 +125,41 @@ function pickMatchingImage(category, postText = '') {
  * Sendet ein Foto via multipart/form-data an Telegram. Caption max 1024 Zeichen
  * (vom Aufrufer einzuhalten).
  */
-async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadId = null) {
-  if (!TELEGRAM_BOT_TOKEN || !chatId || !imagePath) return;
+// Konvertiert Bild zu JPEG (max 1600px Long-Side, Quality 85). PNGs mit Alpha
+// werden auf Brand-Hintergrund (#030200) gerendert. Schlägt sharp fehl,
+// fallback auf das Original-Buffer.
+async function toJpegForTelegram(srcPath) {
+  const original = fs.readFileSync(srcPath);
+  const origName = path.basename(srcPath);
   try {
-    const buf = fs.readFileSync(imagePath);
-    const fileName = path.basename(imagePath);
-    const ext = path.extname(fileName).toLowerCase();
+    const sharp = (await import('sharp')).default;
+    const meta = await sharp(original).metadata();
+    const hasAlpha = !!meta.hasAlpha;
+    let pipeline = sharp(original).rotate(); // EXIF-Orientation berücksichtigen
+    const longSide = Math.max(meta.width || 0, meta.height || 0);
+    if (longSide > 1600) {
+      pipeline = pipeline.resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true });
+    }
+    if (hasAlpha) {
+      pipeline = pipeline.flatten({ background: { r: 3, g: 2, b: 0 } });
+    }
+    const jpeg = await pipeline.jpeg({ quality: 85, progressive: true, mozjpeg: true }).toBuffer();
+    return { buf: jpeg, name: origName.replace(/\.[^.]+$/, '') + '.jpg', mime: 'image/jpeg' };
+  } catch (err) {
+    console.warn('[Telegram] sharp-Konvertierung fehlgeschlagen, sende Original:', err.message);
+    const ext = path.extname(origName).toLowerCase();
     const mime = ext === '.png' ? 'image/png'
       : ext === '.webp' ? 'image/webp'
       : ext === '.gif' ? 'image/gif'
       : 'image/jpeg';
+    return { buf: original, name: origName, mime };
+  }
+}
+
+async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadId = null) {
+  if (!TELEGRAM_BOT_TOKEN || !chatId || !imagePath) return;
+  try {
+    const { buf, name: fileName, mime } = await toJpegForTelegram(imagePath);
     const blob = new Blob([buf], { type: mime });
     const fd = new FormData();
     fd.append('chat_id', String(chatId));

@@ -164,14 +164,23 @@ async function sendTelegramTextWithImage(chatId, text, imageCategory, messageThr
   // des Posts gematcht — random fallback wenn kein Tag matched.
   const imagePath = imageCategory ? pickMatchingImage(imageCategory, text) : null;
   if (imagePath) {
-    if (text.length <= 1024) {
-      const ok = await sendTelegramPhoto(chatId, imagePath, text, messageThreadId);
-      if (ok) return;
-      // Fallback bei sendPhoto-Fehler: text-only senden
-    } else {
-      await sendTelegramPhoto(chatId, imagePath, '', messageThreadId);
-      // → fällt durch zu sendTelegramMessage unten
+    // Telegram-Caption-Limit ist 1024 Zeichen. Wenn der Text drüber liegt, kürzen
+    // wir am letzten Satz/Wort statt den Post in zwei Nachrichten zu splitten.
+    let caption = text;
+    if (caption.length > 1024) {
+      const sliced = caption.slice(0, 1023);
+      const lastBreak = Math.max(
+        sliced.lastIndexOf('. '),
+        sliced.lastIndexOf('? '),
+        sliced.lastIndexOf('! '),
+        sliced.lastIndexOf('\n\n'),
+      );
+      caption = (lastBreak > 600 ? sliced.slice(0, lastBreak + 1) : sliced.replace(/\s\S*$/, '')) + ' …';
+      console.warn(`[Telegram] Caption gekürzt: ${text.length} → ${caption.length} Zeichen (Limit 1024)`);
     }
+    const ok = await sendTelegramPhoto(chatId, imagePath, caption, messageThreadId);
+    if (ok) return;
+    // Fallback bei sendPhoto-Fehler: text-only senden (volltext)
   }
   await sendTelegramMessage(chatId, text, parseMode, messageThreadId);
 }

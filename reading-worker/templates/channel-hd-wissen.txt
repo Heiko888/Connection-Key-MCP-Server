@@ -39,7 +39,7 @@ Eine Einladung zur Selbstreflexion. Kein Aufruf zum Handeln, keine Werbung.
 - Sparsam mit Emojis — maximal 1 im gesamten Text, nur wenn es wirklich passt
 
 ## Regeln
-- Maximal 200 Wörter
+- Maximal 150 Wörter UND maximal 950 Zeichen (hartes Limit für Telegram-Caption — sonst wird der Post in zwei Nachrichten gesplittet)
 - Keine Lebensaufgaben-Sprache ("Du bist hier um...")
 - Kein Verkaufen, kein Call-to-Action für Produkte
 - Sprache: Deutsch

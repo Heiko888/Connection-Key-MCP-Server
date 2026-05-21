@@ -674,6 +674,7 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
       },
       themeId: `${cross192.type_short.toLowerCase()}_${(cross192.topic_en || "").toLowerCase().replace(/\s+/g, "_")}${cross192.variant > 1 ? "_v" + cross192.variant : ""}`,
       variant: cross192.variant,
+      theme_de: cross192.theme_de || null,
       source: "crosses_192",
     };
   }

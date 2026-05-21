@@ -18,7 +18,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Alertness",
       "full_name_de": "Juxtaposition Wachsamkeit",
-      "p_sun_gate": 44
+      "p_sun_gate": 44,
+      "theme_de": "Sensible Aufmerksamkeit"
     },
     "54-Juxtaposition": {
       "type": "Juxtaposition",
@@ -28,7 +29,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Ambition",
       "full_name_de": "Juxtaposition Ehrgeiz",
-      "p_sun_gate": 54
+      "p_sun_gate": 54,
+      "theme_de": "Aufstieg und Ambition"
     },
     "12-Juxtaposition": {
       "type": "Juxtaposition",
@@ -38,7 +40,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Articulation",
       "full_name_de": "Juxtaposition Artikulation",
-      "p_sun_gate": 12
+      "p_sun_gate": 12,
+      "theme_de": "Klarer Ausdruck und vorsichtige Wahl der Worte"
     },
     "23-Juxtaposition": {
       "type": "Juxtaposition",
@@ -48,7 +51,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Assimilation",
       "full_name_de": "Juxtaposition Assimilation",
-      "p_sun_gate": 23
+      "p_sun_gate": 23,
+      "theme_de": "Wissen in eigene Worte fassen"
     },
     "37-Juxtaposition": {
       "type": "Juxtaposition",
@@ -58,7 +62,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Bargains",
       "full_name_de": "Juxtaposition Handel",
-      "p_sun_gate": 37
+      "p_sun_gate": 37,
+      "theme_de": "Verträge und Tauschbeziehungen — Loyalität als Lebensader"
     },
     "53-Juxtaposition": {
       "type": "Juxtaposition",
@@ -68,7 +73,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Beginnings",
       "full_name_de": "Juxtaposition Anfänge",
-      "p_sun_gate": 53
+      "p_sun_gate": 53,
+      "theme_de": "Neuanfänge und Lebensimpuls"
     },
     "10-Juxtaposition": {
       "type": "Juxtaposition",
@@ -78,7 +84,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Behavior",
       "full_name_de": "Juxtaposition Verhalten",
-      "p_sun_gate": 10
+      "p_sun_gate": 10,
+      "theme_de": "Authentisches Verhalten in jeder Situation"
     },
     "27-Juxtaposition": {
       "type": "Juxtaposition",
@@ -88,7 +95,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Caring",
       "full_name_de": "Juxtaposition Fürsorge",
-      "p_sun_gate": 27
+      "p_sun_gate": 27,
+      "theme_de": "Sorge tragen für andere und sich selbst"
     },
     "29-Juxtaposition": {
       "type": "Juxtaposition",
@@ -98,7 +106,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Commitment",
       "full_name_de": "Juxtaposition Verpflichtung",
-      "p_sun_gate": 29
+      "p_sun_gate": 29,
+      "theme_de": "Volle Hingabe an Erfahrung"
     },
     "42-Juxtaposition": {
       "type": "Juxtaposition",
@@ -108,7 +117,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Completion",
       "full_name_de": "Juxtaposition Vollendung",
-      "p_sun_gate": 42
+      "p_sun_gate": 42,
+      "theme_de": "Zyklen zum Abschluss bringen und reifen lassen"
     },
     "6-Juxtaposition": {
       "type": "Juxtaposition",
@@ -118,7 +128,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Conflict",
       "full_name_de": "Juxtaposition Konflikt",
-      "p_sun_gate": 6
+      "p_sun_gate": 6,
+      "theme_de": "Spannungen lösen durch klare Begegnung"
     },
     "64-Juxtaposition": {
       "type": "Juxtaposition",
@@ -128,7 +139,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Confusion",
       "full_name_de": "Juxtaposition Verwirrung",
-      "p_sun_gate": 64
+      "p_sun_gate": 64,
+      "theme_de": "Sinn aus dem Chaos finden"
     },
     "32-Juxtaposition": {
       "type": "Juxtaposition",
@@ -138,7 +150,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Conservation",
       "full_name_de": "Juxtaposition Bewahrung",
-      "p_sun_gate": 32
+      "p_sun_gate": 32,
+      "theme_de": "Schutz des Lebens und energetische Stabilität"
     },
     "8-Juxtaposition": {
       "type": "Juxtaposition",
@@ -148,7 +161,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Contribution",
       "full_name_de": "Juxtaposition Beitrag",
-      "p_sun_gate": 8
+      "p_sun_gate": 8,
+      "theme_de": "Beitragen durch das, was man liebt"
     },
     "21-Juxtaposition": {
       "type": "Juxtaposition",
@@ -158,7 +172,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Control",
       "full_name_de": "Juxtaposition Kontrolle",
-      "p_sun_gate": 21
+      "p_sun_gate": 21,
+      "theme_de": "Verantwortliche Führung"
     },
     "18-Juxtaposition": {
       "type": "Juxtaposition",
@@ -168,7 +183,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Correction",
       "full_name_de": "Juxtaposition Korrektur",
-      "p_sun_gate": 18
+      "p_sun_gate": 18,
+      "theme_de": "Verbesserung und konstruktive Kritik"
     },
     "36-Juxtaposition": {
       "type": "Juxtaposition",
@@ -178,7 +194,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Crisis",
       "full_name_de": "Juxtaposition Krise",
-      "p_sun_gate": 36
+      "p_sun_gate": 36,
+      "theme_de": "Krise als Tür zur Transformation"
     },
     "40-Juxtaposition": {
       "type": "Juxtaposition",
@@ -188,7 +205,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Denial",
       "full_name_de": "Juxtaposition Verleugnung",
-      "p_sun_gate": 40
+      "p_sun_gate": 40,
+      "theme_de": "Innere Distanz und Klärung"
     },
     "48-Juxtaposition": {
       "type": "Juxtaposition",
@@ -198,7 +216,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Depth",
       "full_name_de": "Juxtaposition Tiefe",
-      "p_sun_gate": 48
+      "p_sun_gate": 48,
+      "theme_de": "Tiefe in Wahrnehmung und Kompetenz"
     },
     "62-Juxtaposition": {
       "type": "Juxtaposition",
@@ -208,7 +227,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Detail",
       "full_name_de": "Juxtaposition Details",
-      "p_sun_gate": 62
+      "p_sun_gate": 62,
+      "theme_de": "Klare Worte und logische Tiefe"
     },
     "63-Juxtaposition": {
       "type": "Juxtaposition",
@@ -218,7 +238,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Doubts",
       "full_name_de": "Juxtaposition Zweifel",
-      "p_sun_gate": 63
+      "p_sun_gate": 63,
+      "theme_de": "Fragestellung als Weg zur Wahrheit"
     },
     "14-Juxtaposition": {
       "type": "Juxtaposition",
@@ -228,7 +249,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Empowering",
       "full_name_de": "Juxtaposition Ermächtigung",
-      "p_sun_gate": 14
+      "p_sun_gate": 14,
+      "theme_de": "Macht aus Werten — schöpferische Kraft durch Klarheit"
     },
     "35-Juxtaposition": {
       "type": "Juxtaposition",
@@ -238,7 +260,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Experience",
       "full_name_de": "Juxtaposition Erfahrung",
-      "p_sun_gate": 35
+      "p_sun_gate": 35,
+      "theme_de": "Erfahrung sammeln als Lebenssinn"
     },
     "16-Juxtaposition": {
       "type": "Juxtaposition",
@@ -248,7 +271,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Experimentation",
       "full_name_de": "Juxtaposition Experimentieren",
-      "p_sun_gate": 16
+      "p_sun_gate": 16,
+      "theme_de": "Talent und Spielfreude"
     },
     "15-Juxtaposition": {
       "type": "Juxtaposition",
@@ -258,7 +282,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Extremes",
       "full_name_de": "Juxtaposition Extreme",
-      "p_sun_gate": 15
+      "p_sun_gate": 15,
+      "theme_de": "Polarität als gestaltende Kraft"
     },
     "41-Juxtaposition": {
       "type": "Juxtaposition",
@@ -268,7 +293,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Fantasy",
       "full_name_de": "Juxtaposition Fantasie",
-      "p_sun_gate": 41
+      "p_sun_gate": 41,
+      "theme_de": "Fantasie als Quelle des Neuen"
     },
     "30-Juxtaposition": {
       "type": "Juxtaposition",
@@ -278,7 +304,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Fates",
       "full_name_de": "Juxtaposition Schicksale",
-      "p_sun_gate": 30
+      "p_sun_gate": 30,
+      "theme_de": "Gefühl, Sehnsucht, Schicksalsweg"
     },
     "9-Juxtaposition": {
       "type": "Juxtaposition",
@@ -288,7 +315,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Focus",
       "full_name_de": "Juxtaposition Fokus",
-      "p_sun_gate": 9
+      "p_sun_gate": 9,
+      "theme_de": "Konzentration auf das Wesentliche"
     },
     "4-Juxtaposition": {
       "type": "Juxtaposition",
@@ -298,7 +326,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Formulization",
       "full_name_de": "Juxtaposition Formulierung",
-      "p_sun_gate": 4
+      "p_sun_gate": 4,
+      "theme_de": "Formeln und Antworten für das Leben"
     },
     "22-Juxtaposition": {
       "type": "Juxtaposition",
@@ -308,7 +337,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Grace",
       "full_name_de": "Juxtaposition Anmut",
-      "p_sun_gate": 22
+      "p_sun_gate": 22,
+      "theme_de": "Charisma und emotionale Klarheit"
     },
     "5-Juxtaposition": {
       "type": "Juxtaposition",
@@ -318,7 +348,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Habits",
       "full_name_de": "Juxtaposition Gewohnheiten",
-      "p_sun_gate": 5
+      "p_sun_gate": 5,
+      "theme_de": "Rhythmen halten und durch Beständigkeit stabilisieren"
     },
     "11-Juxtaposition": {
       "type": "Juxtaposition",
@@ -328,7 +359,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Ideas",
       "full_name_de": "Juxtaposition Ideen",
-      "p_sun_gate": 11
+      "p_sun_gate": 11,
+      "theme_de": "Inspiration und das Teilen von Konzepten"
     },
     "31-Juxtaposition": {
       "type": "Juxtaposition",
@@ -338,7 +370,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Influence",
       "full_name_de": "Juxtaposition Einfluss",
-      "p_sun_gate": 31
+      "p_sun_gate": 31,
+      "theme_de": "Stimme der Führung"
     },
     "25-Juxtaposition": {
       "type": "Juxtaposition",
@@ -348,7 +381,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Innocence",
       "full_name_de": "Juxtaposition Unschuld",
-      "p_sun_gate": 25
+      "p_sun_gate": 25,
+      "theme_de": "Reine Präsenz und Vertrauen"
     },
     "43-Juxtaposition": {
       "type": "Juxtaposition",
@@ -358,7 +392,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Insight",
       "full_name_de": "Juxtaposition Einsicht",
-      "p_sun_gate": 43
+      "p_sun_gate": 43,
+      "theme_de": "Plötzliche Wahrheit"
     },
     "7-Juxtaposition": {
       "type": "Juxtaposition",
@@ -368,7 +403,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Interaction",
       "full_name_de": "Juxtaposition Interaktion",
-      "p_sun_gate": 7
+      "p_sun_gate": 7,
+      "theme_de": "Begegnung als Lebenssinn"
     },
     "57-Juxtaposition": {
       "type": "Juxtaposition",
@@ -378,7 +414,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Intuition",
       "full_name_de": "Juxtaposition Intuition",
-      "p_sun_gate": 57
+      "p_sun_gate": 57,
+      "theme_de": "Stille innere Wahrnehmung"
     },
     "60-Juxtaposition": {
       "type": "Juxtaposition",
@@ -388,7 +425,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Limitation",
       "full_name_de": "Juxtaposition Begrenzung",
-      "p_sun_gate": 60
+      "p_sun_gate": 60,
+      "theme_de": "Akzeptanz von Grenzen"
     },
     "13-Juxtaposition": {
       "type": "Juxtaposition",
@@ -398,7 +436,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Listening",
       "full_name_de": "Juxtaposition Zuhören",
-      "p_sun_gate": 13
+      "p_sun_gate": 13,
+      "theme_de": "Aktives Zuhören als Geschenk"
     },
     "55-Juxtaposition": {
       "type": "Juxtaposition",
@@ -408,7 +447,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Moods",
       "full_name_de": "Juxtaposition Stimmungen",
-      "p_sun_gate": 55
+      "p_sun_gate": 55,
+      "theme_de": "Emotionale Wellen erkennen"
     },
     "3-Juxtaposition": {
       "type": "Juxtaposition",
@@ -418,7 +458,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Mutation",
       "full_name_de": "Juxtaposition Mutation",
-      "p_sun_gate": 3
+      "p_sun_gate": 3,
+      "theme_de": "Transformation als Lebensader"
     },
     "19-Juxtaposition": {
       "type": "Juxtaposition",
@@ -428,7 +469,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Need",
       "full_name_de": "Juxtaposition Bedürfnis",
-      "p_sun_gate": 19
+      "p_sun_gate": 19,
+      "theme_de": "Sensibilität für Bedürfnisse von Mensch und Welt"
     },
     "17-Juxtaposition": {
       "type": "Juxtaposition",
@@ -438,7 +480,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Opinions",
       "full_name_de": "Juxtaposition Meinungen",
-      "p_sun_gate": 17
+      "p_sun_gate": 17,
+      "theme_de": "Klare Stellungnahmen und Wahrheit"
     },
     "38-Juxtaposition": {
       "type": "Juxtaposition",
@@ -448,7 +491,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Opposition",
       "full_name_de": "Juxtaposition Opposition",
-      "p_sun_gate": 38
+      "p_sun_gate": 38,
+      "theme_de": "Provokation als Spiegel"
     },
     "47-Juxtaposition": {
       "type": "Juxtaposition",
@@ -458,7 +502,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Oppression",
       "full_name_de": "Juxtaposition Unterdrückung",
-      "p_sun_gate": 47
+      "p_sun_gate": 47,
+      "theme_de": "Mentale Klärung in Begrenzung"
     },
     "45-Juxtaposition": {
       "type": "Juxtaposition",
@@ -468,7 +513,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Possession",
       "full_name_de": "Juxtaposition Besitz",
-      "p_sun_gate": 45
+      "p_sun_gate": 45,
+      "theme_de": "Verantwortlicher Besitz und Führung"
     },
     "34-Juxtaposition": {
       "type": "Juxtaposition",
@@ -478,7 +524,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Power",
       "full_name_de": "Juxtaposition Kraft",
-      "p_sun_gate": 34
+      "p_sun_gate": 34,
+      "theme_de": "Pure Lebensenergie kanalisieren"
     },
     "49-Juxtaposition": {
       "type": "Juxtaposition",
@@ -488,7 +535,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Principles",
       "full_name_de": "Juxtaposition Prinzipien",
-      "p_sun_gate": 49
+      "p_sun_gate": 49,
+      "theme_de": "Werte und Integrität"
     },
     "39-Juxtaposition": {
       "type": "Juxtaposition",
@@ -498,7 +546,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Provocation",
       "full_name_de": "Juxtaposition Provokation",
-      "p_sun_gate": 39
+      "p_sun_gate": 39,
+      "theme_de": "Auslösen, was schlummert"
     },
     "24-Juxtaposition": {
       "type": "Juxtaposition",
@@ -508,7 +557,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Rationalization",
       "full_name_de": "Juxtaposition Rationalisierung",
-      "p_sun_gate": 24
+      "p_sun_gate": 24,
+      "theme_de": "Mentale Verarbeitung als Klärung"
     },
     "33-Juxtaposition": {
       "type": "Juxtaposition",
@@ -518,7 +568,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Retreat",
       "full_name_de": "Juxtaposition Rückzug",
-      "p_sun_gate": 33
+      "p_sun_gate": 33,
+      "theme_de": "Rückzug als Quelle der Klarheit"
     },
     "28-Juxtaposition": {
       "type": "Juxtaposition",
@@ -528,7 +579,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Risks",
       "full_name_de": "Juxtaposition Risiken",
-      "p_sun_gate": 28
+      "p_sun_gate": 28,
+      "theme_de": "Risiken eingehen, die das Leben weitertragen"
     },
     "1-Juxtaposition": {
       "type": "Juxtaposition",
@@ -538,7 +590,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Self Expression",
       "full_name_de": "Juxtaposition Selbstausdruck",
-      "p_sun_gate": 1
+      "p_sun_gate": 1,
+      "theme_de": "Authentischer Ausdruck der eigenen Essenz"
     },
     "46-Juxtaposition": {
       "type": "Juxtaposition",
@@ -548,7 +601,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Serendipity",
       "full_name_de": "Juxtaposition glückliche Fügung",
-      "p_sun_gate": 46
+      "p_sun_gate": 46,
+      "theme_de": "Vertrauen in den Weg"
     },
     "51-Juxtaposition": {
       "type": "Juxtaposition",
@@ -558,7 +612,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Shock",
       "full_name_de": "Juxtaposition Schock",
-      "p_sun_gate": 51
+      "p_sun_gate": 51,
+      "theme_de": "Mut, der wachrüttelt"
     },
     "52-Juxtaposition": {
       "type": "Juxtaposition",
@@ -568,7 +623,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Stillness",
       "full_name_de": "Juxtaposition Stille",
-      "p_sun_gate": 52
+      "p_sun_gate": 52,
+      "theme_de": "Innere Ruhe als Quelle"
     },
     "56-Juxtaposition": {
       "type": "Juxtaposition",
@@ -578,7 +634,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Stimulation",
       "full_name_de": "Juxtaposition Stimulation",
-      "p_sun_gate": 56
+      "p_sun_gate": 56,
+      "theme_de": "Geschichten, die anregen"
     },
     "59-Juxtaposition": {
       "type": "Juxtaposition",
@@ -588,7 +645,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Strategy",
       "full_name_de": "Juxtaposition Strategie",
-      "p_sun_gate": 59
+      "p_sun_gate": 59,
+      "theme_de": "Verbindung als Werkzeug"
     },
     "61-Juxtaposition": {
       "type": "Juxtaposition",
@@ -598,7 +656,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Thinking",
       "full_name_de": "Juxtaposition Denken",
-      "p_sun_gate": 61
+      "p_sun_gate": 61,
+      "theme_de": "Innere Wahrheit und Reflexion"
     },
     "50-Juxtaposition": {
       "type": "Juxtaposition",
@@ -608,7 +667,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Values",
       "full_name_de": "Juxtaposition Werte",
-      "p_sun_gate": 50
+      "p_sun_gate": 50,
+      "theme_de": "Verantwortung für das Kollektiv"
     },
     "58-Juxtaposition": {
       "type": "Juxtaposition",
@@ -618,7 +678,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of Vitality",
       "full_name_de": "Juxtaposition Vitalität",
-      "p_sun_gate": 58
+      "p_sun_gate": 58,
+      "theme_de": "Lebensfreude und Ausdauer"
     },
     "2-Juxtaposition": {
       "type": "Juxtaposition",
@@ -628,7 +689,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of the Driver",
       "full_name_de": "Juxtaposition Fahrer",
-      "p_sun_gate": 2
+      "p_sun_gate": 2,
+      "theme_de": "Stille Führung durch innere Ausrichtung"
     },
     "20-Juxtaposition": {
       "type": "Juxtaposition",
@@ -638,7 +700,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of the Now",
       "full_name_de": "Juxtaposition Jetzt",
-      "p_sun_gate": 20
+      "p_sun_gate": 20,
+      "theme_de": "Volle Präsenz im Moment"
     },
     "26-Juxtaposition": {
       "type": "Juxtaposition",
@@ -648,7 +711,8 @@
       "variant": 1,
       "full_name_en": "Juxtaposition Cross of the Trickster",
       "full_name_de": "Juxtaposition Trickster",
-      "p_sun_gate": 26
+      "p_sun_gate": 26,
+      "theme_de": "Verspieltes Beeinflussen"
     },
     "34-LeftAngle": {
       "type": "Left Angle",
@@ -658,7 +722,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Duality 2",
       "full_name_de": "LAX Dualität 2",
-      "p_sun_gate": 34
+      "p_sun_gate": 34,
+      "theme_de": "Polarität halten und in Balance bringen"
     },
     "39-LeftAngle": {
       "type": "Left Angle",
@@ -668,7 +733,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Individualism",
       "full_name_de": "LAX Individualismus",
-      "p_sun_gate": 39
+      "p_sun_gate": 39,
+      "theme_de": "Eigenständigkeit und kreative Provokation"
     },
     "38-LeftAngle": {
       "type": "Left Angle",
@@ -678,7 +744,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Individualism 2",
       "full_name_de": "LAX Individualismus 2",
-      "p_sun_gate": 38
+      "p_sun_gate": 38,
+      "theme_de": "Eigenständigkeit und kreative Provokation"
     },
     "32-LeftAngle": {
       "type": "Left Angle",
@@ -688,7 +755,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Limitation 2",
       "full_name_de": "LAX Begrenzung 2",
-      "p_sun_gate": 32
+      "p_sun_gate": 32,
+      "theme_de": "Akzeptanz von Grenzen als Quelle der Freiheit"
     },
     "33-LeftAngle": {
       "type": "Left Angle",
@@ -698,7 +766,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Refinement",
       "full_name_de": "LAX Verfeinerung",
-      "p_sun_gate": 33
+      "p_sun_gate": 33,
+      "theme_de": "Bewusstheit, Reife und Verfeinerung der Werte"
     },
     "36-LeftAngle": {
       "type": "Left Angle",
@@ -708,7 +777,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of the Plane",
       "full_name_de": "LAX Ebene",
-      "p_sun_gate": 36
+      "p_sun_gate": 36,
+      "theme_de": "Erfahrung als Lehrmeister der Empathie"
     },
     "27-LeftAngle": {
       "type": "Left Angle",
@@ -718,7 +788,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Alignment",
       "full_name_de": "LAX Ausrichtung",
-      "p_sun_gate": 27
+      "p_sun_gate": 27,
+      "theme_de": "Sich neu an Werten ausrichten"
     },
     "28-LeftAngle": {
       "type": "Left Angle",
@@ -728,7 +799,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Alignment 2",
       "full_name_de": "LAX Ausrichtung 2",
-      "p_sun_gate": 28
+      "p_sun_gate": 28,
+      "theme_de": "Sich neu an Werten ausrichten"
     },
     "45-LeftAngle": {
       "type": "Left Angle",
@@ -738,7 +810,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Confrontation",
       "full_name_de": "LAX Konfrontation",
-      "p_sun_gate": 45
+      "p_sun_gate": 45,
+      "theme_de": "Lernen durch Widerstand und Transformation durch Mut"
     },
     "26-LeftAngle": {
       "type": "Left Angle",
@@ -748,7 +821,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Confrontation 2",
       "full_name_de": "LAX Konfrontation 2",
-      "p_sun_gate": 26
+      "p_sun_gate": 26,
+      "theme_de": "Lernen durch Widerstand und Transformation durch Mut"
     },
     "53-LeftAngle": {
       "type": "Left Angle",
@@ -758,7 +832,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Cycles",
       "full_name_de": "LAX Zyklen",
-      "p_sun_gate": 53
+      "p_sun_gate": 53,
+      "theme_de": "Rhythmus, Wiederholung und Evolution"
     },
     "54-LeftAngle": {
       "type": "Left Angle",
@@ -768,7 +843,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Cycles 2",
       "full_name_de": "LAX Zyklen 2",
-      "p_sun_gate": 54
+      "p_sun_gate": 54,
+      "theme_de": "Rhythmus, Wiederholung und Evolution"
     },
     "23-LeftAngle": {
       "type": "Left Angle",
@@ -778,7 +854,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Dedication",
       "full_name_de": "LAX Hingabe",
-      "p_sun_gate": 23
+      "p_sun_gate": 23,
+      "theme_de": "Singuläre Ausrichtung auf eine innere Wahrheit"
     },
     "43-LeftAngle": {
       "type": "Left Angle",
@@ -788,7 +865,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Dedication 2",
       "full_name_de": "LAX Hingabe 2",
-      "p_sun_gate": 43
+      "p_sun_gate": 43,
+      "theme_de": "Singuläre Ausrichtung auf eine innere Wahrheit"
     },
     "2-LeftAngle": {
       "type": "Left Angle",
@@ -798,7 +876,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Defiance",
       "full_name_de": "LAX Trotz",
-      "p_sun_gate": 2
+      "p_sun_gate": 2,
+      "theme_de": "Widerstand als Weg zur Selbstermächtigung"
     },
     "1-LeftAngle": {
       "type": "Left Angle",
@@ -808,7 +887,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Defiance 2",
       "full_name_de": "LAX Trotz 2",
-      "p_sun_gate": 1
+      "p_sun_gate": 1,
+      "theme_de": "Widerstand als Weg zur Selbstermächtigung"
     },
     "52-LeftAngle": {
       "type": "Left Angle",
@@ -818,7 +898,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Demands",
       "full_name_de": "LAX Forderungen",
-      "p_sun_gate": 52
+      "p_sun_gate": 52,
+      "theme_de": "Klare Ansprüche und Verantwortung in Beziehung"
     },
     "58-LeftAngle": {
       "type": "Left Angle",
@@ -828,7 +909,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Demands 2",
       "full_name_de": "LAX Forderungen 2",
-      "p_sun_gate": 58
+      "p_sun_gate": 58,
+      "theme_de": "Klare Ansprüche und Verantwortung in Beziehung"
     },
     "56-LeftAngle": {
       "type": "Left Angle",
@@ -838,7 +920,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Distraction",
       "full_name_de": "LAX Ablenkung",
-      "p_sun_gate": 56
+      "p_sun_gate": 56,
+      "theme_de": "Vom Wesentlichen ablenken oder dorthin zurückfinden"
     },
     "60-LeftAngle": {
       "type": "Left Angle",
@@ -848,7 +931,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Distraction 2",
       "full_name_de": "LAX Ablenkung 2",
-      "p_sun_gate": 60
+      "p_sun_gate": 60,
+      "theme_de": "Vom Wesentlichen ablenken oder dorthin zurückfinden"
     },
     "63-LeftAngle": {
       "type": "Left Angle",
@@ -858,7 +942,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Dominion",
       "full_name_de": "LAX Vorherrschaft",
-      "p_sun_gate": 63
+      "p_sun_gate": 63,
+      "theme_de": "Verantwortung und Einfluss durch reflektierte Macht"
     },
     "64-LeftAngle": {
       "type": "Left Angle",
@@ -868,7 +953,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Dominion 2",
       "full_name_de": "LAX Vorherrschaft 2",
-      "p_sun_gate": 64
+      "p_sun_gate": 64,
+      "theme_de": "Verantwortung und Einfluss durch reflektierte Macht"
     },
     "20-LeftAngle": {
       "type": "Left Angle",
@@ -878,7 +964,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Duality",
       "full_name_de": "LAX Dualität",
-      "p_sun_gate": 20
+      "p_sun_gate": 20,
+      "theme_de": "Polarität halten und in Balance bringen"
     },
     "12-LeftAngle": {
       "type": "Left Angle",
@@ -888,7 +975,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Education",
       "full_name_de": "LAX Erziehung",
-      "p_sun_gate": 12
+      "p_sun_gate": 12,
+      "theme_de": "Weisheit teilen – Lernen und Lehren als wechselseitiger Weg"
     },
     "11-LeftAngle": {
       "type": "Left Angle",
@@ -898,7 +986,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Education 2",
       "full_name_de": "LAX Erziehung 2",
-      "p_sun_gate": 11
+      "p_sun_gate": 11,
+      "theme_de": "Weisheit teilen – Lernen und Lehren als wechselseitiger Weg"
     },
     "21-LeftAngle": {
       "type": "Left Angle",
@@ -908,7 +997,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Endeavour",
       "full_name_de": "LAX Streben",
-      "p_sun_gate": 21
+      "p_sun_gate": 21,
+      "theme_de": "Beharrlichkeit und Ressourcenführung"
     },
     "48-LeftAngle": {
       "type": "Left Angle",
@@ -918,7 +1008,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Endeavour 2",
       "full_name_de": "LAX Streben 2",
-      "p_sun_gate": 48
+      "p_sun_gate": 48,
+      "theme_de": "Beharrlichkeit und Ressourcenführung"
     },
     "25-LeftAngle": {
       "type": "Left Angle",
@@ -928,7 +1019,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Healing",
       "full_name_de": "LAX Heilung",
-      "p_sun_gate": 25
+      "p_sun_gate": 25,
+      "theme_de": "Emotionale Transformation und Verständnis als Heilweg"
     },
     "46-LeftAngle": {
       "type": "Left Angle",
@@ -938,7 +1030,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Healing 2",
       "full_name_de": "LAX Heilung 2",
-      "p_sun_gate": 46
+      "p_sun_gate": 46,
+      "theme_de": "Emotionale Transformation und Verständnis als Heilweg"
     },
     "16-LeftAngle": {
       "type": "Left Angle",
@@ -948,7 +1041,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Identification",
       "full_name_de": "LAX Identifikation",
-      "p_sun_gate": 16
+      "p_sun_gate": 16,
+      "theme_de": "Sich finden in der Verbindung mit anderen"
     },
     "9-LeftAngle": {
       "type": "Left Angle",
@@ -958,7 +1052,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Identification 2",
       "full_name_de": "LAX Identifikation 2",
-      "p_sun_gate": 9
+      "p_sun_gate": 9,
+      "theme_de": "Sich finden in der Verbindung mit anderen"
     },
     "24-LeftAngle": {
       "type": "Left Angle",
@@ -968,7 +1063,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Incarnation",
       "full_name_de": "LAX Inkarnation",
-      "p_sun_gate": 24
+      "p_sun_gate": 24,
+      "theme_de": "Verkörperung von Bewusstsein in Beziehung"
     },
     "44-LeftAngle": {
       "type": "Left Angle",
@@ -978,7 +1074,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Incarnation 2",
       "full_name_de": "LAX Inkarnation 2",
-      "p_sun_gate": 44
+      "p_sun_gate": 44,
+      "theme_de": "Verkörperung von Bewusstsein in Beziehung"
     },
     "30-LeftAngle": {
       "type": "Left Angle",
@@ -988,7 +1085,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Industry",
       "full_name_de": "LAX Industrie",
-      "p_sun_gate": 30
+      "p_sun_gate": 30,
+      "theme_de": "Beharrliche Hingabe und Produktivität"
     },
     "29-LeftAngle": {
       "type": "Left Angle",
@@ -998,7 +1096,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Industry 2",
       "full_name_de": "LAX Industrie 2",
-      "p_sun_gate": 29
+      "p_sun_gate": 29,
+      "theme_de": "Beharrliche Hingabe und Produktivität"
     },
     "22-LeftAngle": {
       "type": "Left Angle",
@@ -1008,7 +1107,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Informing",
       "full_name_de": "LAX Informieren",
-      "p_sun_gate": 22
+      "p_sun_gate": 22,
+      "theme_de": "Kommunikation, Inspiration und Führung durch Ideen"
     },
     "47-LeftAngle": {
       "type": "Left Angle",
@@ -1018,7 +1118,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Informing 2",
       "full_name_de": "LAX Informieren 2",
-      "p_sun_gate": 47
+      "p_sun_gate": 47,
+      "theme_de": "Kommunikation, Inspiration und Führung durch Ideen"
     },
     "42-LeftAngle": {
       "type": "Left Angle",
@@ -1028,7 +1129,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Limitation",
       "full_name_de": "LAX Begrenzung",
-      "p_sun_gate": 42
+      "p_sun_gate": 42,
+      "theme_de": "Akzeptanz von Grenzen als Quelle der Freiheit"
     },
     "13-LeftAngle": {
       "type": "Left Angle",
@@ -1038,7 +1140,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Masks",
       "full_name_de": "LAX Masken",
-      "p_sun_gate": 13
+      "p_sun_gate": 13,
+      "theme_de": "Identität und Wandel durch soziale Rollen"
     },
     "7-LeftAngle": {
       "type": "Left Angle",
@@ -1048,7 +1151,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Masks 2",
       "full_name_de": "LAX Masken 2",
-      "p_sun_gate": 7
+      "p_sun_gate": 7,
+      "theme_de": "Identität und Wandel durch soziale Rollen"
     },
     "37-LeftAngle": {
       "type": "Left Angle",
@@ -1058,7 +1162,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Migration",
       "full_name_de": "LAX Wanderung",
-      "p_sun_gate": 37
+      "p_sun_gate": 37,
+      "theme_de": "Wandel, Entwicklung und Bewegung zwischen Welten"
     },
     "40-LeftAngle": {
       "type": "Left Angle",
@@ -1068,7 +1173,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Migration 2",
       "full_name_de": "LAX Wanderung 2",
-      "p_sun_gate": 40
+      "p_sun_gate": 40,
+      "theme_de": "Wandel, Entwicklung und Bewegung zwischen Welten"
     },
     "62-LeftAngle": {
       "type": "Left Angle",
@@ -1078,7 +1184,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Obscuration",
       "full_name_de": "LAX Verdunkelung",
-      "p_sun_gate": 62
+      "p_sun_gate": 62,
+      "theme_de": "Durch Dunkelheit zur Erkenntnis – Bewusstheit in Krisen"
     },
     "61-LeftAngle": {
       "type": "Left Angle",
@@ -1088,7 +1195,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Obscuration 2",
       "full_name_de": "LAX Verdunkelung 2",
-      "p_sun_gate": 61
+      "p_sun_gate": 61,
+      "theme_de": "Durch Dunkelheit zur Erkenntnis – Bewusstheit in Krisen"
     },
     "15-LeftAngle": {
       "type": "Left Angle",
@@ -1098,7 +1206,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Prevention",
       "full_name_de": "LAX Vorbeugung",
-      "p_sun_gate": 15
+      "p_sun_gate": 15,
+      "theme_de": "Achtsamkeit, Schutz und Voraussicht"
     },
     "10-LeftAngle": {
       "type": "Left Angle",
@@ -1108,7 +1217,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Prevention 2",
       "full_name_de": "LAX Vorbeugung 2",
-      "p_sun_gate": 10
+      "p_sun_gate": 10,
+      "theme_de": "Achtsamkeit, Schutz und Voraussicht"
     },
     "19-LeftAngle": {
       "type": "Left Angle",
@@ -1118,7 +1228,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Refinement 2",
       "full_name_de": "LAX Verfeinerung 2",
-      "p_sun_gate": 19
+      "p_sun_gate": 19,
+      "theme_de": "Bewusstheit, Reife und Verfeinerung der Werte"
     },
     "49-LeftAngle": {
       "type": "Left Angle",
@@ -1128,7 +1239,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Revolution",
       "full_name_de": "LAX Revolution",
-      "p_sun_gate": 49
+      "p_sun_gate": 49,
+      "theme_de": "Transformation sozialer Strukturen und kollektiver Werte"
     },
     "4-LeftAngle": {
       "type": "Left Angle",
@@ -1138,7 +1250,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Revolution 2",
       "full_name_de": "LAX Revolution 2",
-      "p_sun_gate": 4
+      "p_sun_gate": 4,
+      "theme_de": "Transformation sozialer Strukturen und kollektiver Werte"
     },
     "35-LeftAngle": {
       "type": "Left Angle",
@@ -1148,7 +1261,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Separation",
       "full_name_de": "LAX Trennung",
-      "p_sun_gate": 35
+      "p_sun_gate": 35,
+      "theme_de": "Loslösung als Weg zur eigenen Wahrheit"
     },
     "5-LeftAngle": {
       "type": "Left Angle",
@@ -1158,7 +1272,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Separation 2",
       "full_name_de": "LAX Trennung 2",
-      "p_sun_gate": 5
+      "p_sun_gate": 5,
+      "theme_de": "Loslösung als Weg zur eigenen Wahrheit"
     },
     "55-LeftAngle": {
       "type": "Left Angle",
@@ -1168,7 +1283,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Spirit",
       "full_name_de": "LAX Geist",
-      "p_sun_gate": 55
+      "p_sun_gate": 55,
+      "theme_de": "Stimmung und emotionale Tiefe als kollektives Geschenk"
     },
     "59-LeftAngle": {
       "type": "Left Angle",
@@ -1178,7 +1294,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Spirit 2",
       "full_name_de": "LAX Geist 2",
-      "p_sun_gate": 59
+      "p_sun_gate": 59,
+      "theme_de": "Stimmung und emotionale Tiefe als kollektives Geschenk"
     },
     "8-LeftAngle": {
       "type": "Left Angle",
@@ -1188,7 +1305,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Uncertainty",
       "full_name_de": "LAX Ungewissheit",
-      "p_sun_gate": 8
+      "p_sun_gate": 8,
+      "theme_de": "Weisheit durch das Akzeptieren von Wandel und Unklarheit"
     },
     "14-LeftAngle": {
       "type": "Left Angle",
@@ -1198,7 +1316,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Uncertainty 2",
       "full_name_de": "LAX Ungewissheit 2",
-      "p_sun_gate": 14
+      "p_sun_gate": 14,
+      "theme_de": "Weisheit durch das Akzeptieren von Wandel und Unklarheit"
     },
     "17-LeftAngle": {
       "type": "Left Angle",
@@ -1208,7 +1327,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Upheaval",
       "full_name_de": "LAX Umwälzung",
-      "p_sun_gate": 17
+      "p_sun_gate": 17,
+      "theme_de": "Wandel durch klare Kritik und konstruktive Spannung"
     },
     "18-LeftAngle": {
       "type": "Left Angle",
@@ -1218,7 +1338,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Upheaval 2",
       "full_name_de": "LAX Umwälzung 2",
-      "p_sun_gate": 18
+      "p_sun_gate": 18,
+      "theme_de": "Wandel durch klare Kritik und konstruktive Spannung"
     },
     "3-LeftAngle": {
       "type": "Left Angle",
@@ -1228,7 +1349,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of Wishes",
       "full_name_de": "LAX Wünsche",
-      "p_sun_gate": 3
+      "p_sun_gate": 3,
+      "theme_de": "Sehnsucht und Initiation in neue Erfahrungen"
     },
     "50-LeftAngle": {
       "type": "Left Angle",
@@ -1238,7 +1360,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of Wishes 2",
       "full_name_de": "LAX Wünsche 2",
-      "p_sun_gate": 50
+      "p_sun_gate": 50,
+      "theme_de": "Sehnsucht und Initiation in neue Erfahrungen"
     },
     "31-LeftAngle": {
       "type": "Left Angle",
@@ -1248,7 +1371,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of the Alpha",
       "full_name_de": "LAX Alpha",
-      "p_sun_gate": 31
+      "p_sun_gate": 31,
+      "theme_de": "Führung durch natürliche Autorität – gerufen, nicht gewählt"
     },
     "41-LeftAngle": {
       "type": "Left Angle",
@@ -1258,7 +1382,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of the Alpha 2",
       "full_name_de": "LAX Alpha 2",
-      "p_sun_gate": 41
+      "p_sun_gate": 41,
+      "theme_de": "Führung durch natürliche Autorität – gerufen, nicht gewählt"
     },
     "51-LeftAngle": {
       "type": "Left Angle",
@@ -1268,7 +1393,8 @@
       "variant": 1,
       "full_name_en": "Left Angle Cross of the Clarion",
       "full_name_de": "LAX Klarion",
-      "p_sun_gate": 51
+      "p_sun_gate": 51,
+      "theme_de": "Schock und Mut als Impuls zur Wahrheit"
     },
     "57-LeftAngle": {
       "type": "Left Angle",
@@ -1278,7 +1404,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of the Clarion 2",
       "full_name_de": "LAX Klarion 2",
-      "p_sun_gate": 57
+      "p_sun_gate": 57,
+      "theme_de": "Schock und Mut als Impuls zur Wahrheit"
     },
     "6-LeftAngle": {
       "type": "Left Angle",
@@ -1288,7 +1415,8 @@
       "variant": 2,
       "full_name_en": "Left Angle Cross of the Plane 2",
       "full_name_de": "LAX Ebene 2",
-      "p_sun_gate": 6
+      "p_sun_gate": 6,
+      "theme_de": "Erfahrung als Lehrmeister der Empathie"
     },
     "63-RightAngle": {
       "type": "Right Angle",
@@ -1298,7 +1426,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Consciousness",
       "full_name_de": "RAX Bewusstsein",
-      "p_sun_gate": 63
+      "p_sun_gate": 63,
+      "theme_de": "Erwachen durch Mut, Intuition und mentale Klarheit"
     },
     "35-RightAngle": {
       "type": "Right Angle",
@@ -1308,7 +1437,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Consciousness 2",
       "full_name_de": "RAX Bewusstsein 2",
-      "p_sun_gate": 35
+      "p_sun_gate": 35,
+      "theme_de": "Erwachen durch Mut, Intuition und mentale Klarheit"
     },
     "64-RightAngle": {
       "type": "Right Angle",
@@ -1318,7 +1448,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Consciousness 3",
       "full_name_de": "RAX Bewusstsein 3",
-      "p_sun_gate": 64
+      "p_sun_gate": 64,
+      "theme_de": "Erwachen durch Mut, Intuition und mentale Klarheit"
     },
     "5-RightAngle": {
       "type": "Right Angle",
@@ -1328,7 +1459,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Consciousness 4",
       "full_name_de": "RAX Bewusstsein 4",
-      "p_sun_gate": 5
+      "p_sun_gate": 5,
+      "theme_de": "Erwachen durch Mut, Intuition und mentale Klarheit"
     },
     "30-RightAngle": {
       "type": "Right Angle",
@@ -1338,7 +1470,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Contagion",
       "full_name_de": "RAX Ansteckung",
-      "p_sun_gate": 30
+      "p_sun_gate": 30,
+      "theme_de": "Leidenschaft, Inspiration und Einfluss durch Authentizität"
     },
     "8-RightAngle": {
       "type": "Right Angle",
@@ -1348,7 +1481,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Contagion 2",
       "full_name_de": "RAX Ansteckung 2",
-      "p_sun_gate": 8
+      "p_sun_gate": 8,
+      "theme_de": "Leidenschaft, Inspiration und Einfluss durch Authentizität"
     },
     "29-RightAngle": {
       "type": "Right Angle",
@@ -1358,7 +1492,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Contagion 3",
       "full_name_de": "RAX Ansteckung 3",
-      "p_sun_gate": 29
+      "p_sun_gate": 29,
+      "theme_de": "Leidenschaft, Inspiration und Einfluss durch Authentizität"
     },
     "14-RightAngle": {
       "type": "Right Angle",
@@ -1368,7 +1503,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Contagion 4",
       "full_name_de": "RAX Ansteckung 4",
-      "p_sun_gate": 14
+      "p_sun_gate": 14,
+      "theme_de": "Leidenschaft, Inspiration und Einfluss durch Authentizität"
     },
     "12-RightAngle": {
       "type": "Right Angle",
@@ -1378,7 +1514,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Eden 2",
       "full_name_de": "RAX Eden 2",
-      "p_sun_gate": 12
+      "p_sun_gate": 12,
+      "theme_de": "Erfahrungssammlung als Weg zur Weisheit"
     },
     "6-RightAngle": {
       "type": "Right Angle",
@@ -1388,7 +1525,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Eden 3",
       "full_name_de": "RAX Eden 3",
-      "p_sun_gate": 6
+      "p_sun_gate": 6,
+      "theme_de": "Erfahrungssammlung als Weg zur Weisheit"
     },
     "11-RightAngle": {
       "type": "Right Angle",
@@ -1398,7 +1536,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Eden 4",
       "full_name_de": "RAX Eden 4",
-      "p_sun_gate": 11
+      "p_sun_gate": 11,
+      "theme_de": "Erfahrungssammlung als Weg zur Weisheit"
     },
     "49-RightAngle": {
       "type": "Right Angle",
@@ -1408,7 +1547,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Explanation",
       "full_name_de": "RAX Erklärung",
-      "p_sun_gate": 49
+      "p_sun_gate": 49,
+      "theme_de": "Wissen verständlich machen, mentale Klarheit kommunizieren"
     },
     "23-RightAngle": {
       "type": "Right Angle",
@@ -1418,7 +1558,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Explanation 2",
       "full_name_de": "RAX Erklärung 2",
-      "p_sun_gate": 23
+      "p_sun_gate": 23,
+      "theme_de": "Wissen verständlich machen, mentale Klarheit kommunizieren"
     },
     "4-RightAngle": {
       "type": "Right Angle",
@@ -1428,7 +1569,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Explanation 3",
       "full_name_de": "RAX Erklärung 3",
-      "p_sun_gate": 4
+      "p_sun_gate": 4,
+      "theme_de": "Wissen verständlich machen, mentale Klarheit kommunizieren"
     },
     "43-RightAngle": {
       "type": "Right Angle",
@@ -1438,7 +1580,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Explanation 4",
       "full_name_de": "RAX Erklärung 4",
-      "p_sun_gate": 43
+      "p_sun_gate": 43,
+      "theme_de": "Wissen verständlich machen, mentale Klarheit kommunizieren"
     },
     "3-RightAngle": {
       "type": "Right Angle",
@@ -1448,7 +1591,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Laws",
       "full_name_de": "RAX Gesetze",
-      "p_sun_gate": 3
+      "p_sun_gate": 3,
+      "theme_de": "Strukturen und Ordnungsprinzipien des Lebens"
     },
     "56-RightAngle": {
       "type": "Right Angle",
@@ -1458,7 +1602,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Laws 2",
       "full_name_de": "RAX Gesetze 2",
-      "p_sun_gate": 56
+      "p_sun_gate": 56,
+      "theme_de": "Strukturen und Ordnungsprinzipien des Lebens"
     },
     "50-RightAngle": {
       "type": "Right Angle",
@@ -1468,7 +1613,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Laws 3",
       "full_name_de": "RAX Gesetze 3",
-      "p_sun_gate": 50
+      "p_sun_gate": 50,
+      "theme_de": "Strukturen und Ordnungsprinzipien des Lebens"
     },
     "60-RightAngle": {
       "type": "Right Angle",
@@ -1478,7 +1624,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Laws 4",
       "full_name_de": "RAX Gesetze 4",
-      "p_sun_gate": 60
+      "p_sun_gate": 60,
+      "theme_de": "Strukturen und Ordnungsprinzipien des Lebens"
     },
     "42-RightAngle": {
       "type": "Right Angle",
@@ -1488,7 +1635,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Maya",
       "full_name_de": "RAX Maya",
-      "p_sun_gate": 42
+      "p_sun_gate": 42,
+      "theme_de": "Die Illusion des Lebens durchschauen und anderen neue Perspektiven öffnen"
     },
     "62-RightAngle": {
       "type": "Right Angle",
@@ -1498,7 +1646,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Maya 2",
       "full_name_de": "RAX Maya 2",
-      "p_sun_gate": 62
+      "p_sun_gate": 62,
+      "theme_de": "Die Illusion des Lebens durchschauen und anderen neue Perspektiven öffnen"
     },
     "32-RightAngle": {
       "type": "Right Angle",
@@ -1508,7 +1657,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Maya 3",
       "full_name_de": "RAX Maya 3",
-      "p_sun_gate": 32
+      "p_sun_gate": 32,
+      "theme_de": "Die Illusion des Lebens durchschauen und anderen neue Perspektiven öffnen"
     },
     "61-RightAngle": {
       "type": "Right Angle",
@@ -1518,7 +1668,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Maya 4",
       "full_name_de": "RAX Maya 4",
-      "p_sun_gate": 61
+      "p_sun_gate": 61,
+      "theme_de": "Die Illusion des Lebens durchschauen und anderen neue Perspektiven öffnen"
     },
     "51-RightAngle": {
       "type": "Right Angle",
@@ -1528,7 +1679,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Penetration",
       "full_name_de": "RAX Durchdringung",
-      "p_sun_gate": 51
+      "p_sun_gate": 51,
+      "theme_de": "Mut, intuitive Wahrnehmung und Klarheit in der Tiefe"
     },
     "53-RightAngle": {
       "type": "Right Angle",
@@ -1538,7 +1690,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Penetration 2",
       "full_name_de": "RAX Durchdringung 2",
-      "p_sun_gate": 53
+      "p_sun_gate": 53,
+      "theme_de": "Mut, intuitive Wahrnehmung und Klarheit in der Tiefe"
     },
     "57-RightAngle": {
       "type": "Right Angle",
@@ -1548,7 +1701,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Penetration 3",
       "full_name_de": "RAX Durchdringung 3",
-      "p_sun_gate": 57
+      "p_sun_gate": 57,
+      "theme_de": "Mut, intuitive Wahrnehmung und Klarheit in der Tiefe"
     },
     "54-RightAngle": {
       "type": "Right Angle",
@@ -1558,7 +1712,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Penetration 4",
       "full_name_de": "RAX Durchdringung 4",
-      "p_sun_gate": 54
+      "p_sun_gate": 54,
+      "theme_de": "Mut, intuitive Wahrnehmung und Klarheit in der Tiefe"
     },
     "37-RightAngle": {
       "type": "Right Angle",
@@ -1568,7 +1723,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Planning",
       "full_name_de": "RAX Planung",
-      "p_sun_gate": 37
+      "p_sun_gate": 37,
+      "theme_de": "Gemeinschaft, Unterstützung und Struktur schaffen"
     },
     "16-RightAngle": {
       "type": "Right Angle",
@@ -1578,7 +1734,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Planning 2",
       "full_name_de": "RAX Planung 2",
-      "p_sun_gate": 16
+      "p_sun_gate": 16,
+      "theme_de": "Gemeinschaft, Unterstützung und Struktur schaffen"
     },
     "40-RightAngle": {
       "type": "Right Angle",
@@ -1588,7 +1745,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Planning 3",
       "full_name_de": "RAX Planung 3",
-      "p_sun_gate": 40
+      "p_sun_gate": 40,
+      "theme_de": "Gemeinschaft, Unterstützung und Struktur schaffen"
     },
     "9-RightAngle": {
       "type": "Right Angle",
@@ -1598,7 +1756,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Planning 4",
       "full_name_de": "RAX Planung 4",
-      "p_sun_gate": 9
+      "p_sun_gate": 9,
+      "theme_de": "Gemeinschaft, Unterstützung und Struktur schaffen"
     },
     "22-RightAngle": {
       "type": "Right Angle",
@@ -1608,7 +1767,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Rulership",
       "full_name_de": "RAX Herrschaft",
-      "p_sun_gate": 22
+      "p_sun_gate": 22,
+      "theme_de": "Führung, Einfluss und der Umgang mit Verantwortung"
     },
     "45-RightAngle": {
       "type": "Right Angle",
@@ -1618,7 +1778,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Rulership 2",
       "full_name_de": "RAX Herrschaft 2",
-      "p_sun_gate": 45
+      "p_sun_gate": 45,
+      "theme_de": "Führung, Einfluss und der Umgang mit Verantwortung"
     },
     "47-RightAngle": {
       "type": "Right Angle",
@@ -1628,7 +1789,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Rulership 3",
       "full_name_de": "RAX Herrschaft 3",
-      "p_sun_gate": 47
+      "p_sun_gate": 47,
+      "theme_de": "Führung, Einfluss und der Umgang mit Verantwortung"
     },
     "26-RightAngle": {
       "type": "Right Angle",
@@ -1638,7 +1800,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Rulership 4",
       "full_name_de": "RAX Herrschaft 4",
-      "p_sun_gate": 26
+      "p_sun_gate": 26,
+      "theme_de": "Führung, Einfluss und der Umgang mit Verantwortung"
     },
     "17-RightAngle": {
       "type": "Right Angle",
@@ -1648,7 +1811,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Service",
       "full_name_de": "RAX Dienst",
-      "p_sun_gate": 17
+      "p_sun_gate": 17,
+      "theme_de": "Heilung durch Verbesserung und konstruktive Führung"
     },
     "52-RightAngle": {
       "type": "Right Angle",
@@ -1658,7 +1822,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Service 2",
       "full_name_de": "RAX Dienst 2",
-      "p_sun_gate": 52
+      "p_sun_gate": 52,
+      "theme_de": "Heilung durch Verbesserung und konstruktive Führung"
     },
     "18-RightAngle": {
       "type": "Right Angle",
@@ -1668,7 +1833,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Service 3",
       "full_name_de": "RAX Dienst 3",
-      "p_sun_gate": 18
+      "p_sun_gate": 18,
+      "theme_de": "Heilung durch Verbesserung und konstruktive Führung"
     },
     "58-RightAngle": {
       "type": "Right Angle",
@@ -1678,7 +1844,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Service 4",
       "full_name_de": "RAX Dienst 4",
-      "p_sun_gate": 58
+      "p_sun_gate": 58,
+      "theme_de": "Heilung durch Verbesserung und konstruktive Führung"
     },
     "21-RightAngle": {
       "type": "Right Angle",
@@ -1688,7 +1855,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of Tension",
       "full_name_de": "RAX Spannung",
-      "p_sun_gate": 21
+      "p_sun_gate": 21,
+      "theme_de": "Der Sinn des Kampfes – Sinnfindung durch Herausforderung"
     },
     "39-RightAngle": {
       "type": "Right Angle",
@@ -1698,7 +1866,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of Tension 2",
       "full_name_de": "RAX Spannung 2",
-      "p_sun_gate": 39
+      "p_sun_gate": 39,
+      "theme_de": "Der Sinn des Kampfes – Sinnfindung durch Herausforderung"
     },
     "48-RightAngle": {
       "type": "Right Angle",
@@ -1708,7 +1877,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of Tension 3",
       "full_name_de": "RAX Spannung 3",
-      "p_sun_gate": 48
+      "p_sun_gate": 48,
+      "theme_de": "Der Sinn des Kampfes – Sinnfindung durch Herausforderung"
     },
     "38-RightAngle": {
       "type": "Right Angle",
@@ -1718,7 +1888,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Tension 4",
       "full_name_de": "RAX Spannung 4",
-      "p_sun_gate": 38
+      "p_sun_gate": 38,
+      "theme_de": "Der Sinn des Kampfes – Sinnfindung durch Herausforderung"
     },
     "10-RightAngle": {
       "type": "Right Angle",
@@ -1728,7 +1899,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of Vessel Of Love 4",
       "full_name_de": "RAX Liebesgefäß 4",
-      "p_sun_gate": 10
+      "p_sun_gate": 10,
+      "theme_de": "Verkörperte Liebe, Selbstannahme und Richtung durch Hingabe an das Leben"
     },
     "36-RightAngle": {
       "type": "Right Angle",
@@ -1738,7 +1910,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Eden",
       "full_name_de": "RAX Eden",
-      "p_sun_gate": 36
+      "p_sun_gate": 36,
+      "theme_de": "Erfahrungssammlung als Weg zur Weisheit"
     },
     "24-RightAngle": {
       "type": "Right Angle",
@@ -1748,7 +1921,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Four Ways",
       "full_name_de": "RAX Vier Wege",
-      "p_sun_gate": 24
+      "p_sun_gate": 24,
+      "theme_de": "Führung durch stille Weisheit und die Kraft des Zuhörens"
     },
     "33-RightAngle": {
       "type": "Right Angle",
@@ -1758,7 +1932,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of the Four Ways 2",
       "full_name_de": "RAX Vier Wege 2",
-      "p_sun_gate": 33
+      "p_sun_gate": 33,
+      "theme_de": "Führung durch stille Weisheit und die Kraft des Zuhörens"
     },
     "44-RightAngle": {
       "type": "Right Angle",
@@ -1768,7 +1943,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of the Four Ways 3",
       "full_name_de": "RAX Vier Wege 3",
-      "p_sun_gate": 44
+      "p_sun_gate": 44,
+      "theme_de": "Führung durch stille Weisheit und die Kraft des Zuhörens"
     },
     "19-RightAngle": {
       "type": "Right Angle",
@@ -1778,7 +1954,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of the Four Ways 4",
       "full_name_de": "RAX Vier Wege 4",
-      "p_sun_gate": 19
+      "p_sun_gate": 19,
+      "theme_de": "Führung durch stille Weisheit und die Kraft des Zuhörens"
     },
     "55-RightAngle": {
       "type": "Right Angle",
@@ -1788,7 +1965,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Sleeping Phoenix",
       "full_name_de": "RAX Schlafender Phönix",
-      "p_sun_gate": 55
+      "p_sun_gate": 55,
+      "theme_de": "Transformation durch Loslassen alter Muster und Systeme"
     },
     "20-RightAngle": {
       "type": "Right Angle",
@@ -1798,7 +1976,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of the Sleeping Phoenix 2",
       "full_name_de": "RAX Schlafender Phönix 2",
-      "p_sun_gate": 20
+      "p_sun_gate": 20,
+      "theme_de": "Transformation durch Loslassen alter Muster und Systeme"
     },
     "59-RightAngle": {
       "type": "Right Angle",
@@ -1808,7 +1987,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of the Sleeping Phoenix 3",
       "full_name_de": "RAX Schlafender Phönix 3",
-      "p_sun_gate": 59
+      "p_sun_gate": 59,
+      "theme_de": "Transformation durch Loslassen alter Muster und Systeme"
     },
     "34-RightAngle": {
       "type": "Right Angle",
@@ -1818,7 +1998,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of the Sleeping Phoenix 4",
       "full_name_de": "RAX Schlafender Phönix 4",
-      "p_sun_gate": 34
+      "p_sun_gate": 34,
+      "theme_de": "Transformation durch Loslassen alter Muster und Systeme"
     },
     "13-RightAngle": {
       "type": "Right Angle",
@@ -1828,7 +2009,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Sphinx",
       "full_name_de": "RAX Sphinx",
-      "p_sun_gate": 13
+      "p_sun_gate": 13,
+      "theme_de": "Führung durch Richtung und Ausdruck des inneren Selbst"
     },
     "2-RightAngle": {
       "type": "Right Angle",
@@ -1838,7 +2020,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of the Sphinx 2",
       "full_name_de": "RAX Sphinx 2",
-      "p_sun_gate": 2
+      "p_sun_gate": 2,
+      "theme_de": "Führung durch Richtung und Ausdruck des inneren Selbst"
     },
     "7-RightAngle": {
       "type": "Right Angle",
@@ -1848,7 +2031,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of the Sphinx 3",
       "full_name_de": "RAX Sphinx 3",
-      "p_sun_gate": 7
+      "p_sun_gate": 7,
+      "theme_de": "Führung durch Richtung und Ausdruck des inneren Selbst"
     },
     "1-RightAngle": {
       "type": "Right Angle",
@@ -1858,7 +2042,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of the Sphinx 4",
       "full_name_de": "RAX Sphinx 4",
-      "p_sun_gate": 1
+      "p_sun_gate": 1,
+      "theme_de": "Führung durch Richtung und Ausdruck des inneren Selbst"
     },
     "27-RightAngle": {
       "type": "Right Angle",
@@ -1868,7 +2053,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Unexpected",
       "full_name_de": "RAX Unerwartete",
-      "p_sun_gate": 27
+      "p_sun_gate": 27,
+      "theme_de": "Wandel, Neubeginn und das Lernen im Unbekannten"
     },
     "31-RightAngle": {
       "type": "Right Angle",
@@ -1878,7 +2064,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of the Unexpected 2",
       "full_name_de": "RAX Unerwartete 2",
-      "p_sun_gate": 31
+      "p_sun_gate": 31,
+      "theme_de": "Wandel, Neubeginn und das Lernen im Unbekannten"
     },
     "28-RightAngle": {
       "type": "Right Angle",
@@ -1888,7 +2075,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of the Unexpected 3",
       "full_name_de": "RAX Unerwartete 3",
-      "p_sun_gate": 28
+      "p_sun_gate": 28,
+      "theme_de": "Wandel, Neubeginn und das Lernen im Unbekannten"
     },
     "41-RightAngle": {
       "type": "Right Angle",
@@ -1898,7 +2086,8 @@
       "variant": 4,
       "full_name_en": "Right Angle Cross of the Unexpected 4",
       "full_name_de": "RAX Unerwartete 4",
-      "p_sun_gate": 41
+      "p_sun_gate": 41,
+      "theme_de": "Wandel, Neubeginn und das Lernen im Unbekannten"
     },
     "25-RightAngle": {
       "type": "Right Angle",
@@ -1908,7 +2097,8 @@
       "variant": 1,
       "full_name_en": "Right Angle Cross of the Vessel Of Love",
       "full_name_de": "RAX Liebesgefäß",
-      "p_sun_gate": 25
+      "p_sun_gate": 25,
+      "theme_de": "Verkörperte Liebe, Selbstannahme und Richtung durch Hingabe an das Leben"
     },
     "15-RightAngle": {
       "type": "Right Angle",
@@ -1918,7 +2108,8 @@
       "variant": 2,
       "full_name_en": "Right Angle Cross of the Vessel Of Love 2",
       "full_name_de": "RAX Liebesgefäß 2",
-      "p_sun_gate": 15
+      "p_sun_gate": 15,
+      "theme_de": "Verkörperte Liebe, Selbstannahme und Richtung durch Hingabe an das Leben"
     },
     "46-RightAngle": {
       "type": "Right Angle",
@@ -1928,7 +2119,8 @@
       "variant": 3,
       "full_name_en": "Right Angle Cross of the Vessel Of Love 3",
       "full_name_de": "RAX Liebesgefäß 3",
-      "p_sun_gate": 46
+      "p_sun_gate": 46,
+      "theme_de": "Verkörperte Liebe, Selbstannahme und Richtung durch Hingabe an das Leben"
     }
   }
 }

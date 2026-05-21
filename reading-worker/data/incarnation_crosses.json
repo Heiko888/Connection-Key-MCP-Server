@@ -6,260 +6,452 @@
   },
   "gate_names": {
     "1": {
-      "name": "Kreativität",
-      "keyword": "Selbstausdruck"
+      "name": "Kreativität & Ausdruck",
+      "keyword": "Kreativität, Originalität, Schöpfung",
+      "full_name": "Das Tor des kreativen Selbstausdrucks",
+      "center": "G-Zentrum",
+      "description": "Große schöpferische Umsetzungskraft. Träger einzigartiger Ideen, die die Welt\nbereichern. Arbeitet am stärksten allein und aus innerer Motivation heraus."
     },
     "2": {
-      "name": "Empfänger",
-      "keyword": "Innere Richtung"
+      "name": "Innere Führung",
+      "keyword": "Innere Führung, Orientierung, Empfang",
+      "full_name": "Das Tor des höheren Wissens",
+      "center": "G-Zentrum",
+      "description": "Verbindung zum höheren Selbst als innerer Kompass. Orientierung durch intuitives\nWissen — gibt anderen Richtung, ohne es bewusst zu wollen."
     },
     "3": {
-      "name": "Schwierigkeit",
-      "keyword": "Mutation durch Chaos"
+      "name": "Ordnung aus Chaos",
+      "keyword": "Mutation, Ordnung, Neuanfang",
+      "full_name": "Das Tor des Ordnens",
+      "center": "Sakral",
+      "description": "Intensive Kraft, Veränderungen zu bewirken. Neues entsteht aus scheinbarem\nChaos — Offenheit für Mutation und Neugestaltung ist der Schlüssel."
     },
     "4": {
-      "name": "Formeln",
-      "keyword": "Mentale Lösungen"
+      "name": "Lösungsformeln",
+      "keyword": "Logik, Formeln, Problemlösung",
+      "full_name": "Das Tor des Formulierens und des Verstehens",
+      "center": "Ajna",
+      "description": "Analytisches Denken und Problemlösung. Entwickelt Theorien und Thesen für die\nZukunft — manchmal ohne zu wissen, ob die Lösung wirklich funktioniert."
     },
     "5": {
-      "name": "Feste Rhythmen",
-      "keyword": "Kosmischer Takt"
+      "name": "Universeller Rhythmus",
+      "keyword": "Rhythmus, Rituale, Timing",
+      "full_name": "Das Tor der Rituale und Rhythmen",
+      "center": "Sakral",
+      "description": "Leben in natürlichen Zyklen und Ritualen. Wer in diesem Fluss ist, zieht andere\nan und gibt ihnen unbewusst Orientierung durch verlässliche Muster."
     },
     "6": {
-      "name": "Reibung",
-      "keyword": "Emotionale Grenzen"
+      "name": "Emotionale Balance",
+      "keyword": "Balance, Einfluss, Intimität",
+      "full_name": "Das Tor des Streits, des Einflusses und emotionaler Balance",
+      "center": "Solarplexus",
+      "description": "Bestimmt, wer wirklich nah herankommt. Emotionale Berührbarkeit und Grenzen —\ndie Kunst, zwischen Öffnung und Abgrenzung zu navigieren."
     },
     "7": {
-      "name": "Armee",
-      "keyword": "Führung durch Weisheit"
+      "name": "Demokratische Führung",
+      "keyword": "Strategie, Führung, Richtung",
+      "full_name": "Das Tor der Strategie, Führung und Pläne",
+      "center": "G-Zentrum",
+      "description": "Strategische Führungsenergie für kollektive Richtungsweisung. Wirkt, wenn andere\nfreiwillig folgen — durch Vertrauen, nicht durch Autorität."
     },
     "8": {
-      "name": "Beitrag",
-      "keyword": "Einzigartiger Beitrag"
+      "name": "Authentischer Beitrag",
+      "keyword": "Beitrag, Authentizität, Inspiration",
+      "full_name": "Das Tor des Beitragens und der Authentizität",
+      "center": "Kehlkopf",
+      "description": "Die Stimme des einzigartigen Beitrags. Inspiriert andere durch echtes Sein —\nnicht durch Anstrengung, sondern durch Authentizität."
     },
     "9": {
-      "name": "Fokus",
-      "keyword": "Konzentration auf Details"
+      "name": "Konzentration & Detail",
+      "keyword": "Fokus, Details, Konzentration",
+      "full_name": "Das Tor des Fokussierens",
+      "center": "Sakral",
+      "description": "Kraft, die eigene Energie auf das Wesentliche zu bündeln. Detailgenauigkeit und\nAusdauer bei dem, was wirklich wichtig ist."
     },
     "10": {
-      "name": "Verhalten des Selbst",
-      "keyword": "Authentisches Sein"
+      "name": "Selbstliebe",
+      "keyword": "Selbstliebe, Authentizität, Integrität",
+      "full_name": "Das Tor des Verhaltens des Selbst und der Selbstliebe",
+      "center": "G-Zentrum",
+      "description": "Authentisches Leben unabhängig von Erwartungen anderer. Tiefste Integrität durch\ndas Sein, das man wirklich ist — Selbstliebe als Lebensweise."
     },
     "11": {
-      "name": "Frieden / Ideen",
-      "keyword": "Konzeptuelle Kreativität"
+      "name": "Ideenreichtum",
+      "keyword": "Ideen, Konzepte, Fantasie",
+      "full_name": "Das Tor der Ideen und Konzepte",
+      "center": "Ajna",
+      "description": "Unerschöpfliches Reservoir an Ideen und Möglichkeiten. Nicht alle sind zur\nUmsetzung bestimmt — der Wert liegt oft im Träumen und Inspirieren selbst."
     },
     "12": {
-      "name": "Stillstand",
-      "keyword": "Vorsichtiger Ausdruck"
+      "name": "Artikulierter Ausdruck",
+      "keyword": "Vorsicht, Ausdruck, Einzigartigkeit",
+      "full_name": "Das Tor der Vorsicht und Zurückhaltung",
+      "center": "Kehlkopf",
+      "description": "Tiefe Gefühle in einzigartige Worte kleiden — aber erst wenn der Moment wirklich\nstimmt. Vorsicht schützt vor zu frühem, unausgereiftem Ausdruck."
     },
     "13": {
-      "name": "Zuhörer",
-      "keyword": "Hüter von Geheimnissen"
+      "name": "Hüter der Geschichten",
+      "keyword": "Zuhören, Erinnerung, Geheimnisse",
+      "full_name": "Das Tor der Zuhörer, Erinnerungen und Erzählungen",
+      "center": "G-Zentrum",
+      "description": "Menschen öffnen sich und vertrauen ihre Geheimnisse an. Das Geschenk des tiefen\nZuhörens und Bewahrens — Zeugin fremder Lebensgeschichten."
     },
     "14": {
-      "name": "Reichtum",
-      "keyword": "Sacral-Kraft für Ressourcen"
+      "name": "Ressourcen & Schöpfung",
+      "keyword": "Macht, Ressourcen, Schöpfung",
+      "full_name": "Das Tor geschickt mit Macht umzugehen und der Schöpfung",
+      "center": "Sakral",
+      "description": "Kraft, Ressourcen anzuziehen und klug zu verwalten. Am stärksten wenn\nmaterieller Reichtum einem höheren Zweck dient."
     },
     "15": {
-      "name": "Bescheidenheit",
-      "keyword": "Menschlicher Rhythmus"
+      "name": "Menschenliebe & Extreme",
+      "keyword": "Extreme, Mitgefühl, Menschenliebe",
+      "full_name": "Das Tor der Extreme und des Mitgefühls",
+      "center": "G-Zentrum",
+      "description": "Liebt die Menschheit in ihrer gesamten Vielfalt. Lebt in Extremen — kein fester\nRhythmus, dafür tiefes Mitgefühl für alle Lebensweisen."
     },
     "16": {
-      "name": "Enthusiasmus",
-      "keyword": "Begeisterung für Fähigkeiten"
+      "name": "Talent & Begeisterung",
+      "keyword": "Geschicklichkeit, Begeisterung, Talent",
+      "full_name": "Das Tor der Geschicklichkeit und Begeisterungsfähigkeit",
+      "center": "Kehlkopf",
+      "description": "Begeisterung für das Üben und Meistern von Fähigkeiten. Die Stimme, die durch\nechtes Können andere mitreißt und ansteckt."
     },
     "17": {
-      "name": "Meinungen",
-      "keyword": "Logische Überzeugungen"
+      "name": "Logische Meinungen",
+      "keyword": "Meinungen, Logik, Erwartungen",
+      "full_name": "Das Tor der Meinungen und Erwartungen",
+      "center": "Ajna",
+      "description": "Logische Zukunftsprojektionen und Hypothesen. Bildet eigene Meinungen — auch\nüber Dinge, die noch nicht erlebt wurden — immer auf der Suche nach dem was\nfunktioniert."
     },
     "18": {
-      "name": "Korrektur",
-      "keyword": "Verbesserungsinstinkt"
+      "name": "Korrektur & Perfektion",
+      "keyword": "Korrektur, Perfektion, Instinkt",
+      "full_name": "Das Tor des Korrigierens und Verbesserns",
+      "center": "Milz",
+      "description": "Instinktiver Körper-Radar für das, was nicht stimmt. Erkennt Fehler in Systemen,\nStrukturen und Menschen — um sie zu heilen, nicht zu verurteilen."
     },
     "19": {
-      "name": "Annäherung",
-      "keyword": "Sensibilität für Bedürfnisse"
+      "name": "Bedürfnisse & Einstimmung",
+      "keyword": "Bedürfnisse, Einstimmung, Sensibilität",
+      "full_name": "Das Tor der Ansprüche und Einstimmung",
+      "center": "Wurzel",
+      "description": "Feines Gespür für die Bedürfnisse anderer Menschen und Tiere. Tiefes Verlangen\nnach Verbundenheit und dem Erkennen, was wirklich gebraucht wird."
     },
     "20": {
-      "name": "Das Jetzt",
-      "keyword": "Gegenwärtigkeit"
+      "name": "Präsenz im Jetzt",
+      "keyword": "Jetzt, Achtsamkeit, Präsenz",
+      "full_name": "Das Tor des Jetzt, der Selbstsicherung und Achtsamkeit",
+      "center": "Kehlkopf",
+      "description": "Vollständige Präsenz im gegenwärtigen Moment. Verbindet Erkenntnis direkt mit\nHandlung — Achtsamkeit als natürlicher Bewusstseinszustand."
     },
     "21": {
-      "name": "Kontrolle",
-      "keyword": "Materielle Meisterschaft"
+      "name": "Kontrolle & Wille",
+      "keyword": "Kontrolle, Wille, Jäger",
+      "full_name": "Das Tor des Jägers und der Selbstkontrolle",
+      "center": "Herz",
+      "description": "Starke Willenskraft zur Kontrolle von Ressourcen und Situationen. Zielstrebige\nDurchsetzungsfähigkeit — am besten wenn Kontrolle einem echten Ziel dient."
     },
     "22": {
-      "name": "Anmut",
-      "keyword": "Emotionale Offenheit"
+      "name": "Soziale Offenheit & Anmut",
+      "keyword": "Offenheit, Launen, Anmut",
+      "full_name": "Das Tor der Offenheit und Launen",
+      "center": "Solarplexus",
+      "description": "Emotionale Offenheit und soziale Anmut. Wenn die innere Stimmung stimmt,\nentfaltet sich natürliche Eleganz in der Begegnung mit anderen."
     },
     "23": {
-      "name": "Assimilation",
-      "keyword": "Integration des Neuen"
+      "name": "Assimilation & Klarheit",
+      "keyword": "Assimilation, Vermittlung, Klarheit",
+      "full_name": "Das Tor der Assimilation, des Verständnisses und der Vermittlung",
+      "center": "Kehlkopf",
+      "description": "Komplexes Wissen einfach und verständlich vermitteln. Das innere Wissen das sich\nplötzlich in klare Worte verwandelt — Mut zur eigenen Erkenntnis."
     },
     "24": {
       "name": "Rationalisierung",
-      "keyword": "Wiederkehrende Erkenntnisse"
+      "keyword": "Rationalisierung, Selbsterkenntnis, Wiederholung",
+      "full_name": "Das Tor des Rationalisierens und der Selbsterkenntnis",
+      "center": "Ajna",
+      "description": "Gedanken kehren immer wieder zurück bis sie vollständig verstanden sind. Tiefe\nSelbsterkenntnis entsteht durch das geduldige Durchdenken von Mustern."
     },
     "25": {
-      "name": "Unschuld",
-      "keyword": "Universale Liebe"
+      "name": "Universelle Liebe",
+      "keyword": "Universelle Liebe, Unschuld, Geist",
+      "full_name": "Das Tor der Liebe des Selbst und des Universums",
+      "center": "G-Zentrum",
+      "description": "Bedingungslose Liebe — für das Selbst und den Geist des Menschen als solchem.\nHeilt durch reines Sein und vollständige Akzeptanz ohne Erwartung."
     },
     "26": {
-      "name": "Der Bändiger",
-      "keyword": "Integrität und Einfluss"
+      "name": "Integrität & Überzeugung",
+      "keyword": "Integrität, Überzeugung, Anhäufung",
+      "full_name": "Das Tor des Egoisten, der Integrität und Anhäufung",
+      "center": "Herz",
+      "description": "Talent, andere zu überzeugen und Ideen zu vermarkten. Starke Willensenergie —\nIntegrität entscheidet, ob dieses Talent zum Segen oder zur Last wird."
     },
     "27": {
-      "name": "Ernährung",
-      "keyword": "Fürsorge und Pflege"
+      "name": "Fürsorge & Ernährung",
+      "keyword": "Fürsorge, Nähren, Gemeinschaft",
+      "full_name": "Das Tor der Fürsorge und des Nährens",
+      "center": "Sakral",
+      "description": "Tiefer Instinkt, andere zu nähren — körperlich, emotional und spirituell. Freude\nan Gemeinschaft und daran, anderen das zu geben, was sie wirklich brauchen."
     },
     "28": {
-      "name": "Spiel mit dem Tod",
-      "keyword": "Sinn und Zweck"
+      "name": "Sinn & Lebensabenteuer",
+      "keyword": "Spieler, Abenteuer, Lebendigkeit",
+      "full_name": "Das Tor des Spielers und des Abenteuers",
+      "center": "Milz",
+      "description": "Tiefer Instinkt für das, wofür es sich lohnt zu kämpfen. Das Spiel mit dem\nLeben — Tiefe und Lebendigkeit durch das Ringen mit dem persönlichen Sinn."
     },
     "29": {
-      "name": "Hingabe",
-      "keyword": "Bedingungsloses Ja"
+      "name": "Hingabe & Commitment",
+      "keyword": "Ja-Sagen, Commitment, Hingabe",
+      "full_name": "Das Tor des Ja-Sagens und des Commitments",
+      "center": "Sakral",
+      "description": "Tiefe Bereitschaft und Hingabe. Das Tor des Ja — am kraftvollsten wenn das\nCommitment aus wirklicher innerer Wahrheit und nicht aus Pflicht kommt."
     },
     "30": {
-      "name": "Verlangen",
-      "keyword": "Leidenschaft und Gefühle"
+      "name": "Leidenschaft & Gefühle",
+      "keyword": "Gefühle, Leidenschaft, Sehnsucht",
+      "full_name": "Das Tor des Erkennens von Gefühlen und der Leidenschaft",
+      "center": "Solarplexus",
+      "description": "Tiefe Sehnsüchte und das Feuer der Emotionen. Leidenschaft die Richtung sucht —\nintensives Erleben als Weg zur emotionalen Weisheit."
     },
     "31": {
-      "name": "Einfluss",
-      "keyword": "Demokratische Führung"
+      "name": "Führung durch Stimme",
+      "keyword": "Führung, Einfluss, Stimme",
+      "full_name": "Das Tor des Führens und des Einflusses",
+      "center": "Kehlkopf",
+      "description": "Demokratische Führung durch das gesprochene Wort. Einfluss entsteht wenn andere\nwirklich zuhören wollen — Führung als Dienst an der Gemeinschaft."
     },
     "32": {
-      "name": "Kontinuität",
-      "keyword": "Überlebensinstinkt"
+      "name": "Kontinuität & Instinkt",
+      "keyword": "Kontinuität, Ausdauer, Instinkt",
+      "full_name": "Das Tor der Kontinuität und Ausdauer",
+      "center": "Milz",
+      "description": "Intuitives Gespür für das, was Bestand hat und was nicht. Instinkt für\nnachhaltigen Erfolg — erkennt körperlich was sich lohnt weiterzuführen."
     },
     "33": {
-      "name": "Rückzug",
-      "keyword": "Erfahrungen verarbeiten"
+      "name": "Rückzug & Erinnerung",
+      "keyword": "Rückzug, Erinnerung, Geschichten",
+      "full_name": "Das Tor der Zurückgezogenheit und des Geschichtenerzählers",
+      "center": "Kehlkopf",
+      "description": "Privatsphäre als Kraftquelle. Geschichten entstehen in der Stille des Rückzugs —\ndie Stimme, die aus gelebter Erfahrung heraus erzählt und weitergibt."
     },
     "34": {
-      "name": "Kraft",
-      "keyword": "Reine Lebensenergie"
+      "name": "Reine Kraft & Charisma",
+      "keyword": "Macht, Charisma, Stärke",
+      "full_name": "Das Tor der Macht und des Charismas",
+      "center": "Sakral",
+      "description": "Lebendige Urkraft die sich in Handlung und Charisma verwandelt. Am kraftvollsten\nwenn sie authentisch gelebt wird — für sich selbst oder für andere."
     },
     "35": {
-      "name": "Fortschritt",
-      "keyword": "Hunger nach Erfahrung"
+      "name": "Erfahrung & Fortschritt",
+      "keyword": "Veränderung, Fortschritt, Erfahrung",
+      "full_name": "Das Tor der Veränderungen und des Fortschritts",
+      "center": "Kehlkopf",
+      "description": "Hunger nach neuen Erlebnissen und Veränderungen. Die Stimme, die von gelebten\nErfahrungen berichtet und andere daran teilhaben lässt."
     },
     "36": {
-      "name": "Verdunkelung",
-      "keyword": "Krise als Wachstum"
+      "name": "Krise & Emotionales Lernen",
+      "keyword": "Krise, Durchdringung, Wachstum",
+      "full_name": "Das Tor der Krise und der Durchdringung",
+      "center": "Solarplexus",
+      "description": "Sehnsucht nach neuen Erfahrungen durch emotionale Tiefe. Wachstum durch das\nmutige Durchleben von Krisen — Weisheit entsteht auf der anderen Seite."
     },
     "37": {
-      "name": "Familie",
-      "keyword": "Stammesverbindungen"
+      "name": "Familie & Gemeinschaft",
+      "keyword": "Familie, Freundschaft, Loyalität",
+      "full_name": "Das Tor der Familie und Freundschaft",
+      "center": "Solarplexus",
+      "description": "Tiefer Sinn für Zugehörigkeit und Gemeinschaft. Weberin von echten Bindungen\ndurch Loyalität, Vereinbarungen und geteilte Werte."
     },
     "38": {
-      "name": "Kämpfer",
-      "keyword": "Sinnvoller Widerstand"
+      "name": "Kampf & Sinn",
+      "keyword": "Kämpfer, Integrität, Sinn",
+      "full_name": "Das Tor des Kämpfers und der Integrität",
+      "center": "Wurzel",
+      "description": "Hartnäckige Kraft für das, was sinnvoll ist. Bereit allein zu stehen um die\neigene Wahrheit zu verteidigen — Kampf als Weg zur Seele."
     },
     "39": {
-      "name": "Provokation",
-      "keyword": "Emotionale Herausforderung"
+      "name": "Provokation & Lebensgeist",
+      "keyword": "Provokation, Geist, Energie",
+      "full_name": "Das Tor der Provokation und des Geistes",
+      "center": "Wurzel",
+      "description": "Provoziert andere liebevoll dazu, ihren inneren Geist und ihre Lebendigkeit zu\nfinden. Manchmal irritierend — immer lebendig und energetisch aufweckend."
     },
     "40": {
-      "name": "Alleinsein",
-      "keyword": "Befreiung durch Rückzug"
+      "name": "Einsamkeit & Wille",
+      "keyword": "Abgrenzung, Wille, Gemeinschaft",
+      "full_name": "Das Tor der Abgrenzung und des Willens zur Gemeinschaft",
+      "center": "Herz",
+      "description": "Braucht regelmäßigen Rückzug um wieder geben zu können. Das tiefe Gleichgewicht\nzwischen dem Alleinsein als Kraftquelle und der Sehnsucht nach Verbindung."
     },
     "41": {
-      "name": "Neuer Anfang",
-      "keyword": "Emotionaler Hunger"
+      "name": "Fantasie & Neuer Zyklus",
+      "keyword": "Fantasie, Beginn, Druck",
+      "full_name": "Das Tor der Fantasie und des Beginns",
+      "center": "Wurzel",
+      "description": "Brennpunkt aller menschlichen Erfahrung. Der energetische Startschuss zu jedem\nneuen Zyklus — Druck durch Fantasie, Sehnsucht und das Begehren nach Neuem."
     },
     "42": {
-      "name": "Vollendung",
-      "keyword": "Zyklen abschließen"
+      "name": "Vollendung & Abschluss",
+      "keyword": "Abschluss, Vollendung, Zyklen",
+      "full_name": "Das Tor des Abschließens und der Vollendung",
+      "center": "Sakral",
+      "description": "Kraft, Zyklen vollständig abzuschließen. Stark im Vollenden — Weisheit entsteht\ndurch das konsequente Durchleben eines Prozesses bis zum Ende."
     },
     "43": {
-      "name": "Durchbruch",
-      "keyword": "Revolutionäre Einsicht"
+      "name": "Einzigartige Erkenntnis",
+      "keyword": "Durchbruch, Erkenntnis, Einzigartigkeit",
+      "full_name": "Das Tor des Durchbruchs und der Erkenntnis",
+      "center": "Ajna",
+      "description": "Ich weiß — plötzliche innere Einblicke, die andere oft erst verzögert verstehen.\nMut zur eigenen Erkenntnis auch wenn sie noch nicht in Worte zu fassen ist."
     },
     "44": {
-      "name": "Zusammenkommen",
-      "keyword": "Muster aus der Vergangenheit"
+      "name": "Instinkt & Wachsamkeit",
+      "keyword": "Wachsamkeit, Muster, Instinkt",
+      "full_name": "Das Tor der Wachsamkeit und der Muster",
+      "center": "Milz",
+      "description": "Körperliches Gespür für Muster aus der Vergangenheit. Schützender Warninstinkt\nfür die Gemeinschaft — erkennt instinktiv was schon einmal schief ging."
     },
     "45": {
-      "name": "Der Sammler",
-      "keyword": "Ressourcen für die Gemeinschaft"
+      "name": "Besitz & Autorität",
+      "keyword": "Besitz, Autorität, Gemeinschaft",
+      "full_name": "Das Tor des Besitzes und der Gemeinschaft",
+      "center": "Kehlkopf",
+      "description": "Die Stimme der Autorität. Ich habe — spricht aus einer natürlichen\nFührungsposition mit dem Impuls, Ressourcen zum Wohl der Gemeinschaft zu teilen."
     },
     "46": {
-      "name": "Liebe des Körpers",
-      "keyword": "Körperliche Freude"
+      "name": "Körperliebe & Glück",
+      "keyword": "Körperliebe, Glück, Verkörperung",
+      "full_name": "Das Tor der Liebe des Körpers und des Glücks",
+      "center": "G-Zentrum",
+      "description": "Tiefe Liebe zum Körper und zum physischen Erleben. Glück durch vollständige\nPräsenz im Körper — Verkörperung als spirituelle Praxis."
     },
     "47": {
-      "name": "Realisierung",
-      "keyword": "Sinn aus Erfahrung"
+      "name": "Erkenntnis aus Verwirrung",
+      "keyword": "Verwirrung, Erkenntnis, Rückblick",
+      "full_name": "Das Tor der Erkenntnis aus Verwirrung",
+      "center": "Ajna",
+      "description": "Das Verstehen kommt rückblickend. Geduld bis das Muster sichtbar wird —\nWeisheit entsteht im Nachhinein, wenn die Verwirrung sich klärt."
     },
     "48": {
-      "name": "Der Brunnen",
-      "keyword": "Tiefes Wissen"
+      "name": "Tiefe Kompetenz & Weisheit",
+      "keyword": "Tiefe, Kompetenz, Weisheit",
+      "full_name": "Das Tor der Tiefe und der Kompetenz",
+      "center": "Milz",
+      "description": "Zugang zu einem Brunnen tiefer Weisheit und Fähigkeit. Die Angst, nicht tief\ngenug zu sein, begleitet dieses große Geschenk — der Brunnen ist nie wirklich\nleer."
     },
     "49": {
-      "name": "Revolution",
-      "keyword": "Prinzipientreue"
+      "name": "Revolution & Prinzipien",
+      "keyword": "Revolution, Prinzipien, Ablehnung",
+      "full_name": "Das Tor der Revolution und der Prinzipien",
+      "center": "Solarplexus",
+      "description": "Ablehnung oder Akzeptanz nach klaren Werten. Das Tor das entscheidet, wer\nwirklich zur inneren Gemeinschaft gehört — Prinzipien als heilige Grenze."
     },
     "50": {
-      "name": "Werte",
-      "keyword": "Stammesverantwortung"
+      "name": "Werte & Verantwortung",
+      "keyword": "Werte, Verantwortung, Hüter",
+      "full_name": "Das Tor der Werte und der Verantwortung",
+      "center": "Milz",
+      "description": "Hüter der Gesetze und der Gemeinschaft. Tiefer körperlicher Instinkt für das\nWohlergehen aller — Verantwortung für überlieferte Werte."
     },
     "51": {
-      "name": "Erschütterung",
-      "keyword": "Initiation durch Schock"
+      "name": "Schock & Mut",
+      "keyword": "Schock, Mut, Wettbewerb",
+      "full_name": "Das Tor des Schocks und des Mutes",
+      "center": "Herz",
+      "description": "Initiierung durch Schock und Überraschung. Der Erste sein — sich durch Mut,\nWagnis und Unerschrockenheit als Vorreiter im Leben zu beweisen."
     },
     "52": {
-      "name": "Stillstand",
-      "keyword": "Stille Konzentration"
+      "name": "Stille & Konzentration",
+      "keyword": "Stille, Konzentration, Fokus",
+      "full_name": "Das Tor der Stille und Konzentration",
+      "center": "Wurzel",
+      "description": "Fähigkeit vollständig innezuhalten und tief fokussiert zu bleiben. Stille als\naktive Kraft — Meditation und Sammlung als natürlicher Bewusstseinszustand."
     },
     "53": {
-      "name": "Entwicklung",
-      "keyword": "Neue Zyklen beginnen"
+      "name": "Beginn & Entwicklung",
+      "keyword": "Beginn, Entwicklung, Druck",
+      "full_name": "Das Tor des Beginns und der Entwicklung",
+      "center": "Wurzel",
+      "description": "Druck, neue Zyklen und Entwicklungen zu beginnen. Energie für Wachstum und\nVeränderung — manchmal mehr Starts als Abschlüsse."
     },
     "54": {
-      "name": "Ambition",
-      "keyword": "Aufstieg und Transformation"
+      "name": "Aufstieg & Ambition",
+      "keyword": "Aufstieg, Ambition, Transformation",
+      "full_name": "Das Tor des Aufstiegs und der Transformation",
+      "center": "Wurzel",
+      "description": "Tiefer Trieb, sich zu verbessern und aufzusteigen. Transformation durch\nVerbindungen und Beziehungen — materieller und spiritueller Aufstieg als\nLebensthema."
     },
     "55": {
-      "name": "Überfluss",
-      "keyword": "Geist und Fülle"
+      "name": "Geist & Emotionale Fülle",
+      "keyword": "Geist, Fülle, Stimmung",
+      "full_name": "Das Tor der Fülle und des Geistes",
+      "center": "Solarplexus",
+      "description": "Trägerin von Geist und Individualität in der neuen Zeit. Stimmung als heilige\nInformation — Fülle und Freiheit durch emotionale Authentizität."
     },
     "56": {
-      "name": "Der Wanderer",
-      "keyword": "Stimulation durch Geschichten"
+      "name": "Geschichten & Überzeugungen",
+      "keyword": "Wanderer, Geschichten, Überzeugungen",
+      "full_name": "Das Tor des Wanderers und des Geschichtenerzählers",
+      "center": "Kehlkopf",
+      "description": "Die Kunst des fesselnden Erzählens. Überzeugungen und gelebte Erfahrungen in\nWorte verwandeln, die andere stimulieren und zum Nachdenken bringen."
     },
     "57": {
-      "name": "Intuition",
-      "keyword": "Körperbasierte Weisheit"
+      "name": "Intuition & Instinkt",
+      "keyword": "Intuition, Klarheit, Instinkt",
+      "full_name": "Das Tor der Intuition und der Klarheit",
+      "center": "Milz",
+      "description": "Schärfster Instinkt im gegenwärtigen Moment. Das feinste aller\nBewusstseinswerkzeuge — körperliche Intuition als zuverlässigster innerer\nKompass."
     },
     "58": {
-      "name": "Freude",
-      "keyword": "Tiefe Lebensfreude"
+      "name": "Lebensfreude & Vitalität",
+      "keyword": "Lebensfreude, Vitalität, Perfektion",
+      "full_name": "Das Tor der Lebensfreude und Vitalität",
+      "center": "Wurzel",
+      "description": "Tiefe Freude am Leben und Antrieb, Dinge zu verbessern. Vitalität als\nnatürliches Geschenk — Energie für Optimierung, Schönheit und Wachstum."
     },
     "59": {
-      "name": "Intimität",
-      "keyword": "Öffnung für Verbindung"
+      "name": "Intimität & Verbindung",
+      "keyword": "Sexualität, Intimität, Verbindung",
+      "full_name": "Das Tor der Sexualität und Intimität",
+      "center": "Sakral",
+      "description": "Fähigkeit, Grenzen aufzulösen und tiefe Verbindung herzustellen. Das Tor der\nSexualität — Intimität als Weg zu echter Nähe und Verbundenheit."
     },
     "60": {
-      "name": "Begrenzung",
-      "keyword": "Transformation durch Grenzen"
+      "name": "Akzeptanz & Mutation",
+      "keyword": "Akzeptanz, Mutation, Grenzen",
+      "full_name": "Das Tor der Akzeptanz und der Mutation",
+      "center": "Wurzel",
+      "description": "Impulse zur Veränderung begrenzt durch das Bestehende. Weisheit im Akzeptieren\nvon Grenzen — Mutation entsteht durch das Loslassen von Kontrolle."
     },
     "61": {
-      "name": "Innere Wahrheit",
-      "keyword": "Mystisches Wissen"
+      "name": "Innere Wahrheit & Mysterium",
+      "keyword": "Wahrheit, Mysterium, Erkenntnis",
+      "full_name": "Das Tor der inneren Wahrheit und des Mysteriums",
+      "center": "Kopf",
+      "description": "Mentaler Druck, absolute Wahrheiten zu erkennen. Erforschung des Unbekannten und\ndes Geheimnisses — innere Wahrheit offenbart sich aus dem Schweigen."
     },
     "62": {
-      "name": "Details",
-      "keyword": "Präzision und Genauigkeit"
+      "name": "Details & Präzision",
+      "keyword": "Details, Präzision, Überblick",
+      "full_name": "Das Tor der Details und der Präzision",
+      "center": "Kehlkopf",
+      "description": "Trotz Detailfülle den Überblick behalten. Stärke im Konkreten und\nNachvollziehbaren — präzise Fakten klar und verständlich benennen."
     },
     "63": {
-      "name": "Zweifel",
-      "keyword": "Logischer Druck"
+      "name": "Zweifel & Überprüfung",
+      "keyword": "Überprüfung, Zweifel, Logik",
+      "full_name": "Das Tor der Überprüfung und Verifizierung",
+      "center": "Kopf",
+      "description": "Skeptischer Verstand der zweifelt und prüft. Mentaler Druck, Konzepte zu\nverifizieren — gesunder Skeptizismus als Qualitätskontrolle für die Zukunft."
     },
     "64": {
-      "name": "Verwirrung",
-      "keyword": "Inspiration aus dem Chaos"
+      "name": "Reflexion & Transformation",
+      "keyword": "Reflexion, Vollendung, Transformation",
+      "full_name": "Das Tor der Reflexion und Vollendung",
+      "center": "Kopf",
+      "description": "Ständiger mentaler Druck, über vergangene Erlebnisse nachzudenken. Verwirrung\nklärt sich wenn Bilder vollständig sind — Weisheit durch Reflexion."
     }
   },
   "crosses": {

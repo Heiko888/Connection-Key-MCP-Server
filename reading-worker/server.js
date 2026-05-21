@@ -880,36 +880,36 @@ ${entries}
 // keine Substring-Kürzung bei Kern-Files. Fallback auf generisches Bundle.
 const KNOWLEDGE_MAP = {
   // Kern-Reading-Typen
-  'detailed':         ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'channels-gates', 'profiles-detailed', 'incarnation-cross'],
+  'detailed':         ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority', 'centers-detailed', 'channels-gates', 'gates-detailed', 'profiles-detailed', 'incarnation-cross'],
   'single':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed', 'centers-detailed', 'incarnation-cross'],
   'basic':            ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'profiles-detailed'],
-  'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
-  'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'profiles-detailed'],
+  'business':         ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'gates-detailed', 'profiles-detailed'],
+  'career':           ['human-design-basics', 'types-detailed', 'strategy-authority', 'authority-detailed', 'channels-gates', 'gates-detailed', 'profiles-detailed'],
   // Connection / Beziehungs-Typen
-  'connection':       ['connection-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed', 'authority-detailed', 'profiles-detailed'],
-  'relationship':     ['connection-knowledge', 'channels-gates', 'types-detailed', 'authority-detailed', 'centers-detailed'],
-  'compatibility':    ['connection-knowledge', 'channels-gates', 'types-detailed', 'centers-detailed'],
+  'connection':       ['connection-knowledge', 'channels-gates', 'gates-detailed', 'centers-detailed', 'types-detailed', 'authority-detailed', 'profiles-detailed'],
+  'relationship':     ['connection-knowledge', 'channels-gates', 'gates-detailed', 'types-detailed', 'authority-detailed', 'centers-detailed'],
+  'compatibility':    ['connection-knowledge', 'channels-gates', 'gates-detailed', 'types-detailed', 'centers-detailed'],
   // Penta
-  'penta':            ['penta-knowledge', 'channels-gates', 'centers-detailed', 'types-detailed'],
-  'penta-communication': ['penta-knowledge', 'penta-communication-dynamics', 'penta-strategy-impulses', 'channels-gates', 'centers-detailed', 'types-detailed'],
+  'penta':            ['penta-knowledge', 'channels-gates', 'gates-detailed', 'centers-detailed', 'types-detailed'],
+  'penta-communication': ['penta-knowledge', 'penta-communication-dynamics', 'penta-strategy-impulses', 'channels-gates', 'gates-detailed', 'centers-detailed', 'types-detailed'],
   // Psychologie / Tiefe
-  'depth-analysis':   ['channels-gates', 'centers-detailed', 'splits-detailed', 'authority-detailed', 'profiles-detailed', 'incarnation-cross'],
+  'depth-analysis':   ['channels-gates', 'gates-detailed', 'centers-detailed', 'splits-detailed', 'authority-detailed', 'profiles-detailed', 'incarnation-cross'],
   'shadow-work':      ['shadow-work-knowledge', 'centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'strategy-authority', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources'],
-  'psychology':       ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'channels-gates', 'variable-arrows', 'crisis-resources'],
+  'psychology':       ['centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'channels-gates', 'gates-detailed', 'variable-arrows', 'crisis-resources'],
   'reflection':       ['reflection-knowledge', 'strategy-authority', 'authority-detailed', 'profiles-detailed', 'types-detailed', 'centers-detailed', 'variable-arrows', 'bodygraph-statistics'],
   'trauma':           ['trauma-knowledge', 'centers-detailed', 'authority-detailed', 'splits-detailed', 'profiles-detailed', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources'],
   'reflection-profiles': ['profiles-detailed', 'strategy-authority', 'types-detailed', 'authority-detailed'],
   'emotions':         ['authority-detailed', 'strategy-authority', 'centers-detailed', 'types-detailed', 'crisis-resources'],
   // Körper / Gesundheit
   'health':           ['health-knowledge', 'human-design-basics', 'arrows-detailed', 'variable-arrows', 'bodygraph-statistics', 'centers-detailed', 'types-detailed', 'authority-detailed'],
-  'sexuality':        ['sexuality-knowledge', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources', 'centers-detailed', 'channels-gates', 'types-detailed', 'authority-detailed'],
-  'spiritual':        ['spiritual-knowledge', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'centers-detailed', 'arrows-detailed', 'variable-arrows'],
-  'geld-ueberfluss':  ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates', 'centers-detailed', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources'],
-  'money':            ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates', 'variable-arrows', 'crisis-resources'],
-  'life-purpose':     ['life-purpose-knowledge', 'human-design-basics', 'types-detailed', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'authority-detailed', 'variable-arrows', 'bodygraph-statistics'],
+  'sexuality':        ['sexuality-knowledge', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources', 'centers-detailed', 'channels-gates', 'gates-detailed', 'types-detailed', 'authority-detailed'],
+  'spiritual':        ['spiritual-knowledge', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'gates-detailed', 'centers-detailed', 'arrows-detailed', 'variable-arrows'],
+  'geld-ueberfluss':  ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates', 'gates-detailed', 'centers-detailed', 'variable-arrows', 'bodygraph-statistics', 'crisis-resources'],
+  'money':            ['geld-ueberfluss-knowledge', 'human-design-basics', 'types-detailed', 'authority-detailed', 'channels-gates', 'gates-detailed', 'variable-arrows', 'crisis-resources'],
+  'life-purpose':     ['life-purpose-knowledge', 'human-design-basics', 'types-detailed', 'incarnation-cross', 'profiles-detailed', 'channels-gates', 'gates-detailed', 'authority-detailed', 'variable-arrows', 'bodygraph-statistics'],
   // Zeit / Transit
-  'transit':          ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority'],
-  'jahres-reading':   ['channels-gates', 'centers-detailed', 'types-detailed', 'strategy-authority', 'incarnation-cross'],
+  'transit':          ['channels-gates', 'gates-detailed', 'centers-detailed', 'types-detailed', 'strategy-authority'],
+  'jahres-reading':   ['channels-gates', 'gates-detailed', 'centers-detailed', 'types-detailed', 'strategy-authority', 'incarnation-cross'],
   // Tagesimpuls
   'tagesimpuls':      ['type-specific-impulse-rules', 'authority-specific-impulse-rules', 'profile-specific-impulse-rules', 'transit-impulse-instructions'],
   // Familie

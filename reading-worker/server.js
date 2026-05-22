@@ -6135,7 +6135,10 @@ async function postChannelBeziehungsGeschichten({ dryRun = false } = {}) {
     const text = await generateWithClaude(prompt, { maxTokens: 350, temperature: 0.95 });
 
     if (!dryRun) {
-      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'connection-key', null, '');
+      // Eigene Bild-Kategorie 'alltagsgeschichten' (Alltags-Bilder ohne HD-Bezug).
+      // Wenn Verzeichnis leer ist, faellt pickMatchingImage auf null zurueck →
+      // sendTelegramTextWithImage schickt text-only (graceful degradation).
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'alltagsgeschichten', null, '');
       console.log(`📖 [Channel] Beziehungs-Geschichte gepostet: ${topic} (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Channel] Beziehungs-Geschichte-Entwurf: ${topic} (${text.length} Zeichen)`);
@@ -7228,7 +7231,7 @@ app.post('/api/newsletter/generate-draft', requireAdminAuth, async (req, res) =>
 // Coach-Portal (frontend-coach /admin/telegram-images) verwaltet die Bilder
 // in /app/images/<topic>/ via diese Endpoints. Auth: x-api-key gegen API_KEY.
 // ======================================================
-const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key'];
+const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key', 'alltagsgeschichten'];
 const TELEGRAM_IMAGE_ROOT = '/app/images';
 const TELEGRAM_IMAGE_MAX_BYTES = 10 * 1024 * 1024; // 10 MB Telegram-Limit
 const TELEGRAM_IMAGE_EXT_RE = /\.(jpe?g|png|webp)$/i;

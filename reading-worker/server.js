@@ -6117,6 +6117,49 @@ async function postChannelTagesimpuls({ dryRun = false } = {}) {
 
 const HD_BEZIEHUNG_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-beziehung.json'), 'utf-8'));
 const BEZIEHUNGS_GESCHICHTEN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-beziehungs-geschichten.json'), 'utf-8'));
+const MARKETING_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-marketing.json'), 'utf-8'));
+
+/**
+ * Marketing-Posts (Reading/Coaching/VIP/Workshop/Community/App).
+ * NUR manueller Trigger — keine Cron-Automatisierung (User-entscheidet wann gepostet wird).
+ * Optional: spezifisches Topic via req-Body { topicIndex } oder { topic, topicHashtag, category }.
+ */
+async function postChannelMarketing({ dryRun = false, topicIndex = null, customTopic = null } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`📣 [Channel] Generiere Marketing-Post${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    let topic, topicHashtag, category;
+    if (customTopic && customTopic.topic) {
+      ({ topic, topicHashtag, category } = customTopic);
+    } else {
+      const idx = typeof topicIndex === 'number' && topicIndex >= 0 && topicIndex < MARKETING_TOPICS.length
+        ? topicIndex
+        : Math.floor(Math.random() * MARKETING_TOPICS.length);
+      ({ topic, topicHashtag, category } = MARKETING_TOPICS[idx]);
+    }
+
+    const templateText = templates['channel-marketing'] || '';
+    const prompt = templateText
+      .replace(/\{\{topic\}\}/g, topic)
+      .replace(/\{\{topicHashtag\}\}/g, topicHashtag || 'ConnectionKey')
+      .replace(/\{\{category\}\}/g, category || 'angebot');
+    const text = await generateWithClaude(prompt, { maxTokens: 350, temperature: 0.85 });
+
+    if (!dryRun) {
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'marketing', null, '');
+      console.log(`📣 [Channel] Marketing gepostet: ${topic} (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Channel] Marketing-Entwurf: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'marketing', topic, { dryRun });
+    if (!dryRun) sendMattermost(`📣 **Marketing gepostet** | ${topic}`, 'channel');
+    return row;
+  } catch (err) {
+    console.error('[Channel] Marketing Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Marketing-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
 
 /**
  * Beziehungs-Geschichten — kurze Anekdoten aus dem Alltag.
@@ -6484,6 +6527,33 @@ app.post('/api/channel/post-abend-reflexion', async (req, res) => {
 // Wenn body.dryRun === true: Entwurf-Modus — kein Telegram-Versand, nur DB-Save als 'draft'.
 // Return wird dann synchron mit der gespeicherten Row zurueckgegeben.
 // Ohne dryRun: fire-and-forget wie bisher (fuer Cron-Kompatibilitaet).
+// Manueller Trigger: Marketing-Post (Reading/Coaching/VIP/Workshop)
+// Body: optional { dryRun, topicIndex, topic, topicHashtag, category }
+app.post('/api/channel/post-marketing', async (req, res) => {
+  const body = req.body || {};
+  const dryRun = !!body.dryRun;
+  const opts = {
+    dryRun,
+    topicIndex: typeof body.topicIndex === 'number' ? body.topicIndex : null,
+    customTopic: body.topic ? { topic: body.topic, topicHashtag: body.topicHashtag, category: body.category } : null,
+  };
+  if (dryRun) {
+    try {
+      const row = await postChannelMarketing(opts);
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Marketing-Post gestartet' });
+  postChannelMarketing(opts).catch(e => console.error('[Channel] Marketing async:', e.message));
+});
+
+// GET liefert die verfügbaren Marketing-Topics (für UI-Auswahl im Coach-Admin)
+app.get('/api/channel/marketing-topics', (req, res) => {
+  res.json({ success: true, topics: MARKETING_TOPICS });
+});
+
 // Manueller Trigger: Beziehungs-Geschichten (Alltags-Anekdoten)
 app.post('/api/channel/post-beziehungs-geschichten', async (req, res) => {
   const dryRun = !!(req.body && req.body.dryRun);
@@ -7231,7 +7301,7 @@ app.post('/api/newsletter/generate-draft', requireAdminAuth, async (req, res) =>
 // Coach-Portal (frontend-coach /admin/telegram-images) verwaltet die Bilder
 // in /app/images/<topic>/ via diese Endpoints. Auth: x-api-key gegen API_KEY.
 // ======================================================
-const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key', 'alltagsgeschichten', 'tagesimpuls', 'abend-reflexion'];
+const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key', 'alltagsgeschichten', 'tagesimpuls', 'abend-reflexion', 'marketing'];
 const TELEGRAM_IMAGE_ROOT = '/app/images';
 const TELEGRAM_IMAGE_MAX_BYTES = 10 * 1024 * 1024; // 10 MB Telegram-Limit
 const TELEGRAM_IMAGE_EXT_RE = /\.(jpe?g|png|webp)$/i;

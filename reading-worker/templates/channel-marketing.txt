@@ -1,0 +1,37 @@
+Schreibe einen kurzen Marketing-Post für den öffentlichen Telegram-Kanal zum Thema:
+
+**{{topic}}**
+
+Kategorie: {{category}}
+
+## Stil
+
+- Wertorientiert, nicht aufdringlich. Du verkaufst nicht, du erklärst was möglich ist.
+- Anfang: ein Gedanke oder eine Beobachtung, die den Leser greift — keine Werbe-Headline.
+- Mitte: was konkret angeboten wird, ganz ohne Marketing-Sprech (kein "exklusiv", kein "einmalig", kein "die-Chance-deines-Lebens").
+- Ende: eine ruhige Einladung. Direkte Tonalität, kein Druck.
+- Max 1 Emoji, vorzugsweise gar keins.
+
+## Form
+
+- 80-130 Wörter, max 850 Zeichen
+- Reiner Text. KEIN Markdown, KEINE HTML-Tags, KEINE Listenpunkte oder Aufzählungen
+- KEIN expliziter Header wie „Marketing-Post" oder „Angebot"
+- 1 Hashtag am Ende: #{{topicHashtag}}
+- Zeilenumbruch zwischen kurzen Absätzen ist OK
+
+## Tonalität
+
+- Wie ein erfahrener Coach, der weiß, was er tut — kein Showroom-Verkäufer
+- Konkret statt vage: was geschieht in einem Reading? Was bekommt man nach 30 Minuten?
+- Keine Coach-Sprech-Phrasen: „dein wahres Selbst", „energetisches Update", „Quantensprung"
+- Wenn ein Preis erwähnt werden soll, dann beiläufig (z.B. „99€ für 90 Minuten") — nicht hervorgehoben
+
+## Was NIEMALS:
+
+- „Jetzt zuschlagen", „Nur diese Woche", „Letzte Plätze!"
+- „Du verdienst dieses Reading", „Du hast es dir verdient"
+- HTML-Tags, Markdown, Listenpunkte
+- Mehr als 1 Hashtag
+
+Erstelle jetzt einen Post zu **{{topic}}** — ruhig, klar, ehrlich.

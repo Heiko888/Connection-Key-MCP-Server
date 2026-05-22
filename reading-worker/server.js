@@ -5981,7 +5981,11 @@ app.post('/api/channel/content/:id/send-telegram', requireAdminAuth, async (req,
   if (fetchErr || !post) return res.status(404).json({ error: 'Post nicht gefunden' });
   if (!TELEGRAM_CHANNEL_ID) return res.status(503).json({ error: 'TELEGRAM_CHANNEL_ID fehlt' });
   try {
-    await sendTelegramMessage(TELEGRAM_CHANNEL_ID, post.telegram_text, '');
+    // Bild-Kategorie aus post.topic ableiten (fallback: 'general')
+    const imgCat = post.topic && ['hd-wissen', 'connection-key', 'business-hd', 'general'].includes(post.topic)
+      ? post.topic
+      : 'general';
+    await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, post.telegram_text, imgCat, null, '');
     await supabasePublic.from('channel_posts').update({
       telegram_sent: true, sent_at: new Date().toISOString(), status: 'published',
     }).eq('id', id);
@@ -6093,7 +6097,7 @@ async function postChannelTagesimpuls({ dryRun = false } = {}) {
     if (!dryRun) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'general', null, 'HTML');
       console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Channel] Tagesimpuls-Entwurf erstellt (${text.length} Zeichen)`);
@@ -6130,7 +6134,7 @@ async function postChannelBeziehung({ dryRun = false } = {}) {
     const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
 
     if (!dryRun) {
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, text.trim(), '');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'connection-key', null, '');
       console.log(`💞 [Channel] Beziehung gepostet: ${topic} (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Channel] Beziehungs-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
@@ -6326,7 +6330,7 @@ async function postChannelAbendReflexion({ dryRun = false } = {}) {
     if (!dryRun) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       const header = `🌙 <b>Abend-Reflexion — ${escHtml(today_de)}</b>\n\n`;
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'general', null, 'HTML');
       console.log(`🌙 [Channel] Abend-Reflexion gepostet (${text.length} Zeichen)`);
       sendMattermost(`🌙 **Abend-Reflexion gepostet**\n${text.trim().substring(0, 200)}...`, 'channel');
     } else {
@@ -6693,7 +6697,7 @@ Kein Markdown. Reiner Text mit Zeilenumbrüchen.`;
 
     if (!dryRun) {
       const header = `🌍 <b>Wochen-Transit — ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long' })}</b>\n\n`;
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtmlGlobal(text.trim()), 'general', null, 'HTML');
     }
     const { row } = await generateAndSaveInstagramCaption(text.trim(), 'transit-ausblick', `Woche ${weekStart}`, { dryRun });
     console.log(`🌍 [Transit] Wochen-Ausblick ${dryRun ? 'Entwurf erstellt' : 'gepostet'}`);
@@ -6870,7 +6874,7 @@ Antworte NUR mit dem Post-Text, kein Kommentar davor/danach.`;
 
     if (send_telegram && TELEGRAM_CHANNEL_ID) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      await sendTelegramMessage(TELEGRAM_CHANNEL_ID, escHtml(text.trim()), 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, escHtml(text.trim()), 'hd-wissen', null, 'HTML');
       if (savedId && supabasePublic) {
         await supabasePublic.from('channel_posts').update({ telegram_sent: true, sent_at: new Date().toISOString(), status: 'published' }).eq('id', savedId);
       }

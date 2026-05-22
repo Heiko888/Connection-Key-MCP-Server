@@ -6097,7 +6097,7 @@ async function postChannelTagesimpuls({ dryRun = false } = {}) {
     if (!dryRun) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
-      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'general', null, 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'tagesimpuls', null, 'HTML');
       console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Channel] Tagesimpuls-Entwurf erstellt (${text.length} Zeichen)`);
@@ -6366,7 +6366,7 @@ async function postChannelAbendReflexion({ dryRun = false } = {}) {
     if (!dryRun) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       const header = `🌙 <b>Abend-Reflexion — ${escHtml(today_de)}</b>\n\n`;
-      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'general', null, 'HTML');
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'abend-reflexion', null, 'HTML');
       console.log(`🌙 [Channel] Abend-Reflexion gepostet (${text.length} Zeichen)`);
       sendMattermost(`🌙 **Abend-Reflexion gepostet**\n${text.trim().substring(0, 200)}...`, 'channel');
     } else {
@@ -7231,7 +7231,7 @@ app.post('/api/newsletter/generate-draft', requireAdminAuth, async (req, res) =>
 // Coach-Portal (frontend-coach /admin/telegram-images) verwaltet die Bilder
 // in /app/images/<topic>/ via diese Endpoints. Auth: x-api-key gegen API_KEY.
 // ======================================================
-const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key', 'alltagsgeschichten'];
+const TELEGRAM_IMAGE_TOPICS = ['general', 'hd-wissen', 'business-hd', 'connection-key', 'alltagsgeschichten', 'tagesimpuls', 'abend-reflexion'];
 const TELEGRAM_IMAGE_ROOT = '/app/images';
 const TELEGRAM_IMAGE_MAX_BYTES = 10 * 1024 * 1024; // 10 MB Telegram-Limit
 const TELEGRAM_IMAGE_EXT_RE = /\.(jpe?g|png|webp)$/i;

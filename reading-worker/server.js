@@ -6116,6 +6116,39 @@ async function postChannelTagesimpuls({ dryRun = false } = {}) {
 }
 
 const HD_BEZIEHUNG_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-beziehung.json'), 'utf-8'));
+const BEZIEHUNGS_GESCHICHTEN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-beziehungs-geschichten.json'), 'utf-8'));
+
+/**
+ * Beziehungs-Geschichten — kurze Anekdoten aus dem Alltag.
+ * KEIN HD-Bezug. Stil: warm, beobachtend, erzählerisch.
+ * Cron: Sonntags 19:00 CEST (= 17:00 UTC).
+ */
+async function postChannelBeziehungsGeschichten({ dryRun = false } = {}) {
+  if (!TELEGRAM_CHANNEL_ID && !dryRun) return null;
+  console.log(`📖 [Channel] Generiere Beziehungs-Geschichte${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+    const { topic, topicHashtag } = BEZIEHUNGS_GESCHICHTEN_TOPICS[dayOfYear % BEZIEHUNGS_GESCHICHTEN_TOPICS.length];
+
+    const templateText = templates['channel-beziehungs-geschichten'] || '';
+    const prompt = templateText.replace(/\{\{topic\}\}/g, topic).replace(/\{\{topicHashtag\}\}/g, topicHashtag);
+    const text = await generateWithClaude(prompt, { maxTokens: 350, temperature: 0.95 });
+
+    if (!dryRun) {
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'connection-key', null, '');
+      console.log(`📖 [Channel] Beziehungs-Geschichte gepostet: ${topic} (${text.length} Zeichen)`);
+    } else {
+      console.log(`📝 [Channel] Beziehungs-Geschichte-Entwurf: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'beziehungs-geschichte', topic, { dryRun });
+    if (!dryRun) sendMattermost(`📖 **Beziehungs-Geschichte gepostet** | ${topic}`, 'channel');
+    return row;
+  } catch (err) {
+    console.error('[Channel] Beziehungs-Geschichte Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Beziehungs-Geschichte-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
 
 /**
  * Postet täglich einen Beziehungs- und Resonanz-Beitrag in den Telegram-Kanal.
@@ -6354,6 +6387,13 @@ scheduleDailyAt(18, 0, async () => {
   return postChannelBeziehung();
 });
 
+// Beziehungs-Geschichten (Alltags-Anekdoten, kein HD-Bezug): Sonntags 17:00 UTC (19:00 CEST)
+scheduleDailyAt(17, 0, async () => {
+  const day = new Date().getUTCDay();
+  if (day !== 0) return; // nur Sonntag
+  return postChannelBeziehungsGeschichten();
+});
+
 // HD-Wissen jeden 2. Tag, 16:00 UTC (18:00 MESZ) — Funktion prüft intern dayOfYear%2
 scheduleDailyAt(16, 0, postChannelHDWissen);
 
@@ -6441,6 +6481,21 @@ app.post('/api/channel/post-abend-reflexion', async (req, res) => {
 // Wenn body.dryRun === true: Entwurf-Modus — kein Telegram-Versand, nur DB-Save als 'draft'.
 // Return wird dann synchron mit der gespeicherten Row zurueckgegeben.
 // Ohne dryRun: fire-and-forget wie bisher (fuer Cron-Kompatibilitaet).
+// Manueller Trigger: Beziehungs-Geschichten (Alltags-Anekdoten)
+app.post('/api/channel/post-beziehungs-geschichten', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  if (dryRun) {
+    try {
+      const row = await postChannelBeziehungsGeschichten({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Beziehungs-Geschichten-Post gestartet' });
+  postChannelBeziehungsGeschichten({ dryRun: false }).catch(e => console.error('[Channel] Beziehungs-Geschichte async:', e.message));
+});
+
 app.post('/api/channel/post-beziehung', async (req, res) => {
   const dryRun = !!(req.body && req.body.dryRun);
   if (dryRun) {

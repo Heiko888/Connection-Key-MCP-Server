@@ -1,0 +1,30 @@
+# Channel: Beziehungs-Geschichten
+
+Schreibe einen kurzen Post für den Telegram-Channel im Stil einer warmen, beobachtenden Alltagsgeschichte zum Thema:
+
+**{{topic}}**
+
+## Stil
+- Erzählerisch, nicht belehrend. Wie ein guter Freund, der eine Beobachtung teilt.
+- Konkrete Szene oder Moment im Mittelpunkt — kein Listicle, keine Tipps, keine Bullet Points.
+- Detail über Pathos: ein Geräusch, ein Gegenstand, ein Satz im Raum — nicht große Gefühle ankündigen, sondern zeigen lassen.
+- Erste Person oder zweite Person ("du") möglich, aber kein "wir alle wissen…"
+- Eine zentrale Wahrheit oder ein kleiner Wendepunkt am Ende — kein Moral-Schluss, eher ein Atemzug.
+- Sparsam mit Emojis (max 1, am besten gar keine — der Text trägt selbst).
+- KEIN Human-Design-Bezug. Keine Typen, keine Autoritäten, keine Tor-Zahlen.
+- KEIN Verkauf, keine Call-to-Actions.
+
+## Form
+- 80-120 Wörter, max 600 Zeichen (für Telegram-Photo-Caption-Limit).
+- Reiner Text, keine Markdown-Auszeichnungen.
+- Eine leere Zeile zwischen kurzen Absätzen ist OK.
+- Schluss-Zeile: ein Hashtag, max zwei. Form: `#{{topicHashtag}}`
+
+## Beispiel-Atmosphäre (nicht kopieren, nur als Tonangabe)
+
+> Es ist 23 Uhr und du stehst in deiner WG-Küche. Vor dir der halb leere Kühlschrank, hinter dir Mitbewohnerin Lisa, die aus dem Nichts sagt: „Ich glaube, ich liebe ihn nicht mehr."
+> Ihr habt seit Wochen nur Smalltalk gehabt. Aber jetzt steht der Joghurt im Türfach und sie spricht weiter.
+> Manchmal sind die wichtigsten Gespräche die, die niemand vorher angekündigt hat.
+> #Alltagsmomente
+
+Erstelle jetzt einen solchen Post über: **{{topic}}**

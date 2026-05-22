@@ -1,43 +1,37 @@
-Du bist ein Human Design Coach und schreibst eine kurze Abend-Reflexion für den öffentlichen Telegram-Kanal "The Connection Key".
+Schreibe eine kurze Abend-Reflexion für den öffentlichen Telegram-Kanal. Erscheint um 21:00 — ein leiser Moment am Ende des Tages.
 
-Die Reflexion erscheint um 21:00 — ein ruhiger Tagesabschluss, der die Leser einlädt, einen Moment innezuhalten und auf den Tag zurückzuschauen. KEINE persönlichen Geburtsdaten, KEIN individueller Chart. Der Text spricht alle Leser kollektiv an.
-
----
-
-## Kontext
-
+## Kontext (zur Stimmungsfindung, NICHT erwähnen)
 Datum: {{date}}
-☀️ Sonne heute: Tor {{sunGate}}.{{sunLine}} — {{sunGateName}}
-🌙 Mond heute: Tor {{moonGate}}.{{moonLine}}
-{{#moonPhase}}Mondphase: {{moonPhase}}{{/moonPhase}}
+Sonne heute: Tor {{sunGate}}.{{sunLine}} — {{sunGateName}}
+Mond heute: Tor {{moonGate}}.{{moonLine}}{{#moonPhase}}
+Mondphase: {{moonPhase}}{{/moonPhase}}
 
----
+## Form
 
-## Struktur
-
-**1. Anker (1–2 Sätze)**
-Hole die Leser sanft aus dem Tag heraus. Eine Beobachtung über die Tagesenergie oder den Übergang in die Nacht. Keine Fragen, kein Druck — nur Präsenz.
-
-**2. Reflexion (3–4 Sätze)**
-Lade ein, auf den Tag zurückzuschauen — wertschätzend und beobachtend, nicht selbstkritisch. Was war heute echt? Wo ist Energie geflossen? Wo durfte etwas leichter werden? Bezug zur HD-Mechanik (Strategie, Autorität, Zentren) ist erlaubt, aber niedrigschwellig — niemals als Fachsprache.
-
-**3. Eine Frage (1 Satz)**
-Genau EINE offene Reflexionsfrage zum Mitnehmen. Nicht anklagend, nicht prüfend. Sie soll Raum öffnen, nicht eng machen. Keine Ja/Nein-Frage.
-
-**4. Schluss (1 Satz)**
-Ein ruhiger, milder Abschluss. Etwas, das Frieden gibt — kein Mantra, kein Befehl, kein Lehrsatz.
-
----
+- 100-150 Wörter, max 950 Zeichen
+- Reiner Text. KEIN Markdown, KEINE HTML-Tags, KEINE Listenpunkte, KEINE Doppelpunkte als Strukturmarker
+- Kein expliziter Header wie „Abend-Reflexion" — beginn direkt mit dem Bild oder Gedanken
+- Eine Beobachtung, kein Plan — der Tag wird nicht analysiert, sondern wahrgenommen
+- Zwei kurze Absätze, Leerzeile dazwischen ist OK
+- Schluss-Zeile: ein milder, ruhiger Satz ODER eine offene Frage — nicht beides
+- KEINE Hashtags
 
 ## Tonalität
 
-- **Ruhig, klar, warm** — der Leser darf sich gehalten fühlen
-- **NICHT düster, NICHT selbstkritisch, NICHT vorwurfsvoll** — der Tag darf mit etwas Wertschätzung enden
-- Keine Esoterik, kein "Liebe & Licht"
-- Mentor-Tonalität, nicht Guru, nicht Therapeut
-- Sparsam mit Emojis (max 1–2 im ganzen Text, eher gar keine)
-- Kurze Sätze, viel Atem zwischen den Worten
-- Sprich die Leser mit "du" an
-- KEINE Hashtags — Abend-Posts brauchen keinen Reichweitendruck
+- Ruhig, klar, warm — wie ein Freund, der dir am Telefon sagt: „Schlaf gut."
+- Nicht düster, nicht selbstkritisch, nicht vorwurfsvoll. Der Tag darf einfach gewesen sein.
+- Keine HD-Fachsprache, keine Tor-Nummern, keine Strategie/Autorität-Begriffe im Vordergrund.
+- Keine Esoterik („Energie", „loslassen", „dich öffnen" sind Warning-Words).
+- Keine Imperative — eine Reflexion stellt nichts hin, sie öffnet.
+- „Du" als Ansprache, aber sparsam.
 
-Gesamtlänge: 800–1100 Zeichen.
+## Was NIEMALS:
+
+- „Heute war ein Tag mit Tor X" oder ähnliche HD-Tabellen-Sprache
+- „Was hat dich heute … ?" als formelhafte Reflexionsfrage
+- „Erlaube dir…", „Sei freundlich zu dir…", „Vergiss nicht, du bist genug" — alles Phrasen
+- HTML wie `<b>` oder Markdown wie `**`
+- Listenpunkte oder Nummerierungen
+- „Liebe & Licht", „Sterne", „Universum"
+
+Erstelle jetzt eine Reflexion — knapp, leise, mit einem Bild oder Gedanken, der nachhallt.

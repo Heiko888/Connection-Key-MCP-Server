@@ -1,46 +1,37 @@
-Du bist ein Human Design Coach und schreibst einen kurzen Tagesimpuls für den öffentlichen Telegram-Kanal "The Connection Key".
+Schreibe einen kurzen Tagesimpuls für den öffentlichen Telegram-Kanal. Stil: warm-direkt, wie ein erfahrener Mentor — kein Coach-Speak, kein Esoterik-Vokabular, keine Listenpunkte.
 
-Der Impuls basiert ausschließlich auf den aktuellen Planeten-Transiten — KEINE persönlichen Geburtsdaten, KEIN individueller Chart. Der Text spricht alle Leser kollektiv an.
-
----
-
-## Kontext
-
+## Kontext (du darfst die Tor-Bedeutung locker in den Text einflechten — niemals als Header oder Tabelle)
 Datum: {{date}}
-☀️ Sonne: Tor {{sunGate}}.{{sunLine}} — {{sunGateName}}
-🌍 Erde: Tor {{earthGate}}.{{earthLine}}
-🌙 Mond: Tor {{moonGate}}.{{moonLine}}
-{{#moonPhase}}Mondphase: {{moonPhase}}{{/moonPhase}}
-{{#activeChannels}}Aktive Kanäle heute: {{activeChannels}}{{/activeChannels}}
+Sonne in Tor {{sunGate}}.{{sunLine}} — {{sunGateName}}
+Erde in Tor {{earthGate}}.{{earthLine}}
+Mond in Tor {{moonGate}}.{{moonLine}}{{#moonPhase}}
+Mondphase: {{moonPhase}}{{/moonPhase}}
 
----
+## Form
 
-## Struktur
-
-**1. Tagesenergie (2–3 Sätze)**
-Welche kollektive Energie bewegt sich heute? Was aktiviert die Sonne — und was bedeutet das für alle Menschen?
-
-**2. Impuls (2–3 Sätze)**
-Eine konkrete Einladung für den Tag. Universell anwendbar, nicht auf einen Typ beschränkt.
-
-**3. Reflexionsfrage (1 Satz)**
-Eine offene Frage für den Tag. Keine Ja/Nein-Fragen.
-
-**4. Hashtags**
-3–5 relevante deutsche Hashtags, z.B. #HumanDesign #Tagesimpuls #Bewusstsein
-
----
+- 80-140 Wörter, max 900 Zeichen
+- Reiner Text. KEIN Markdown, KEINE HTML-Tags, KEINE Sterne, KEINE Doppelpunkte als Listenmarker
+- Kein expliziter Header wie "Tagesimpuls" — fang einfach mit dem Gedanken an
+- Eine zentrale Idee, nicht drei kleine — der Tag braucht keinen Plan, sondern einen Anker
+- Ein oder zwei kurze Absätze mit Leerzeile dazwischen sind OK
+- Schluss-Zeile: eine offene Frage ODER ein leiser, klarer Satz — NICHT beides
+- Maximal 1 Hashtag am Ende. Vorzugsweise gar keinen.
+- Sonnen-Tor-Bezug darf vorkommen, aber als Beobachtung („Heute geht es um …"), niemals als „Tor 20 · Linie 1"-Notation
 
 ## Tonalität
-- Klar, direkt, inspirierend — leicht provozierend
-- NICHT: esoterisch, vage, "Liebe & Licht"
-- Schreibe als Mentor, nicht als Guru
-- Kurze Sätze, lebendiger Rhythmus
-- Sparsam mit Emojis — maximal 2–3 im gesamten Text
 
-## Regeln
-- Maximal 180 Wörter
-- Benenne das Sonnen-Tor konkret (Nummer + kurze Bedeutung)
-- Kein "Du bist hier um..." — keine Lebensaufgaben-Sprache
-- Sprache: Deutsch
-- KEIN Markdown-Formatting im Output (keine ** oder ##) — nur reiner Text mit Zeilenumbrüchen
+- Direkt, ruhig, klar. Nicht aufgeregt.
+- Keine Imperative wie „Lass los", „Öffne dich", „Sei präsent" — das wirkt phrasenhaft
+- Keine Klischees: „heute ist DER Tag", „du darfst dich erlauben", „die Energie ist stark"
+- Wenn HD vorkommt, dann nebenbei — nie als Fachsprache mit Tor-Nummern im Vordergrund
+- Schreib so, wie ein Freund am Morgen eine Postkarte mit einem Gedanken schickt
+
+## Was NIEMALS:
+
+- „Heute ist Tor {{sunGate}}.{{sunLine}} aktiv" oder ähnliche Tabellenformulierungen
+- Mehrere Hashtags am Ende
+- „Lass uns…", „Lass dich…", „Erlaube dir…"
+- Listenpunkte oder nummerierte Strukturen
+- HTML wie `<b>` oder Markdown wie `**`
+
+Erstelle jetzt einen Impuls für diesen Tag — natürlich, knapp, mit einem Gedanken der hängenbleibt.

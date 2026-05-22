@@ -156,7 +156,7 @@ async function toJpegForTelegram(srcPath) {
   }
 }
 
-async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadId = null) {
+async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadId = null, parseMode = '') {
   if (!TELEGRAM_BOT_TOKEN || !chatId || !imagePath) return;
   try {
     const { buf, name: fileName, mime } = await toJpegForTelegram(imagePath);
@@ -164,6 +164,7 @@ async function sendTelegramPhoto(chatId, imagePath, caption = '', messageThreadI
     const fd = new FormData();
     fd.append('chat_id', String(chatId));
     if (caption) fd.append('caption', caption);
+    if (parseMode) fd.append('parse_mode', parseMode);
     if (messageThreadId) fd.append('message_thread_id', String(messageThreadId));
     fd.append('photo', blob, fileName);
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
@@ -208,7 +209,7 @@ async function sendTelegramTextWithImage(chatId, text, imageCategory, messageThr
       caption = (lastBreak > 600 ? sliced.slice(0, lastBreak + 1) : sliced.replace(/\s\S*$/, '')) + ' …';
       console.warn(`[Telegram] Caption gekürzt: ${text.length} → ${caption.length} Zeichen (Limit 1024)`);
     }
-    const ok = await sendTelegramPhoto(chatId, imagePath, caption, messageThreadId);
+    const ok = await sendTelegramPhoto(chatId, imagePath, caption, messageThreadId, parseMode);
     if (ok) return;
     // Fallback bei sendPhoto-Fehler: text-only senden (volltext)
   }
@@ -6095,9 +6096,8 @@ async function postChannelTagesimpuls({ dryRun = false } = {}) {
     const text = await generateWithClaude(prompt, { maxTokens: 600, temperature: 0.85 });
 
     if (!dryRun) {
-      const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const header = `✨ <b>Tagesimpuls — ${escHtml(today_de)}</b>\n${escHtml(`☀️ Tor ${sunGate}.${sunLine} · 🌙 Tor ${moonGate}.${moonLine}`)}\n\n`;
-      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'tagesimpuls', null, 'HTML');
+      // Kein robotischer Header mehr — Claude flicht Tor-Bezug ggf. weich in den Text
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'tagesimpuls', null, '');
       console.log(`📢 [Channel] Tagesimpuls gepostet (${text.length} Zeichen)`);
     } else {
       console.log(`📝 [Channel] Tagesimpuls-Entwurf erstellt (${text.length} Zeichen)`);
@@ -6365,8 +6365,8 @@ async function postChannelAbendReflexion({ dryRun = false } = {}) {
 
     if (!dryRun) {
       const escHtml = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const header = `🌙 <b>Abend-Reflexion — ${escHtml(today_de)}</b>\n\n`;
-      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, header + escHtml(text.trim()), 'abend-reflexion', null, 'HTML');
+      // Kein robotischer Header mehr — Claude beginnt die Reflexion direkt
+      await sendTelegramTextWithImage(TELEGRAM_CHANNEL_ID, text.trim(), 'abend-reflexion', null, '');
       console.log(`🌙 [Channel] Abend-Reflexion gepostet (${text.length} Zeichen)`);
       sendMattermost(`🌙 **Abend-Reflexion gepostet**\n${text.trim().substring(0, 200)}...`, 'channel');
     } else {

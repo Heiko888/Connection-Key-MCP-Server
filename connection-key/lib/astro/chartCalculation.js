@@ -1056,10 +1056,6 @@ export async function calculateHumanDesignChart(input) {
     return false;
   }
 
-  function isSacralConnectedToThroat(channels) {
-    return isCenterConnectedToThroat("sacral", channels);
-  }
-
   function isAnyMotorConnectedToThroat(channels) {
     // Motoren in HD: Sacral, Solar-Plexus, Heart, Root
     const motors = ["sacral", "solar-plexus", "heart", "root"];
@@ -1073,7 +1069,11 @@ export async function calculateHumanDesignChart(input) {
   if (allUndefined) {
     type = "Reflector";
   } else if (sacral) {
-    type = isSacralConnectedToThroat(activeChannels) ? "Manifesting Generator" : "Generator";
+    // Manifesting Generator: Sacral definiert UND IRGENDEIN Motor (Sacral/Solar-Plexus/
+    // Heart/Root) mit dem Throat verbunden — nicht nur der Sacral selbst. Bei Split-
+    // Definition kann der Motor→Throat-Pfad in einer anderen Gruppe als der Sacral liegen
+    // (z.B. Heart→Throat via 21-45), das Chart ist trotzdem MG.
+    type = isAnyMotorConnectedToThroat(activeChannels) ? "Manifesting Generator" : "Generator";
   } else if (throat) {
     // Manifestor benötigt Motor (Sacral/Solar-Plex/Heart/Root) verbunden mit Throat
     // via Kanalpfad — nicht nur „irgendwo definiert" (Split Definition beachten!)

@@ -121,13 +121,13 @@ Das Profil beschreibt die Lebensrolle — wie jemand seinen Weg durch die Welt g
 
 ### Karmische Gruppen
 
-**Rechter Winkel (Persönliches Karma):** 1/2, 2/1, 3/4, 4/3
+**Rechter Winkel (Persönliches Karma):** 1/3, 1/4, 2/4, 2/5, 3/5, 3/6, 4/6
 → Lebensweg ist nach innen gerichtet — für sich selbst leben, dadurch andere inspirieren
 
 **Juxtaposition (Fixes Karma):** 4/1
 → Einziges fixes Karma — der Weg ist determiniert, nicht verhandelbar
 
-**Linker Winkel (Transpersonales Karma):** 4/6, 5/1, 5/2, 6/2, 6/3
+**Linker Winkel (Transpersonales Karma):** 5/1, 5/2, 6/2, 6/3
 → Lebensweg ist nach außen gerichtet — dient einem größeren Zweck für andere
 
 ---
@@ -224,11 +224,11 @@ Das Profil beschreibt die Lebensrolle — wie jemand seinen Weg durch die Welt g
 ---
 
 ### Profil 4/6 — Opportunist/Rollenmodell
-**Karma:** Linker Winkel — Transpersonales Karma
+**Karma:** Rechter Winkel — Persönliches Karma
 **Bewusst:** Linie 4 (Netzwerk, Beziehungen als Fundament)
 **Unbewusst:** Linie 6 (reift zum Rollenmodell)
 
-**Lebensthema:** Transpersonale Rolle durch Netzwerk-Einfluss. Wirkt durch tiefe Beziehungen (L4) und reift über Zeit zu einem Rollenmodell (L6) das anderen echten Orientierung gibt. Der Einfluss kommt durch vertraute Verbindungen, nicht durch Massenreichweite.
+**Lebensthema:** Persönlicher Lebensweg (Rechter Winkel), der sich über Netzwerk und Beziehungen entfaltet. Wirkt durch tiefe Beziehungen (L4) und reift über Zeit zu einem Rollenmodell (L6) das anderen echten Orientierung gibt. Der Einfluss kommt durch vertraute Verbindungen, nicht durch Massenreichweite.
 
 **Stärken:** Tiefer Einfluss durch Vertrauen; Netzwerk trägt die Weisheit in die Welt
 **Herausforderung:** Muss Netzwerk UND Lebensphase-Timing respektieren; kann nicht vor der Zeit als Vorbild wirken
@@ -299,7 +299,7 @@ Das Profil beschreibt die Lebensrolle — wie jemand seinen Weg durch die Welt g
 | 3/5 | Märtyrer | Herausgeber | Persönlich | Praxisweisheit als echte Lösung |
 | 3/6 | Märtyrer | Rollenmodell | Persönlich | Tiefste Lebenserfahrung |
 | 4/1 | Opportunist | Forscher | Juxtaposition | Fixes Karma: Netzwerk + Fundament |
-| 4/6 | Opportunist | Rollenmodell | Transpersonal | Einfluss durch Vertrauen und Reife |
+| 4/6 | Opportunist | Rollenmodell | Persönlich | Einfluss durch Vertrauen und Reife |
 | 5/1 | Herausgeber | Forscher | Transpersonal | Stärkstes Projektionsfeld + Fundament |
 | 5/2 | Herausgeber | Eremit | Transpersonal | Projektionsfeld + natürliches Talent |
 | 6/2 | Rollenmodell | Eremit | Transpersonal | Gaben reifen zur Weisheit |

@@ -1,5 +1,13 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-03-29 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-05-24 | **Quellen:** Live-Analyse Server .138 + .167
+
+> **Changelog 2026-05-24:** Inkarnationskreuz-Bug behoben — Profil **4/6** wurde
+> fälschlich als Left Angle statt Right Angle klassifiziert (Winkel wurde nur aus
+> der ersten Profillinie abgeleitet). Fix in `connection-key/lib/astro/chartCalculation.js`
+> (vollständige `PROFILE_ANGLE`-Map) + Prompt-Korrektur in `reading-worker/server.js:1517`.
+> Betraf 9 bestehende 4/6-Readings (siehe `KREUZ_4-6_BETROFFENE_READINGS.md`).
+> Der reading-worker holt den Chart per HTTP von `connection-key:3000/api/chart/calculate`
+> (`CHART_SERVICE_URL`) — Single Source für die Chart-Berechnung ist also diese Engine.
 
 ---
 
@@ -304,7 +312,7 @@ Supabase v4.reading_results + public.readings
 ### Server .138 — Connection-Key API (Port 3000)
 
 **Basis:** `http://138.199.237.34:3000/api`
-**Auth:** ❌ `AUTH_ENABLED=false` — ALLE Endpunkte offen!
+**Auth:** ⚠️ Teilweise aktiv — `/api/chart/calculate` verlangt Header `x-api-key` (ENV `API_KEY`); `/health` ist offen. Der frühere Stand „`AUTH_ENABLED=false`, alle Endpunkte offen" stimmt **nicht mehr** für alle Routen. **TODO:** vollständiges Auth-Audit, welche Routen tatsächlich geschützt sind. Der reading-worker ruft die Chart-API intern mit `x-api-key: $API_KEY` auf (`reading-worker/server.js:286`).
 
 | Methode | Pfad | Beschreibung | Status |
 |---------|------|-------------|--------|
@@ -671,7 +679,7 @@ MarketingWorkflow.tsx       Marketing
 
 | # | Problem | Server |
 |---|---------|--------|
-| 1 | `AUTH_ENABLED=false` — alle .138 APIs ohne Auth offen | .138 |
+| 1 | Auth nur teilweise aktiv — `/api/chart/calculate` verlangt `x-api-key` (ENV `API_KEY`), aber Auth-Abdeckung aller Routen unklar → Audit nötig | .138 |
 | 2 | JWT-Implementation fehlt (TODO in auth.js) | .138 |
 | 3 | Stripe LIVE-Modus + Auth deaktiviert — echte Zahlungen ohne Schutz | .138 |
 

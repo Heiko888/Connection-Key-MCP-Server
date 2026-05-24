@@ -632,20 +632,37 @@ function getIncarnationCross(sunLonP, sunLonD, profile) {
   const dSunGate   = gateForLongitude(sunLonD);
   const dEarthGate = gateForLongitude(norm360(sunLonD + 180));
 
+  // Cross-Type aus dem VOLLEN Profil (nicht nur der ersten Linie!).
+  // Kanonische HD-Zuordnung:
+  //   Right Angle : 1/3, 1/4, 2/4, 2/5, 3/5, 3/6, 4/6
+  //   Juxtaposition: 4/1
+  //   Left Angle  : 5/1, 5/2, 6/2, 6/3
+  // ACHTUNG: 4/6 ist das EINZIGE Right-Angle-Profil mit erster Linie 4 — eine
+  // reine "Linie 1-3 = RAX, sonst LAX"-Heuristik klassifiziert es faelschlich
+  // als Left Angle (Bug: RAX of Planning -> LAX of Migration).
+  const PROFILE_ANGLE = {
+    "1/3": "Right Angle",  "1/4": "Right Angle",
+    "2/4": "Right Angle",  "2/5": "Right Angle",
+    "3/5": "Right Angle",  "3/6": "Right Angle",
+    "4/6": "Right Angle",
+    "4/1": "Juxtaposition",
+    "5/1": "Left Angle",   "5/2": "Left Angle",
+    "6/2": "Left Angle",   "6/3": "Left Angle",
+  };
   const pSunLine = parseInt(profile.split("/")[0], 10);
+  // Fallback fuer untypische Profile (sollte bei sauberer Berechnung nie greifen):
+  // Linie 1-3 = RAX, sonst LAX.
+  const crossType = PROFILE_ANGLE[profile]
+    || ((pSunLine >= 1 && pSunLine <= 3) ? "Right Angle" : "Left Angle");
 
-  // Cross-Type aus Profil: 4/1 → Juxtaposition; Linie 1-3 → RAX; Linie 4-6 → LAX
-  let crossType, typeShort, typePrefixDe;
-  if (profile === "4/1") {
-    crossType = "Juxtaposition";
+  let typeShort, typePrefixDe;
+  if (crossType === "Juxtaposition") {
     typeShort = "JUX";
     typePrefixDe = "Juxtaposition der";
-  } else if (pSunLine >= 1 && pSunLine <= 3) {
-    crossType = "Right Angle";
+  } else if (crossType === "Right Angle") {
     typeShort = "RAX";
     typePrefixDe = "RAX der";
   } else {
-    crossType = "Left Angle";
     typeShort = "LAX";
     typePrefixDe = "LAX der";
   }

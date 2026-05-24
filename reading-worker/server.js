@@ -1514,7 +1514,7 @@ ANWEISUNG: Die Chart-Daten sind via Swiss Ephemeris berechnet. Beginne direkt. K
 PFLICHT — Kerntreue Life-Purpose:
 - Das Inkarnationskreuz ${placeholders.incarnationCrossName} ist der ROTE FADEN. Nenne den Kreuznamen mehrfach (mindestens 5×) und leite die Lebensaufgabe daraus ab.
 - Die vier IC-Tore (PSon ${placeholders.personalitySun}, PErd ${placeholders.personalityEarth}, DSon ${placeholders.designSun}, DErd ${placeholders.designEarth}) müssen jeweils einen eigenen Abschnitt bekommen.
-- Profil ${placeholders.profile} → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6 → Right Angle (persönliches Schicksal); 4/1 → Juxtaposition (festes Schicksal); 4/6, 5/1, 5/2, 6/2, 6/3 → Left Angle (transpersonal).
+- Profil ${placeholders.profile} → Inkarnationskreuztyp deterministisch: 1/3, 1/4, 2/4, 2/5, 3/5, 3/6, 4/6 → Right Angle (persönliches Schicksal); 4/1 → Juxtaposition (festes Schicksal); 5/1, 5/2, 6/2, 6/3 → Left Angle (transpersonal).
 - KEIN Business-Coaching: Marketing, Pricing, Angebotsstruktur, Sichtbarkeit, Kunden, Skalieren — diese Themen gehören NICHT in dieses Reading. Wenn Lebensaufgabe sich auch im Beruflichen zeigt, bleibe auf der Mission-Ebene, nicht auf der Operativ-Ebene.
 - Halluziniere keine Planeten-Positionen. Wenn Reading eine Planet-Tor-Aussage macht, MUSS sie aus diesen Listen kommen:
   Persönlichkeitsplaneten: ${placeholders.personalityPlanetsList}

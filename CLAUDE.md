@@ -772,6 +772,7 @@ MarketingWorkflow.tsx       Marketing
 | Veraltete Docker Images | .138 | ~10 Images, ~3-4 GB |
 | TypeScript `ignoreBuildErrors` entfernen | .167 | Fehler fixen |
 | Duplikat-Queue `bull:reading-v4-queue` prüfen | .138 | Konsolidieren |
+| Committete Build-Artefakte entfernen | .138 | `frontend/.next/` ist eingecheckt (`.next` fehlt in `.gitignore`) → `.gitignore` ergänzen + `git rm -r --cached frontend/.next` |
 
 ### 🟢 LOW PRIORITY
 
@@ -781,6 +782,7 @@ MarketingWorkflow.tsx       Marketing
 | Archive löschen | .167 | `archive/`, `_archive_docs/`, `_temp/` |
 | Altlast-Verzeichnisse | .138 | `_ARCHIVE_OLD_SCRIPTS/`, `reading-worker-backup-old/`, `v4-reading-worker/` (leer), `gateway/`, `mcp-gateway/` (nur node_modules) |
 | Backup-Dateien | .138 | `mcp-gateway.js.OLD`, `chartCalculation.js.backup` |
+| ⚠️ Concern-Vermischung im Backend-Repo (**unter Vorbehalt — vor Löschen verifizieren**) | .138 | `frontend/` (Next.js `connection-key-frontend`, 436 Dateien, Docker-Service auskommentiert) + `integration/` (~275 Dateien, fast nur MD-Anleitungen/Deploy-Skripte: `FIX_*`, `QUICK_*`, `INSTALL_*`, `DEPLOY_*`) liegen im .138-Backend-Repo, gehören laut Goldener Regel auf .167 bzw. sind einmalige Migrations-Notizen. **Nicht blind löschen:** prüfen, ob `frontend/` noch als Quelle/Referenz dient und ob `integration/api-routes`+`lib`+`services` schon nach .167 übernommen wurden. |
 | Legacy prüfen | .167 | `frontend/` (v3) + `v3-api-server/` — Migrationsplan |
 | Docker-Images | .138 | `chatgpt-agent` (2×287 MB), `v3-api-server`, `reading-worker-v4`, `connection-key-img` |
 | Docker-Volumes | .138 | `n8n_data` Duplikat, 4× anonyme Volumes |

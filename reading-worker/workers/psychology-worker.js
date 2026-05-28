@@ -43,11 +43,27 @@ function createClients() {
 async function fetchReadingData(supabasePublic, readingId) {
   const { data, error } = await supabasePublic
     .from("readings")
-    .select("reading_type, profile, authority, strategy, defined_centers, undefined_centers, not_self_theme, gates, channels, client_name, reading_data")
+    .select("reading_type, client_name, reading_data, chart_data")
     .eq("id", readingId)
     .single();
   if (error) throw new Error(`Reading ${readingId} nicht gefunden: ${error.message}`);
-  return data;
+  // HD-Attribute liegen im JSON (reading_data.chart_data bzw. Spalte chart_data),
+  // nicht als eigene Spalten -> flach mappen, damit chartSummary() sie wie bisher liest.
+  const chart = data.reading_data?.chart_data || data.chart_data || {};
+  const centers = chart.centers && typeof chart.centers === "object" ? chart.centers : {};
+  const isDefined = (v) => v === true || v === "defined";
+  return {
+    ...data,
+    reading_type: data.reading_type || chart.type,
+    profile: chart.profile,
+    authority: chart.authority,
+    strategy: chart.strategy,
+    defined_centers: Object.entries(centers).filter(([, v]) => isDefined(v)).map(([k]) => k),
+    undefined_centers: Object.entries(centers).filter(([, v]) => !isDefined(v)).map(([k]) => k),
+    not_self_theme: chart.not_self_theme || chart.notSelfTheme || null,
+    gates: Array.isArray(chart.gates) ? chart.gates.map((g) => g.number || g) : [],
+    channels: Array.isArray(chart.channels) ? chart.channels.map((c) => c.name_de || c.name || `${c.gate1}-${c.gate2}`) : [],
+  };
 }
 
 async function fetchConnectionData(supabasePublic, connectionReadingId) {

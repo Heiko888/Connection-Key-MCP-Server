@@ -1,5 +1,18 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-05-24 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-05-27 | **Quellen:** Live-Analyse Server .138 + .167
+
+> **Changelog 2026-05-27 (Code-Abgleich .138):** Doku gegen den tatsächlichen
+> Repo-Stand abgeglichen. Korrekturen: (1) **Auth ist implementiert** —
+> `connection-key/middleware/auth.js` prüft `x-api-key` **und** Supabase-JWT (Bearer)
+> für **alle** `/api`-Routen (Ausnahmen: `/health`, `/`, `/api/stripe/webhook`,
+> `/api/telegram/webhook`); `AUTH_ENABLED` ist im `docker-compose.yml` per Default `true`.
+> Die früheren P0-Punkte „Auth deaktiviert" / „JWT fehlt" sind damit erledigt.
+> (2) **`sync-reading-service` ist jetzt in `docker-compose.yml`** (Port 7001).
+> (3) **MCP-Gateway-Agenten-Liste korrigiert** — die real existierenden `/agent/*`-Routen
+> weichen von der alten Liste ab (`chart`, `yearly`, `automation`, `depth-analysis`,
+> `tasks` haben **keine** dedizierte Gateway-Route → laufen über `/agents/run` gegen
+> die MCP-Core-Tools in `index.js`; das erklärt die 404er aus `AGENTEN_404_FEHLER_ANALYSE.md`).
+> (4) Git-Stand aktualisiert (Working Tree sauber, letzter Commit `1a3b316`).
 
 > **Changelog 2026-05-24:** Inkarnationskreuz-Bug behoben — Profil **4/6** wurde
 > fälschlich als Left Angle statt Right Angle klassifiziert (Winkel wurde nur aus
@@ -72,7 +85,7 @@ The Connection Key ist eine Human-Design-Plattform mit KI-gestützten Readings, 
 │  │         ││(v4 UI) ││        │───────┼──► .138:3000 (V4 Backend API)           │
 │  └─────────┘└────────┘└────────┘   │  │  ┌─────────────────────────────┐         │
 │                                      │  │  │ sync-reading :7001         │         │
-│  ┌─────────┐ ┌───────────┐          │  │  │ (nicht in docker-compose!) │         │
+│  ┌─────────┐ ┌───────────┐          │  │  │ (in docker-compose.yml)    │         │
 │  │Grafana  │ │Prometheus │          │  │  └─────────────────────────────┘         │
 │  │ :3001   │ │ :9090     │          │  │                                          │
 │  └─────────┘ └───────────┘          │  │  ┌─────────────────────────────┐         │
@@ -104,7 +117,7 @@ Kommunikation .167 → .138:
 
 | Server | Repo | Pfad | Branch | Letzter Commit | Uncommitted |
 |--------|------|------|--------|----------------|-------------|
-| .138 | `Heiko888/Connection-Key-MCP-Server` | `/opt/mcp-connection-key` | main | `0636dc8` feat: Transit-Berechnung | ⚠️ `reading-worker/server.js` modified, `depth-analysis.txt` untracked |
+| .138 | `Heiko888/Connection-Key-MCP-Server` | `/opt/mcp-connection-key` | main | `1a3b316` Merge: MG-Typ-Erkennung (Motor→Throat) | ✅ Sauber |
 | .138 | (Zweites Repo) | `/opt/the-connection-key` | main | — | Frontend-lastig, separates Repo |
 | .167 | `Heiko888/The-Connection-Key` | `/opt/hd-app/The-Connection-Key` | main | `35a75bd76` Refactor: MUI | ✅ Sauber |
 
@@ -122,7 +135,7 @@ Kommunikation .167 → .138:
 | `connection-key` | `mcp-connection-key-connection-key` (2.03 GB!) | 0.0.0.0:3000→3000 | ✅ Up 43h | 172.18.0.4 | ✅ |
 | `reading-worker` | `mcp-connection-key-reading-worker` (268 MB) | 0.0.0.0:4000→4000 | ✅ Up 5h | 172.18.0.7 | ✅ |
 | `mcp-gateway` | `mcp-connection-key-mcp-gateway` (574 MB) | 0.0.0.0:7000→7000 | ✅ Up 5d | 172.18.0.3 | ✅ |
-| `sync-reading-service` | (234 MB) | 0.0.0.0:7001→7001 | ✅ Up 2w | 172.18.0.2 | ❌ Manuell! |
+| `sync-reading-service` | (234 MB) | 0.0.0.0:7001→7001 | ✅ Up 2w | 172.18.0.2 | ✅ (nur `ANTHROPIC_API_KEY` als ENV) |
 | `redis-queue-secure` | `redis:7-alpine` | intern 6379 | ✅ Healthy | 172.18.0.5 | ✅ |
 | `n8n` | `n8nio/n8n:latest` (1.64 GB) | 0.0.0.0:5678→5678 | ✅ Up 2w | 172.18.0.6 | ✅ |
 | Frontend | auskommentiert | — | ❌ | — | Auskommentiert |
@@ -312,7 +325,7 @@ Supabase v4.reading_results + public.readings
 ### Server .138 — Connection-Key API (Port 3000)
 
 **Basis:** `http://138.199.237.34:3000/api`
-**Auth:** ⚠️ Teilweise aktiv — `/api/chart/calculate` verlangt Header `x-api-key` (ENV `API_KEY`); `/health` ist offen. Der frühere Stand „`AUTH_ENABLED=false`, alle Endpunkte offen" stimmt **nicht mehr** für alle Routen. **TODO:** vollständiges Auth-Audit, welche Routen tatsächlich geschützt sind. Der reading-worker ruft die Chart-API intern mit `x-api-key: $API_KEY` auf (`reading-worker/server.js:286`).
+**Auth:** ✅ Aktiv für **alle** `/api`-Routen via `authMiddleware` (`connection-key/middleware/auth.js`). Akzeptiert zwei Methoden: **(1)** `x-api-key`-Header gegen ENV `API_KEY` (interne Services: .167, n8n, reading-worker) und **(2)** `Authorization: Bearer <token>` als **Supabase-JWT** (Frontend-User-Sessions, via `supabase.auth.getUser()`). Zusätzlich Legacy-Support für `?apiKey=`. **Public (ohne Auth):** `/health`, `/` (Service-Info), `/api/stripe/webhook` (Stripe-Signatur prüft selbst), `/api/telegram/webhook` (Bot-API sendet keine Header). `AUTH_ENABLED` Default `true` (`docker-compose.yml`). Der reading-worker ruft die Chart-API intern mit `x-api-key: $API_KEY` auf (`reading-worker/server.js:286`).
 
 | Methode | Pfad | Beschreibung | Status |
 |---------|------|-------------|--------|
@@ -342,23 +355,26 @@ Supabase v4.reading_results + public.readings
 | POST | `/api/stripe/create-checkout-session` | Stripe Checkout | ✅ |
 | POST | `/api/stripe/webhook` | Stripe Webhook (Signatur-Auth) | ✅ |
 
-### Server .138 — MCP Gateway (Port 7000)
+### Server .138 — MCP Gateway (Port 7000, `mcp-gateway.js`)
 
-**Auth:** Bearer Token (`MCP_API_KEY`)
+**Auth:** `/agents/run` per Bearer Token (`MCP_API_KEY` / `CK_AGENT_SECRET`). Die dedizierten `/agent/*`-Routen sind aktuell **ohne** eigenen Auth-Check.
 
-| Methode | Pfad | Agent |
-|---------|------|-------|
-| POST | `/agents/run` | Alle Agenten |
+| Methode | Pfad | Funktion |
+|---------|------|----------|
+| POST | `/agents/run` | Generischer Dispatcher (`domain`/`task`/`payload`) → spawnt MCP-Core (`index.js`) per stdio; max. 1 Request gleichzeitig |
 | GET | `/health` | Health-Check |
 
-**Agent-Endpunkte (via MCP Gateway):**
+**Dedizierte Agent-Endpunkte (real in `mcp-gateway.js`, 16 Stück):**
 ```
-/agent/chart             /agent/yearly          /agent/automation
-/agent/ui-ux             /agent/sales           /agent/business-hd
-/agent/video-creation    /agent/transit         /agent/depth-analysis
-/agent/tasks             /agent/shadow-work     /agent/social-youtube
-/agent/marketing         /agent/reflection      /agent/chart-architect
+/agent/marketing         /agent/sales           /agent/social-youtube
+/agent/video             /agent/video-creation  /agent/ui-ux
+/agent/chart-architect   /agent/reading         /agent/reflection
+/agent/shadow-work       /agent/relationship    /agent/transit
+/agent/business-hd       /agent/emotions        /agent/health
+/agent/abundance
 ```
+⚠️ **Kein** dedizierter Endpunkt für `chart`, `yearly`, `automation`, `depth-analysis`, `tasks` — diese müssten über `/agents/run` gegen die MCP-Core-Tools laufen. `index.js` registriert nur: `ping`, `echo`, `getDateTime`, `calculate`, `generateUUID`, `callN8N`, `createN8NWorkflow`, `triggerN8NWebhook`, `generateReading`, `analyzeChart`, `matchPartner`, `saveUserData`. Das erklärt die 404er aus `AGENTEN_404_FEHLER_ANALYSE.md`.
+⚠️ `/agent/reading` fällt ohne `ANTHROPIC_API_KEY` auf Placeholder-Text zurück (`mcp-gateway.js:246`); `/agents/reading` (mit s) ist ein reiner Platzhalter (`:302`, TODO `:312`).
 
 ### Server .138 — Sync Reading Service (Port 7001)
 
@@ -455,28 +471,42 @@ Timeout:        300s
 Max Tokens:     8000 (config) / 16000 (actual)
 ```
 
-### Agent-Übersicht (18 Agenten)
+### Agent-Übersicht (Stand: `mcp-gateway.js` abgeglichen 2026-05-27)
+
+**Dedizierte `/agent/*`-Routen (existieren real, 16):**
 
 | # | Agent | Server | Endpunkt | Modell | Status |
 |---|-------|--------|----------|--------|--------|
-| 1 | Chart Analysis | .138 | :7000/agent/chart | Claude | ✅ |
-| 2 | Yearly Analysis | .138 | :7000/agent/yearly | Claude | ✅ |
-| 3 | Automation Strategy | .138 | :7000/agent/automation | Claude | ✅ |
-| 4 | UI/UX Strategy | .138 | :7000/agent/ui-ux | Claude | ✅ |
-| 5 | Sales Strategy | .138 | :7000/agent/sales | Claude | ✅ |
-| 6 | Business HD | .138 | :7000/agent/business-hd | Claude | ✅ |
-| 7 | Video Creation | .138 | :7000/agent/video-creation | Claude | ✅ |
-| 8 | Transit Insights | .138 | :7000/agent/transit | Claude | ✅ |
-| 9 | Depth Analysis | .138 | :7000/agent/depth-analysis | Claude | ✅ |
-| 10 | Task Planning | .138 | :7000/agent/tasks | Claude | ❌ TODO |
-| 11 | Shadow Work | .138 | :7000/agent/shadow-work | Claude | ✅ |
-| 12 | Social/YouTube | .138 | :7000/agent/social-youtube | Claude | ✅ |
-| 13 | Marketing | .138 | :7000/agent/marketing | Claude | ✅ |
-| 14 | Reflection | .138 | :7000/agent/reflection | Claude | ✅ |
-| 15 | Chart Architect | .138 | :7000/agent/chart-architect | Claude | ✅ |
-| 16 | Relationship | .138 | :7000/agent/relationship | Claude | ✅ |
-| 17 | Emotions | .138 | :7000/agent/emotions | Claude | ✅ |
-| 18 | HD Relationship | .167 | UI-only | — | ✅ UI |
+| 1 | Marketing | .138 | :7000/agent/marketing | Claude | ✅ |
+| 2 | Sales Strategy | .138 | :7000/agent/sales | Claude | ✅ |
+| 3 | Social/YouTube | .138 | :7000/agent/social-youtube | Claude | ✅ |
+| 4 | Video Creation | .138 | :7000/agent/video, /agent/video-creation | Claude | ✅ |
+| 5 | UI/UX Strategy | .138 | :7000/agent/ui-ux | Claude | ✅ |
+| 6 | Chart Architect | .138 | :7000/agent/chart-architect | Claude | ✅ |
+| 7 | Reading | .138 | :7000/agent/reading | Claude | ⚠️ Placeholder ohne API-Key |
+| 8 | Reflection | .138 | :7000/agent/reflection | Claude | ✅ |
+| 9 | Shadow Work | .138 | :7000/agent/shadow-work | Claude | ✅ |
+| 10 | Relationship | .138 | :7000/agent/relationship | Claude | ✅ |
+| 11 | Transit Insights | .138 | :7000/agent/transit | Claude | ✅ |
+| 12 | Business HD | .138 | :7000/agent/business-hd | Claude | ✅ |
+| 13 | Emotions | .138 | :7000/agent/emotions | Claude | ✅ |
+| 14 | Health & Wellness | .138 | :7000/agent/health | Claude | ✅ |
+| 15 | Geld & Überfluss | .138 | :7000/agent/abundance | Claude | ✅ |
+| 16 | HD Relationship | .167 | UI-only | — | ✅ UI |
+
+**Vom Frontend (.167 `/api/agents/*`) erwartet, aber OHNE dedizierte Gateway-Route (→ 404, siehe `AGENTEN_404_FEHLER_ANALYSE.md`):**
+
+| Agent | Frontend-Route (.167) | Gateway-Route (.138) | Status |
+|-------|----------------------|----------------------|--------|
+| Chart Analysis | `/api/agents/chart` | ❌ `/agent/chart` fehlt | ❌ |
+| Yearly Analysis | `/api/agents/yearly` | ❌ `/agent/yearly` fehlt | ❌ |
+| Automation Strategy | `/api/agents/automation` | ❌ `/agent/automation` fehlt | ❌ |
+| Depth Analysis | `/api/agents/depth-analysis` | ❌ `/agent/depth-analysis` fehlt | ❌ |
+| Task Planning | `/api/agents/tasks` | ❌ `/agent/tasks` fehlt | ❌ TODO |
+
+> Hinweis: `chart`, `automation`, `chart`(Analyse) etc. haben zwar System-Prompts in
+> `AGENT_SYSTEM_PROMPTS`, aber keine registrierte HTTP-Route. Sie müssten entweder als
+> dedizierte `/agent/*`-Route ergänzt oder über `/agents/run` (MCP-Core) bedient werden.
 
 ### Reading-Templates (22 Stück auf .138)
 
@@ -679,9 +709,9 @@ MarketingWorkflow.tsx       Marketing
 
 | # | Problem | Server |
 |---|---------|--------|
-| 1 | Auth nur teilweise aktiv — `/api/chart/calculate` verlangt `x-api-key` (ENV `API_KEY`), aber Auth-Abdeckung aller Routen unklar → Audit nötig | .138 |
-| 2 | JWT-Implementation fehlt (TODO in auth.js) | .138 |
-| 3 | Stripe LIVE-Modus + Auth deaktiviert — echte Zahlungen ohne Schutz | .138 |
+| 1 | ✅ **ERLEDIGT (2026-05-27):** Auth aktiv für alle `/api`-Routen (`x-api-key` + Supabase-JWT), `AUTH_ENABLED` Default `true` | .138 |
+| 2 | ✅ **ERLEDIGT:** Token-Verifikation via Supabase-JWT implementiert (`auth.js`). Offen nur: eigener JWT-Secret-Flow (`JWT_SECRET` in config.js, aktuell ungenutzt für Verifikation) | .138 |
+| 3 | Stripe LIVE-Modus aktiv — durch aktivierte Auth jetzt geschützt, aber LIVE-Keys + Webhook-Signatur prüfen/rotieren | .138 |
 
 ### 🟠 P1 — Dringend
 
@@ -691,8 +721,8 @@ MarketingWorkflow.tsx       Marketing
 | 5 | `agent.the-connection-key.de` → Port 3005 → 502 (Host-Nginx falsch) | .167 |
 | 6 | `138.199.237.34` hardcoded in **50+ Dateien** auf .167 | .167 |
 | 7 | `generateReading.js` auf .167 ist ein **STUB** (11 Zeilen, wirft Fehler) | .167 |
-| 8 | `reading-worker/server.js` nicht committed | .138 |
-| 9 | CORS auf localhost gesetzt statt Produktionsdomain | .138 |
+| 8 | ✅ **ERLEDIGT:** Working Tree sauber, alle Änderungen committet | .138 |
+| 9 | CORS nicht auf Produktionsdomain: Code-Default = localhost-Liste (`config.js`), `docker-compose.yml` überschreibt mit `CORS_ORIGINS:-*` (zu offen) → auf `the-connection-key.de` setzen | .138 |
 | 10 | `RESEND_API_KEY` fehlt — E-Mail-Versand kaputt | .167 |
 | 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) | .167 |
 
@@ -703,10 +733,10 @@ MarketingWorkflow.tsx       Marketing
 | 12 | System-Redis parallel zu Docker-Redis | .138 |
 | 13 | Kein Swap-Space | .138 |
 | 14 | v4-worker auf .167 definiert aber gehört auf .138 | .167 |
-| 15 | `sync-reading-service` nicht in docker-compose.yml | .138 |
+| 15 | ✅ **ERLEDIGT:** `sync-reading-service` ist in `docker-compose.yml` (braucht ggf. noch Supabase-ENV) | .138 |
 | 16 | n8n ohne SSL | .138 |
-| 17 | 8+ TODOs in kritischen Pfaden | .138 |
-| 18 | `depth-analysis.txt` untracked | .138 |
+| 17 | TODOs/Platzhalter in kritischen Pfaden: `mcp-gateway.js:312` (`/agents/reading` Platzhalter), `services/chart-truth/chartTruthService.ts` (Swiss-Ephemeris-STUB) | .138 |
+| 18 | ✅ **ERLEDIGT:** `depth-analysis.txt`/Reading-Templates committet | .138 |
 | 19 | Dual-Nginx auf .167 (Host + Docker parallel) | .167 |
 | 20 | `bull:reading-v4-queue` Duplikat-Namespace | .138 |
 
@@ -718,14 +748,16 @@ MarketingWorkflow.tsx       Marketing
 
 | Was | Server | Aktion |
 |-----|--------|--------|
-| AUTH_ENABLED auf true + JWT implementieren | .138 | Sicherheitskritisch |
-| CORS auf `the-connection-key.de` setzen | .138 | Produktionsdomain eintragen |
+| ✅ ~~AUTH_ENABLED auf true + JWT implementieren~~ | .138 | **Erledigt** — Auth (API-Key + Supabase-JWT) aktiv |
+| CORS auf `the-connection-key.de` setzen | .138 | `CORS_ORIGINS` env auf Produktionsdomain (statt `*`) |
+| `/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen | .138 | Fehlende Gateway-Routen → behebt 404er (`AGENTEN_404_FEHLER_ANALYSE.md`) |
+| `/agents/reading`-Platzhalter durch echte Generierung ersetzen | .138 | `mcp-gateway.js:302-316` |
 | Host-Nginx agent Config fixen (3005→4000) | .167 | Port ändern |
 | IP-Hardcoding durch ENV-Variablen ersetzen (50+ Dateien) | .167 | `V4_BACKEND_URL`, `READING_AGENT_URL`, `MCP_SERVER_URL` |
 | `generateReading.js` STUB durch echte Engine ersetzen | .167 | Von .138 kopieren ODER v4-worker auf .138 deployen |
-| `sync-reading-service` in docker-compose.yml aufnehmen | .138 | Service definieren |
+| ✅ ~~`sync-reading-service` in docker-compose.yml aufnehmen~~ | .138 | **Erledigt** (Supabase-ENV ggf. ergänzen) |
 | `RESEND_API_KEY` setzen | .167 | API-Key beschaffen und in .env |
-| Uncommitted Changes committen | .138 | `git add && git commit` |
+| ✅ ~~Uncommitted Changes committen~~ | .138 | **Erledigt** — Working Tree sauber |
 
 ### 🟡 MEDIUM PRIORITY
 
@@ -740,6 +772,7 @@ MarketingWorkflow.tsx       Marketing
 | Veraltete Docker Images | .138 | ~10 Images, ~3-4 GB |
 | TypeScript `ignoreBuildErrors` entfernen | .167 | Fehler fixen |
 | Duplikat-Queue `bull:reading-v4-queue` prüfen | .138 | Konsolidieren |
+| Committete Build-Artefakte entfernen | .138 | `frontend/.next/` ist eingecheckt (`.next` fehlt in `.gitignore`) → `.gitignore` ergänzen + `git rm -r --cached frontend/.next` |
 
 ### 🟢 LOW PRIORITY
 
@@ -749,6 +782,7 @@ MarketingWorkflow.tsx       Marketing
 | Archive löschen | .167 | `archive/`, `_archive_docs/`, `_temp/` |
 | Altlast-Verzeichnisse | .138 | `_ARCHIVE_OLD_SCRIPTS/`, `reading-worker-backup-old/`, `v4-reading-worker/` (leer), `gateway/`, `mcp-gateway/` (nur node_modules) |
 | Backup-Dateien | .138 | `mcp-gateway.js.OLD`, `chartCalculation.js.backup` |
+| ⚠️ Concern-Vermischung im Backend-Repo (**unter Vorbehalt — vor Löschen verifizieren**) | .138 | `frontend/` (Next.js `connection-key-frontend`, 436 Dateien, Docker-Service auskommentiert) + `integration/` (~275 Dateien, fast nur MD-Anleitungen/Deploy-Skripte: `FIX_*`, `QUICK_*`, `INSTALL_*`, `DEPLOY_*`) liegen im .138-Backend-Repo, gehören laut Goldener Regel auf .167 bzw. sind einmalige Migrations-Notizen. **Nicht blind löschen:** prüfen, ob `frontend/` noch als Quelle/Referenz dient und ob `integration/api-routes`+`lib`+`services` schon nach .167 übernommen wurden. |
 | Legacy prüfen | .167 | `frontend/` (v3) + `v3-api-server/` — Migrationsplan |
 | Docker-Images | .138 | `chatgpt-agent` (2×287 MB), `v3-api-server`, `reading-worker-v4`, `connection-key-img` |
 | Docker-Volumes | .138 | `n8n_data` Duplikat, 4× anonyme Volumes |
@@ -848,6 +882,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-03-29*
-*Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167)*
+*Letzte Aktualisierung: 2026-05-27 (Code-Abgleich .138 gegen tatsächlichen Repo-Stand)*
+*Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

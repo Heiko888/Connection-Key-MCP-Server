@@ -37,6 +37,14 @@ import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from 
 // Bei Problemen: READING_STRICT_MODE=false setzen, altes Verhalten kommt zurück.
 const READING_STRICT_MODE = (process.env.READING_STRICT_MODE || 'true').toLowerCase() !== 'false';
 
+// System-Level-Verstärkung der Chart-Treue (chart_fidelity). Der Fakten-Block in
+// der User-Nachricht trägt Whitelist/Verbote/Wahrheitsquelle; diese Regel hebt sie
+// zusätzlich auf System-Ebene, wo Claude Instruktionen am stärksten gewichtet.
+// Leer wenn READING_STRICT_MODE=false → altes Verhalten unverändert.
+const STRICT_FIDELITY_SYSTEM_RULE = READING_STRICT_MODE ? `
+
+CHART-TREUE (verbindlich): Der mit "=== FAKTEN ===" markierte Block in der Nachricht ist die EINZIGE Wahrheitsquelle für dieses Chart. Verwende ausschließlich die dort gelisteten Tore, Kanäle, Zentren und Planeten-Positionen. Erfinde KEINE weiteren Tore/Kanäle, auch nicht als "ähnlich", "fast aktiv" oder "resonant", und fasse einzelne Tore NICHT zu nicht gelisteten Kanälen zusammen. Halte die "=== ERLAUBTE ERWÄHNUNGEN ===" (Whitelist) und "=== VERBOTEN ===" strikt ein. Im Zweifel lass die Aussage weg — ein kürzerer, korrekter Text ist besser als ein erfundener.` : '';
+
 const app = express();
 // 15MB Limit für JSON-Body — Coach-Admin-UI lädt Telegram-Bilder Base64-kodiert
 // (Bild max 10 MB, Base64-Overhead ~33% → ~13 MB). Reguläre JSON-Requests bleiben klein.
@@ -2041,7 +2049,7 @@ ${tuningInstructions}${languageInstruction}
 
 WICHTIGE ANWEISUNG: Dir werden vollständig berechnete Chart-Daten (via Swiss Ephemeris) direkt im Prompt übergeben. Nutze NUR diese Daten. Füge KEINEN Disclaimer, KEINE Einleitung und KEINE Anmerkung ein, die besagt, dass du kein Berechnungstool hast oder die Daten ableitest. Die Daten sind präzise und vollständig — beginne das Reading direkt.
 ${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}
-Erstelle ein professionelles Reading basierend auf den Nutzerdaten.`;
+Erstelle ein professionelles Reading basierend auf den Nutzerdaten.${STRICT_FIDELITY_SYSTEM_RULE}`;
 
   // Connection-Reading: Beide Personen mit ihren Charts übergeben
   let userMessage;
@@ -5536,7 +5544,7 @@ app.post('/api/readings/stream', async (req, res) => {
     const templateContent = templates[reading_type] || templates['default'] || '';
     const langInstruction = language === 'en' ? '\n\nLANGUAGE: Write in English.' : '';
 
-    const systemPrompt = `Du bist ein Reading-Agent für Human Design.\n\n${templateContent}\n\nVerwende folgendes Wissen:\n${knowledgeText}\n${langInstruction}\n${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}\n\nANWEISUNG: Keine Disclaimer. Beginne direkt.`;
+    const systemPrompt = `Du bist ein Reading-Agent für Human Design.\n\n${templateContent}\n\nVerwende folgendes Wissen:\n${knowledgeText}\n${langInstruction}\n${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}\n\nANWEISUNG: Keine Disclaimer. Beginne direkt.${STRICT_FIDELITY_SYSTEM_RULE}`;
 
     const userMessage = `Erstelle ein ${reading_type} Reading für:
 Name: ${name || 'Unbekannt'}

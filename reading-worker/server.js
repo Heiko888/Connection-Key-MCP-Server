@@ -63,6 +63,7 @@ const TELEGRAM_HD_WISSEN_THREAD_ID = parseInt(process.env.TELEGRAM_HD_WISSEN_THR
 const TELEGRAM_BUSINESS_HD_THREAD_ID = parseInt(process.env.TELEGRAM_BUSINESS_HD_THREAD_ID || '0', 10) || null;
 const TELEGRAM_CONNECTION_KEY_THREAD_ID = parseInt(process.env.TELEGRAM_CONNECTION_KEY_THREAD_ID || '0', 10) || null;
 const TELEGRAM_INKARNATIONSKREUZE_THREAD_ID = parseInt(process.env.TELEGRAM_INKARNATIONSKREUZE_THREAD_ID || '113', 10) || null;
+const TELEGRAM_GELEBTES_DESIGN_THREAD_ID = parseInt(process.env.TELEGRAM_GELEBTES_DESIGN_THREAD_ID || '121', 10) || null;
 
 function escapeTgMd2(text) {
   if (!text) return '';
@@ -6009,6 +6010,7 @@ app.post('/api/channel/content/:id/send-telegram', requireAdminAuth, async (req,
 
 const HD_WISSEN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-hd-wissen.json'), 'utf-8'));
 const INKARNATIONSKREUZE_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-inkarnationskreuze.json'), 'utf-8'));
+const GELEBTES_DESIGN_TOPICS = JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-gelebtes-design.json'), 'utf-8'));
 const CONNECTION_KEY_TOPICS = (() => {
   try {
     return JSON.parse(fs.readFileSync(path.join(__dirname, '../content-topics/telegram-connection-key.json'), 'utf-8'));
@@ -6319,6 +6321,50 @@ async function postChannelInkarnationskreuze({ dryRun = false, force = false } =
   }
 }
 
+async function postChannelGelebtesDesign({ dryRun = false, force = false } = {}) {
+  if (!TELEGRAM_COMMUNITY_ID && !dryRun) {
+    console.warn('[Channel] TELEGRAM_COMMUNITY_ID nicht gesetzt — überspringe');
+    return null;
+  }
+  // Topic anhand des Datums rotieren.
+  const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+  // Nur jeden 3. Tag (Offset 2 — versetzt zu HD-Wissen %2, Connection-Key %3==0, Inkarnationskreuze %3==1) — ausser dryRun/force
+  if (!dryRun && !force && dayOfYear % 3 !== 2) {
+    console.log(`[Channel] Gelebtes Design: nur jeden 3. Tag (heute dayOfYear=${dayOfYear} → skip)`);
+    return null;
+  }
+  console.log(`🌱 [Channel] Generiere Gelebtes-Design-Post${dryRun ? ' (Entwurf)' : ''}...`);
+  try {
+    const { topic, topicHashtag } = GELEBTES_DESIGN_TOPICS[dayOfYear % GELEBTES_DESIGN_TOPICS.length];
+
+    const templateText = templates['channel-gelebtes-design'] || '';
+    const filledTemplate = templateText
+      .replace(/\{\{topic\}\}/g, topic)
+      .replace(/\{\{topicHashtag\}\}/g, topicHashtag);
+
+    const prompt = `${filledTemplate}\n\nErstelle jetzt den Gelebtes-Design-Post über: ${topic}`;
+    const text = await generateWithClaude(prompt, { maxTokens: 500, temperature: 0.9 });
+
+    // Telegram-Versand nur wenn ein Thread (Topic) gesetzt ist — sonst nur Entwurf speichern.
+    const canPost = !dryRun && TELEGRAM_GELEBTES_DESIGN_THREAD_ID;
+    if (canPost) {
+      await sendTelegramTextWithImage(TELEGRAM_COMMUNITY_ID, text.trim(), 'gelebtes-design', TELEGRAM_GELEBTES_DESIGN_THREAD_ID);
+      console.log(`🌱 [Channel] Gelebtes Design gepostet: ${topic} (${text.length} Zeichen, thread=${TELEGRAM_GELEBTES_DESIGN_THREAD_ID})`);
+    } else if (!dryRun) {
+      console.warn(`[Channel] Gelebtes Design: TELEGRAM_GELEBTES_DESIGN_THREAD_ID nicht gesetzt → nur Entwurf, kein Telegram-Post (${topic})`);
+    } else {
+      console.log(`📝 [Channel] Gelebtes-Design-Entwurf erstellt: ${topic} (${text.length} Zeichen)`);
+    }
+    const { row } = await generateAndSaveInstagramCaption(text.trim(), 'gelebtes-design', topic, { dryRun });
+    if (canPost) sendMattermost(`🌱 **Gelebtes Design gepostet** | ${topic}`, 'channel');
+    return row;
+  } catch (err) {
+    console.error('[Channel] Gelebtes Design Fehler:', err.message);
+    if (!dryRun) sendMattermost(`❌ **Gelebtes-Design-Fehler**: ${err.message}`, 'errors');
+    throw err;
+  }
+}
+
 /**
  * Postet jeden 3. Tag um 19:00 MESZ einen Verbindungs-/Beziehungs-Beitrag in das
  * #Connection-Key Topic der Telegram-Community-Gruppe.
@@ -6492,6 +6538,8 @@ scheduleDailyAt(16, 0, postChannelHDWissen);
 
 // Inkarnationskreuze jeden 3. Tag, 15:00 UTC (17:00 MESZ) — Funktion prüft intern dayOfYear%3==1
 scheduleDailyAt(15, 0, postChannelInkarnationskreuze);
+// Gelebtes Design jeden 3. Tag, 13:00 UTC (15:00 MESZ) — Funktion prüft intern dayOfYear%3==2
+scheduleDailyAt(13, 0, postChannelGelebtesDesign);
 
 // Connection-Key (Verbindungs-Wissen) jeden 3. Tag, 17:00 UTC (19:00 MESZ)
 // — Funktion prüft intern dayOfYear%3
@@ -6689,6 +6737,21 @@ app.post('/api/channel/post-inkarnationskreuze', async (req, res) => {
   }
   res.json({ success: true, message: 'Inkarnationskreuze-Post gestartet' });
   postChannelInkarnationskreuze({ dryRun: false, force }).catch(e => console.error('[Channel] Inkarnationskreuze async:', e.message));
+});
+
+app.post('/api/channel/post-gelebtes-design', async (req, res) => {
+  const dryRun = !!(req.body && req.body.dryRun);
+  const force = !!(req.body && req.body.force);
+  if (dryRun) {
+    try {
+      const row = await postChannelGelebtesDesign({ dryRun: true });
+      return res.json({ success: true, post: row, dryRun: true });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  res.json({ success: true, message: 'Gelebtes-Design-Post gestartet' });
+  postChannelGelebtesDesign({ dryRun: false, force }).catch(e => console.error('[Channel] Gelebtes Design async:', e.message));
 });
 
 app.post('/api/channel/post-connection-key', async (req, res) => {

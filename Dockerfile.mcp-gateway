@@ -14,6 +14,11 @@ COPY production/agent-sales.js ./production/agent-sales.cjs
 COPY production/agent-social.js ./production/agent-social.cjs
 COPY production/agent-video.js ./production/agent-video.cjs
 COPY production/agent-design.js ./production/agent-design.cjs
+COPY production/agent-knowledge.cjs ./production/agent-knowledge.cjs
+
+# Knowledge & Templates für den Knowledge-Agent (gleicher Satz wie reading-worker)
+COPY reading-worker/knowledge ./knowledge
+COPY reading-worker/templates ./templates
 
 EXPOSE 7000
 

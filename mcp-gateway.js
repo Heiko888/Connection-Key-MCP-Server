@@ -21,6 +21,7 @@ const { handleSalesAgent }     = require('./production/agent-sales.cjs');
 const { handleSocialAgent }    = require('./production/agent-social.cjs');
 const { handleVideoAgent }     = require('./production/agent-video.cjs');
 const { handleDesignAgent }    = require('./production/agent-design.cjs');
+const { handleKnowledgeAgent } = require('./production/agent-knowledge.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -109,6 +110,8 @@ app.post('/agent/social-youtube', handleSocialAgent);
 app.post('/agent/video',          handleVideoAgent);
 app.post('/agent/video-creation', handleVideoAgent);
 app.post('/agent/ui-ux',          handleDesignAgent);
+// Knowledge & Templates Agent: action = list | get | search | ask
+app.post('/agent/knowledge',      handleKnowledgeAgent);
 
 
 // Chart-Architect / Bodygraph-Gestalter

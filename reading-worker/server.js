@@ -556,7 +556,14 @@ try {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
   if (apiKey) {
-    anthropicClient = new Anthropic({ apiKey });
+    // maxRetries: SDK wiederholt transiente Fehler (429 Rate-Limit, 529 Overloaded,
+    // 5xx) mit exponentiellem Backoff. Default ist 2 — auf 4 erhöht, da ein
+    // gleichzeitiger Overload sonst die komplette Modell-Liste durchbrennt und
+    // den Job mit "Alle Claude-Modelle fehlgeschlagen" killt.
+    anthropicClient = new Anthropic({
+      apiKey,
+      maxRetries: parseInt(process.env.CLAUDE_MAX_RETRIES || "4", 10),
+    });
     console.log("✅ Claude API verfügbar");
   } else {
     console.warn("⚠️  ANTHROPIC_API_KEY nicht gesetzt – Claude-Modelle nicht verfügbar");
@@ -2205,6 +2212,7 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
 
   if (modelConfig.provider === "claude") {
     const modelsToTry = modelConfig.models || [];
+    let lastErr;
     for (const modelId of modelsToTry) {
       try {
         console.log(`   Versuche Claude-Modell: ${modelId}`);
@@ -2216,10 +2224,31 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
         console.log(`   ✅ Claude (${modelId}) erfolgreich`);
         return result;
       } catch (claudeErr) {
+        lastErr = claudeErr;
         console.warn(`   ⚠️  Claude (${modelId}) fehlgeschlagen:`, claudeErr.message);
       }
     }
-    throw new Error("Alle Claude-Modelle fehlgeschlagen");
+    // Alle Claude-Modelle gescheitert → OpenAI-Fallback statt Job-Fail (symmetrisch
+    // zum OpenAI→Claude-Fallback unten). Häufigster Grund für "alle gescheitert":
+    // transienter 529 Overloaded / 429 Rate-Limit über die ganze Modell-Liste.
+    // Reading nicht verlieren, sondern mit OpenAI weitermachen wenn verfügbar.
+    if (isOpenAIAvailable()) {
+      const fallbackModelId = "gpt-4o";
+      console.warn(`   🔁 Alle Claude-Modelle fehlgeschlagen — Fallback auf OpenAI (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
+      try {
+        const result = await generateWithOpenAI(fullPrompt, {
+          model: fallbackModelId,
+          maxTokens,
+          temperature: 0.7,
+        });
+        console.log(`   ✅ OpenAI-Fallback (${fallbackModelId}) erfolgreich`);
+        return result;
+      } catch (openaiErr) {
+        console.warn(`   ⚠️  OpenAI-Fallback fehlgeschlagen:`, openaiErr.message);
+        lastErr = openaiErr;
+      }
+    }
+    throw new Error(`Alle Claude-Modelle fehlgeschlagen: ${lastErr?.message || "?"}`);
   }
 
   if (modelConfig.provider === "openai") {

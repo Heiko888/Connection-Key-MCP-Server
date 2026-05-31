@@ -362,8 +362,10 @@ Antworte in ca. 300-500 Wörtern mit klaren, differenzierten Perspektiven.`
   }
 });
 
-// Reading Agent Route - Spezialfall (alter Endpoint, bleibt für Kompatibilität)
+// Reading Agent Route - Spezialfall (alter Endpoint, Legacy-Frontend via ck-agent.ts).
+// Antwortet im { ok, result }-Format, das der Aufrufer erwartet.
 app.post('/agents/reading', async (req, res) => {
+  const startTime = Date.now();
   const { readingType, clientName, readingData, agentConfig } = req.body;
 
   if (!readingType || !clientName) {
@@ -373,12 +375,47 @@ app.post('/agents/reading', async (req, res) => {
     });
   }
 
-  // TODO: Hier Reading-Generierung implementieren
-  // Placeholder Response
-  res.json({
-    ok: true,
-    result: `[READING AGENT] Reading für ${clientName} (Typ: ${readingType}) wird generiert. Die vollständige Integration wird gerade implementiert.`
-  });
+  const rd = readingData || {};
+  const personContext = [
+    `Name: ${clientName}`,
+    rd.birthDate  ? `Geburtsdatum: ${rd.birthDate}` : null,
+    rd.birthTime  ? `Geburtszeit: ${rd.birthTime}`   : null,
+    rd.birthPlace ? `Geburtsort: ${rd.birthPlace}`   : null,
+  ].filter(Boolean).join('\n');
+
+  const systemPrompt = `Du bist ein erfahrener Human Design Reading-Interpret. Du erstellst ein fundiertes, einfühlsames Reading vom Typ "${readingType}". Arbeite konkret mit den vorhandenen Geburts-/Chartdaten, vermeide Allgemeinplätze und Heilsversprechen. Sprache: Deutsch, klar und wertschätzend. Umfang: ca. 400-700 Wörter.`;
+  const userMessage = `Erstelle ein Human Design Reading (Typ: ${readingType}) für folgende Person:\n${personContext}`;
+
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        ok: false,
+        error: 'ANTHROPIC_API_KEY nicht konfiguriert'
+      });
+    }
+
+    const completion = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+
+    res.json({
+      ok: true,
+      result: completion.content[0].text,
+      readingType,
+      tokens: completion.usage.input_tokens + completion.usage.output_tokens,
+      model: 'claude-sonnet-4-5',
+      runtimeMs: Date.now() - startTime,
+    });
+  } catch (error) {
+    console.error(`[Agent /agents/reading] Fehler (${readingType}):`, error.message);
+    res.status(500).json({
+      ok: false,
+      error: `Claude API Error: ${error.message}`
+    });
+  }
 });
 
 

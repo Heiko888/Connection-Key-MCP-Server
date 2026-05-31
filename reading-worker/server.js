@@ -1017,6 +1017,8 @@ const KNOWLEDGE_MAP = {
   // Familie
   'parenting':        ['types-detailed', 'authority-detailed', 'profiles-detailed', 'centers-detailed', 'strategy-authority'],
   'kinder':           ['types-detailed', 'authority-detailed', 'profiles-detailed', 'centers-detailed'],
+  // Variablen / Primary Health System (4 Pfeile)
+  'variable-phs':     ['variable-arrows', 'arrows-detailed', 'bodygraph-statistics', 'centers-detailed', 'authority-detailed', 'types-detailed'],
   // Weitere
   'correct-reading':  ['human-design-basics', 'types-detailed', 'authority-detailed', 'strategy-authority'],
 };

@@ -102,6 +102,9 @@ const AGENT_SYSTEM_PROMPTS = {
   'social-youtube': 'Du bist ein Social Media und YouTube Begleiter für Human Design Coaches. Du hilfst bei Content-Strategien, Video-Ideen und Social-Media-Posts. Antworte auf Deutsch.',
   'chart': 'Du bist ein Human Design Chart-Analytiker. Du analysierst tiefgehend Human Design Charts und erklärst Zentren, Kanäle, Tore, Profile und Inkarnationskreuze präzise. Antworte auf Deutsch.',
   'ui-ux': 'Du bist ein Design-Begleiter für Human Design Coaches. Du hilfst bei der visuellen Gestaltung von Webseiten und Materialien. Antworte auf Deutsch.',
+  'yearly': 'Du bist ein Human Design Jahres-Analyst. Du erstellst auf Basis von Chart-Daten und aktuellen Transiten eine differenzierte Jahresvorschau: energetische Themen, günstige Phasen, Entwicklungsfelder und konkrete Hinweise zur Ausrichtung. Klar, strukturiert, ohne Heilsversprechen. Antworte auf Deutsch.',
+  'depth-analysis': 'Du bist ein Human Design Tiefen-Analytiker. Du gehst über die Standard-Deutung hinaus und beleuchtest Wechselwirkungen zwischen Profil, Inkarnationskreuz, Variablen, Kanälen und Schattenthemen. Du arbeitest präzise mit den konkreten Chart-Daten und vermeidest Allgemeinplätze. Antworte auf Deutsch.',
+  'tasks': 'Du bist ein Aufgaben- und Umsetzungs-Planer für Human Design Coaches. Aus einer Anfrage leitest du konkrete, priorisierte Schritte ab, die zum Energietyp und zur Strategie passen. Du gibst eine klar strukturierte, umsetzbare Aufgabenliste zurück. Antworte auf Deutsch.',
 };
 
 app.post('/agent/marketing',      handleMarketingAgent);
@@ -112,6 +115,64 @@ app.post('/agent/video-creation', handleVideoAgent);
 app.post('/agent/ui-ux',          handleDesignAgent);
 // Knowledge & Templates Agent: action = list | get | search | ask
 app.post('/agent/knowledge',      handleKnowledgeAgent);
+
+// ============================================
+// Generische Claude-Agenten (System-Prompt aus AGENT_SYSTEM_PROMPTS)
+// Behebt 404er für chart, yearly, automation, depth-analysis, tasks
+// ============================================
+function makeSimpleAgent(agentName) {
+  const systemPrompt = AGENT_SYSTEM_PROMPTS[agentName];
+  return async (req, res) => {
+    const startTime = Date.now();
+    const { message, userId, chartData, context } = req.body;
+    if (!message) {
+      return res.status(400).json({ success: false, agent: agentName, error: 'message is required', timestamp: new Date().toISOString() });
+    }
+    try {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return res.json({
+          success: true,
+          agent: agentName,
+          message,
+          response: `[${agentName.toUpperCase()} AGENT] (Placeholder Mode)\n\nAnthropic API Key nicht konfiguriert.`,
+          tokens: 0,
+          model: 'placeholder',
+          runtimeMs: Date.now() - startTime,
+          timestamp: new Date().toISOString()
+        });
+      }
+      const contextBlock = chartData
+        ? `Chart-Daten:\n${JSON.stringify(chartData, null, 2)}\n\n`
+        : (context ? `Kontext:\n${typeof context === 'object' ? JSON.stringify(context, null, 2) : context}\n\n` : '');
+      const userMessage = contextBlock ? `${contextBlock}Frage: ${message}` : message;
+      const claudeRes = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }],
+        max_tokens: 2000,
+      });
+      res.json({
+        success: true,
+        agent: agentName,
+        message,
+        response: claudeRes.content[0].text,
+        tokens: claudeRes.usage.input_tokens + claudeRes.usage.output_tokens,
+        model: 'claude-sonnet-4-5',
+        runtimeMs: Date.now() - startTime,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error(`[Agent ${agentName}] Fehler:`, error.message);
+      res.status(500).json({ success: false, agent: agentName, error: error.message, runtimeMs: Date.now() - startTime, timestamp: new Date().toISOString() });
+    }
+  };
+}
+
+app.post('/agent/chart',          makeSimpleAgent('chart'));
+app.post('/agent/automation',     makeSimpleAgent('automation'));
+app.post('/agent/yearly',         makeSimpleAgent('yearly'));
+app.post('/agent/depth-analysis', makeSimpleAgent('depth-analysis'));
+app.post('/agent/tasks',          makeSimpleAgent('tasks'));
 
 
 // Chart-Architect / Bodygraph-Gestalter

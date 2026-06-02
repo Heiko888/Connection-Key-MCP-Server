@@ -75,12 +75,15 @@ Proxy-Routen liegen als Staging in
 `integration/api-routes/app-router/agents/video-generation/` und gehören nach
 `frontend-coach/app/api/agents/video-generation/`:
 
-| Datei | Route |
+| Staging-Datei (`integration/...`) | Ziel in `frontend-coach/` |
 |------|------|
-| `route.ts` | `POST /api/agents/video-generation` |
-| `status/[taskId]/route.ts` | `GET /api/agents/video-generation/status/[taskId]` |
+| `api-routes/app-router/agents/video-generation/route.ts` | `app/api/agents/video-generation/route.ts` (`POST`) |
+| `api-routes/app-router/agents/video-generation/status/[taskId]/route.ts` | `app/api/agents/video-generation/status/[taskId]/route.ts` (`GET`) |
+| `frontend/components/VideoGenerationPanel.tsx` | `components/VideoGenerationPanel.tsx` (MUI-UI: Formular + Polling + Player) |
+| `frontend/app/coach/agents/video-generation/page.tsx` | `app/coach/agents/video-generation/page.tsx` (Seite `/coach/agents/video-generation`) |
 
-Benötigt `MCP_SERVER_URL` (bereits in .167-ENV vorhanden, → `:7000`).
+Benötigt `MCP_SERVER_URL` (bereits in .167-ENV vorhanden, → `:7000`). Nach dem Kopieren
+`frontend-coach` neu bauen (siehe Skill `deploy-167`).
 
 **UI-Flow (Polling) — Minimalbeispiel:**
 ```ts

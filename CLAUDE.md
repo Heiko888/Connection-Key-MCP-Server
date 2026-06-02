@@ -697,7 +697,7 @@ MarketingWorkflow.tsx       Marketing
 |----------|------|-----------|
 | CPU | 3 Kerne | OK |
 | RAM | 3.7 GiB (1.5 GiB genutzt, 2.2 GiB Cache) | ⚠️ |
-| Swap | 0 — kein Swap! | ⚠️ OOM-Risiko |
+| Swap | 4 GB Swapfile (`/swapfile`, fstab, `vm.swappiness=10`) | ✅ (eingerichtet 2026-06-02) |
 | Disk | 75 GB (41 GB, 57%) | OK |
 | OS | Ubuntu 24.04, Kernel 6.8 | ✅ |
 
@@ -731,7 +731,7 @@ MarketingWorkflow.tsx       Marketing
 | # | Problem | Server |
 |---|---------|--------|
 | 12 | System-Redis parallel zu Docker-Redis | .138 |
-| 13 | Kein Swap-Space | .138 |
+| 13 | ✅ **ERLEDIGT (2026-06-02):** 4 GB Swap + `vm.swappiness=10` auf .138 (und .167) eingerichtet | .138 |
 | 14 | v4-worker auf .167 definiert aber gehört auf .138 | .167 |
 | 15 | ✅ **ERLEDIGT:** `sync-reading-service` ist in `docker-compose.yml` (braucht ggf. noch Supabase-ENV) | .138 |
 | 16 | n8n ohne SSL | .138 |
@@ -765,7 +765,7 @@ MarketingWorkflow.tsx       Marketing
 |-----|--------|--------|
 | System-Redis deaktivieren | .138 | `systemctl disable redis-server` |
 | Ungenutzte UFW-Ports schließen (3005, 3456, 4001) | .138 | `ufw delete allow` |
-| Swap-Space einrichten (2-4 GB) | .138 | Swapfile erstellen |
+| ✅ ~~Swap-Space einrichten (2-4 GB)~~ | .138 | **Erledigt** — 4 GB `/swapfile`, swappiness 10 (.138 + .167) |
 | n8n hinter HTTPS | .138 | Nginx-Proxy Config |
 | Dual-Nginx auflösen | .167 | Host-Nginx direkt auf Docker-Container |
 | Dangling Docker Images | .167 | `docker image prune` (~13.7 GB) |

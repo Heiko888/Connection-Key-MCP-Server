@@ -20,6 +20,7 @@ const { handleMarketingAgent } = require('./production/agent-marketing.cjs');
 const { handleSalesAgent }     = require('./production/agent-sales.cjs');
 const { handleSocialAgent }    = require('./production/agent-social.cjs');
 const { handleVideoAgent }     = require('./production/agent-video.cjs');
+const { handleVideoGenerate, handleVideoStatus } = require('./production/agent-video-generation.cjs');
 const { handleDesignAgent }    = require('./production/agent-design.cjs');
 const { handleKnowledgeAgent } = require('./production/agent-knowledge.cjs');
 
@@ -112,6 +113,9 @@ app.post('/agent/sales',          handleSalesAgent);
 app.post('/agent/social-youtube', handleSocialAgent);
 app.post('/agent/video',          handleVideoAgent);
 app.post('/agent/video-creation', handleVideoAgent);
+// Echte Video-Generierung via Runway / Seedance 2.0 (async: generate startet, status pollt)
+app.post('/agent/video/generate',        handleVideoGenerate);
+app.get('/agent/video/status/:taskId',   handleVideoStatus);
 app.post('/agent/ui-ux',          handleDesignAgent);
 // Knowledge & Templates Agent: action = list | get | search | ask
 app.post('/agent/knowledge',      handleKnowledgeAgent);

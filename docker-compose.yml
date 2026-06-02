@@ -55,6 +55,9 @@ services:
       - CANVA_REDIRECT_URI=${CANVA_REDIRECT_URI:-}
       - CANVA_MCP_URL=${CANVA_MCP_URL:-https://mcp.canva.com/mcp}
       - FRONTEND_URL=${FRONTEND_URL:-https://coach.the-connection-key.de}
+      # Runway / Seedance 2.0 Video-Generierung
+      - RUNWAYML_API_SECRET=${RUNWAYML_API_SECRET:-}
+      - RUNWAY_VIDEO_MODEL=${RUNWAY_VIDEO_MODEL:-seedance2}
     volumes:
       # Content-Topics-Datenbank (readonly) — social-youtube Agent liest hieraus
       - /opt/mcp-connection-key/content-topics:/app/content-topics:ro

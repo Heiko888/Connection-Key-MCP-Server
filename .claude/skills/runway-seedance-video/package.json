@@ -1,0 +1,9 @@
+{
+  "name": "runway-seedance-video-skill",
+  "private": true,
+  "type": "module",
+  "description": "Standalone skill: generate videos via Runway API with the Seedance 2.0 model",
+  "dependencies": {
+    "@runwayml/sdk": "*"
+  }
+}

@@ -1,32 +1,31 @@
 /**
  * Video Generation Status API Route (App Router)
- * Route: /api/agents/video-generation/status/[taskId]
+ * Route: /api/agents/video-generation/status/[jobId]
  *
- * Pollt den Status einer laufenden Runway/Seedance-Generierung über das
- * Backend (.138 mcp-gateway). Bei status === 'SUCCEEDED' enthält die Antwort
- * `output: string[]` (Video-URLs, laufen nach einiger Zeit ab → ggf. in
- * Supabase Storage sichern).
+ * Pollt den persistenten video_jobs-Status über den reading-worker (.138:4000).
+ * Bei status === 'completed' enthält die Antwort `video_url` (permanente
+ * Supabase-Storage-URL — läuft NICHT ab).
  *
  * Deployment-Ziel: Server .167, frontend-coach
- *   app/api/agents/video-generation/status/[taskId]/route.ts
+ *   app/api/agents/video-generation/status/[jobId]/route.ts
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const MCP_SERVER_URL = process.env.MCP_SERVER_URL || 'http://138.199.237.34:7000';
+const READING_AGENT_URL = process.env.READING_AGENT_URL || 'http://138.199.237.34:4000';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { taskId: string } },
+  { params }: { params: { jobId: string } },
 ) {
-  const { taskId } = params;
-  if (!taskId) {
-    return NextResponse.json({ success: false, error: 'taskId is required' }, { status: 400 });
+  const { jobId } = params;
+  if (!jobId) {
+    return NextResponse.json({ success: false, error: 'jobId is required' }, { status: 400 });
   }
 
   try {
     const response = await fetch(
-      `${MCP_SERVER_URL}/agent/video/status/${encodeURIComponent(taskId)}`,
+      `${READING_AGENT_URL}/api/videos/${encodeURIComponent(jobId)}`,
       { method: 'GET', headers: { 'Content-Type': 'application/json' } },
     );
     const data = await response.json().catch(() => ({}));
@@ -36,7 +35,7 @@ export async function GET(
         { status: response.status || 500 },
       );
     }
-    // { success, taskId, status, progress, output?, error? }
+    // { success, status, progress, video_url, error, ... }
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('Video Generation Status API Error:', error);

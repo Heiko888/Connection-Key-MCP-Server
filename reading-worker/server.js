@@ -25,6 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
+import { startVideoWorker, getVideoQueue } from "./workers/video-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
@@ -2950,6 +2951,7 @@ console.log("🟢 Multi-Agent Worker aktiv (Queue: reading-queue-v4-multi-agent)
 // W6 — Psychology Worker
 // ======================================================
 startPsychologyWorker();
+startVideoWorker();
 console.log("[W6] Psychology Worker gestartet");
 
 // ======================================================
@@ -4976,6 +4978,67 @@ app.get("/api/readings/psychology/:id", async (req, res) => {
     return res.json(data);
   } catch (err) {
     console.error("[Psychology] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ─── Video-Generierung (Runway / Seedance 2.0) ──────────────────────────────
+// Robuster, persistenter Pfad: legt video_jobs an, enqueued in "video-queue",
+// der video-worker generiert + speichert das Video permanent im Storage.
+app.post("/api/videos/generate", async (req, res) => {
+  try {
+    const { mode = "text", prompt, shots, images, ratio, duration, model, userId, coachId } = req.body || {};
+    if (!prompt && !(Array.isArray(shots) && shots.length)) {
+      return res.status(400).json({ success: false, error: "prompt oder shots[] ist erforderlich" });
+    }
+    if ((mode === "image" || mode === "reference") && !(Array.isArray(images) && images.length)) {
+      return res.status(400).json({ success: false, error: `mode "${mode}" braucht images[]` });
+    }
+
+    const promptText = prompt || (Array.isArray(shots) ? shots.join(" / ") : "");
+    const { data, error } = await supabase
+      .from("video_jobs")
+      .insert({
+        user_id: userId || null,
+        coach_id: coachId || null,
+        mode,
+        prompt: promptText,
+        shots: Array.isArray(shots) ? shots : null,
+        images: Array.isArray(images) ? images : null,
+        ratio: ratio || "1280:720",
+        duration: Number(duration) || 5,
+        model: model || undefined,
+        status: "pending",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    const queue = getVideoQueue();
+    if (!queue) throw new Error("Video-Queue nicht initialisiert");
+    await queue.add("video", { jobId: data.id });
+
+    return res.status(202).json({ success: true, jobId: data.id });
+  } catch (err) {
+    console.error("[Video] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/videos/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("video_jobs")
+      .select("id, status, progress, video_url, mode, prompt, error, error_code, created_at, finished_at")
+      .eq("id", req.params.id)
+      .single();
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json({ success: true, ...data });
+  } catch (err) {
+    console.error("[Video] GET fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

@@ -145,6 +145,11 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
 
+      # Runway / Seedance 2.0 Video-Generierung (video-worker)
+      - RUNWAYML_API_SECRET=${RUNWAYML_API_SECRET:-}
+      - RUNWAY_VIDEO_MODEL=${RUNWAY_VIDEO_MODEL:-seedance2}
+      - VIDEO_TIMEOUT_MS=${VIDEO_TIMEOUT_MS:-900000}
+
       # Security
       - AGENT_SECRET=${AGENT_SECRET}
 

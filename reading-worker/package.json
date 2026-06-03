@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@runwayml/sdk": "^3.22.0",
     "@supabase/supabase-js": "^2.39.7",
     "bullmq": "^5.66.5",
     "cors": "^2.8.5",

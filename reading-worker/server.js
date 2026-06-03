@@ -4996,7 +4996,7 @@ app.post("/api/videos/generate", async (req, res) => {
     }
 
     const promptText = prompt || (Array.isArray(shots) ? shots.join(" / ") : "");
-    const { data, error } = await supabase
+    const { data, error } = await supabasePublic
       .from("video_jobs")
       .insert({
         user_id: userId || null,
@@ -5027,7 +5027,7 @@ app.post("/api/videos/generate", async (req, res) => {
 
 app.get("/api/videos/:id", async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabasePublic
       .from("video_jobs")
       .select("id, status, progress, video_url, mode, prompt, error, error_code, created_at, finished_at")
       .eq("id", req.params.id)

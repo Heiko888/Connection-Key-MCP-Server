@@ -1956,6 +1956,31 @@ function applyPlaceholders(template, placeholders) {
   return out;
 }
 
+// Baut den System-Prompt-Abschnitt für den Modus "KI + Bausteine".
+// Nur aktiv, wenn snippet_mode === "with-snippets" und Bausteine mitgeschickt
+// wurden — andernfalls leerer String (→ exakt bisheriges Verhalten).
+// placeholders (optional): wird via applyPlaceholders auf den Baustein-Text
+// angewendet, damit {{name}} & Co. mit echten Daten gefüllt werden.
+function buildSnippetBlock(payload, placeholders) {
+  if (payload?.snippet_mode !== 'with-snippets') return '';
+  const list = Array.isArray(payload?.snippets) ? payload.snippets : [];
+  if (list.length === 0) return '';
+  const items = list.slice(0, 20)
+    .map(s => {
+      const raw = s.text || '';
+      const text = placeholders ? applyPlaceholders(raw, placeholders) : raw;
+      return `- [${s.category || 'Allgemein'}] ${s.label}: «${text}»`;
+    }).join('\n');
+  return [
+    '## Verbindliche Textbausteine',
+    'Die folgenden vom Coach gepflegten Bausteine sind für genau diesen Klienten ausgewählt',
+    '(passend zu Typ, Autorität und Profil). Arbeite ihre Kernaussagen inhaltlich ein und bleibe',
+    'ihrer Botschaft treu. Formuliere flüssig, kopiere sie nicht wörtlich aneinander, wiederhole',
+    'nichts doppelt. Platzhalter wie {{name}} mit echten Daten füllen.',
+    '', items,
+  ].join('\n');
+}
+
 async function generateReading({ agentId, template, userData, chartData }) {
   const rawModelId = userData?.ai_model || DEFAULT_MODEL;
   // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
@@ -5637,7 +5662,17 @@ app.post('/api/readings/stream', async (req, res) => {
     const templateContent = templates[reading_type] || templates['default'] || '';
     const langInstruction = language === 'en' ? '\n\nLANGUAGE: Write in English.' : '';
 
-    const systemPrompt = `Du bist ein Reading-Agent für Human Design.\n\n${templateContent}\n\nVerwende folgendes Wissen:\n${knowledgeText}\n${langInstruction}\n${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}\n\nANWEISUNG: Keine Disclaimer. Beginne direkt.${STRICT_FIDELITY_SYSTEM_RULE}`;
+    const baseSystemPrompt = `Du bist ein Reading-Agent für Human Design.\n\n${templateContent}\n\nVerwende folgendes Wissen:\n${knowledgeText}\n${langInstruction}\n${transitOverlay ? '\n' + transitOverlay : ''}${deltaContext ? '\n\n' + deltaContext : ''}\n\nANWEISUNG: Keine Disclaimer. Beginne direkt.${STRICT_FIDELITY_SYSTEM_RULE}`;
+
+    // Modus "KI + Bausteine": vom Coach-Portal mitgeschickte Textbausteine in den
+    // System-Prompt einbauen. Bei snippet_mode "pure" / ohne snippets bleibt der
+    // Block leer → exakt bisheriges Verhalten. Platzhalter wie {{name}} im
+    // Baustein-Text werden mit echten Chart-/Personendaten gefüllt.
+    const snippetPlaceholders = {
+      ...buildChartPlaceholders(chartData, { client_name: name, birth_date, birth_time, birth_location }),
+      name: name || 'die Person',
+    };
+    const systemPrompt = [baseSystemPrompt, buildSnippetBlock(req.body, snippetPlaceholders)].filter(Boolean).join('\n\n');
 
     const userMessage = `Erstelle ein ${reading_type} Reading für:
 Name: ${name || 'Unbekannt'}

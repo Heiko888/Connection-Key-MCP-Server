@@ -66,7 +66,7 @@ The Connection Key ist eine Human-Design-Plattform mit KI-gestützten Readings, 
 │  │ Host-Nginx (80/443) ⚠️ DUAL     │  │  │  │ Host-Nginx (80/443)              │    │
 │  │ the-connection-key.de    →:3000  │  │  │  │ werdemeisterdeiner...de  →:3000  │    │
 │  │ coach.the-c...-key.de   →:3002  │  │  │  └────┬─────────┬──────────┬───────┘    │
-│  │ agent.the-c...-key.de   →:3005❌│  │  │       │         │          │            │
+│  │ agent.the-c...-key.de   →:4000✅│  │  │       │         │          │            │
 │  └────┬─────────┬────────────────┘  │  │       ▼         ▼          ▼            │
 │       │         │                    │  │  ┌─────────┐┌────────┐┌─────────┐       │
 │       ▼         ▼                    │  │  │conn-key ││reading ││  mcp-   │       │
@@ -215,7 +215,7 @@ Kommunikation .167 → .138:
 | 3000 | frontend (Docker) | via Nginx/SSL | the-connection-key.de | ✅ |
 | 3001 | grafana (Docker) | ⚠️ Intern | Monitoring | ⚠️ |
 | 3002 | frontend-coach (Docker) | via Nginx/SSL | coach.the-connection-key.de | ✅ |
-| 3005 | **NICHTS** | — | agent.the-connection-key.de → **502** | ❌ |
+| 3005 | **NICHTS** | — | ⚠️ veralteter Port (UFW schließen); agent.the-connection-key.de läuft jetzt über 4000 | 🗑️ |
 | 4000 | ck-agent (Docker) | Intern | Agent Express Server | ✅ |
 | 5678 | n8n (Docker) | Intern | Workflows | ✅ |
 | 6379 | redis (Docker) | Intern | Cache | ✅ |
@@ -240,7 +240,7 @@ werdemeisterdeinergedankenagent.de → localhost:3000 (HTTPS, Let's Encrypt)
 ```
 the-connection-key.de           → localhost:3000  ✅
 coach.the-connection-key.de     → localhost:3002  ✅
-agent.the-connection-key.de     → localhost:3005  ❌ FALSCHER PORT (sollte 4000 sein)
+agent.the-connection-key.de     → localhost:4000  ✅ (gefixt 2026-06-07, war 3005)
 n8n                             → n8n Server
 ```
 
@@ -261,7 +261,7 @@ Rate Limiting: API 10r/s, Login 5r/m
 Agent Timeout: 300s
 ```
 
-**Problem:** Host-Nginx und Docker-Nginx laufen parallel. Host-Nginx leitet `agent.the-connection-key.de` an Port 3005 weiter (falsch), Docker-Nginx würde korrekt auf 4000 leiten. **Lösung:** Host-Nginx Config für agent auf Port 4000 ändern.
+**Problem:** Host-Nginx und Docker-Nginx laufen parallel. ✅ **Teil-Fix (2026-06-07):** Host-Nginx (`sites-enabled/agent`) leitet `agent.the-connection-key.de` jetzt korrekt auf Port 4000 (ck-agent) → 200 statt 502. Offen bleibt die generelle Dual-Nginx-Auflösung (Host + Docker parallel).
 
 ---
 
@@ -685,7 +685,7 @@ MarketingWorkflow.tsx       Marketing
 |--------|--------|------|-------|--------|
 | `the-connection-key.de` | .167 | 3000 | Hauptseite | ✅ |
 | `coach.the-connection-key.de` | .167 | 3002 | Coach-Portal | ✅ |
-| `agent.the-connection-key.de` | .167 | 3005→**502** | Agent-UI | ❌ |
+| `agent.the-connection-key.de` | .167 | 4000 | Agent-UI | ✅ (gefixt 2026-06-07) |
 | `werdemeisterdeinergedankenagent.de` | .138 | 3000 | API-Domain | ✅ |
 | `n8n.werdemeisterdeinergedankenagent.de` | .138 | 5678 | n8n | ⚠️ kein SSL |
 
@@ -718,7 +718,7 @@ MarketingWorkflow.tsx       Marketing
 | # | Problem | Server |
 |---|---------|--------|
 | 4 | Ports 3000, 4000, 7001 öffentlich ohne HTTPS | .138 |
-| 5 | `agent.the-connection-key.de` → Port 3005 → 502 (Host-Nginx falsch) | .167 |
+| 5 | ✅ **ERLEDIGT (2026-06-07):** `agent.the-connection-key.de` → 200; Host-Nginx (`sites-enabled/agent`) leitet jetzt korrekt auf `127.0.0.1:4000` (ck-agent) | .167 |
 | 6 | `138.199.237.34` hardcoded in **50+ Dateien** auf .167 | .167 |
 | 7 | `generateReading.js` auf .167 ist ein **STUB** (11 Zeilen, wirft Fehler) | .167 |
 | 8 | ✅ **ERLEDIGT:** Working Tree sauber, alle Änderungen committet | .138 |
@@ -752,7 +752,7 @@ MarketingWorkflow.tsx       Marketing
 | CORS auf `the-connection-key.de` setzen | .138 | `CORS_ORIGINS` env auf Produktionsdomain (statt `*`) |
 | `/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen | .138 | Fehlende Gateway-Routen → behebt 404er (`AGENTEN_404_FEHLER_ANALYSE.md`) |
 | `/agents/reading`-Platzhalter durch echte Generierung ersetzen | .138 | `mcp-gateway.js:302-316` |
-| Host-Nginx agent Config fixen (3005→4000) | .167 | Port ändern |
+| ✅ ~~Host-Nginx agent Config fixen (3005→4000)~~ | .167 | **Erledigt (2026-06-07)** — `sites-enabled/agent` → 4000, 200 |
 | IP-Hardcoding durch ENV-Variablen ersetzen (50+ Dateien) | .167 | `V4_BACKEND_URL`, `READING_AGENT_URL`, `MCP_SERVER_URL` |
 | `generateReading.js` STUB durch echte Engine ersetzen | .167 | Von .138 kopieren ODER v4-worker auf .138 deployen |
 | ✅ ~~`sync-reading-service` in docker-compose.yml aufnehmen~~ | .138 | **Erledigt** (Supabase-ENV ggf. ergänzen) |

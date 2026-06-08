@@ -1,6 +1,18 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-05-27 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-08 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-08 (.167 Deploys + Verifikation):** (1) **P1 #5 (Agent-502)
+> verifiziert erledigt** — Host-Nginx `sites-enabled/agent` leitet jetzt auf
+> `127.0.0.1:4000` (ck-agent) statt des toten Ports 3005; `agent.the-connection-key.de`
+> liefert extern **HTTP 200** (war 502). Doku in beiden Repos auf `main`.
+> (2) **Workshop-Verwaltung (Phase 1) live** auf `frontend-coach` (Commit `84b229b88`):
+> neue Routen `/api/workshops`, `/api/workshops/[id]`, `/api/workshops/upload`,
+> Seite `/workshops` + `WorkshopFormDialog`/`WorkshopLandingEditor`. Upload schreibt
+> via Service-Role in den Supabase-Storage-Bucket **`workshop-images`** (public,
+> angelegt 2026-06-08, Projekt `wdiadklhvhlndnjojrfu`) → Bucket verifiziert vorhanden.
+> (3) Blueprint-Fixes (Commit `a0f4c2bcb`) auf `frontend` + `frontend-coach` deployt.
+> Beide Frontends nach Rebuild HTTP 200 (lokal + extern).
+>
 > **Changelog 2026-05-27 (Code-Abgleich .138):** Doku gegen den tatsächlichen
 > Repo-Stand abgeglichen. Korrekturen: (1) **Auth ist implementiert** —
 > `connection-key/middleware/auth.js` prüft `x-api-key` **und** Supabase-JWT (Bearer)

@@ -1,6 +1,15 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-08 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-10 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-10 (.167 Mattermost-Workshop-Benachrichtigungen):** Neue ENV
+> `MATTERMOST_WEBHOOK_WORKSHOPS` (Incoming-Webhook, Secret) für `frontend` auf .167.
+> Bei bestätigter Workshop-Anmeldung (`/api/workshops/confirm` → `lib/mattermost.ts`,
+> `notifyWorkshopRegistration`) wird fire-and-forget an den Mattermost-Channel gepostet.
+> ⚠️ **ENV-Gotcha:** Die Var gehört ins **Root-`.env`** (`/opt/hd-app/The-Connection-Key/.env`),
+> das per `env_file: - .env` von der `frontend`-Compose gelesen wird — **nicht** in
+> `frontend/.env`. Server-ENV wirkt erst nach `docker compose up -d frontend` (recreate).
+> Siehe Abschnitt 13 + 17.
+>
 > **Changelog 2026-06-08 (.167 Deploys + Verifikation):** (1) **P1 #5 (Agent-502)
 > verifiziert erledigt** — Host-Nginx `sites-enabled/agent` leitet jetzt auf
 > `127.0.0.1:4000` (ck-agent) statt des toten Ports 3005; `agent.the-connection-key.de`
@@ -687,6 +696,7 @@ MarketingWorkflow.tsx       Marketing
 | Supabase | Postgres DB + Auth | URL + Keys | .138 + .167 | ✅ |
 | n8n | Workflows | JWT Token | .138 + .167 | ✅ |
 | Resend | E-Mail-Versand | `RESEND_API_KEY` | .167 | ❌ FEHLT! |
+| Mattermost | Workshop-Anmelde-Benachrichtigungen (Incoming-Webhook) | `MATTERMOST_WEBHOOK_WORKSHOPS` | .167 | ✅ |
 | Let's Encrypt | SSL | certbot | .138 + .167 | ✅ |
 
 **13 Stripe Price IDs** konfiguriert (Basic, Premium, VIP, Connection-Key 1/3/5er, Penta, HD-Readings).
@@ -843,6 +853,11 @@ STRIPE_BASIC_PRICE_ID / PREMIUM / VIP
 RESEND_API_KEY                    # ❌ FEHLT — E-Mail kaputt!
 RESEND_FROM_DOMAIN
 RESEND_FROM_NAME
+
+# Mattermost (Workshop-Anmelde-Benachrichtigungen)
+MATTERMOST_WEBHOOK_WORKSHOPS      # Incoming-Webhook-URL (Secret) — bei bestätigter Workshop-Anmeldung
+                                  # ⚠️ Gehört ins ROOT-.env (env_file der frontend-Compose), NICHT frontend/.env!
+                                  # Nach Änderung: docker compose up -d frontend (recreate, kein Rebuild für Server-ENV)
 
 # Redis / Monitoring / Node
 REDIS_HOST / PORT / PASSWORD

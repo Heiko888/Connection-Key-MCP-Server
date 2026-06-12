@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, Volume2, VolumeX, Square } from 'lucide-react';
+import { useAudio } from '../lib/audioService';
 
 interface Message {
   id: string;
@@ -29,6 +30,11 @@ export default function AIChatInterface({ userChart, userId, className = '' }: A
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Sprachausgabe (Text-to-Speech) über den vorhandenen Audio-Service
+  const { speak, stop } = useAudio();
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -36,6 +42,44 @@ export default function AIChatInterface({ userChart, userId, className = '' }: A
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Wiedergabe beim Verlassen der Komponente stoppen
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Eine einzelne Nachricht vorlesen bzw. laufende Wiedergabe stoppen
+  const speakMessage = async (message: Message) => {
+    if (speakingId === message.id) {
+      stop();
+      setSpeakingId(null);
+      return;
+    }
+    stop();
+    setSpeakingId(message.id);
+    try {
+      await speak(message.content);
+    } catch (error) {
+      console.error('Sprachausgabe-Fehler:', error);
+    } finally {
+      setSpeakingId(null);
+    }
+  };
+
+  // Sprachausgabe global an-/ausschalten
+  const toggleAutoSpeak = () => {
+    setAutoSpeak((prev) => {
+      const next = !prev;
+      if (!next) {
+        stop();
+        setSpeakingId(null);
+      }
+      return next;
+    });
+  };
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -81,6 +125,14 @@ export default function AIChatInterface({ userChart, userId, className = '' }: A
           timestamp: data.timestamp
         };
         setMessages(prev => [...prev, aiMessage]);
+
+        // Antwort automatisch vorlesen, falls Sprachausgabe aktiviert ist
+        if (autoSpeak && aiMessage.content) {
+          setSpeakingId(aiMessage.id);
+          speak(aiMessage.content)
+            .catch((error) => console.error('Sprachausgabe-Fehler:', error))
+            .finally(() => setSpeakingId(null));
+        }
       } else {
         throw new Error(data.error || 'Fehler beim Senden der Nachricht');
       }
@@ -113,10 +165,22 @@ export default function AIChatInterface({ userChart, userId, className = '' }: A
         <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
           <Bot className="w-6 h-6 text-white" />
         </div>
-        <div>
+        <div className="flex-1">
           <h3 className="font-semibold text-gray-900">AI Human Design Coach</h3>
           <p className="text-sm text-gray-600">Ihr persönlicher Berater</p>
         </div>
+        <button
+          onClick={toggleAutoSpeak}
+          aria-pressed={autoSpeak}
+          title={autoSpeak ? 'Sprachausgabe deaktivieren' : 'Antworten automatisch vorlesen'}
+          className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
+            autoSpeak
+              ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+              : 'bg-white text-gray-500 border border-gray-300 hover:bg-gray-100'
+          }`}
+        >
+          {autoSpeak ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </button>
       </div>
 
       {/* Messages */}
@@ -140,11 +204,27 @@ export default function AIChatInterface({ userChart, userId, className = '' }: A
               }`}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
-              <p className={`text-xs mt-1 ${
-                message.role === 'user' ? 'text-purple-100' : 'text-gray-500'
-              }`}>
-                {new Date(message.timestamp).toLocaleTimeString()}
-              </p>
+              <div className="flex items-center justify-between mt-1 gap-2">
+                <p className={`text-xs ${
+                  message.role === 'user' ? 'text-purple-100' : 'text-gray-500'
+                }`}>
+                  {new Date(message.timestamp).toLocaleTimeString()}
+                </p>
+                {message.role === 'assistant' && (
+                  <button
+                    onClick={() => speakMessage(message)}
+                    title={speakingId === message.id ? 'Vorlesen stoppen' : 'Antwort vorlesen'}
+                    aria-label={speakingId === message.id ? 'Vorlesen stoppen' : 'Antwort vorlesen'}
+                    className="flex items-center justify-center w-6 h-6 rounded-full text-gray-500 hover:text-purple-600 hover:bg-gray-200 transition-colors duration-200 flex-shrink-0"
+                  >
+                    {speakingId === message.id ? (
+                      <Square className="w-3.5 h-3.5" />
+                    ) : (
+                      <Volume2 className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {message.role === 'user' && (

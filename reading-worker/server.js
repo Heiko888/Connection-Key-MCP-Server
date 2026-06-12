@@ -31,6 +31,15 @@ import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/in
 import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
 import { classifyTwoPersonChannels, classifyCompositeConnections, HD_CHANNELS } from "./lib/composite-classification.js";
 import { buildFactsBlock, formatCompositeBlock, formatConditioningMatrix } from "./lib/facts-builder.js";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { calculateCost, logUsage } from "./usage.js";
+
+// ── KI-Kosten-Tracking ───────────────────────────────────────────────────────
+// Trägt pro Reading-Job die Attributions-Metadaten (reading_id, coach_id, agent)
+// durch die gesamte Aufruf-Kette bis zum einzigen Claude-Choke-Point
+// (generateWithClaude), ohne sie durch jede 2-Pass-Hilfsfunktion zu fädeln.
+// AsyncLocalStorage isoliert die Daten je Job (BullMQ verarbeitet parallel).
+const usageContext = new AsyncLocalStorage();
 
 // ── Feature-Flag Baustein 4 ──────────────────────────────────────────────────
 // READING_STRICT_MODE=true → buildChartInfo() wird durch buildFactsBlock() ersetzt,
@@ -488,6 +497,11 @@ const supabasePublic = createClient(supabaseUrl, supabaseKey, {
 setPipelineSupabase(supabasePublic);
 
 console.log("✅ Supabase (V4):", supabaseUrl.substring(0, 40) + "...");
+console.log(
+  "ℹ️  KI-Kosten-Tracking aktiv → public.mcp_usage (source='reading-worker'). " +
+  "Voraussetzung: Migration supabase-mcp-usage-costs.sql muss eingespielt sein " +
+  "(coach_id nullable + Spalte source)."
+);
 
 // ======================================================
 // Error Monitoring — Webhook Notification
@@ -616,45 +630,79 @@ async function generateWithClaude(prompt, options = {}) {
   const model = options.model || "claude-sonnet-4-6";
   const maxTokens = options.maxTokens || 8000;
   const temperature = options.temperature ?? 0.8;
+  // Attributions-Metadaten: explizit via options.usageMeta ODER aus dem
+  // AsyncLocalStorage-Kontext (von generateReading je Job gesetzt).
+  const usageMeta = options.usageMeta || usageContext.getStore() || {};
 
   console.log(`   [Claude] Start ${model}, max_tokens=${maxTokens}, timeout=${CLAUDE_TIMEOUT_MS / 1000}s`);
 
   const messages = [{ role: "user", content: prompt }];
   let fullContent = "";
   let totalOutputTokens = 0;
+  let totalInputTokens = 0;
+  let responseModel = model;
   const MAX_CONTINUATIONS = 3;
+  const usageStartedAt = Date.now();
 
-  for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
-    const apiCall = anthropicClient.messages.create({
-      model,
-      max_tokens: maxTokens,
-      temperature,
-      messages,
+  // Schreibt einen mcp_usage-Eintrag (fire-and-forget, wirft nie).
+  const trackUsage = (success, errorCode = null) => {
+    logUsage(supabasePublic, {
+      reading_id: usageMeta.reading_id || null,
+      coach_id: usageMeta.coach_id || null,
+      agent: usageMeta.agent || null,
+      source: "reading-worker",
+      model: responseModel,
+      input_tokens: totalInputTokens,
+      output_tokens: totalOutputTokens,
+      estimated_cost_usd: calculateCost(responseModel, totalInputTokens, totalOutputTokens),
+      duration_ms: Date.now() - usageStartedAt,
+      success,
+      error_code: errorCode,
     });
+  };
 
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error(`Claude Timeout nach ${CLAUDE_TIMEOUT_MS / 1000}s`)), CLAUDE_TIMEOUT_MS);
-    });
+  try {
+    for (let attempt = 0; attempt <= MAX_CONTINUATIONS; attempt++) {
+      const apiCall = anthropicClient.messages.create({
+        model,
+        max_tokens: maxTokens,
+        temperature,
+        messages,
+      });
 
-    const response = await Promise.race([apiCall, timeoutPromise]);
-    const chunk = response.content[0]?.text || "";
-    const stopReason = response.stop_reason;
-    totalOutputTokens += response.usage?.output_tokens || 0;
-    fullContent += chunk;
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(`Claude Timeout nach ${CLAUDE_TIMEOUT_MS / 1000}s`)), CLAUDE_TIMEOUT_MS);
+      });
 
-    console.log(`   [Claude] Antwort erhalten (${chunk.length} Zeichen, stop_reason=${stopReason}, output_tokens=${response.usage?.output_tokens})`);
+      const response = await Promise.race([apiCall, timeoutPromise]);
+      const chunk = response.content[0]?.text || "";
+      const stopReason = response.stop_reason;
+      totalOutputTokens += response.usage?.output_tokens || 0;
+      totalInputTokens += response.usage?.input_tokens || 0;
+      responseModel = response.model || responseModel;
+      fullContent += chunk;
 
-    if (stopReason !== "max_tokens" || attempt >= MAX_CONTINUATIONS) break;
+      console.log(`   [Claude] Antwort erhalten (${chunk.length} Zeichen, stop_reason=${stopReason}, output_tokens=${response.usage?.output_tokens})`);
 
-    // Fortsetzung: bisherige Antwort als Assistent-Turn + neues "Weiter"-Request
-    console.log(`   [Claude] ⚠️  max_tokens erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
-    messages.push({ role: "assistant", content: chunk });
-    messages.push({ role: "user", content: "Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie 'Ich fahre fort' — einfach weiterschreiben." });
+      if (stopReason !== "max_tokens" || attempt >= MAX_CONTINUATIONS) break;
+
+      // Fortsetzung: bisherige Antwort als Assistent-Turn + neues "Weiter"-Request
+      console.log(`   [Claude] ⚠️  max_tokens erreicht — Fortsetzung ${attempt + 1}/${MAX_CONTINUATIONS}...`);
+      messages.push({ role: "assistant", content: chunk });
+      messages.push({ role: "user", content: "Bitte fahre direkt dort fort, wo du aufgehört hast. Kein Satz wie 'Ich fahre fort' — einfach weiterschreiben." });
+    }
+
+    if (!fullContent) throw new Error("Claude lieferte leere Antwort");
+    if (totalOutputTokens > 0) console.log(`   [Claude] Gesamt: ${fullContent.length} Zeichen, ~${totalInputTokens} input / ${totalOutputTokens} output_tokens`);
+
+    trackUsage(true);
+    return fullContent;
+  } catch (err) {
+    // Fehlversuch ebenfalls tracken (success:false) — Tracking blockiert nie.
+    const errorCode = err?.status != null ? String(err.status) : (err?.code || err?.name || "claude_error");
+    trackUsage(false, errorCode);
+    throw err;
   }
-
-  if (!fullContent) throw new Error("Claude lieferte leere Antwort");
-  if (totalOutputTokens > 0) console.log(`   [Claude] Gesamt: ${fullContent.length} Zeichen, ~${totalOutputTokens} output_tokens`);
-  return fullContent;
 }
 
 async function generateWithOpenAI(prompt, options = {}) {
@@ -1981,7 +2029,22 @@ function buildSnippetBlock(payload, placeholders) {
   ].join('\n');
 }
 
+// Thin Wrapper: setzt den Kosten-Tracking-Kontext (reading_id, coach_id, agent)
+// für diesen Job. Alle generateWithClaude-Calls darunter — inkl. sämtlicher
+// 2-Pass-Hilfsfunktionen — erben die Metadaten via AsyncLocalStorage.
 async function generateReading({ agentId, template, userData, chartData }) {
+  const usageMeta = {
+    reading_id: userData?.reading_id || userData?.readingId || null,
+    coach_id: userData?.coach_id || userData?.user_id || userData?.userId || userData?.coachId || null,
+    agent: template || agentId || null,
+    source: "reading-worker",
+  };
+  return usageContext.run(usageMeta, () =>
+    _generateReading({ agentId, template, userData, chartData })
+  );
+}
+
+async function _generateReading({ agentId, template, userData, chartData }) {
   const rawModelId = userData?.ai_model || DEFAULT_MODEL;
   // Normalize: full model IDs wie "claude-sonnet-4-6" → config key "claude-sonnet"
   let selectedModelId = MODEL_CONFIG[rawModelId]
@@ -2416,7 +2479,11 @@ const workerV4 = new Worker(
         birth_time: birth.time || reading.birth_time,
         birth_location: birth.location || reading.birth_location,
         ...(reading.reading_data || {}),
-        ...(reading.client_data || {})
+        ...(reading.client_data || {}),
+        // Attribution fürs Kosten-Tracking (mcp_usage) — nach den Spreads, damit
+        // sie nicht von reading_data/client_data überschrieben werden.
+        reading_id: readingId,
+        coach_id: reading.coach_id || reading.user_id || null,
       };
 
       const [rawContent, reflexionsfragen] = await Promise.all([
@@ -3720,8 +3787,15 @@ async function processConnectionJob(job, reading) {
     : readingType === 'relationship' ? 'relationship'
     : 'connection';
 
-  // Connection: immer 2-Pass für vollständige Qualität
-  const rawContent = await generateConnectionReadingTwoParts({
+  // Connection: immer 2-Pass für vollständige Qualität.
+  // Kosten-Tracking-Kontext (mcp_usage) für alle Claude-Calls dieses Jobs setzen.
+  const connectionUsageMeta = {
+    reading_id: readingId || connectionReadingId || null,
+    coach_id: reading?.coach_id || reading?.user_id || payload?.coach_id || payload?.user_id || null,
+    agent: readingType || 'connection',
+    source: "reading-worker",
+  };
+  const rawContent = await usageContext.run(connectionUsageMeta, () => generateConnectionReadingTwoParts({
     userData: {
       personA: { name: nameA },
       personB: { name: nameB },
@@ -3735,7 +3809,7 @@ async function processConnectionJob(job, reading) {
     personBChart,
     modelConfig: MODEL_CONFIG[DEFAULT_MODEL],
     templateName,
-  });
+  }));
 
   // ── Pipeline: Validierung & Korrektur ─────────────────────────────────
   let pipelineInfo = { validated: false, corrected: false, errorCount: 0 };

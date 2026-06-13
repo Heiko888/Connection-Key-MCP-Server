@@ -5051,8 +5051,12 @@ app.post("/api/readings/psychology/start", async (req, res) => {
 
     if (error) throw new Error(error.message);
 
+    // Die soeben angelegte Zeilen-id an den Job weiterreichen, damit der Worker
+    // GENAU diese Zeile fortschreibt (statt eine zweite anzulegen). Sonst bliebe
+    // die hier zurückgegebene id ewig "pending", während der Worker eine andere
+    // Zeile abschließt, die der Aufrufer nie pollt.
     const queue = getPsychologyQueue();
-    await queue.add("psychology", { mode, reading_id, connection_reading_id, person_a_id, person_b_id });
+    await queue.add("psychology", { mode, reading_id, connection_reading_id, person_a_id, person_b_id, psychology_reading_id: data.id });
 
     return res.status(202).json({ success: true, psychology_reading_id: data.id });
   } catch (err) {

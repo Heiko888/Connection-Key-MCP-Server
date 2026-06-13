@@ -188,36 +188,47 @@ function chartSummary(reading) {
 // ─── Job Processor ────────────────────────────────────────────────────────────
 
 async function processJob(job, { supabase, supabasePublic, anthropic }) {
-  const { mode, reading_id, connection_reading_id, person_a_id, person_b_id } = job.data;
+  const { mode, reading_id, connection_reading_id, person_a_id, person_b_id, psychology_reading_id: existingId } = job.data;
   console.log(`📥 [Psychology] Job ${job.id} | mode=${mode} | person_a=${person_a_id}`);
 
-  // 1. Chart-Daten laden
-  const personA = await fetchReadingData(supabasePublic, person_a_id);
-  let personB = null;
-  let compositeData = null;
-
-  if (mode === "connection") {
-    personB = await fetchReadingData(supabasePublic, person_b_id);
-    if (connection_reading_id) {
-      const connData = await fetchConnectionData(supabasePublic, connection_reading_id);
-      compositeData = connData?.composite_data || null;
-    }
+  // 1. DB-Eintrag zuerst auflösen: bevorzugt die vom Endpoint angelegte Zeile
+  // fortschreiben (existingId), damit der Aufrufer GENAU diese id pollt und sie
+  // completed wird. Fallback (Legacy / direkter Queue-Add ohne id): neue Zeile.
+  // Auflösung vor dem Chart-Laden, damit der catch-Block jeden nachgelagerten
+  // Fehler (auch beim Laden) als status="failed" auf dieser Zeile festhält —
+  // statt sie ewig "pending" stehen zu lassen.
+  let psychology_reading_id;
+  if (existingId) {
+    psychology_reading_id = existingId;
+    await updatePsychologyRecord(supabase, psychology_reading_id, { status: "processing" });
+    console.log(`   ✅ [Psychology] Record wiederverwendet: ${psychology_reading_id}`);
+  } else {
+    psychology_reading_id = await createPsychologyRecord(supabase, {
+      mode, reading_id, connection_reading_id, person_a_id, person_b_id,
+    });
+    console.log(`   ✅ [Psychology] Record erstellt: ${psychology_reading_id}`);
   }
 
-  // 2. DB-Eintrag anlegen
-  const psychology_reading_id = await createPsychologyRecord(supabase, {
-    mode, reading_id, connection_reading_id, person_a_id, person_b_id,
-  });
-  console.log(`   ✅ [Psychology] Record erstellt: ${psychology_reading_id}`);
-
-  // Deterministische Fakten-Blöcke (Whitelist) als Erdung für alle Linsen
-  const factsA = factsFor(personA);
-  const factsB = personB ? factsFor(personB) : "";
-  const connectionBlock = personB
-    ? `\n\n=== PERSON B ===\n${chartSummary(personB)}\n\n${factsB}`
-    : "";
-
   try {
+    // 2. Chart-Daten laden
+    const personA = await fetchReadingData(supabasePublic, person_a_id);
+    let personB = null;
+
+    if (mode === "connection") {
+      personB = await fetchReadingData(supabasePublic, person_b_id);
+      if (connection_reading_id) {
+        // composite_data wird derzeit nicht weiterverarbeitet, aber validiert die Connection-Referenz.
+        await fetchConnectionData(supabasePublic, connection_reading_id);
+      }
+    }
+
+    // Deterministische Fakten-Blöcke (Whitelist) als Erdung für alle Linsen
+    const factsA = factsFor(personA);
+    const factsB = personB ? factsFor(personB) : "";
+    const connectionBlock = personB
+      ? `\n\n=== PERSON B ===\n${chartSummary(personB)}\n\n${factsB}`
+      : "";
+
     // 3. Call 1 — Vier Linsen in einem kombinierten Call.
     // Konsolidiert (vormals 4 Einzel-Calls): halbiert Kosten/Latenz und erzeugt
     // kohärentere Cross-Linsen-Analyse, da das Modell alle vier Perspektiven

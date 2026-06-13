@@ -146,10 +146,10 @@ async function updatePsychologyRecord(supabase, id, fields) {
 
 // ─── Claude Calls ─────────────────────────────────────────────────────────────
 
-async function claudeJSON(anthropic, system, user) {
+async function claudeJSON(anthropic, system, user, maxTokens = 2000) {
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 2000,
+    max_tokens: maxTokens,
     system,
     messages: [{ role: "user", content: user }],
   });
@@ -217,75 +217,55 @@ async function processJob(job, { supabase, supabasePublic, anthropic }) {
     : "";
 
   try {
-    // 3. Call 1 — Polyvagal
-    console.log("   🧠 [Psychology] Call 1: Polyvagal...");
-    const polyvagal = await claudeJSON(
+    // 3. Call 1 — Vier Linsen in einem kombinierten Call.
+    // Konsolidiert (vormals 4 Einzel-Calls): halbiert Kosten/Latenz und erzeugt
+    // kohärentere Cross-Linsen-Analyse, da das Modell alle vier Perspektiven
+    // gemeinsam auf dieselben Chart-Fakten anwendet.
+    console.log("   🧠 [Psychology] Call 1: Vier Linsen (kombiniert)...");
+    const lenses = await claudeJSON(
       anthropic,
-      `Du bist ein Experte für Polyvagal-Theorie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON, kein Markdown, keine Erklärungen. ${GROUNDING_RULE}
+      `Du bist ein interdisziplinäres Team aus vier Experten — Polyvagal-Theorie,
+Bindungstheorie, Jungsche Psychologie und Big-Five-Persönlichkeitspsychologie —
+und verbindest jede Disziplin mit Human Design. Antworte ausschließlich auf
+Deutsch. Antworte NUR mit einem validen JSON-Objekt, kein Markdown, keine
+Erklärungen. ${GROUNDING_RULE}
 
 === FACHWISSEN POLYVAGAL ===
-${KNOWLEDGE.polyvagal}`,
-      `${chartSummary(personA)}
-
-${factsA}${connectionBlock}
-
-Analysiere das Nervensystem-Muster auf Basis der obigen Chart-Fakten. Output als JSON:
-{ "summary": "string", "patterns": ["string"], "regulation_approach": "string", "connection_dynamics": "string" }`
-    );
-
-    // 4. Call 2 — Attachment
-    console.log("   🧠 [Psychology] Call 2: Attachment...");
-    const attachment = await claudeJSON(
-      anthropic,
-      `Du bist ein Experte für Attachment Theory und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
+${KNOWLEDGE.polyvagal}
 
 === FACHWISSEN BINDUNGSTHEORIE ===
-${KNOWLEDGE.attachment}`,
-      `${chartSummary(personA)}
-
-${factsA}${connectionBlock}
-
-Mappe auf Bindungsmuster — nutze die Zuordnungen aus dem Fachwissen und die
-konkreten offenen/definierten Zentren oben. Output als JSON:
-{ "attachment_type": "string", "triggers": ["string"], "dynamics": "string", "connection_patterns": "string" }`
-    );
-
-    // 5. Call 3 — Jung
-    console.log("   🧠 [Psychology] Call 3: Jung...");
-    const jungian = await claudeJSON(
-      anthropic,
-      `Du bist ein Experte für Jungsche Psychologie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
+${KNOWLEDGE.attachment}
 
 === FACHWISSEN JUNG ===
-${KNOWLEDGE.jungian}`,
-      `${chartSummary(personA)}
-
-${factsA}
-
-Leite den Profil-Archetyp aus dem Profil oben ab und analysiere Schatten und
-Individuationsweg. Output als JSON:
-{ "shadow_theme": "string", "archetype": "string", "individuation_path": "string", "shadow_projections": ["string"] }`
-    );
-
-    // 6. Call 4 — Big Five
-    console.log("   🧠 [Psychology] Call 4: Big Five...");
-    const bigfive = await claudeJSON(
-      anthropic,
-      `Du bist ein Persönlichkeitspsychologe mit Expertise in Big Five und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
+${KNOWLEDGE.jungian}
 
 === FACHWISSEN BIG FIVE ===
 ${KNOWLEDGE.bigfive}`,
-      `Typ: ${personA.type || "—"}, Profil: ${personA.profile || "—"}
+      `${chartSummary(personA)}
 
-${factsA}
+${factsA}${connectionBlock}
 
-Ordne wissenschaftlich in Big Five ein (jeder Faktor als Spektrum, als Hypothese
-gerahmt). Output als JSON:
-{ "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" }`
+Analysiere die Person durch alle vier Linsen — jede nutzt ausschließlich die
+obigen Chart-Fakten und ihr jeweiliges Fachwissen. Den Profil-Archetyp (Jung)
+aus dem Profil ableiten; Big Five jeden Faktor als Spektrum/Hypothese rahmen.
+Output als EIN JSON-Objekt mit exakt dieser Struktur:
+{
+  "polyvagal": { "summary": "string", "patterns": ["string"], "regulation_approach": "string", "connection_dynamics": "string" },
+  "attachment": { "attachment_type": "string", "triggers": ["string"], "dynamics": "string", "connection_patterns": "string" },
+  "jungian": { "shadow_theme": "string", "archetype": "string", "individuation_path": "string", "shadow_projections": ["string"] },
+  "bigfive": { "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" }
+}`,
+      5000
     );
 
-    // 7. Call 5 — Synthese
-    console.log("   🧠 [Psychology] Call 5: Synthese...");
+    // Linsen extrahieren (mit Fallback auf {}, falls ein Teil fehlt)
+    const polyvagal = lenses.polyvagal || {};
+    const attachment = lenses.attachment || {};
+    const jungian = lenses.jungian || {};
+    const bigfive = lenses.bigfive || {};
+
+    // 7. Call 2 — Synthese
+    console.log("   🧠 [Psychology] Call 2: Synthese...");
     const clientName = personA.client_name || personA.reading_data?.client_name || "der Klient";
     const connectionSection = mode === "connection"
       ? "\n[Connection-Mode: Ergänze Beziehungsabschnitte über die Dynamik zwischen beiden Personen.]"

@@ -114,17 +114,6 @@ async function fetchReadingData(supabasePublic, readingId) {
   };
 }
 
-async function fetchConnectionData(supabasePublic, connectionReadingId) {
-  const { data, error } = await supabasePublic
-    .schema("public")
-    .from("connection_readings")
-    .select("composite_data")
-    .eq("id", connectionReadingId)
-    .single();
-  if (error) throw new Error(`Connection Reading ${connectionReadingId} nicht gefunden: ${error.message}`);
-  return data;
-}
-
 async function createPsychologyRecord(supabase, { mode, reading_id, connection_reading_id, person_a_id, person_b_id }) {
   const { data, error } = await supabase
     .schema("public")
@@ -147,6 +136,22 @@ async function updatePsychologyRecord(supabase, id, fields) {
 
 // ─── Claude Calls ─────────────────────────────────────────────────────────────
 
+// Robustes JSON-Parsing: roher Text → Markdown-Fences entfernen → auf das
+// äußerste {…} reduzieren. Fängt die häufigsten Modell-Macken ab (```json-Fence,
+// Vor-/Nachtext). Bei abgeschnittener Antwort (fehlendes schließendes }) bleibt
+// nur { raw } übrig — die Aufrufstelle erkennt das an den fehlenden Linsen-Keys.
+function parseJSONLoose(raw) {
+  try { return JSON.parse(raw); } catch { /* weiter unten */ }
+  const stripped = raw.replace(/```(?:json)?/gi, "").trim();
+  try { return JSON.parse(stripped); } catch { /* weiter unten */ }
+  const a = stripped.indexOf("{");
+  const b = stripped.lastIndexOf("}");
+  if (a >= 0 && b > a) {
+    try { return JSON.parse(stripped.slice(a, b + 1)); } catch { /* aufgeben */ }
+  }
+  return { raw };
+}
+
 async function claudeJSON(anthropic, system, user, maxTokens = 2000) {
   const response = await anthropic.messages.create({
     model: MODEL,
@@ -154,13 +159,11 @@ async function claudeJSON(anthropic, system, user, maxTokens = 2000) {
     system,
     messages: [{ role: "user", content: user }],
   });
-  const raw = response.content[0]?.text || "{}";
-  try {
-    return JSON.parse(raw);
-  } catch {
-    const stripped = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-    try { return JSON.parse(stripped); } catch { return { raw }; }
+  if (response.stop_reason === "max_tokens") {
+    console.warn(`   ⚠️ [Psychology] claudeJSON: Antwort an max_tokens (${maxTokens}) abgeschnitten — JSON evtl. unvollständig.`);
   }
+  const raw = response.content[0]?.text || "{}";
+  return parseJSONLoose(raw);
 }
 
 async function claudeText(anthropic, system, user) {
@@ -216,24 +219,24 @@ async function processJob(job, { supabase, supabasePublic, anthropic }) {
 
     if (mode === "connection") {
       personB = await fetchReadingData(supabasePublic, person_b_id);
-      if (connection_reading_id) {
-        // composite_data wird derzeit nicht weiterverarbeitet, aber validiert die Connection-Referenz.
-        await fetchConnectionData(supabasePublic, connection_reading_id);
-      }
     }
 
-    // Deterministische Fakten-Blöcke (Whitelist) als Erdung für alle Linsen
+    // Deterministische Fakten-Blöcke (Whitelist) als Erdung
     const factsA = factsFor(personA);
     const factsB = personB ? factsFor(personB) : "";
-    const connectionBlock = personB
-      ? `\n\n=== PERSON B ===\n${chartSummary(personB)}\n\n${factsB}`
+    // Person-B-Kontext fließt NICHT in den Linsen-Call (sonst verdoppelt das Modell
+    // den Output → max_tokens-Truncation → unparsebares JSON). Die Linsen analysieren
+    // ausschließlich Person A; die Beziehungsdynamik kommt erst in der Synthese dazu,
+    // die dafür Person Bs Chart-Fakten erhält.
+    const personBSynthesisBlock = personB
+      ? `\n\n=== PERSON B (Chart-Fakten nur für die Beziehungsabschnitte) ===\n${chartSummary(personB)}\n\n${factsB}`
       : "";
 
-    // 3. Call 1 — Vier Linsen in einem kombinierten Call.
-    // Konsolidiert (vormals 4 Einzel-Calls): halbiert Kosten/Latenz und erzeugt
-    // kohärentere Cross-Linsen-Analyse, da das Modell alle vier Perspektiven
-    // gemeinsam auf dieselben Chart-Fakten anwendet.
-    console.log("   🧠 [Psychology] Call 1: Vier Linsen (kombiniert)...");
+    // 3. Call 1 — Fünf Linsen in einem kombinierten Call.
+    // Konsolidiert (vormals Einzel-Calls): senkt Kosten/Latenz und erzeugt
+    // kohärentere Cross-Linsen-Analyse, da das Modell alle fünf Perspektiven
+    // gemeinsam auf dieselben Chart-Fakten (Person A) anwendet.
+    console.log("   🧠 [Psychology] Call 1: Fünf Linsen (kombiniert)...");
     const lenses = await claudeJSON(
       anthropic,
       `Du bist ein interdisziplinäres Team aus fünf Experten — Polyvagal-Theorie,
@@ -258,7 +261,7 @@ ${KNOWLEDGE.bigfive}
 ${KNOWLEDGE.ifs}`,
       `${chartSummary(personA)}
 
-${factsA}${connectionBlock}
+${factsA}
 
 Analysiere die Person durch alle fünf Linsen — jede nutzt ausschließlich die
 obigen Chart-Fakten und ihr jeweiliges Fachwissen. Den Profil-Archetyp (Jung)
@@ -272,7 +275,7 @@ Output als EIN JSON-Objekt mit exakt dieser Struktur:
   "bigfive": { "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" },
   "ifs": { "protectors": ["string"], "exiles": ["string"], "self_energy": "string", "integration_path": "string" }
 }`,
-      6000
+      8000
     );
 
     // Linsen extrahieren (mit Fallback auf {}, falls ein Teil fehlt)
@@ -282,11 +285,20 @@ Output als EIN JSON-Objekt mit exakt dieser Struktur:
     const bigfive = lenses.bigfive || {};
     const ifs = lenses.ifs || {};
 
+    // Sicherheitsnetz: schlägt der Linsen-Call fehl (z. B. trotz Hardening
+    // unparsebares/abgeschnittenes JSON), wären alle Linsen leer und die Synthese
+    // ungeerdet. Lieber sichtbar scheitern (Job → failed) als ein leeres Reading.
+    const populatedLenses = [polyvagal, attachment, jungian, bigfive, ifs]
+      .filter((l) => l && Object.keys(l).length > 0).length;
+    if (populatedLenses === 0) {
+      throw new Error("Linsen-Call lieferte kein verwertbares JSON (alle Linsen leer)");
+    }
+
     // 7. Call 2 — Synthese
     console.log("   🧠 [Psychology] Call 2: Synthese...");
     const clientName = personA.client_name || personA.reading_data?.client_name || "der Klient";
     const connectionSection = mode === "connection"
-      ? "\n[Connection-Mode: Ergänze Beziehungsabschnitte über die Dynamik zwischen beiden Personen.]"
+      ? `\n[Connection-Mode: Ergänze am Ende Beziehungsabschnitte über die Dynamik zwischen beiden Personen. Nutze für Person B AUSSCHLIESSLICH die unten gelieferten Person-B-Chart-Fakten, erfinde nichts.]${personBSynthesisBlock}`
       : "";
 
     const synthesis = await claudeText(

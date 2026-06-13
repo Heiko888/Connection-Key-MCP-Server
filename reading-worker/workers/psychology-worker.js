@@ -42,6 +42,7 @@ const KNOWLEDGE = {
   attachment: loadLensKnowledge("attachment-knowledge"),
   jungian: loadLensKnowledge("jung-knowledge"),
   bigfive: loadLensKnowledge("bigfive-knowledge"),
+  ifs: loadLensKnowledge("ifs-knowledge"),
 };
 
 // Strikte Erdungs-Regel: nur Chart-Fakten nutzen, nichts erfinden.
@@ -224,11 +225,11 @@ async function processJob(job, { supabase, supabasePublic, anthropic }) {
     console.log("   🧠 [Psychology] Call 1: Vier Linsen (kombiniert)...");
     const lenses = await claudeJSON(
       anthropic,
-      `Du bist ein interdisziplinäres Team aus vier Experten — Polyvagal-Theorie,
-Bindungstheorie, Jungsche Psychologie und Big-Five-Persönlichkeitspsychologie —
-und verbindest jede Disziplin mit Human Design. Antworte ausschließlich auf
-Deutsch. Antworte NUR mit einem validen JSON-Objekt, kein Markdown, keine
-Erklärungen. ${GROUNDING_RULE}
+      `Du bist ein interdisziplinäres Team aus fünf Experten — Polyvagal-Theorie,
+Bindungstheorie, Jungsche Psychologie, Big-Five-Persönlichkeitspsychologie und
+Internal Family Systems (IFS) — und verbindest jede Disziplin mit Human Design.
+Antworte ausschließlich auf Deutsch. Antworte NUR mit einem validen JSON-Objekt,
+kein Markdown, keine Erklärungen. ${GROUNDING_RULE}
 
 === FACHWISSEN POLYVAGAL ===
 ${KNOWLEDGE.polyvagal}
@@ -240,22 +241,27 @@ ${KNOWLEDGE.attachment}
 ${KNOWLEDGE.jungian}
 
 === FACHWISSEN BIG FIVE ===
-${KNOWLEDGE.bigfive}`,
+${KNOWLEDGE.bigfive}
+
+=== FACHWISSEN IFS (PARTS-WORK) ===
+${KNOWLEDGE.ifs}`,
       `${chartSummary(personA)}
 
 ${factsA}${connectionBlock}
 
-Analysiere die Person durch alle vier Linsen — jede nutzt ausschließlich die
+Analysiere die Person durch alle fünf Linsen — jede nutzt ausschließlich die
 obigen Chart-Fakten und ihr jeweiliges Fachwissen. Den Profil-Archetyp (Jung)
-aus dem Profil ableiten; Big Five jeden Faktor als Spektrum/Hypothese rahmen.
+aus dem Profil ableiten; Big Five jeden Faktor als Spektrum/Hypothese rahmen;
+IFS-Teile (Protectors/Exiles) aus offenen Zentren und Not-Self ableiten.
 Output als EIN JSON-Objekt mit exakt dieser Struktur:
 {
   "polyvagal": { "summary": "string", "patterns": ["string"], "regulation_approach": "string", "connection_dynamics": "string" },
   "attachment": { "attachment_type": "string", "triggers": ["string"], "dynamics": "string", "connection_patterns": "string" },
   "jungian": { "shadow_theme": "string", "archetype": "string", "individuation_path": "string", "shadow_projections": ["string"] },
-  "bigfive": { "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" }
+  "bigfive": { "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" },
+  "ifs": { "protectors": ["string"], "exiles": ["string"], "self_energy": "string", "integration_path": "string" }
 }`,
-      5000
+      6000
     );
 
     // Linsen extrahieren (mit Fallback auf {}, falls ein Teil fehlt)
@@ -263,6 +269,7 @@ Output als EIN JSON-Objekt mit exakt dieser Struktur:
     const attachment = lenses.attachment || {};
     const jungian = lenses.jungian || {};
     const bigfive = lenses.bigfive || {};
+    const ifs = lenses.ifs || {};
 
     // 7. Call 2 — Synthese
     console.log("   🧠 [Psychology] Call 2: Synthese...");
@@ -280,13 +287,15 @@ Polyvagal-Analyse: ${JSON.stringify(polyvagal)}
 Attachment-Analyse: ${JSON.stringify(attachment)}
 Jungscher Schatten: ${JSON.stringify(jungian)}
 Big Five: ${JSON.stringify(bigfive)}
+IFS / Innere Anteile: ${JSON.stringify(ifs)}
 
-Schreibe ein integriertes psychologisches Coaching-Profil (1500-2500 Wörter).
+Schreibe ein integriertes psychologisches Coaching-Profil (1700-2700 Wörter).
 Struktur:
 ## Dein psychologisches Profil
 ### Dein Nervensystem
 ### Deine Bindungsmuster
 ### Dein Schatten & Dein Weg
+### Deine inneren Anteile
 ### Wissenschaftliche Einordnung
 ## Dein Weg zur Integration${connectionSection}`
     );
@@ -321,6 +330,7 @@ Struktur:
       attachment,
       jungian,
       bigfive,
+      ifs,
       synthesis: finalSynthesis,
       status: "completed",
     });

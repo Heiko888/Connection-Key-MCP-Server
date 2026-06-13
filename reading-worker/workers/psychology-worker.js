@@ -45,6 +45,18 @@ const KNOWLEDGE = {
   ifs: loadLensKnowledge("ifs-knowledge"),
 };
 
+// Not-Self-Theme pro HD-Typ (eindeutig ableitbar). Read-Time-Fallback: bestehende
+// Charts in der DB wurden ohne not_self_theme gespeichert (Feld erst seit dem
+// Engine-Fix in chartCalculation.js gesetzt) — hier deterministisch aus dem Typ
+// nachgezogen, ohne Prod-Daten zu mutieren. Spiegelt notSelfThemeMap der Engine.
+const NOT_SELF_BY_TYPE = {
+  "Generator": "Frustration",
+  "Manifesting Generator": "Frustration und Wut",
+  "Manifestor": "Wut",
+  "Projector": "Verbitterung",
+  "Reflector": "Enttäuschung",
+};
+
 // Strikte Erdungs-Regel: nur Chart-Fakten nutzen, nichts erfinden.
 const GROUNDING_RULE =
   "WICHTIG: Stütze dich ausschließlich auf die unten gelieferten Chart-Fakten " +
@@ -108,7 +120,7 @@ async function fetchReadingData(supabasePublic, readingId) {
     strategy: chart.strategy,
     defined_centers: Object.entries(centers).filter(([, v]) => isDefined(v)).map(([k]) => k),
     undefined_centers: Object.entries(centers).filter(([, v]) => !isDefined(v)).map(([k]) => k),
-    not_self_theme: chart.not_self_theme || chart.notSelfTheme || null,
+    not_self_theme: chart.not_self_theme || chart.notSelfTheme || NOT_SELF_BY_TYPE[chart.type] || null,
     gates: Array.isArray(chart.gates) ? chart.gates.map((g) => g.number || g) : [],
     channels: Array.isArray(chart.channels) ? chart.channels.map((c) => c.name_de || c.name || `${c.gate1}-${c.gate2}`) : [],
   };

@@ -1160,6 +1160,17 @@ export async function calculateHumanDesignChart(input) {
     "Reflector": "Warten – einen vollen Mondzyklus (28–29 Tage)",
   };
 
+  // Not-Self-Theme (das Signal, dass man nicht der eigenen Strategie/Autorität folgt) —
+  // eindeutig pro HD-Typ. Wird hier an der Quelle abgeleitet, damit jeder Chart das Feld
+  // führt (vorher fehlte not_self_theme komplett → Consumer fielen auf "—" zurück).
+  const notSelfThemeMap = {
+    "Generator": "Frustration",
+    "Manifesting Generator": "Frustration und Wut",
+    "Manifestor": "Wut",
+    "Projector": "Verbitterung",
+    "Reflector": "Enttäuschung",
+  };
+
   // Sortierung nach HD-Standard-Reihenfolge
   const PLANET_ORDER = ['sun', 'earth', 'north-node', 'south-node', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'chiron', 'lilith'];
   const sortPlanets = (arr) => arr.slice().sort((a, b) => PLANET_ORDER.indexOf(a.planet) - PLANET_ORDER.indexOf(b.planet));
@@ -1177,6 +1188,7 @@ export async function calculateHumanDesignChart(input) {
     profile,
     authority,
     strategy: strategyMap[type] || "Warten und antworten",
+    not_self_theme: notSelfThemeMap[type] || null,
     definition,
     incarnationCross,
     centers,

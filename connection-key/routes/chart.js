@@ -74,6 +74,7 @@ router.post("/calculate", async (req, res, next) => {
         profile: chart.profile,
         authority: chart.authority,
         strategy: chart.strategy,
+        not_self_theme: chart.not_self_theme,
         definition: chart.definition,
         incarnationCross: chart.incarnationCross,
         gates: chart.gates,

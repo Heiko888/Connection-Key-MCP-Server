@@ -13,6 +13,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildFactsBlock } from "../lib/facts-builder.js";
+import { runReadingPipeline } from "../reading-pipeline.js";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -310,13 +311,37 @@ Struktur:
 ## Dein Weg zur Integration${connectionSection}`
     );
 
+    // 7b. Validierungs-Pipeline (nur Single-Mode):
+    // Prüft die Synthese gegen die echten Chart-Fakten und korrigiert erfundene
+    // Tore/Zentren/Kanäle. Im Connection-Mode übersprungen, da die Synthese auch
+    // Person B's Chart referenziert — eine Validierung nur gegen Person A würde
+    // gültige B-Tore fälschlich als Halluzination flaggen.
+    let finalSynthesis = synthesis;
+    if (mode === "single") {
+      try {
+        console.log("   🔎 [Psychology] Validierungs-Pipeline...");
+        const pipe = await runReadingPipeline(synthesis, personA.chart || {}, {
+          supabasePublic,
+          readingId: psychology_reading_id,
+          readingType: "psychology-single",
+          template: "psychology-synthesis",
+        });
+        finalSynthesis = pipe.text;
+        console.log(
+          `   ✅ [Psychology] Pipeline: validated=${pipe.validated} corrected=${pipe.corrected} errors=${pipe.errorCount}`
+        );
+      } catch (pipeErr) {
+        console.warn(`   ⚠️ [Psychology] Pipeline-Fehler, nutze Original-Synthese: ${pipeErr.message}`);
+      }
+    }
+
     // 8. Ergebnis speichern
     await updatePsychologyRecord(supabase, psychology_reading_id, {
       polyvagal,
       attachment,
       jungian,
       bigfive,
-      synthesis,
+      synthesis: finalSynthesis,
       status: "completed",
     });
 

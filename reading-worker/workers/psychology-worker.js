@@ -9,12 +9,56 @@ import { Worker, Queue } from "bullmq";
 import IORedis from "ioredis";
 import { createClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { buildFactsBlock } from "../lib/facts-builder.js";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const MODEL = "claude-sonnet-4-6";
 const TIMEOUT = parseInt(process.env.CLAUDE_TIMEOUT_MS || "120000", 10);
 const QUEUE_NAME = "reading-queue-v4-psychology";
+
+// ─── Knowledge-Grounding ────────────────────────────────────────────────────────
+// Die vier Linsen werden mit dedizierten Wissensdateien geerdet, damit das Modell
+// nicht aus dem Allgemeinwissen frei assoziiert, sondern fachlich sauber bleibt.
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const KNOWLEDGE_DIR = path.join(__dirname, "..", "knowledge", "psychology");
+
+function loadLensKnowledge(name) {
+  try {
+    return fs.readFileSync(path.join(KNOWLEDGE_DIR, `${name}.md`), "utf8");
+  } catch (err) {
+    console.warn(`   ⚠️ [Psychology] Wissensdatei ${name}.md nicht ladbar: ${err.message}`);
+    return "";
+  }
+}
+
+const KNOWLEDGE = {
+  polyvagal: loadLensKnowledge("polyvagal-knowledge"),
+  attachment: loadLensKnowledge("attachment-knowledge"),
+  jungian: loadLensKnowledge("jung-knowledge"),
+  bigfive: loadLensKnowledge("bigfive-knowledge"),
+};
+
+// Strikte Erdungs-Regel: nur Chart-Fakten nutzen, nichts erfinden.
+const GROUNDING_RULE =
+  "WICHTIG: Stütze dich ausschließlich auf die unten gelieferten Chart-Fakten " +
+  "(Typ, Profil, Autorität, definierte/offene Zentren, Kanäle, Tore). Erfinde " +
+  "KEINE Tore, Kanäle oder Zentren, die nicht im FAKTEN-Block stehen. Wenn eine " +
+  "Information fehlt, lass sie weg, statt sie zu erfinden.";
+
+// Baut den deterministischen Fakten-Block (Whitelist) für eine Person.
+function factsFor(reading) {
+  try {
+    return buildFactsBlock(reading.chart || {}, { readingType: "detailed" });
+  } catch (err) {
+    console.warn(`   ⚠️ [Psychology] Faktenblock nicht baubar: ${err.message}`);
+    return chartSummary(reading);
+  }
+}
 
 // ─── Clients ──────────────────────────────────────────────────────────────────
 
@@ -54,7 +98,9 @@ async function fetchReadingData(supabasePublic, readingId) {
   const isDefined = (v) => v === true || v === "defined";
   return {
     ...data,
+    chart, // rohes Chart-Objekt für den deterministischen Faktenblock
     reading_type: data.reading_type || chart.type,
+    type: data.reading_type || chart.type, // Alias (Bugfix: Big-Five-Prompt las personA.type)
     profile: chart.profile,
     authority: chart.authority,
     strategy: chart.strategy,
@@ -162,8 +208,11 @@ async function processJob(job, { supabase, supabasePublic, anthropic }) {
   });
   console.log(`   ✅ [Psychology] Record erstellt: ${psychology_reading_id}`);
 
+  // Deterministische Fakten-Blöcke (Whitelist) als Erdung für alle Linsen
+  const factsA = factsFor(personA);
+  const factsB = personB ? factsFor(personB) : "";
   const connectionBlock = personB
-    ? `\nPerson B:\n${chartSummary(personB)}`
+    ? `\n\n=== PERSON B ===\n${chartSummary(personB)}\n\n${factsB}`
     : "";
 
   try {
@@ -171,10 +220,15 @@ async function processJob(job, { supabase, supabasePublic, anthropic }) {
     console.log("   🧠 [Psychology] Call 1: Polyvagal...");
     const polyvagal = await claudeJSON(
       anthropic,
-      "Du bist ein Experte für Polyvagal-Theorie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON, kein Markdown, keine Erklärungen.",
-      `${chartSummary(personA)}${connectionBlock}
+      `Du bist ein Experte für Polyvagal-Theorie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON, kein Markdown, keine Erklärungen. ${GROUNDING_RULE}
 
-Analysiere das Nervensystem-Muster. Output als JSON:
+=== FACHWISSEN POLYVAGAL ===
+${KNOWLEDGE.polyvagal}`,
+      `${chartSummary(personA)}
+
+${factsA}${connectionBlock}
+
+Analysiere das Nervensystem-Muster auf Basis der obigen Chart-Fakten. Output als JSON:
 { "summary": "string", "patterns": ["string"], "regulation_approach": "string", "connection_dynamics": "string" }`
     );
 
@@ -182,15 +236,16 @@ Analysiere das Nervensystem-Muster. Output als JSON:
     console.log("   🧠 [Psychology] Call 2: Attachment...");
     const attachment = await claudeJSON(
       anthropic,
-      "Du bist ein Experte für Attachment Theory und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON.",
-      `Undefinierte Zentren: ${Array.isArray(personA.undefined_centers) ? personA.undefined_centers.join(", ") : personA.undefined_centers || "—"}
-Not-Self-Theme: ${personA.not_self_theme || "—"}${connectionBlock}
+      `Du bist ein Experte für Attachment Theory und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
 
-Mappe auf Bindungsmuster. Regeln:
-Undefiniertes Herzzentrum → externaler Selbstwert (anxious attachment)
-Undefinierter Solar Plexus → emotionale Instabilität
-Undefiniertes G-Zentrum → diffuse Identität
-Output als JSON:
+=== FACHWISSEN BINDUNGSTHEORIE ===
+${KNOWLEDGE.attachment}`,
+      `${chartSummary(personA)}
+
+${factsA}${connectionBlock}
+
+Mappe auf Bindungsmuster — nutze die Zuordnungen aus dem Fachwissen und die
+konkreten offenen/definierten Zentren oben. Output als JSON:
 { "attachment_type": "string", "triggers": ["string"], "dynamics": "string", "connection_patterns": "string" }`
     );
 
@@ -198,14 +253,16 @@ Output als JSON:
     console.log("   🧠 [Psychology] Call 3: Jung...");
     const jungian = await claudeJSON(
       anthropic,
-      "Du bist ein Experte für Jungsche Psychologie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON.",
-      `Not-Self-Theme: ${personA.not_self_theme || "—"}
-Profil: ${personA.profile || "—"}
-Undefinierte Zentren: ${Array.isArray(personA.undefined_centers) ? personA.undefined_centers.join(", ") : personA.undefined_centers || "—"}
+      `Du bist ein Experte für Jungsche Psychologie und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
 
-Profil-Archetypen: 1=Forscher, 2=Eremit, 3=Märtyrer, 4=Opportunist, 5=Häretiker, 6=Rollenmodell
+=== FACHWISSEN JUNG ===
+${KNOWLEDGE.jungian}`,
+      `${chartSummary(personA)}
 
-Analysiere Schatten und Individuationsweg. Output als JSON:
+${factsA}
+
+Leite den Profil-Archetyp aus dem Profil oben ab und analysiere Schatten und
+Individuationsweg. Output als JSON:
 { "shadow_theme": "string", "archetype": "string", "individuation_path": "string", "shadow_projections": ["string"] }`
     );
 
@@ -213,11 +270,16 @@ Analysiere Schatten und Individuationsweg. Output als JSON:
     console.log("   🧠 [Psychology] Call 4: Big Five...");
     const bigfive = await claudeJSON(
       anthropic,
-      "Du bist ein Persönlichkeitspsychologe mit Expertise in Big Five und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON.",
-      `Typ: ${personA.type || "—"}, Profil: ${personA.profile || "—"}
-Definierte Zentren: ${Array.isArray(personA.defined_centers) ? personA.defined_centers.join(", ") : personA.defined_centers || "—"}
+      `Du bist ein Persönlichkeitspsychologe mit Expertise in Big Five und Human Design. Antworte ausschließlich auf Deutsch. Antworte NUR mit validem JSON. ${GROUNDING_RULE}
 
-Ordne wissenschaftlich in Big Five ein. Output als JSON:
+=== FACHWISSEN BIG FIVE ===
+${KNOWLEDGE.bigfive}`,
+      `Typ: ${personA.type || "—"}, Profil: ${personA.profile || "—"}
+
+${factsA}
+
+Ordne wissenschaftlich in Big Five ein (jeder Faktor als Spektrum, als Hypothese
+gerahmt). Output als JSON:
 { "openness": "string", "conscientiousness": "string", "extraversion": "string", "agreeableness": "string", "neuroticism": "string", "scientific_framing": "string" }`
     );
 

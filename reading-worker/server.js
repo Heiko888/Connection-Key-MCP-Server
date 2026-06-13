@@ -5066,7 +5066,7 @@ app.get("/api/readings/psychology/:id", async (req, res) => {
     const { data, error } = await supabase
       .schema("public")
       .from("psychology_readings")
-      .select("id, status, polyvagal, attachment, jungian, bigfive, synthesis, error_message, created_at")
+      .select("id, status, polyvagal, attachment, jungian, bigfive, ifs, synthesis, error_message, created_at")
       .eq("id", req.params.id)
       .single();
 

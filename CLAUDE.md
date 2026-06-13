@@ -1,6 +1,22 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-13 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte
+> kein `not_self_theme` → Consumer (z. B. Psychology-Reading) fielen auf „—" zurück. Das
+> Not-Self-Theme ist pro HD-Typ eindeutig und wird jetzt an **drei** Stellen sichergestellt:
+> (1) **Engine** `connection-key/lib/astro/chartCalculation.js` (`notSelfThemeMap` + Feld im
+> Rückgabeobjekt → neue Charts + persistiertes `chart_data` führen es); (2) **API**
+> `connection-key/routes/chart.js` (Feld in die `/api/chart/calculate`-Response aufgenommen —
+> die Response **pickt Felder einzeln** und hätte es sonst gestrippt); (3) **Read-Time-Fallback**
+> im reading-worker (`psychology-worker.js`, `NOT_SELF_BY_TYPE` aus `chart.type`) → deckt **alle
+> bestehenden** Readings ab, ohne Prod-Daten zu mutieren. Mapping: Generator=Frustration,
+> MG=Frustration und Wut, Manifestor=Wut, Projector=Verbitterung, Reflector=Enttäuschung.
+> ⚠️ **Deploy-Gotcha:** `connection-key` hat **keinen** Source-Bind-Mount → Deploy per
+> `docker cp <datei> connection-key:/app/connection-key/… && docker restart connection-key`
+> (2 GB-Rebuild vermeiden; Pfad im Container ist `/app/connection-key/…`). Quelle ist
+> trotzdem ins Repo committet, damit ein späterer Rebuild denselben Stand backt. Commit
+> `a900d9f` auf `main`.
+>
 > **Changelog 2026-06-13 (.138 Psychology-Worker — Connection-Linsen repariert, Paket 6):**
 > Im **Connection-Mode** waren alle strukturierten Linsen (`polyvagal/attachment/jungian/
 > bigfive/ifs`) **leer `{}`**: Person Bs Chart floss in den kombinierten Linsen-Call, das

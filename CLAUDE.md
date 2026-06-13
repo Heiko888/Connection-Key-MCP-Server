@@ -1,6 +1,22 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-13 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-13 (.138 Psychology-Worker — Connection-Linsen repariert, Paket 6):**
+> Im **Connection-Mode** waren alle strukturierten Linsen (`polyvagal/attachment/jungian/
+> bigfive/ifs`) **leer `{}`**: Person Bs Chart floss in den kombinierten Linsen-Call, das
+> Modell verdoppelte den Output, riss `max_tokens` (6000, `stop_reason=max_tokens`) und lieferte
+> abgeschnittenes JSON → `claudeJSON`-Fallback `{raw}` → alle Linsen leer. Da Connection die
+> Validierungs-Pipeline überspringt, fiel es nicht auf; die Synthese lief ungeerdet.
+> **Fix (`reading-worker/workers/psychology-worker.js`):** (1) `claudeJSON` gehärtet
+> (`parseJSONLoose`: Fences entfernen + äußerstes `{…}` extrahieren; Warnung bei `max_tokens`;
+> Linsen-Call `max_tokens` 6000→**8000**; Sicherheitsnetz: alle Linsen leer → Job `failed` statt
+> leeres Reading). (2) Toten/kaputten `fetchConnectionData` entfernt (selektierte die nicht
+> existierende Spalte `connection_readings.composite_data`, Ergebnis nie verwendet). (3) **Linsen-Call
+> analysiert nur Person A** → keine Truncation; die **Synthese** erhält jetzt Person Bs Chart-Fakten
+> für geerdete Beziehungsabschnitte (vorher bekam sie gar keine B-Fakten). Verifiziert: Single +
+> Connection liefern voll befüllte Linsen (4/4/4/6/4), IFS mit Protectors/Exiles, je 1 Zeile →
+> `completed`. Deploy: reading-worker **Rebuild**. Commit `4efdb63` auf `main`. Siehe Abschnitt 7.
+>
 > **Changelog 2026-06-13 (.138 Psychology-Worker — Doppel-Insert-Bug behoben, Paket 5):**
 > Der Endpoint `POST /api/readings/psychology/start` (`reading-worker/server.js`) legte
 > eine `psychology_readings`-Zeile (`status=pending`) an und gab deren id zurück, der
@@ -321,7 +337,10 @@ an, gibt deren id als `psychology_reading_id` zurück **und reicht dieselbe id i
 (`job.data.psychology_reading_id`) weiter. Der Worker schreibt **genau diese Zeile** fort
 (`processing` → `completed`/`failed`), legt nur im Fallback (Job ohne id) eine neue an.
 5 Linsen (Polyvagal, Attachment, Jung, Big Five, **IFS**) in **2 Claude-Calls** + Synthese,
-im Single-Mode zusätzlich abgesichert durch die Validierungs-Pipeline. Ergebnis-Spalten:
+im Single-Mode zusätzlich abgesichert durch die Validierungs-Pipeline. **Connection-Mode:** der
+Linsen-Call (Call 1) analysiert ausschließlich **Person A** (sonst Output-Verdopplung →
+`max_tokens`-Truncation → leere Linsen, siehe Changelog Paket 6); die **Beziehungsdynamik** kommt
+erst in der Synthese (Call 2) dazu, die dafür Person Bs Chart-Fakten erhält. Ergebnis-Spalten:
 `polyvagal, attachment, jungian, bigfive, ifs, synthesis`. Abfrage: `GET /api/readings/psychology/:id`.
 Deploy = **Rebuild** (`docker compose build reading-worker && docker compose up -d reading-worker`).
 

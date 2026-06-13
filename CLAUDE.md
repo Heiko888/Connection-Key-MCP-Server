@@ -1,6 +1,22 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-10 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-13 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-13 (.138 Psychology-Worker — Doppel-Insert-Bug behoben, Paket 5):**
+> Der Endpoint `POST /api/readings/psychology/start` (`reading-worker/server.js`) legte
+> eine `psychology_readings`-Zeile (`status=pending`) an und gab deren id zurück, der
+> Worker (`reading-worker/workers/psychology-worker.js`) legte via `createPsychologyRecord`
+> aber eine **zweite** Zeile an und schloss nur diese ab → die an den Aufrufer zurückgegebene
+> id blieb **ewig `pending`**, das fertige Reading lag unter einer nie gepollten id, und jede
+> Anfrage hinterließ eine Karteileiche. **Fix (Variante 1):** Endpoint reicht die Zeilen-id
+> als `job.data.psychology_reading_id` mit; der Worker schreibt **genau diese** Zeile fort
+> (`status→processing`), Neuanlage nur noch im Fallback ohne id. Zusätzlich wird der
+> DB-Eintrag **vor** dem Chart-Laden aufgelöst und Laden + Faktenblock in den `try`-Block
+> gezogen, damit der `catch` auch Lade-Fehler als `status=failed` festhält (statt `pending`).
+> End-to-End verifiziert (genau 1 Zeile, zurückgegebene id wird `completed`). Deploy:
+> reading-worker per **Rebuild** (`docker compose build reading-worker && up -d`). Commit
+> `7d959d4` auf `main`. Vorausgegangen: Paket 4 (IFS als 5. Linse) verifiziert erledigt.
+> Siehe Abschnitt 7 + 8.
+>
 > **Changelog 2026-06-10 (.167 Mattermost-Workshop-Benachrichtigungen):** Neue ENV
 > `MATTERMOST_WEBHOOK_WORKSHOPS` (Incoming-Webhook, Secret) für `frontend` auf .167.
 > Bei bestätigter Workshop-Anmeldung (`/api/workshops/confirm` → `lib/mattermost.ts`,
@@ -298,6 +314,16 @@ Agent Timeout: 300s
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
 | `ck-agent/server.js` | .167 | ck-agent | 4000 | Express | Agent-UI Proxy → .138 | ✅ Aktiv |
+
+**Psychology-Worker — Flow (Stand 2026-06-13):** `POST /api/readings/psychology/start`
+(reading-worker, Port 4000) legt **eine** `public.psychology_readings`-Zeile (`status=pending`)
+an, gibt deren id als `psychology_reading_id` zurück **und reicht dieselbe id im BullMQ-Job**
+(`job.data.psychology_reading_id`) weiter. Der Worker schreibt **genau diese Zeile** fort
+(`processing` → `completed`/`failed`), legt nur im Fallback (Job ohne id) eine neue an.
+5 Linsen (Polyvagal, Attachment, Jung, Big Five, **IFS**) in **2 Claude-Calls** + Synthese,
+im Single-Mode zusätzlich abgesichert durch die Validierungs-Pipeline. Ergebnis-Spalten:
+`polyvagal, attachment, jungian, bigfive, ifs, synthesis`. Abfrage: `GET /api/readings/psychology/:id`.
+Deploy = **Rebuild** (`docker compose build reading-worker && docker compose up -d reading-worker`).
 
 ### Inaktive / Problematische Worker
 

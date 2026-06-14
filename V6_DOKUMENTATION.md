@@ -57,7 +57,11 @@ V6 ist das KI-Coaching-System von The Connection Key. Es besteht aus drei Module
 └──────────────────────────────┘
 ```
 
-**Wichtig:** V6 läuft komplett auf Server **.167** (Frontend + ck-agent). Server **.138** ist für V6 **nicht beteiligt**.
+**Wichtig:** Coaching & Lernpfade laufen auf Server **.167** (Frontend + ck-agent).
+**Ausnahme seit 2026-06-14:** Der **Evolution Tracker** wurde auf eine tiefe Engine auf
+Server **.138** umgestellt (reading-worker, Queue `reading-queue-v4-evolution`) — siehe
+**Abschnitt 12**. Die alte oberflächliche Single-Call-Variante auf ck-agent (.167) wird
+davon abgelöst (Frontend-Repointing offen, siehe 12d).
 
 ---
 
@@ -414,7 +418,8 @@ SUPABASE_SERVICE_ROLE_KEY
 | 4 | PDF Export: Transcript wird auf max 40 Nachrichten gekürzt | UX |
 | 5 | Neue Session: User-ID muss als UUID eingegeben werden — kein User-Suche via E-Mail | UX |
 | 6 | Lernpfad-Seiten (`/v6/learning`) nicht mit Coach-Portal verknüpft | Feature |
-| 7 | Evolution Analyse: Mindestens 1 Reading nötig — User ohne Readings können nicht starten | UX |
+| 7 | ✅ **Teilweise erledigt (2026-06-14):** Neue Engine läuft auch mit **1 Reading** (Baseline-Modus). „0 Readings" bleibt UX-Hürde. | UX |
+| 8 | ⏳ **Evolution-Engine auf .138 gebaut (2026-06-14)** — Frontend (`/api/v6/evolution`-Proxy + UI) noch nicht auf die neuen .138-Endpunkte umgestellt (Abschnitt 12d) | Feature |
 
 ---
 
@@ -422,7 +427,62 @@ SUPABASE_SERVICE_ROLE_KEY
 
 - **10 coaching_sessions** (Stand 2026-04-08): 4 scheduled, 5 completed, 1 in_progress
 - **Lernpfade**: unbekannte Anzahl
-- **Evolution Analysen**: vorhanden in `evolution_analyses` (Supabase)
+- **Evolution Analysen**: 3 Zeilen / 1 User in `evolution_analyses` (jüngste war `pending`/leer — Grund für den .138-Rebuild, Abschnitt 12)
+
+---
+
+## 12. EVOLUTION-ENGINE (.138) — TIEFE ANALYSE (NEU 2026-06-14)
+
+Ablösung der oberflächlichen Single-Claude-Call-Variante auf ck-agent durch eine
+wissensgeerdete, mehrdimensionale Engine auf **Server .138** (reading-worker). Entspricht
+der Goldenen Regel „alle KI/Berechnung auf .138" und spiegelt das bewährte Psychology-Worker-Muster.
+
+### 12a. Bausteine (Repo `Connection-Key-MCP-Server`, Branch `claude/evolution-feature-expansion-lsfnnl`)
+
+| Datei | Zweck |
+|-------|-------|
+| `reading-worker/workers/evolution-worker.js` | BullMQ-Worker, Queue `reading-queue-v4-evolution`, 2 Claude-Calls (JSON-Analyse + Narrativ) |
+| `reading-worker/knowledge/evolution/evolution-knowledge.md` | Fachliche Erdung: Dekonditionierung, Not-Self↔Signatur, offene Zentren, Autorität, Score-Rahmen |
+| `reading-worker/server.js` | Startup `startEvolutionWorker()` + 3 Endpunkte |
+| `supabase/migrations/2026061401_evolution_engine.sql` | Neue Spalten auf `public.evolution_analyses` (angewandt) |
+
+### 12b. Kern-Konzept
+Das **natale Chart ist konstant** — „Evolution" meint **Dekonditionierung**: die wachsende
+Stimmigkeit mit Typ, Strategie & Autorität, abgelesen an der **chronologischen Abfolge der
+Readings** (+ `coaching_sessions` & `learning_paths` als Verlaufs-Signale). Das Chart wird als
+deterministischer Fakten-Block (`buildFactsBlock`, Whitelist/Verbote) geerdet → keine erfundenen
+Tore/Kanäle. Bei nur **einem** Reading: **Baseline-Modus** (konservativer Score, transparent).
+
+### 12c. Vier Dimensionen (die „Tiefe")
+1. **Zentren- & Autoritäts-Verlauf** (`center_evolution`, `authority_alignment`): pro offenem
+   Zentrum Druck-Muster → Weisheit + Trajektorie & Übung; Autoritäts-/Strategie-Stimmigkeit.
+2. **Not-Self-Tracking** (`not_self_tracking`): Position & Bewegung auf der Achse
+   Not-Self → Signatur (typ-spezifisch, deterministisch verankert).
+3. **Zeitleiste & Trends** (`timeline`): pro Reading ein Marker + Score-Schätzung (für Diagramme).
+4. **Coaching/Lernpfad-Verknüpfung** (`coaching_links`): aus `growth_areas` abgeleitete
+   konkrete **Session-Themen** (mit `session_type`) und **Lern-Übungen** (mit `topic`).
+   Plus `narrative` (Markdown-Bericht), `key_changes`, `growth_areas`, `recommendations`, `insights`.
+
+### 12d. API-Kontrakt (für die Frontend-Anbindung im .167-Repo)
+Basis: reading-worker auf **.138:4000** (intern via `READING_AGENT_URL`).
+
+| Methode | Endpunkt | Body / Hinweis |
+|---------|----------|----------------|
+| POST | `/api/readings/evolution/start` | `{user_id, reading_ids?, focus_area?, type?}` → `202 {evolution_analysis_id}` |
+| GET | `/api/readings/evolution/:id` | Polling: `status` (pending/processing/completed/failed), `progress`, alle Ergebnis-Felder |
+| GET | `/api/readings/evolution/user/:userId` | Liste der Analysen (für Übersicht) |
+
+**Noch offen (im .167-Repo, hier nicht zugänglich):**
+- `frontend/app/api/v6/evolution/route.ts`: POST/GET auf die obigen .138-Endpunkte umbiegen
+  (statt ck-agent `/api/v6/evolution/*`).
+- `frontend/app/v6/evolution`-UI: neue Felder rendern (Timeline-Chart, Zentren-Karten,
+  Not-Self↔Signatur-Achse, Coaching-Links als CTAs zu `/v6/coaching` & `/v6/learning`).
+
+### 12e. Deploy (.138)
+```bash
+docker compose build reading-worker && docker compose up -d reading-worker
+```
+(reading-worker hat keinen Source-Bind-Mount → Rebuild nötig; Migration ist bereits in Supabase.)
 
 ---
 

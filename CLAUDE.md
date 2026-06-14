@@ -1,6 +1,27 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-13 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-14 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-14 (.138 — W7 Evolution-Engine, ersetzt oberflächliches V6-Evolution):**
+> Das V6-Feature `/v6/evolution` lief bisher als **ein einziger** Claude-Call auf ck-agent
+> (.167) → flach, und in der Praxis kaputt (Live-DB: `evolution_analyses` hatte 3 Zeilen/1 User,
+> jüngste `status=pending`, `growth_score=0`, alle Arrays leer). **Neu:** eine wissensgeerdete,
+> mehrdimensionale **Evolution-Engine auf .138** (Golden Rule: alle KI/Berechnung auf .138),
+> als BullMQ-Worker analog zum Psychology-Worker. Dateien: `reading-worker/workers/evolution-worker.js`
+> (Queue `reading-queue-v4-evolution`, 2 Claude-Calls: strukturiertes JSON + Narrativ),
+> Wissensbasis `reading-worker/knowledge/evolution/evolution-knowledge.md` (Dekonditionierung,
+> Not-Self↔Signatur, offene Zentren, Autoritäts-Ausrichtung, Score-Rahmen). Endpunkte in
+> `reading-worker/server.js`: `POST /api/readings/evolution/start`, `GET /api/readings/evolution/:id`,
+> `GET /api/readings/evolution/user/:userId`. DB: Migration `supabase/migrations/2026061401_evolution_engine.sql`
+> erweitert `public.evolution_analyses` um `center_evolution, authority_alignment, not_self_tracking,
+> timeline, coaching_links, narrative, error_message, model` (+Index user_id,created_at) — **angewandt**
+> auf Projekt `wdiadklhvhlndnjojrfu`. Kern: das **natale Chart ist konstant** → „Evolution" =
+> Dekonditionierung/Stimmigkeit über die Abfolge der Readings (+ Coaching-Sessions, Lernpfade als
+> Signale), als deterministischer Fakten-Block geerdet. **Vier neue Dimensionen:** Zentren-/Autoritäts-
+> Verlauf, Not-Self-Tracking, Zeitleiste/Trends, Coaching/Lernpfad-Verknüpfung. Deploy = reading-worker
+> **Rebuild**. ⏳ **Offen (im .167-Repo, hier nicht zugänglich):** den `/api/v6/evolution`-Proxy auf die
+> neuen .138-Endpunkte umstellen + Evolution-UI um die neuen Felder erweitern. Branch
+> `claude/evolution-feature-expansion-lsfnnl`. Siehe Abschnitt 7 + 8.
+>
 > **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte
 > kein `not_self_theme` → Consumer (z. B. Psychology-Reading) fielen auf „—" zurück. Das
 > Not-Self-Theme ist pro HD-Typ eindeutig und wird jetzt an **drei** Stellen sichergestellt:
@@ -342,6 +363,7 @@ Agent Timeout: 300s
 |--------|--------|-----------|------|-------------|-------|--------|
 | `reading-worker/server.js` | .138 | reading-worker | 4000 | BullMQ (Redis) | HD-Readings via Claude | ✅ Aktiv |
 | `workers/psychology-worker.js` | .138 | reading-worker | — | `reading-queue-v4-psychology` | Psychologie-Readings | ✅ Integriert |
+| `workers/evolution-worker.js` | .138 | reading-worker | — | `reading-queue-v4-evolution` | Evolution-/Dekonditionierungs-Analyse (V6) | ✅ Integriert (2026-06-14) |
 | `lib/live-reading/routes.js` | .138 | reading-worker | — | HTTP (SSE/WS) | Live-Readings | ✅ Integriert |
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
@@ -360,6 +382,24 @@ erst in der Synthese (Call 2) dazu, die dafür Person Bs Chart-Fakten erhält. E
 `polyvagal, attachment, jungian, bigfive, ifs, synthesis`. Abfrage: `GET /api/readings/psychology/:id`.
 Deploy = **Rebuild** (`docker compose build reading-worker && docker compose up -d reading-worker`).
 
+**Evolution-Worker — Flow (Stand 2026-06-14):** `POST /api/readings/evolution/start`
+(reading-worker, Port 4000; Body `{user_id, reading_ids?, focus_area?, type?}`) legt **eine**
+`public.evolution_analyses`-Zeile (`status=pending`) an, gibt deren id als
+`evolution_analysis_id` zurück **und reicht dieselbe id im BullMQ-Job** weiter (Queue
+`reading-queue-v4-evolution`). Der Worker schreibt **genau diese Zeile** fort
+(`processing` → `completed`/`failed`), legt nur im Fallback (Job ohne id) eine neue an
+(gleiches Muster wie Psychology, vermeidet Doppel-Insert/ewig-pending). Er lädt die
+**chronologische Reading-Historie** des Users (+ best-effort `coaching_sessions` &
+`learning_paths` als Verlaufs-Signale), erdet das **konstante natale Chart** als
+deterministischen Fakten-Block (`buildFactsBlock`) und fährt **2 Claude-Calls**: (1)
+strukturierte mehrdimensionale Analyse (JSON, 8000 Tokens), (2) warmes Narrativ (Markdown).
+Ergebnis-Spalten: `overall_growth_score, not_self_tracking, authority_alignment,
+center_evolution, timeline, key_changes, growth_areas, recommendations, coaching_links,
+insights, comparison_data, narrative`. Abfrage: `GET /api/readings/evolution/:id`,
+Liste: `GET /api/readings/evolution/user/:userId`. Bei nur **einem** Reading: Baseline-Modus
+(konservativer Score). Deploy = **Rebuild**. Frontend-Anbindung (`/api/v6/evolution`-Proxy
+umstellen) liegt im .167-Repo.
+
 ### Inaktive / Problematische Worker
 
 | Worker | Server | Problem | Soll auf | Aktion |
@@ -377,6 +417,7 @@ Deploy = **Rebuild** (`docker compose build reading-worker && docker compose up 
 | `bull:reading-queue-v4` | V4 | Standard V4 Readings |
 | `bull:reading-queue-v4-penta` | V4 | Penta-Readings (3-5 Personen) |
 | `bull:reading-queue-v4-psychology` | V4 | Psychologie-Readings |
+| `bull:reading-queue-v4-evolution` | V4 | Evolution-/Dekonditionierungs-Analyse (V6) |
 | `bull:reading-queue-v4-multi-agent` | V4 | Multi-Agent-Readings |
 | `bull:reading-queue-v4-connection` | V4 | Connection-Readings |
 | `bull:reading-v4-queue` | V4 | ⚠️ Alternatives Namespace (Duplikat?) |

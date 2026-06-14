@@ -25,6 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { createLiveReadingRouter } from "./lib/live-reading/routes.js";
 import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-worker.js";
+import { startEvolutionWorker, getEvolutionQueue } from "./workers/evolution-worker.js";
 import { startVideoWorker, getVideoQueue } from "./workers/video-worker.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
@@ -3043,8 +3044,10 @@ console.log("🟢 Multi-Agent Worker aktiv (Queue: reading-queue-v4-multi-agent)
 // W6 — Psychology Worker
 // ======================================================
 startPsychologyWorker();
+startEvolutionWorker();
 startVideoWorker();
 console.log("[W6] Psychology Worker gestartet");
+console.log("[W7] Evolution Worker gestartet");
 
 // ======================================================
 // Job Polling System
@@ -5081,6 +5084,84 @@ app.get("/api/readings/psychology/:id", async (req, res) => {
     return res.json(data);
   } catch (err) {
     console.error("[Psychology] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// W7 — Evolution Endpoints (Dekonditionierungs-Analyse über mehrere Readings)
+// ======================================================
+// Ersetzt die alte, oberflächliche Single-Claude-Call-Variante auf ck-agent (.167)
+// durch eine wissensgeerdete, mehrdimensionale Engine auf .138 (Golden Rule: alle
+// KI/Berechnung auf .138). Schreibt in public.evolution_analyses (erweiterte Spalten).
+app.post("/api/readings/evolution/start", async (req, res) => {
+  try {
+    const { user_id, reading_ids, focus_area, type } = req.body || {};
+    if (!user_id) {
+      return res.status(400).json({ success: false, error: "user_id ist erforderlich" });
+    }
+    if (reading_ids !== undefined && reading_ids !== null && !Array.isArray(reading_ids)) {
+      return res.status(400).json({ success: false, error: "reading_ids muss ein Array sein (oder weglassen)" });
+    }
+    // reading_ids ist NOT NULL (default '{}') → niemals explizit null einfügen.
+    const readingIds = Array.isArray(reading_ids) ? reading_ids : [];
+
+    // Zeile vorab anlegen und deren id an den Job reichen, damit der Worker GENAU
+    // diese Zeile fortschreibt (kein Doppel-Insert, kein ewig-pending) — wie Psychology.
+    const { data, error } = await supabasePublic
+      .schema("public")
+      .from("evolution_analyses")
+      .insert({ user_id, type: type || "deconditioning", reading_ids: readingIds, focus_area: focus_area || null, status: "pending", progress: 0 })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const queue = getEvolutionQueue();
+    await queue.add("evolution", { user_id, reading_ids: readingIds, focus_area: focus_area || null, evolution_analysis_id: data.id });
+
+    return res.status(202).json({ success: true, evolution_analysis_id: data.id });
+  } catch (err) {
+    console.error("[Evolution] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/evolution/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabasePublic
+      .schema("public")
+      .from("evolution_analyses")
+      .select("id, status, progress, overall_growth_score, not_self_tracking, authority_alignment, center_evolution, timeline, key_changes, growth_areas, recommendations, coaching_links, insights, comparison_data, narrative, error_message, created_at, completed_at")
+      .eq("id", req.params.id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[Evolution] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Liste aller Analysen eines Users (für die Übersicht im Frontend).
+app.get("/api/readings/evolution/user/:userId", async (req, res) => {
+  try {
+    const { data, error } = await supabasePublic
+      .schema("public")
+      .from("evolution_analyses")
+      .select("id, status, overall_growth_score, focus_area, comparison_data, created_at, completed_at")
+      .eq("user_id", req.params.userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) throw new Error(error.message);
+    return res.json({ success: true, analyses: data || [] });
+  } catch (err) {
+    console.error("[Evolution] LIST fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

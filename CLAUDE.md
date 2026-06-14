@@ -18,8 +18,12 @@
 > Dekonditionierung/Stimmigkeit über die Abfolge der Readings (+ Coaching-Sessions, Lernpfade als
 > Signale), als deterministischer Fakten-Block geerdet. **Vier neue Dimensionen:** Zentren-/Autoritäts-
 > Verlauf, Not-Self-Tracking, Zeitleiste/Trends, Coaching/Lernpfad-Verknüpfung. Deploy = reading-worker
-> **Rebuild**. ⏳ **Offen (im .167-Repo, hier nicht zugänglich):** den `/api/v6/evolution`-Proxy auf die
-> neuen .138-Endpunkte umstellen + Evolution-UI um die neuen Felder erweitern. Branch
+> **Rebuild**. ✅ **Deploy verifiziert (2026-06-14):** reading-worker per `docker compose build
+> reading-worker && up -d` neu gebaut → Container `Up` auf Port 4000, Log `🟢 Evolution Worker
+> aktiv` / `[W7] Evolution Worker gestartet`; Migration `2026061401` auf `wdiadklhvhlndnjojrfu`
+> **angewandt** (alle 8 Spalten + Index via `information_schema` bestätigt). ⏳ **Offen (im
+> .167-Repo, hier nicht zugänglich):** den `/api/v6/evolution`-Proxy auf die neuen
+> .138-Endpunkte umstellen + Evolution-UI um die neuen Felder erweitern. Branch
 > `claude/evolution-feature-expansion-lsfnnl`. Siehe Abschnitt 7 + 8.
 >
 > **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte

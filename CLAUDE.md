@@ -21,10 +21,25 @@
 > **Rebuild**. ✅ **Deploy verifiziert (2026-06-14):** reading-worker per `docker compose build
 > reading-worker && up -d` neu gebaut → Container `Up` auf Port 4000, Log `🟢 Evolution Worker
 > aktiv` / `[W7] Evolution Worker gestartet`; Migration `2026061401` auf `wdiadklhvhlndnjojrfu`
-> **angewandt** (alle 8 Spalten + Index via `information_schema` bestätigt). ⏳ **Offen (im
-> .167-Repo, hier nicht zugänglich):** den `/api/v6/evolution`-Proxy auf die neuen
-> .138-Endpunkte umstellen + Evolution-UI um die neuen Felder erweitern. Branch
+> **angewandt** (alle 8 Spalten + Index via `information_schema` bestätigt). ✅ **Frontend (.167)
+> umgestellt + deployt (2026-06-14, Commit `952c93723` auf `The-Connection-Key`@main):** Der
+> Proxy `frontend/app/api/v6/evolution/route.ts` ruft im `POST` jetzt die neue .138-Engine
+> (`READING_AGENT_URL`/`BACKEND_4000` → `/api/readings/evolution/start`, async, liefert
+> `analysis_id`) statt der alten **JS-Formel im Route-Handler**; neuer `GET ?action=get&id=`
+> pollt die `evolution_analyses`-Zeile (RLS `auth.uid()=user_id`), `GET ?action=list`
+> unverändert. UI `frontend/app/v6/evolution/page.tsx`: `createAnalysis` pollt bis
+> `completed`/`failed` (5-min-Cap), Feld-Shapes an das neue JSON angepasst
+> (`key_changes.change`, `growth_areas.title`/`progress`, `recommendations.title`/`description`)
+> + neuer **Narrativ-Bericht** gerendert. Deploy = `frontend` **Rebuild** auf .167 (Next 14,
+> seriell). **E2E verifiziert** über den echten Browser-Pfad (gefälschtes `@supabase/ssr`-Cookie
+> aus Admin-Magic-Link): Auth-Gate 401 ohne Session, `POST`→202→Poll→`completed`, Ergebnis
+> voll befüllt (Score, alle Dimensionen, Narrativ), UI-Feld-Shapes passend. Branch
 > `claude/evolution-feature-expansion-lsfnnl`. Siehe Abschnitt 7 + 8.
+>
+> ⚠️ **Deploy-Gotcha (.167-Proxy):** `BACKEND_4000` zeigt auf den **reading-worker** (Port 4000),
+> NICHT auf die connection-key-API (3000) — Evolution-Endpunkte leben im reading-worker. Der
+> Evolution-Start-Endpunkt prüft (Stand 2026-06-14) **keinen** `x-api-key` (Schutz = Netzwerk-
+> Firewall .167→.138); der Proxy sendet ihn dennoch konsistent mit.
 >
 > **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte
 > kein `not_self_theme` → Consumer (z. B. Psychology-Reading) fielen auf „—" zurück. Das

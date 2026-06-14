@@ -41,6 +41,14 @@
 > Evolution-Start-Endpunkt prüft (Stand 2026-06-14) **keinen** `x-api-key` (Schutz = Netzwerk-
 > Firewall .167→.138); der Proxy sendet ihn dennoch konsistent mit.
 >
+> 🐛 **Fix 2026-06-14 (Eigentümerschaft `profile_id`):** Live-Fehler „Keine Readings für diesen
+> User gefunden" trotz vorhandener Auswahl. Ursache: `fetchUserReadings` im evolution-worker
+> filterte nur `user_id`, die v3-Liste (`.167 /api/readings`) zeigt Readings aber per
+> `user_id` **ODER** `profile_id` (`.or(user_id.eq.X,profile_id.eq.X)`). Readings dieser User
+> sind `profile_id`-verknüpft (7 von 91 in Prod) → Auswahl sichtbar, Worker fand nichts. **Fix:**
+> `evolution-worker.js` nutzt jetzt dieselbe `.or(user_id.eq,profile_id.eq)`-Logik. Verifiziert
+> mit `profile_id`-User (7 Readings) → `completed`. Deploy = reading-worker **Rebuild**.
+>
 > **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte
 > kein `not_self_theme` → Consumer (z. B. Psychology-Reading) fielen auf „—" zurück. Das
 > Not-Self-Theme ist pro HD-Typ eindeutig und wird jetzt an **drei** Stellen sichergestellt:

@@ -106,11 +106,14 @@ function createClients() {
 // MAX_READINGS. Das natale Chart wird aus dem jüngsten Reading mit Chart-Daten
 // abgeleitet (es ist über alle Readings identisch).
 async function fetchUserReadings(supabase, userId, readingIds) {
+  // Eigentümerschaft wie in der v3-Liste (.167 /api/readings): Reading gehört dem
+  // User per user_id ODER profile_id. Nur user_id zu filtern verfehlte alle
+  // profile_id-verknüpften Readings → "Keine Readings gefunden" trotz Auswahl.
   let query = supabase
     .schema("public")
     .from("readings")
     .select("id, reading_type, client_name, status, chart_data, reading_data, content, created_at, completed_at")
-    .eq("user_id", userId)
+    .or(`user_id.eq.${userId},profile_id.eq.${userId}`)
     .order("created_at", { ascending: true });
 
   if (Array.isArray(readingIds) && readingIds.length) {

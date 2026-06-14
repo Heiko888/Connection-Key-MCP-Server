@@ -49,6 +49,19 @@
 > `evolution-worker.js` nutzt jetzt dieselbe `.or(user_id.eq,profile_id.eq)`-Logik. Verifiziert
 > mit `profile_id`-User (7 Readings) → `completed`. Deploy = reading-worker **Rebuild**.
 >
+> ✨ **UI-Ausbau 2026-06-14 (.167, Commit `853c18dc4`):** Die Evolution-Seite
+> (`frontend/app/v6/evolution/page.tsx`) rendert jetzt **alle** Engine-Dimensionen statt nur
+> Score/key_changes/growth_areas/recommendations: **Phase**-Badge (⚠️ aus `comparison_data.phase`,
+> KEINE eigene Spalte), **Not-Self→Signatur**-Achse (+movement/evidence), **Autoritäts-Ausrichtung**
+> (alignment/observations/next_step), **`center_evolution`** (Druck→Weisheit je offenem Zentrum),
+> **Zeitleiste** (`timeline`) und **`coaching_links`**-CTAs (session_topics + learning_exercises).
+> Das **`narrative`** wird über die bestehende `@/components/MarkdownLite`-Komponente als Markdown
+> gerendert (vorher `whitespace-pre-wrap`). Feldnamen autoritativ aus dem Worker-Kontrakt
+> (`evolution-worker.js`, JSON-Schema im Call-1-Prompt) — es gibt **keine** Frontend-Vorlagen im
+> .138-Repo. Deploy = `frontend` **Rebuild**. **E2E verifiziert** (Browser-Pfad, realer
+> `profile_id`-User): alle Dimensionen befüllt (Phase=Experimentieren, Not-Self→Signatur,
+> 3× center_evolution/timeline/coaching, Markdown-Narrativ).
+>
 > **Changelog 2026-06-13 (.138 Chart — `not_self_theme` ergänzt):** Das Chart-Objekt führte
 > kein `not_self_theme` → Consumer (z. B. Psychology-Reading) fielen auf „—" zurück. Das
 > Not-Self-Theme ist pro HD-Typ eindeutig und wird jetzt an **drei** Stellen sichergestellt:

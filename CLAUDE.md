@@ -558,7 +558,7 @@ Supabase v4.reading_results + public.readings
 | POST | `/api/v4/readings/[id]/regenerate` | Regenerate | ✅ |
 | GET | `/api/v4/readings/[id]/history` | Versionen | ✅ |
 | POST | `/api/v4/readings/[id]/share` | Teilen | ✅ |
-| POST | `/api/v4/readings/[id]/email` | E-Mail versenden | ⚠️ RESEND_API_KEY fehlt! |
+| POST | `/api/v4/readings/[id]/email` | E-Mail versenden | ✅ (`RESEND_API_KEY` auf .167 gesetzt) |
 | GET | `/api/v4/readings/[id]/pdf` | PDF Export | ❌ TODO |
 | GET | `/api/v4/readings/[id]/generate-stream` | Streaming | ✅ |
 | POST | `/api/v4/readings/specialized` | Spezial-Readings | ✅ |
@@ -814,12 +814,13 @@ MarketingWorkflow.tsx       Marketing
 
 ---
 
-## 12. VERSIONIERUNG (V3 / V4)
+## 12. VERSIONIERUNG (V3 / V4 / V6)
 
 | Version | Status | Server | Schema | Beschreibung |
 |---------|--------|--------|--------|-------------|
 | V3 | ✅ Aktiv | .138 | `public` | Orchestrator, 4 Agenten, `readings-v3` Routes |
 | V4 | ✅ Aktiv | .138 + .167 | `v4` | BullMQ Queues, spezialisierte Workers, Coach-Portal |
+| V6 | ✅ Aktiv & live genutzt | .167 (+ .138 Evolution-Worker) | `public` | Coaching-Layer, 3 Säulen: Coaching-Sessions (`coaching_sessions`), Lernpfade (`learning_paths`), Evolution (`evolution_analyses`, Engine auf .138 via `reading-queue-v4-evolution`). Frontend `/v6/{coaching,learning,evolution}`. **Seit 2026-06-16 (.167) an Abo-Stufen gekoppelt** (`lib/access/requirePackage.ts`): coaching=VIP, learning/evolution=Premium, server- + seitenseitig. Geplante eigene `v6_payments`-Monetarisierung entfällt durch Abo-Kopplung. |
 | V3 alt (production/) | ⚠️ Inaktiv | .138 | — | Standalone, nicht im Docker |
 | V3 API Server | ⚠️ Inaktiv | .167 | — | Legacy, nie gestartet |
 | V4 worker (v4-reading-worker/) | 🗑️ Leer | .138 | — | Leeres Verzeichnis |
@@ -837,7 +838,7 @@ MarketingWorkflow.tsx       Marketing
 | Stripe | Zahlungen (LIVE!) | `sk_live_51***`, `pk_live_51***`, Webhook | .138 + .167 | ✅ ⚠️ |
 | Supabase | Postgres DB + Auth | URL + Keys | .138 + .167 | ✅ |
 | n8n | Workflows | JWT Token | .138 + .167 | ✅ |
-| Resend | E-Mail-Versand | `RESEND_API_KEY` | .167 | ❌ FEHLT! |
+| Resend | E-Mail-Versand | `RESEND_API_KEY` | .167 | ✅ gesetzt (Root-.env → frontend, frontend-coach, ck-agent) |
 | Mattermost | Workshop-Anmelde-Benachrichtigungen (Incoming-Webhook) | `MATTERMOST_WEBHOOK_WORKSHOPS` | .167 | ✅ |
 | Let's Encrypt | SSL | certbot | .138 + .167 | ✅ |
 
@@ -887,7 +888,7 @@ MarketingWorkflow.tsx       Marketing
 | 7 | `generateReading.js` auf .167 ist ein **STUB** (11 Zeilen, wirft Fehler) | .167 |
 | 8 | ✅ **ERLEDIGT:** Working Tree sauber, alle Änderungen committet | .138 |
 | 9 | CORS nicht auf Produktionsdomain: Code-Default = localhost-Liste (`config.js`), `docker-compose.yml` überschreibt mit `CORS_ORIGINS:-*` (zu offen) → auf `the-connection-key.de` setzen | .138 |
-| 10 | `RESEND_API_KEY` fehlt — E-Mail-Versand kaputt | .167 |
+| 10 | ✅ **ERLEDIGT:** `RESEND_API_KEY` ist auf .167 gesetzt (Root-.env, durchgereicht an frontend/frontend-coach/ck-agent) — E-Mail-Versand funktional | .167 |
 | 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) | .167 |
 
 ### 🟡 P2 — Wichtig
@@ -920,7 +921,7 @@ MarketingWorkflow.tsx       Marketing
 | IP-Hardcoding durch ENV-Variablen ersetzen (50+ Dateien) | .167 | `V4_BACKEND_URL`, `READING_AGENT_URL`, `MCP_SERVER_URL` |
 | `generateReading.js` STUB durch echte Engine ersetzen | .167 | Von .138 kopieren ODER v4-worker auf .138 deployen |
 | ✅ ~~`sync-reading-service` in docker-compose.yml aufnehmen~~ | .138 | **Erledigt** (Supabase-ENV ggf. ergänzen) |
-| `RESEND_API_KEY` setzen | .167 | API-Key beschaffen und in .env |
+| ✅ ~~`RESEND_API_KEY` setzen~~ | .167 | **Erledigt** — Key in Root-.env, an 3 Container durchgereicht |
 | ✅ ~~Uncommitted Changes committen~~ | .138 | **Erledigt** — Working Tree sauber |
 
 ### 🟡 MEDIUM PRIORITY
@@ -992,7 +993,7 @@ STRIPE_WEBHOOK_SECRET
 STRIPE_BASIC_PRICE_ID / PREMIUM / VIP
 
 # Email
-RESEND_API_KEY                    # ❌ FEHLT — E-Mail kaputt!
+RESEND_API_KEY                    # ✅ gesetzt (Root-.env, an frontend/frontend-coach/ck-agent)
 RESEND_FROM_DOMAIN
 RESEND_FROM_NAME
 
@@ -1041,7 +1042,7 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 | Payments | `stripe`, `@stripe/stripe-js` |
 | PDF | `html2canvas` + `jspdf` |
 | QR | `qrcode` |
-| E-Mail | Resend (API-Key fehlt!) |
+| E-Mail | Resend (`RESEND_API_KEY` gesetzt) |
 | Shared Code | `@ck/shared` (packages/shared/) |
 | Monitoring | Grafana + Prometheus + Node Exporter + AlertManager + Redis Exporter |
 | Container | Docker Compose (10 Services) |

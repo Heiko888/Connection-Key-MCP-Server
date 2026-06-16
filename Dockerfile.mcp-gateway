@@ -9,12 +9,12 @@ COPY mcp-gateway.js ./
 COPY index.js ./
 COPY config.js ./
 RUN mkdir -p production
-COPY production/agent-marketing.js ./production/agent-marketing.cjs
-COPY production/agent-sales.js ./production/agent-sales.cjs
-COPY production/agent-social.js ./production/agent-social.cjs
-COPY production/agent-video.js ./production/agent-video.cjs
-COPY production/agent-video-generation.js ./production/agent-video-generation.cjs
-COPY production/agent-design.js ./production/agent-design.cjs
+COPY production/agent-marketing.cjs ./production/agent-marketing.cjs
+COPY production/agent-sales.cjs ./production/agent-sales.cjs
+COPY production/agent-social.cjs ./production/agent-social.cjs
+COPY production/agent-video.cjs ./production/agent-video.cjs
+COPY production/agent-video-generation.cjs ./production/agent-video-generation.cjs
+COPY production/agent-design.cjs ./production/agent-design.cjs
 COPY production/agent-knowledge.cjs ./production/agent-knowledge.cjs
 
 # Knowledge & Templates für den Knowledge-Agent (gleicher Satz wie reading-worker)

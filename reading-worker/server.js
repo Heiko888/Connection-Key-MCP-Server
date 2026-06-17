@@ -5171,6 +5171,15 @@ app.get("/api/readings/evolution/user/:userId", async (req, res) => {
 // der video-worker generiert + speichert das Video permanent im Storage.
 app.post("/api/videos/generate", async (req, res) => {
   try {
+    // Fast-Fail: ohne Runway-Key gar nicht erst einen Job anlegen/enqueuen,
+    // der im Worker zwangsläufig als failed/NO_API_KEY endet.
+    if (!process.env.RUNWAYML_API_SECRET) {
+      return res.status(503).json({
+        success: false,
+        error: "Video-Generierung ist nicht konfiguriert (RUNWAYML_API_SECRET fehlt auf .138)",
+        error_code: "NO_API_KEY",
+      });
+    }
     const { mode = "text", prompt, shots, images, ratio, duration, model, userId, coachId } = req.body || {};
     if (!prompt && !(Array.isArray(shots) && shots.length)) {
       return res.status(400).json({ success: false, error: "prompt oder shots[] ist erforderlich" });
@@ -6018,7 +6027,11 @@ app.get("/health", async (_, res) => {
       redis: redis.status,
       knowledge: Object.keys(knowledge).length,
       templates: Object.keys(templates).length,
-      blueprint: { sections_last_24h: sectionsLast24h }
+      blueprint: { sections_last_24h: sectionsLast24h },
+      video: {
+        runway: !!process.env.RUNWAYML_API_SECRET ? "ready" : "missing_key",
+        model: process.env.RUNWAY_VIDEO_MODEL || "seedance2"
+      }
     });
   } catch (error) {
     res.status(500).json({ status: "error", error: error.message });

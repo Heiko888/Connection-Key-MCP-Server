@@ -36,6 +36,23 @@ if (!MCP_API_KEY) {
   process.exit(1);
 }
 
+// Gültige Schlüssel für die /agent/*-Routen. Interne Aufrufer (.167 frontend-coach)
+// senden x-api-key = CONNECTION_KEY_API_KEY || CK_AGENT_SECRET; /agents/run nutzt
+// Bearer == MCP_API_KEY. Alle bekannten Varianten werden akzeptiert; weitere Keys
+// können per GATEWAY_ALLOWED_KEYS (kommagetrennt) ergänzt werden.
+const VALID_AGENT_KEYS = new Set(
+  [
+    process.env.MCP_API_KEY,
+    process.env.CK_AGENT_SECRET,
+    process.env.CONNECTION_KEY_API_KEY,
+    ...(process.env.GATEWAY_ALLOWED_KEYS || '').split(',')
+  ].map((k) => (k || '').trim()).filter(Boolean)
+);
+
+// Erzwingen erst, wenn AGENT_AUTH_ENFORCE=true. Default = Grace-Mode:
+// unautorisierte Calls werden nur geloggt, aber durchgelassen (kein Live-Bruch).
+const AGENT_AUTH_ENFORCE = process.env.AGENT_AUTH_ENFORCE === 'true';
+
 // Anthropic Client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -84,6 +101,44 @@ function authMiddleware(req, res, next) {
 
   next();
 }
+
+// Schlüssel aus Bearer-Header ODER x-api-key-Header extrahieren
+function extractAgentKey(req) {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) return authHeader.substring(7).trim();
+  if (req.headers['x-api-key']) return String(req.headers['x-api-key']).trim();
+  return null;
+}
+
+// Auth-Gate für alle dedizierten /agent/*-Routen (NICHT /agents/run — das hat
+// bereits authMiddleware). Akzeptiert Bearer ODER x-api-key gegen VALID_AGENT_KEYS.
+// Im Grace-Mode (AGENT_AUTH_ENFORCE!=true) wird ein Fehlschlag nur geloggt.
+function agentAuthGate(req, res, next) {
+  const key = extractAgentKey(req);
+  if (key && VALID_AGENT_KEYS.has(key)) return next();
+
+  if (AGENT_AUTH_ENFORCE) {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'UNAUTHORIZED',
+        message: 'Missing or invalid agent credentials (Authorization: Bearer or x-api-key)'
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  console.warn(
+    `⚠️  [agent-auth] Unautorisierter Zugriff auf ${req.method} ${req.path} ` +
+    `(kein gültiger Bearer/x-api-key) — im Grace-Mode durchgelassen. ` +
+    `AGENT_AUTH_ENFORCE=true zum Erzwingen.`
+  );
+  return next();
+}
+
+// Greift nur für /agent und /agent/* — Express matcht die Mount-Prefix nur an
+// Segment-Grenzen, daher bleibt /agents/run (eigene authMiddleware) unberührt.
+app.use('/agent', agentAuthGate);
 
 // Health Check
 app.get('/health', (req, res) => {
@@ -856,5 +911,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ MCP HTTP Gateway läuft auf Port ${PORT}`);
   console.log(`📡 Health Check: http://localhost:${PORT}/health`);
   console.log(`🔐 Auth: Bearer ${MCP_API_KEY.substring(0, 8)}...`);
+  console.log(`🔑 /agent/*-Auth: ${VALID_AGENT_KEYS.size} gültige(r) Schlüssel · Modus: ${AGENT_AUTH_ENFORCE ? '🔒 ENFORCE (401)' : '🟡 GRACE (nur Log)'}`);
   console.log(`🤖 Claude: ${process.env.ANTHROPIC_API_KEY ? '✅ Connected' : '❌ Not configured'}`);
 });

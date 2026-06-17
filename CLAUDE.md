@@ -1,6 +1,37 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-14 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (Video-Pipeline E2E verifiziert + dokumentiert):** Prüfung ergab,
+> dass die Runway/Seedance-Video-Pipeline **bereits vollständig E2E gebaut** ist (CLAUDE.md
+> beschrieb sie bisher gar nicht). **.138:** Migration `2026060301_video_jobs.sql` (angewandt
+> 2026-06-03) + Bucket `generated-videos`; `workers/video-worker.js` (Queue `video-queue`,
+> `startVideoWorker()` aktiv); Endpunkte `POST /api/videos/generate` (202 +jobId) und
+> `GET /api/videos/:id`. **.167:** Proxy `/api/agents/video-generation` (+Status-Poll-Route),
+> UI `VideoGenerationPanel` + Seite `/agents/video-generation` (sendet → pollt 5 s → rendert
+> `<video>` + Download), in Navigation/Marketing-Hub/Admin verlinkt. Kette korrekt verdrahtet,
+> keine Code-Änderung nötig — nur dokumentiert (§7 Worker+Queue, §10 `video_jobs`+Bucket).
+> ⚠️ Betriebsvoraussetzung: `RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (Default leer),
+> sonst Jobs `failed`/`NO_API_KEY`. `/agents/video-creation` (Text-Agent) ist ein separates
+> Feature, kein Duplikat. Siehe Abschnitt 7.
+>
+> **Changelog 2026-06-17 (.138 Systemprüfung — Härtung + Doku-Abgleich):** (1) **CORS-Wildcard
+> geschlossen** — `docker-compose.yml` (connection-key:3000) hatte `CORS_ORIGINS:-*` als Fallback;
+> ersetzt durch explizite Produktionsdomains (the-connection-key.de, coach./agent. +
+> werdemeisterdeinergedankenagent.de). Override via gesetztes `CORS_ORIGINS` bleibt; Server→Server-
+> Calls (kein Origin-Header) unberührt. Deploy: `docker compose up -d connection-key`.
+> (2) **Auth-Gate auf alle `/agent/*`-Routen** (`mcp-gateway.js`, `agentAuthGate`) — vorher offen
+> (jeder konnte Claude-Calls auslösen). Akzeptiert Bearer **oder** `x-api-key` gegen
+> `VALID_AGENT_KEYS`; **Grace-Mode** per Default (`AGENT_AUTH_ENFORCE=false`, loggt nur), scharf
+> via `AGENT_AUTH_ENFORCE=true`. Greift NICHT auf `/agents/run` (hat eigene `authMiddleware`).
+> docker-compose: Gateway bekommt `CK_AGENT_SECRET`/`CONNECTION_KEY_API_KEY`/`GATEWAY_ALLOWED_KEYS`/
+> `AGENT_AUTH_ENFORCE`. Deploy: `docker compose build mcp-gateway && up -d mcp-gateway`, dann Logs
+> (`grep agent-auth`) prüfen, bevor enforced wird. (3) **Doku-Korrekturen verifiziert:** die früher
+> als „fehlend/404" gelisteten Gateway-Routen (`chart`/`yearly`/`automation`/`depth-analysis`/`tasks`)
+> **existieren** (via `makeSimpleAgent`); `/agents/reading` ist **kein Platzhalter** mehr (echter
+> Claude-Call); Duplikat-Queue `reading-v4-queue` ist **totes Legacy** (Produzent `.167/scripts/v4.js`
+> nirgends gemountet, kein Worker konsumiert sie) → kein Live-Bug. Branch
+> `claude/system-check-138-extensions-6qjf8b`. Siehe Abschnitt 8 + 15.
+>
 > **Changelog 2026-06-14 (.138 — W7 Evolution-Engine, ersetzt oberflächliches V6-Evolution):**
 > Das V6-Feature `/v6/evolution` lief bisher als **ein einziger** Claude-Call auf ck-agent
 > (.167) → flach, und in der Praxis kaputt (Live-DB: `evolution_analyses` hatte 3 Zeilen/1 User,
@@ -404,6 +435,7 @@ Agent Timeout: 300s
 | `reading-worker/server.js` | .138 | reading-worker | 4000 | BullMQ (Redis) | HD-Readings via Claude | ✅ Aktiv |
 | `workers/psychology-worker.js` | .138 | reading-worker | — | `reading-queue-v4-psychology` | Psychologie-Readings | ✅ Integriert |
 | `workers/evolution-worker.js` | .138 | reading-worker | — | `reading-queue-v4-evolution` | Evolution-/Dekonditionierungs-Analyse (V6) | ✅ Integriert (2026-06-14) |
+| `workers/video-worker.js` | .138 | reading-worker | — | `video-queue` | Echte Video-Generierung (Runway/Seedance 2.0) | ✅ Integriert (E2E verifiziert 2026-06-17) |
 | `lib/live-reading/routes.js` | .138 | reading-worker | — | HTTP (SSE/WS) | Live-Readings | ✅ Integriert |
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
@@ -440,6 +472,27 @@ Liste: `GET /api/readings/evolution/user/:userId`. Bei nur **einem** Reading: Ba
 (konservativer Score). Deploy = **Rebuild**. Frontend-Anbindung (`/api/v6/evolution`-Proxy
 umstellen) liegt im .167-Repo.
 
+**Video-Worker — Flow (E2E verifiziert 2026-06-17):** Vollständige Kette über beide Server.
+**.138** (`reading-worker`, Port 4000): `POST /api/videos/generate` (Body `{mode:text|image|reference,
+prompt, shots?, images?, ratio?, duration?, userId}`) legt eine `public.video_jobs`-Zeile
+(`status=pending`) an und enqueued `{ jobId }` in die BullMQ-Queue `video-queue`; gibt `202 {jobId}`
+zurück. `workers/video-worker.js` ruft Runway/Seedance (`@runwayml/sdk`, `RUNWAYML_API_SECRET`,
+Modell `RUNWAY_VIDEO_MODEL` Default `seedance2`), pollt bis fertig (`VIDEO_TIMEOUT_MS`, Default
+15 min), lädt das MP4 herunter und speichert es **permanent** im Storage-Bucket `generated-videos`,
+schreibt `status/progress/video_url` in `video_jobs` fort. Status-Abruf: `GET /api/videos/:id`.
+Multi-Shot via `shots[]` (Seedance), `text|image|reference`-Modi. **.167** (`frontend-coach`):
+Proxy `POST /api/agents/video-generation` → `workerFetch /api/videos/generate` (+`userId`);
+`GET /api/agents/video-generation/status/[jobId]` pollt; UI `components/VideoGenerationPanel.tsx`
+(Seite `/agents/video-generation`) sendet, pollt alle 5 s, rendert `<video>` + Download. Beide
+Seiten in Navigation/Marketing-Hub/Admin verlinkt. ⚠️ **Abgrenzung:** `/agents/video-creation`
+(Text-Agent: Skript/Shot-List/Produktionsanleitung) ist ein **anderes** Feature als
+`/agents/video-generation` (echte Video-Erzeugung) — kein Duplikat. ⚠️ **Betriebsvoraussetzung:**
+`RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (docker-compose Default leer). **Absicherung
+(2026-06-17):** `POST /api/videos/generate` macht jetzt **Fast-Fail** — ohne Key sofort `503`
+`NO_API_KEY` (kein doomed Job mehr; die .167-UI zeigt die Meldung direkt). Der Health-Endpunkt
+(`GET /health` am reading-worker) meldet `video.runway: "ready" | "missing_key"`. Deploy =
+reading-worker **Rebuild**.
+
 ### Inaktive / Problematische Worker
 
 | Worker | Server | Problem | Soll auf | Aktion |
@@ -460,7 +513,8 @@ umstellen) liegt im .167-Repo.
 | `bull:reading-queue-v4-evolution` | V4 | Evolution-/Dekonditionierungs-Analyse (V6) |
 | `bull:reading-queue-v4-multi-agent` | V4 | Multi-Agent-Readings |
 | `bull:reading-queue-v4-connection` | V4 | Connection-Readings |
-| `bull:reading-v4-queue` | V4 | ⚠️ Alternatives Namespace (Duplikat?) |
+| `bull:video-queue` | — | Video-Generierung (Runway/Seedance, `video-worker`) |
+| `bull:reading-v4-queue` | V4 | ⚠️ Totes Legacy — Produzent `.167/scripts/v4.js` nirgends gemountet, kein Worker konsumiert (verifiziert 2026-06-17) |
 
 ### V4 Job-Architektur
 
@@ -520,24 +574,27 @@ Supabase v4.reading_results + public.readings
 
 ### Server .138 — MCP Gateway (Port 7000, `mcp-gateway.js`)
 
-**Auth:** `/agents/run` per Bearer Token (`MCP_API_KEY` / `CK_AGENT_SECRET`). Die dedizierten `/agent/*`-Routen sind aktuell **ohne** eigenen Auth-Check.
+**Auth:** `/agents/run` per Bearer Token (`MCP_API_KEY` / `CK_AGENT_SECRET`). Die dedizierten `/agent/*`-Routen haben **seit 2026-06-17 ein Auth-Gate** (`agentAuthGate`, akzeptiert `Authorization: Bearer` **oder** `x-api-key` gegen `VALID_AGENT_KEYS` = `MCP_API_KEY`/`CK_AGENT_SECRET`/`CONNECTION_KEY_API_KEY`/`GATEWAY_ALLOWED_KEYS`). Default ist **Grace-Mode** (`AGENT_AUTH_ENFORCE=false`): unautorisierte Calls werden nur geloggt; mit `AGENT_AUTH_ENFORCE=true` → echtes 401. Hintergrund: die internen .167-Aufrufer (frontend-coach, Muster A) senden `x-api-key`, **nicht** Bearer.
 
 | Methode | Pfad | Funktion |
 |---------|------|----------|
 | POST | `/agents/run` | Generischer Dispatcher (`domain`/`task`/`payload`) → spawnt MCP-Core (`index.js`) per stdio; max. 1 Request gleichzeitig |
 | GET | `/health` | Health-Check |
 
-**Dedizierte Agent-Endpunkte (real in `mcp-gateway.js`, 16 Stück):**
+**Dedizierte Agent-Endpunkte (real in `mcp-gateway.js`):**
 ```
 /agent/marketing         /agent/sales           /agent/social-youtube
 /agent/video             /agent/video-creation  /agent/ui-ux
 /agent/chart-architect   /agent/reading         /agent/reflection
 /agent/shadow-work       /agent/relationship    /agent/transit
 /agent/business-hd       /agent/emotions        /agent/health
-/agent/abundance
+/agent/abundance         /agent/knowledge
+/agent/chart             /agent/yearly          /agent/automation
+/agent/depth-analysis    /agent/tasks
+/agent/video/generate (POST) · /agent/video/status/:taskId (GET)
 ```
-⚠️ **Kein** dedizierter Endpunkt für `chart`, `yearly`, `automation`, `depth-analysis`, `tasks` — diese müssten über `/agents/run` gegen die MCP-Core-Tools laufen. `index.js` registriert nur: `ping`, `echo`, `getDateTime`, `calculate`, `generateUUID`, `callN8N`, `createN8NWorkflow`, `triggerN8NWebhook`, `generateReading`, `analyzeChart`, `matchPartner`, `saveUserData`. Das erklärt die 404er aus `AGENTEN_404_FEHLER_ANALYSE.md`.
-⚠️ `/agent/reading` fällt ohne `ANTHROPIC_API_KEY` auf Placeholder-Text zurück (`mcp-gateway.js:246`); `/agents/reading` (mit s) ist ein reiner Platzhalter (`:302`, TODO `:312`).
+✅ **Korrektur 2026-06-17:** Die früher fehlenden Routen `chart`, `yearly`, `automation`, `depth-analysis`, `tasks` **existieren jetzt** (via `makeSimpleAgent`, System-Prompt aus `AGENT_SYSTEM_PROMPTS`) → die alten 404er aus `AGENTEN_404_FEHLER_ANALYSE.md` sind behoben. Ebenfalls neu: `/agent/knowledge` und die echte Video-Generierung (`/agent/video/generate` + `/agent/video/status`, Runway/Seedance).
+⚠️ `/agent/reading` fällt ohne `ANTHROPIC_API_KEY` auf Placeholder-Text zurück. `/agents/reading` (mit s, `mcp-gateway.js:426`) ist **kein** Platzhalter mehr — es macht einen echten Claude-Call (503 ohne API-Key). Einziger Aufrufer ist das **auskommentierte** Legacy-Frontend (`docker-compose.yml` `#frontend:`).
 
 ### Server .138 — Sync Reading Service (Port 7001)
 
@@ -714,6 +771,14 @@ reflection, relationship, sexuality, shadow-work, spiritual
 | `reading_results` | Job Results (result_text, metadata) |
 | `evolution_analyses` | Evolution Analysis |
 | `mcp_usage` | MCP Server Usage Tracking |
+
+### Tabellen — public Schema (Video)
+
+| Tabelle | Beschreibung |
+|---------|-------------|
+| `video_jobs` | Video-Generierungs-Jobs (mode/prompt/shots/images, status, runway_task_id, video_url/video_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026060301_video_jobs.sql` (angewandt 2026-06-03). |
+
+**Storage-Bucket:** `generated-videos` (public) — fertige MP4s, permanente URLs (laufen nicht ab).
 
 ### Redis
 
@@ -900,7 +965,7 @@ MarketingWorkflow.tsx       Marketing
 | 14 | v4-worker auf .167 definiert aber gehört auf .138 | .167 |
 | 15 | ✅ **ERLEDIGT:** `sync-reading-service` ist in `docker-compose.yml` (braucht ggf. noch Supabase-ENV) | .138 |
 | 16 | n8n ohne SSL | .138 |
-| 17 | TODOs/Platzhalter in kritischen Pfaden: `mcp-gateway.js:312` (`/agents/reading` Platzhalter), `services/chart-truth/chartTruthService.ts` (Swiss-Ephemeris-STUB) | .138 |
+| 17 | ✅ **ERLEDIGT (2026-06-17):** `/agents/reading` ist kein Platzhalter mehr (echter Claude-Call); der tote `services/chart-truth/`-Baum (nicht lauffähig — Abhängigkeit `chart-calculation-astronomy.js` fehlte, nirgends gemountet, duplizierte die echte Engine) wurde **entfernt** (inkl. `integration/.../chart/truth/route.ts`). ⚠️ Rest: n8n-Templates (`n8n-workflows/*chart-truth*`) rufen noch `/api/chart/truth` auf — diesen Endpunkt serviert die connection-key-API **nicht** (sie hat `/api/chart/calculate`); Templates sind nicht live, aber vor n8n-Import anpassen | .138 |
 | 18 | ✅ **ERLEDIGT:** `depth-analysis.txt`/Reading-Templates committet | .138 |
 | 19 | Dual-Nginx auf .167 (Host + Docker parallel) | .167 |
 | 20 | `bull:reading-v4-queue` Duplikat-Namespace | .138 |

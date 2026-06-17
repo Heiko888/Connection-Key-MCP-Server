@@ -46,6 +46,12 @@ services:
       - NODE_ENV=production
       - MCP_PORT=7000
       - MCP_API_KEY=${CK_AGENT_SECRET}
+      # /agent/*-Auth: x-api-key der internen Aufrufer (.167) wird gegen diese Keys geprüft
+      - CK_AGENT_SECRET=${CK_AGENT_SECRET:-}
+      - CONNECTION_KEY_API_KEY=${CONNECTION_KEY_API_KEY:-}
+      - GATEWAY_ALLOWED_KEYS=${GATEWAY_ALLOWED_KEYS:-}
+      # Grace-Mode (Default): unautorisierte /agent/*-Calls nur loggen. true = 401 erzwingen.
+      - AGENT_AUTH_ENFORCE=${AGENT_AUTH_ENFORCE:-false}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SUPABASE_URL=${SUPABASE_URL}

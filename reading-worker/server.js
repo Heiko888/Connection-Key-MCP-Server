@@ -28,6 +28,7 @@ import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-
 import { startEvolutionWorker, getEvolutionQueue } from "./workers/evolution-worker.js";
 import { startVideoWorker, getVideoQueue } from "./workers/video-worker.js";
 import { startAudioWorker, getAudioQueue } from "./workers/audio-worker.js";
+import { startReadingVideoWorker, getReadingVideoQueue } from "./workers/reading-video-worker.js";
 import { synthesizeSpeech as synthesizeSpeechSync, ttsVoiceSignature } from "./lib/tts.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
@@ -3049,9 +3050,11 @@ startPsychologyWorker();
 startEvolutionWorker();
 startVideoWorker();
 startAudioWorker();
+startReadingVideoWorker();
 console.log("[W6] Psychology Worker gestartet");
 console.log("[W7] Evolution Worker gestartet");
 console.log("[W8] Audio (Voice-Reading) Worker gestartet");
+console.log("[W9] Reading-Video Worker gestartet");
 
 // ======================================================
 // Job Polling System
@@ -5338,6 +5341,59 @@ app.get("/api/tts/config", (_req, res) => {
   });
 });
 
+// ── Reading → Video (v8 Phase 2) ──────────────────────────────────────────────
+app.post("/api/reading-video/generate", async (req, res) => {
+  try {
+    // Fast-Fail: ohne nutzbares TTS (Voiceover) ist kein Reading-Video möglich.
+    const provider = (process.env.TTS_PROVIDER || "openai").toLowerCase();
+    const ttsReady = provider === "elevenlabs" ? !!process.env.ELEVENLABS_API_KEY : !!process.env.OPENAI_API_KEY;
+    if (!ttsReady) {
+      return res.status(503).json({
+        success: false,
+        error: `Reading-Video nicht konfiguriert (TTS-Provider '${provider}' ohne API-Key auf .138)`,
+        error_code: "NO_API_KEY",
+      });
+    }
+    const { reading_id, readingId, voiceId, userId, coachId } = req.body || {};
+    const rid = reading_id || readingId;
+    if (!rid) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const { data, error } = await supabasePublic
+      .from("reading_video_jobs")
+      .insert({ user_id: userId || null, coach_id: coachId || null, reading_id: rid, voice_id: voiceId || null, status: "pending" })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    const queue = getReadingVideoQueue();
+    if (!queue) throw new Error("Reading-Video-Queue nicht initialisiert");
+    await queue.add("reading-video", { jobId: data.id });
+
+    return res.status(202).json({ success: true, jobId: data.id });
+  } catch (err) {
+    console.error("[ReadingVideo] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/reading-video/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabasePublic
+      .from("reading_video_jobs")
+      .select("id, status, progress, video_url, reading_id, duration, error, error_code, result, created_at, finished_at")
+      .eq("id", req.params.id)
+      .single();
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json({ success: true, ...data });
+  } catch (err) {
+    console.error("[ReadingVideo] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ======================================================
 // Shadow Work Endpoints
 // ======================================================
@@ -6137,6 +6193,11 @@ app.get("/health", async (_, res) => {
       audio: {
         elevenlabs: !!process.env.ELEVENLABS_API_KEY ? "ready" : "missing_key",
         model: process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2"
+      },
+      reading_video: {
+        tts: ((process.env.TTS_PROVIDER || "openai").toLowerCase() === "elevenlabs"
+          ? !!process.env.ELEVENLABS_API_KEY : !!process.env.OPENAI_API_KEY) ? "ready" : "missing_key",
+        resolution: process.env.READING_VIDEO_RESOLUTION || "720p"
       }
     });
   } catch (error) {

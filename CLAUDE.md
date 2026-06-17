@@ -1,6 +1,28 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (v8 Phase 2a — Reading→Video, ffmpeg-Slideshow gebaut):** Aufbauend auf
+> Phase 1. **.138:** neuer Worker `reading-worker/workers/reading-video-worker.js` (Queue
+> `reading-video-queue`, `startReadingVideoWorker()`, `[W9]`, `concurrency=1` — CPU-schwer);
+> Endpunkte `POST /api/reading-video/generate` (202 +jobId, Fast-Fail `503 NO_API_KEY` wenn TTS-Provider
+> ohne Key) + `GET /api/reading-video/:id`; Migration `2026061702_reading_video_jobs.sql`
+> (Tabelle `reading_video_jobs` + RLS + Bucket `generated-reading-videos`, **noch anzuwenden**).
+> Pipeline: Voiceover (`lib/tts.js` `synthesizeLongText`, Default **OpenAI** → kein ElevenLabs-Key nötig)
+> → **chart-spezifischer Bodygraph** (`lib/bodygraph-svg.js`, Geometrie 1:1 portiert aus
+> `.167 lib/hd-bodygraph/data.ts`, SVG→PNG via **`@resvg/resvg-js`**) + Titel-/Text-Slides
+> (`lib/slides.js`, Text paginiert) → **ffmpeg-Slideshow** (`lib/video-compose.js`, concat-Demuxer
+> mit Per-Slide-Dauer aus Audiolänge via ffprobe) → MP4 (Default **720p**) permanent im Bucket.
+> Dockerfile (reading-worker): `apk add ffmpeg font-dejavu fontconfig`; neue Dep `@resvg/resvg-js`;
+> docker-compose: `READING_VIDEO_RESOLUTION/READING_VIDEO_TIMEOUT_MS/FFMPEG_THREADS`. Health meldet
+> `reading_video.tts`. **.167:** Proxy `/api/agents/reading-video` (+`/status/[jobId]`), Komponente
+> `components/ReadingVideoButton.tsx` (IconButton + Dialog: POST→Poll→`<video>`) auf der
+> Reading-Detailseite (`readings-v4/[id]`). ⚠️ **Phase 2b offen:** Ken-Burns/Crossfades, Branding,
+> Untertitel. ⚠️ **Single-Source-Risiko:** Bodygraph-Geometrie dupliziert .167↔.138 (mittelfristig
+> nach `@ck/shared`). ⚠️ **Verifikation:** Kette verdrahtet + syntaxgeprüft, aber **nicht E2E
+> render-verifiziert** (ffmpeg/resvg/Storage nicht in dieser Umgebung). Deploy = reading-worker
+> **Rebuild** (größeres Image) + frontend-coach **Rebuild** + Migration. Plan-Doc:
+> `docs/V8_PHASE2_READING_VIDEO_PLAN.md`. Branch `claude/dazzling-knuth-5k0m70`. Siehe §7 + §8 + §10.
+>
 > **Changelog 2026-06-17 (v8 Phase 1 — Voice-Reading via ElevenLabs gebaut):** Erster Baustein
 > der v8-Vision aus der Reading-Evolution-Roadmap (`docs/READING_EVOLUTION_ROADMAP.md`). **.138:**
 > neuer BullMQ-Worker `reading-worker/workers/audio-worker.js` (Queue `audio-queue`,

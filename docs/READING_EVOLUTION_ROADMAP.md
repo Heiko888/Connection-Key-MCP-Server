@@ -30,7 +30,7 @@
 | v5 Streaming + Real-Time | 💭 Konzept | Streaming + geführte Sessions ja; Multi-User-Collab nein | 🟡 |
 | v6 Coaching + Learning + Evolution | 💭 Konzept | **Voll live & abo-gekoppelt** | ✅ ✨ |
 | v7 Marketplace + Custom Agents | 💭 Konzept | Nicht gebaut | ❌ |
-| v8 Voice + Video + AR/VR | 💭 Vision | **Voice-Reading (TTS→MP3) gebaut** (Phase 1, ElevenLabs); Reading→Video als Phase 2 geplant; AR/VR offen | 🟡 ✨ |
+| v8 Voice + Video + AR/VR | 💭 Vision | **Phase 1 (Voice-Reading MP3) + Phase 2a (Reading→Video, ffmpeg-Slideshow) gebaut**; AR/VR offen | 🟡 ✨ |
 | v9 Global + Enterprise | 💭 Vision | Nicht gebaut | ❌ |
 | v10 AI-Evolution + Autonomy | 💭 Vision | Nicht gebaut | ❌ |
 
@@ -129,7 +129,7 @@ Phasenweiser Ausbau (Entscheidung: Voice zuerst, dann Video):
 | Roadmap-Feature | Realer Stand |
 |-----------------|--------------|
 | **Voice-Readings (TTS → MP3)** | ✅ **Phase 1 gebaut (2026-06-17, ElevenLabs):** `audio-worker.js` (Queue `audio-queue`), `POST /api/audio/generate` + `GET /api/audio/:id` (reading-worker, .138), Tabelle `audio_jobs` + Bucket `generated-audio`, Chunking langer Readings, Fast-Fail ohne Key. .167: Proxy `/api/agents/audio-generation` (+Status), `AudioGenerationPanel` + Seite `/agents/audio-generation` (Player + Download), in Agenten-Übersicht verlinkt. ⚠️ Betrieb: `ELEVENLABS_API_KEY` auf .138 setzen. |
-| Video-Readings (animierter Bodygraph + Voiceover des Readings) | 🟡 **Phase 2 (geplant):** baut auf dem Voice-MP3 als Tonspur auf. Aktuell existiert nur die **generische** prompt-basierte Video-Generierung (Runway/Seedance: `video-worker.js`, `video-queue`, `video_jobs`, `generated-videos`, `VideoGenerationPanel`) — noch **nicht** die „Reading → animiertes Video"-Funktion. |
+| Video-Readings (Reading → narriertes Video) | 🟡 **Phase 2a gebaut (2026-06-17, MVP):** `reading-video-worker.js` (Queue `reading-video-queue`), `POST /api/reading-video/generate` + `GET /api/reading-video/:id`, Tabelle `reading_video_jobs` + Bucket `generated-reading-videos`. Pipeline: Voiceover (TTS, Default OpenAI) → **chart-spezifischer Bodygraph** (`lib/bodygraph-svg.js`, SVG→PNG via `@resvg/resvg-js`) + Titel- + Text-Slides (`lib/slides.js`) → **ffmpeg-Slideshow** (`lib/video-compose.js`, Dockerfile `apk add ffmpeg`) → MP4. .167: Proxy `/api/agents/reading-video` (+Status), `ReadingVideoButton` auf der Reading-Detailseite. Default 720p, `concurrency=1`. **Phase 2b offen:** Ken-Burns/Crossfades, Branding/Untertitel. Separat davon: die **generische** Runway/Seedance-Video-Generierung (`video-worker.js`) bleibt bestehen. |
 | AR/VR-Integration | ❌ Nicht gebaut |
 
 ---

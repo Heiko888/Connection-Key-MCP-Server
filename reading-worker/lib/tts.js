@@ -73,6 +73,44 @@ export async function openAiTTS(text, { voice, model, speed } = {}) {
   return Buffer.from(await res.arrayBuffer());
 }
 
+/** Langen Text in TTS-freundliche Chunks ≤ maxChars schneiden (Absatz-/Satzgrenzen). */
+export function chunkTtsText(text, maxChars = 4500) {
+  const clean = String(text || "").replace(/\r\n/g, "\n").trim();
+  if (clean.length <= maxChars) return clean ? [clean] : [];
+  const paragraphs = clean.split(/\n{2,}/);
+  const chunks = [];
+  let buf = "";
+  const pushBuf = () => { if (buf.trim()) chunks.push(buf.trim()); buf = ""; };
+  for (const para of paragraphs) {
+    if ((buf + "\n\n" + para).length <= maxChars) { buf = buf ? `${buf}\n\n${para}` : para; continue; }
+    pushBuf();
+    if (para.length <= maxChars) { buf = para; continue; }
+    const sentences = para.match(/[^.!?]+[.!?]+|\s*[^.!?]+$/g) || [para];
+    for (const s of sentences) {
+      if ((buf + " " + s).length <= maxChars) buf = buf ? `${buf} ${s}`.trim() : s.trim();
+      else { pushBuf(); let rest = s.trim(); while (rest.length > maxChars) { chunks.push(rest.slice(0, maxChars)); rest = rest.slice(maxChars); } buf = rest; }
+    }
+  }
+  pushBuf();
+  return chunks;
+}
+
+/**
+ * Vertont langen Text (chunked) → ein konkatenierter MP3-Buffer.
+ * Nutzt denselben Provider-Switch wie der Rest (Default OpenAI). Wirft bei Fehler.
+ */
+export async function synthesizeLongText(rawText, { speed, provider, voiceId, maxChars } = {}) {
+  const chunks = chunkTtsText(rawText, maxChars || Number(process.env.ELEVENLABS_MAX_CHARS) || 4500);
+  if (chunks.length === 0) throw new Error("Kein Text zum Vertonen");
+  const prov = (provider || process.env.TTS_PROVIDER || "openai").toLowerCase();
+  const spd = typeof speed === "number" ? speed : (Number(process.env.TTS_SPEED) || 1.1);
+  const buffers = [];
+  for (const c of chunks) {
+    buffers.push(prov === "elevenlabs" ? await elevenLabsTTS(c, { voiceId, speed: spd }) : await openAiTTS(c, { speed: spd }));
+  }
+  return { audio: Buffer.concat(buffers), chunks: chunks.length, provider: prov };
+}
+
 /**
  * Synchroner Provider-Switch für kurze Texte (Chat-Vorlesen).
  * Liefert { ok, audio: Buffer, contentType } oder { ok:false, status, error }.

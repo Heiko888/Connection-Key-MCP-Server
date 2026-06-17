@@ -80,7 +80,7 @@ services:
       - N8N_BASE_URL=http://n8n:5678
       - AUTH_ENABLED=${AUTH_ENABLED:-true}
       - API_KEY=${API_KEY:-}
-      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - CORS_ORIGINS=${CORS_ORIGINS:-https://the-connection-key.de,https://coach.the-connection-key.de,https://agent.the-connection-key.de,https://werdemeisterdeinergedankenagent.de}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}

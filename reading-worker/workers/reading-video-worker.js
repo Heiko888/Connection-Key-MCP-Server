@@ -74,7 +74,13 @@ async function processJob(job, { supabase }) {
 
     // 2) Voiceover (TTS, Default OpenAI → kein ElevenLabs-Key nötig)
     await updateJob(supabase, jobId, { status: "generating", progress: 15 });
-    const { audio, provider } = await synthesizeLongText(text, { voiceId: row.voice_id || undefined });
+    // Sichtbarer Fortschritt: Vertonung langer Readings dauert Minuten (~51s/Chunk).
+    // Progress pro Chunk im Fenster 15→40 fortschreiben (45% kommt nach probeDuration).
+    const { audio, provider } = await synthesizeLongText(text, {
+      voiceId: row.voice_id || undefined,
+      onProgress: (done, total) =>
+        updateJob(supabase, jobId, { progress: 15 + Math.round((done / total) * 25) }),
+    });
     const audioPath = path.join(workDir, "voice.mp3");
     await fs.writeFile(audioPath, audio);
     const durationSec = await probeDurationSec(audioPath);

@@ -16,6 +16,29 @@ export const MAX_TTS_CHARS = 5000;
 const EL_API_BASE = "https://api.elevenlabs.io/v1/text-to-speech";
 const EL_OUTPUT_FORMAT = process.env.ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128";
 
+// Timeout pro TTS-Request (ein Chunk ≤ ~4500 Zeichen). Ohne Timeout hängt ein
+// nicht antwortender Provider den ganzen Job unbegrenzt (z. B. Reading-Video auf 15%).
+// Gemessen ~51s/Chunk bei ElevenLabs → 120s gibt Reserve.
+const TTS_REQUEST_TIMEOUT_MS = Number(process.env.TTS_REQUEST_TIMEOUT_MS) || 120000;
+
+/** fetch mit harter Deadline (AbortController). Wirft bei Timeout err.statusCode=504. */
+async function fetchWithTimeout(url, opts = {}, timeoutMs = TTS_REQUEST_TIMEOUT_MS) {
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...opts, signal: ac.signal });
+  } catch (err) {
+    if (err?.name === "AbortError") {
+      const e = new Error(`TTS-Request Timeout nach ${Math.round(timeoutMs / 1000)}s`);
+      e.statusCode = 504;
+      throw e;
+    }
+    throw err;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 /** Welche Stimm-/Modell-Signatur ist aktiv (für Cache-Busting auf .167 abrufbar). */
 export function ttsVoiceSignature() {
   const provider = (process.env.TTS_PROVIDER || "openai").toLowerCase();
@@ -38,7 +61,7 @@ export async function elevenLabsTTS(text, { voiceId, modelId, speed } = {}) {
   const voiceSettings = { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: true };
   if (typeof speed === "number") voiceSettings.speed = Math.min(1.2, Math.max(0.7, speed));
 
-  const res = await fetch(`${EL_API_BASE}/${encodeURIComponent(vId)}?output_format=${encodeURIComponent(EL_OUTPUT_FORMAT)}`, {
+  const res = await fetchWithTimeout(`${EL_API_BASE}/${encodeURIComponent(vId)}?output_format=${encodeURIComponent(EL_OUTPUT_FORMAT)}`, {
     method: "POST",
     headers: { "xi-api-key": apiKey, "Content-Type": "application/json", Accept: "audio/mpeg" },
     body: JSON.stringify({ text, model_id: model, voice_settings: voiceSettings }),
@@ -55,7 +78,7 @@ export async function elevenLabsTTS(text, { voiceId, modelId, speed } = {}) {
 export async function openAiTTS(text, { voice, model, speed } = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) { const e = new Error("OPENAI_API_KEY nicht konfiguriert"); e.statusCode = 503; e.code = "NO_API_KEY"; throw e; }
-  const res = await fetch("https://api.openai.com/v1/audio/speech", {
+  const res = await fetchWithTimeout("https://api.openai.com/v1/audio/speech", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -99,14 +122,16 @@ export function chunkTtsText(text, maxChars = 4500) {
  * Vertont langen Text (chunked) → ein konkatenierter MP3-Buffer.
  * Nutzt denselben Provider-Switch wie der Rest (Default OpenAI). Wirft bei Fehler.
  */
-export async function synthesizeLongText(rawText, { speed, provider, voiceId, maxChars } = {}) {
+export async function synthesizeLongText(rawText, { speed, provider, voiceId, maxChars, onProgress } = {}) {
   const chunks = chunkTtsText(rawText, maxChars || Number(process.env.ELEVENLABS_MAX_CHARS) || 4500);
   if (chunks.length === 0) throw new Error("Kein Text zum Vertonen");
   const prov = (provider || process.env.TTS_PROVIDER || "openai").toLowerCase();
   const spd = typeof speed === "number" ? speed : (Number(process.env.TTS_SPEED) || 1.1);
   const buffers = [];
-  for (const c of chunks) {
-    buffers.push(prov === "elevenlabs" ? await elevenLabsTTS(c, { voiceId, speed: spd }) : await openAiTTS(c, { speed: spd }));
+  for (let i = 0; i < chunks.length; i++) {
+    buffers.push(prov === "elevenlabs" ? await elevenLabsTTS(chunks[i], { voiceId, speed: spd }) : await openAiTTS(chunks[i], { speed: spd }));
+    // Pro Chunk melden (für sichtbaren Fortschritt bei langen Readings).
+    if (typeof onProgress === "function") { try { await onProgress(i + 1, chunks.length); } catch { /* Progress ist best-effort */ } }
   }
   return { audio: Buffer.concat(buffers), chunks: chunks.length, provider: prov };
 }

@@ -2,6 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# ffmpeg/ffprobe (Reading→Video, v8 Phase 2) + Fonts für resvg/SVG-Text-Rendering
+RUN apk add --no-cache ffmpeg font-dejavu fontconfig && fc-cache -f
+
 # 1. Package-Dateien zuerst (sauberer Cache)
 COPY package.json package-lock.json ./
 

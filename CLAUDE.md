@@ -1,6 +1,64 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (v8 Phase 2a — Reading→Video, ffmpeg-Slideshow gebaut):** Aufbauend auf
+> Phase 1. **.138:** neuer Worker `reading-worker/workers/reading-video-worker.js` (Queue
+> `reading-video-queue`, `startReadingVideoWorker()`, `[W9]`, `concurrency=1` — CPU-schwer);
+> Endpunkte `POST /api/reading-video/generate` (202 +jobId, Fast-Fail `503 NO_API_KEY` wenn TTS-Provider
+> ohne Key) + `GET /api/reading-video/:id`; Migration `2026061702_reading_video_jobs.sql`
+> (Tabelle `reading_video_jobs` + RLS + Bucket `generated-reading-videos`, **noch anzuwenden**).
+> Pipeline: Voiceover (`lib/tts.js` `synthesizeLongText`, Default **OpenAI** → kein ElevenLabs-Key nötig)
+> → **chart-spezifischer Bodygraph** (`lib/bodygraph-svg.js`, Geometrie 1:1 portiert aus
+> `.167 lib/hd-bodygraph/data.ts`, SVG→PNG via **`@resvg/resvg-js`**) + Titel-/Text-Slides
+> (`lib/slides.js`, Text paginiert) → **ffmpeg-Slideshow** (`lib/video-compose.js`, concat-Demuxer
+> mit Per-Slide-Dauer aus Audiolänge via ffprobe) → MP4 (Default **720p**) permanent im Bucket.
+> Dockerfile (reading-worker): `apk add ffmpeg font-dejavu fontconfig`; neue Dep `@resvg/resvg-js`;
+> docker-compose: `READING_VIDEO_RESOLUTION/READING_VIDEO_TIMEOUT_MS/FFMPEG_THREADS`. Health meldet
+> `reading_video.tts`. **.167:** Proxy `/api/agents/reading-video` (+`/status/[jobId]`), Komponente
+> `components/ReadingVideoButton.tsx` (IconButton + Dialog: POST→Poll→`<video>`) auf der
+> Reading-Detailseite (`readings-v4/[id]`). ⚠️ **Phase 2b offen:** Ken-Burns/Crossfades, Branding,
+> Untertitel. ⚠️ **Single-Source-Risiko:** Bodygraph-Geometrie dupliziert .167↔.138 (mittelfristig
+> nach `@ck/shared`). ⚠️ **Verifikation:** Kette verdrahtet + syntaxgeprüft, aber **nicht E2E
+> render-verifiziert** (ffmpeg/resvg/Storage nicht in dieser Umgebung). Deploy = reading-worker
+> **Rebuild** (größeres Image) + frontend-coach **Rebuild** + Migration. Plan-Doc:
+> `docs/V8_PHASE2_READING_VIDEO_PLAN.md`. Branch `claude/dazzling-knuth-5k0m70`. Siehe §7 + §8 + §10.
+>
+> **Changelog 2026-06-17 (v8 Phase 1 — Voice-Reading via ElevenLabs gebaut):** Erster Baustein
+> der v8-Vision aus der Reading-Evolution-Roadmap (`docs/READING_EVOLUTION_ROADMAP.md`). **.138:**
+> neuer BullMQ-Worker `reading-worker/workers/audio-worker.js` (Queue `audio-queue`,
+> `startAudioWorker()` in `server.js` verdrahtet, `[W8]`), Endpunkte `POST /api/audio/generate`
+> (202 +jobId, Fast-Fail `503 NO_API_KEY` ohne Schlüssel — analog Video) und `GET /api/audio/:id`;
+> Migration `supabase/migrations/2026061701_audio_jobs.sql` (Tabelle `public.audio_jobs` + RLS +
+> Bucket `generated-audio`, **noch anzuwenden**). Der Worker löst den Text direkt **oder** aus
+> `public.readings.reading_data.text` auf, chunkt lange Readings (≤`ELEVENLABS_MAX_CHARS`, Default
+> 4500) an Absatz-/Satzgrenzen, ruft ElevenLabs TTS (REST, **kein neues SDK**, Modell
+> `eleven_multilingual_v2`), konkateniert die MP3-Teile und speichert permanent im Bucket. Persistenter
+> Row-Pattern wie Psychology/Video (pending→processing→generating→completed/failed). Health meldet
+> `audio.elevenlabs: ready|missing_key`. **.167:** Proxy `/api/agents/audio-generation` (+`/status/[jobId]`),
+> UI `components/AudioGenerationPanel.tsx` + Seite `/agents/audio-generation` (Text- oder Reading-ID-Quelle,
+> pollt 5 s, `<audio>`-Player + Download), in der Agenten-Übersicht (Reading-Gruppe) verlinkt.
+> ⚠️ **Betriebsvoraussetzung:** `ELEVENLABS_API_KEY` auf .138 setzen (docker-compose Default leer;
+> Var ist durchgereicht). Deploy = reading-worker **Rebuild** + frontend-coach **Rebuild**. Das
+> Voice-MP3 ist bewusst eigenständig, damit v8 Phase 2 (Reading→Video) es als Tonspur wiederverwenden
+> kann. Branch `claude/dazzling-knuth-5k0m70`. Siehe Abschnitt 7 + 8 + 10.
+>
+> **Changelog 2026-06-17 (TTS konsolidiert auf .138 — ein TTS-Quell-Ort):** Das bestehende
+> `.167 /api/tts` (Chat-Vorlesen, synchron Text→MP3, OpenAI/ElevenLabs, Disk-Cache) rief die
+> TTS-Provider **direkt auf dem Frontend-Server** (Goldene-Regel-Verstoß + Key-Duplikat). **Neu:**
+> die Synthese läuft jetzt zentral auf .138. (1) Neues Util `reading-worker/lib/tts.js`
+> (`synthesizeSpeech` Provider-Switch, `elevenLabsTTS`/`openAiTTS` Low-Level, `ttsVoiceSignature`)
+> — **einziger** Provider-Aufrufer; der v8 `audio-worker.js` nutzt jetzt `elevenLabsTTS` daraus
+> (kein eigener Fetch mehr). (2) Endpunkte am reading-worker: `POST /api/tts/speak` (synchron →
+> MP3-Bytes; Provider/Keys nur auf .138; Default-Provider **OpenAI**, OPENAI_API_KEY ist dort
+> bereits gesetzt → funktioniert sofort) und `GET /api/tts/config` (liefert `voice_sig` fürs
+> Cache-Busting). (3) **.167** `frontend/lib/tts.ts` + `frontend-coach/lib/tts.ts` rufen statt der
+> Provider jetzt `BACKEND_4000/api/tts/speak`; der **Disk-Cache bleibt** auf .167 davor (Cache-Key
+> = `voice_sig|text`, `voice_sig` von `/api/tts/config` mit 5-min-Memo). `/api/tts/route.ts`
+> unverändert. docker-compose: `TTS_PROVIDER`/`TTS_SPEED`/`TTS_OPENAI_MODEL`/`TTS_OPENAI_VOICE` an
+> reading-worker. Ergebnis: ElevenLabs/OpenAI-Keys leben **nur** noch auf .138; Chat-Vorlesen
+> bleibt synchron + gecached. Deploy = reading-worker **Rebuild** + frontend/frontend-coach
+> **Rebuild**. Branch `claude/dazzling-knuth-5k0m70`.
+>
 > **Changelog 2026-06-17 (Video-Pipeline E2E verifiziert + dokumentiert):** Prüfung ergab,
 > dass die Runway/Seedance-Video-Pipeline **bereits vollständig E2E gebaut** ist (CLAUDE.md
 > beschrieb sie bisher gar nicht). **.138:** Migration `2026060301_video_jobs.sql` (angewandt

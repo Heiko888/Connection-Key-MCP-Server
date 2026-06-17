@@ -921,7 +921,7 @@ MarketingWorkflow.tsx       Marketing
 | 14 | v4-worker auf .167 definiert aber gehört auf .138 | .167 |
 | 15 | ✅ **ERLEDIGT:** `sync-reading-service` ist in `docker-compose.yml` (braucht ggf. noch Supabase-ENV) | .138 |
 | 16 | n8n ohne SSL | .138 |
-| 17 | TODOs/Platzhalter in kritischen Pfaden: `mcp-gateway.js:312` (`/agents/reading` Platzhalter), `services/chart-truth/chartTruthService.ts` (Swiss-Ephemeris-STUB) | .138 |
+| 17 | ✅ **ERLEDIGT (2026-06-17):** `/agents/reading` ist kein Platzhalter mehr (echter Claude-Call); der tote `services/chart-truth/`-Baum (nicht lauffähig — Abhängigkeit `chart-calculation-astronomy.js` fehlte, nirgends gemountet, duplizierte die echte Engine) wurde **entfernt** (inkl. `integration/.../chart/truth/route.ts`). ⚠️ Rest: n8n-Templates (`n8n-workflows/*chart-truth*`) rufen noch `/api/chart/truth` auf — diesen Endpunkt serviert die connection-key-API **nicht** (sie hat `/api/chart/calculate`); Templates sind nicht live, aber vor n8n-Import anpassen | .138 |
 | 18 | ✅ **ERLEDIGT:** `depth-analysis.txt`/Reading-Templates committet | .138 |
 | 19 | Dual-Nginx auf .167 (Host + Docker parallel) | .167 |
 | 20 | `bull:reading-v4-queue` Duplikat-Namespace | .138 |

@@ -487,8 +487,11 @@ Proxy `POST /api/agents/video-generation` → `workerFetch /api/videos/generate`
 Seiten in Navigation/Marketing-Hub/Admin verlinkt. ⚠️ **Abgrenzung:** `/agents/video-creation`
 (Text-Agent: Skript/Shot-List/Produktionsanleitung) ist ein **anderes** Feature als
 `/agents/video-generation` (echte Video-Erzeugung) — kein Duplikat. ⚠️ **Betriebsvoraussetzung:**
-`RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (docker-compose Default leer) — sonst markiert
-der Worker Jobs als `failed` (`NO_API_KEY`). Deploy = reading-worker **Rebuild**.
+`RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (docker-compose Default leer). **Absicherung
+(2026-06-17):** `POST /api/videos/generate` macht jetzt **Fast-Fail** — ohne Key sofort `503`
+`NO_API_KEY` (kein doomed Job mehr; die .167-UI zeigt die Meldung direkt). Der Health-Endpunkt
+(`GET /health` am reading-worker) meldet `video.runway: "ready" | "missing_key"`. Deploy =
+reading-worker **Rebuild**.
 
 ### Inaktive / Problematische Worker
 

@@ -161,6 +161,12 @@ services:
       - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-}
       - ELEVENLABS_MODEL_ID=${ELEVENLABS_MODEL_ID:-eleven_multilingual_v2}
 
+      # Synchrones TTS (Chat-Vorlesen, konsolidiert von .167 /api/tts → /api/tts/speak)
+      - TTS_PROVIDER=${TTS_PROVIDER:-openai}
+      - TTS_SPEED=${TTS_SPEED:-1.1}
+      - TTS_OPENAI_MODEL=${TTS_OPENAI_MODEL:-gpt-4o-mini-tts}
+      - TTS_OPENAI_VOICE=${TTS_OPENAI_VOICE:-nova}
+
       # Security
       - AGENT_SECRET=${AGENT_SECRET}
 

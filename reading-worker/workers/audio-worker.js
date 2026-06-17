@@ -17,14 +17,13 @@
 import { Worker, Queue } from "bullmq";
 import IORedis from "ioredis";
 import { createClient } from "@supabase/supabase-js";
+import { elevenLabsTTS } from "../lib/tts.js";
 
 const QUEUE_NAME = "audio-queue";
 const BUCKET = "generated-audio";
-const API_BASE = "https://api.elevenlabs.io/v1/text-to-speech";
 const DEFAULT_MODEL = process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2";
 // Multilingual-fähige Default-Stimme ("Rachel"); via ENV überschreibbar.
 const DEFAULT_VOICE = process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM";
-const OUTPUT_FORMAT = process.env.ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128";
 // ElevenLabs verarbeitet pro Request begrenzt viele Zeichen → Readings werden gechunkt.
 const MAX_CHARS = parseInt(process.env.ELEVENLABS_MAX_CHARS || "4500", 10);
 
@@ -82,35 +81,6 @@ function chunkText(text, maxChars = MAX_CHARS) {
   }
   pushBuf();
   return chunks;
-}
-
-/** Einen Text-Chunk via ElevenLabs in einen MP3-Buffer wandeln. */
-async function synthesizeChunk(apiKey, { text, voiceId, modelId }) {
-  const url = `${API_BASE}/${encodeURIComponent(voiceId)}?output_format=${encodeURIComponent(OUTPUT_FORMAT)}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "xi-api-key": apiKey,
-      "Content-Type": "application/json",
-      Accept: "audio/mpeg",
-    },
-    body: JSON.stringify({
-      text,
-      model_id: modelId,
-      voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: true },
-    }),
-  });
-  if (!res.ok) {
-    let detail = `HTTP ${res.status}`;
-    try {
-      const j = await res.json();
-      detail = j?.detail?.message || j?.detail?.status || JSON.stringify(j?.detail || j) || detail;
-    } catch { /* non-JSON error body */ }
-    const err = new Error(`ElevenLabs TTS fehlgeschlagen: ${detail}`);
-    err.statusCode = res.status;
-    throw err;
-  }
-  return Buffer.from(await res.arrayBuffer());
 }
 
 async function updateJob(supabase, jobId, fields) {
@@ -172,7 +142,7 @@ async function processJob(job, { supabase, apiKey }) {
     // Chunks vertonen, Fortschritt 10→80 über die Chunks verteilen
     const buffers = [];
     for (let i = 0; i < chunks.length; i++) {
-      const buf = await synthesizeChunk(apiKey, { text: chunks[i], voiceId, modelId });
+      const buf = await elevenLabsTTS(chunks[i], { voiceId, modelId });
       buffers.push(buf);
       const progress = 10 + Math.round(((i + 1) / chunks.length) * 70);
       await updateJob(supabase, jobId, { progress });

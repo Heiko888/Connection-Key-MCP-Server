@@ -20,6 +20,23 @@
 > Voice-MP3 ist bewusst eigenständig, damit v8 Phase 2 (Reading→Video) es als Tonspur wiederverwenden
 > kann. Branch `claude/dazzling-knuth-5k0m70`. Siehe Abschnitt 7 + 8 + 10.
 >
+> **Changelog 2026-06-17 (TTS konsolidiert auf .138 — ein TTS-Quell-Ort):** Das bestehende
+> `.167 /api/tts` (Chat-Vorlesen, synchron Text→MP3, OpenAI/ElevenLabs, Disk-Cache) rief die
+> TTS-Provider **direkt auf dem Frontend-Server** (Goldene-Regel-Verstoß + Key-Duplikat). **Neu:**
+> die Synthese läuft jetzt zentral auf .138. (1) Neues Util `reading-worker/lib/tts.js`
+> (`synthesizeSpeech` Provider-Switch, `elevenLabsTTS`/`openAiTTS` Low-Level, `ttsVoiceSignature`)
+> — **einziger** Provider-Aufrufer; der v8 `audio-worker.js` nutzt jetzt `elevenLabsTTS` daraus
+> (kein eigener Fetch mehr). (2) Endpunkte am reading-worker: `POST /api/tts/speak` (synchron →
+> MP3-Bytes; Provider/Keys nur auf .138; Default-Provider **OpenAI**, OPENAI_API_KEY ist dort
+> bereits gesetzt → funktioniert sofort) und `GET /api/tts/config` (liefert `voice_sig` fürs
+> Cache-Busting). (3) **.167** `frontend/lib/tts.ts` + `frontend-coach/lib/tts.ts` rufen statt der
+> Provider jetzt `BACKEND_4000/api/tts/speak`; der **Disk-Cache bleibt** auf .167 davor (Cache-Key
+> = `voice_sig|text`, `voice_sig` von `/api/tts/config` mit 5-min-Memo). `/api/tts/route.ts`
+> unverändert. docker-compose: `TTS_PROVIDER`/`TTS_SPEED`/`TTS_OPENAI_MODEL`/`TTS_OPENAI_VOICE` an
+> reading-worker. Ergebnis: ElevenLabs/OpenAI-Keys leben **nur** noch auf .138; Chat-Vorlesen
+> bleibt synchron + gecached. Deploy = reading-worker **Rebuild** + frontend/frontend-coach
+> **Rebuild**. Branch `claude/dazzling-knuth-5k0m70`.
+>
 > **Changelog 2026-06-17 (Video-Pipeline E2E verifiziert + dokumentiert):** Prüfung ergab,
 > dass die Runway/Seedance-Video-Pipeline **bereits vollständig E2E gebaut** ist (CLAUDE.md
 > beschrieb sie bisher gar nicht). **.138:** Migration `2026060301_video_jobs.sql` (angewandt

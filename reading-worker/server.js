@@ -28,6 +28,7 @@ import { startPsychologyWorker, getPsychologyQueue } from "./workers/psychology-
 import { startEvolutionWorker, getEvolutionQueue } from "./workers/evolution-worker.js";
 import { startVideoWorker, getVideoQueue } from "./workers/video-worker.js";
 import { startAudioWorker, getAudioQueue } from "./workers/audio-worker.js";
+import { synthesizeSpeech as synthesizeSpeechSync, ttsVoiceSignature } from "./lib/tts.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
 import { runReadingPipeline, setPipelineSupabase } from "./reading-pipeline.js";
@@ -5305,6 +5306,36 @@ app.get("/api/audio/:id", async (req, res) => {
     console.error("[Audio] GET fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
+});
+
+// ── Synchrones TTS (Chat-Vorlesen) — konsolidiert von .167 /api/tts ───────────
+// Liefert MP3-Bytes direkt zurück. Provider/Keys leben nur hier auf .138.
+// .167 /api/tts proxyt hierher (behält seinen Disk-Cache davor).
+app.post("/api/tts/speak", async (req, res) => {
+  try {
+    const { text, speed, provider, voiceId } = req.body || {};
+    const result = await synthesizeSpeechSync(text, {
+      speed: typeof speed === "number" ? speed : undefined,
+      provider,
+      voiceId,
+    });
+    if (!result.ok) return res.status(result.status || 502).json({ success: false, error: result.error });
+    res.set("Content-Type", result.contentType);
+    res.set("X-TTS-Voice-Sig", ttsVoiceSignature());
+    return res.send(result.audio);
+  } catch (err) {
+    console.error("[TTS] /speak fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Aktive Stimm-/Modell-Signatur — erlaubt dem .167-Cache ein korrektes Cache-Busting.
+app.get("/api/tts/config", (_req, res) => {
+  res.json({
+    success: true,
+    provider: (process.env.TTS_PROVIDER || "openai").toLowerCase(),
+    voice_sig: ttsVoiceSignature(),
+  });
 });
 
 // ======================================================

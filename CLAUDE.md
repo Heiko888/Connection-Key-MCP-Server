@@ -1,6 +1,25 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (v8 Phase 1 — Voice-Reading via ElevenLabs gebaut):** Erster Baustein
+> der v8-Vision aus der Reading-Evolution-Roadmap (`docs/READING_EVOLUTION_ROADMAP.md`). **.138:**
+> neuer BullMQ-Worker `reading-worker/workers/audio-worker.js` (Queue `audio-queue`,
+> `startAudioWorker()` in `server.js` verdrahtet, `[W8]`), Endpunkte `POST /api/audio/generate`
+> (202 +jobId, Fast-Fail `503 NO_API_KEY` ohne Schlüssel — analog Video) und `GET /api/audio/:id`;
+> Migration `supabase/migrations/2026061701_audio_jobs.sql` (Tabelle `public.audio_jobs` + RLS +
+> Bucket `generated-audio`, **noch anzuwenden**). Der Worker löst den Text direkt **oder** aus
+> `public.readings.reading_data.text` auf, chunkt lange Readings (≤`ELEVENLABS_MAX_CHARS`, Default
+> 4500) an Absatz-/Satzgrenzen, ruft ElevenLabs TTS (REST, **kein neues SDK**, Modell
+> `eleven_multilingual_v2`), konkateniert die MP3-Teile und speichert permanent im Bucket. Persistenter
+> Row-Pattern wie Psychology/Video (pending→processing→generating→completed/failed). Health meldet
+> `audio.elevenlabs: ready|missing_key`. **.167:** Proxy `/api/agents/audio-generation` (+`/status/[jobId]`),
+> UI `components/AudioGenerationPanel.tsx` + Seite `/agents/audio-generation` (Text- oder Reading-ID-Quelle,
+> pollt 5 s, `<audio>`-Player + Download), in der Agenten-Übersicht (Reading-Gruppe) verlinkt.
+> ⚠️ **Betriebsvoraussetzung:** `ELEVENLABS_API_KEY` auf .138 setzen (docker-compose Default leer;
+> Var ist durchgereicht). Deploy = reading-worker **Rebuild** + frontend-coach **Rebuild**. Das
+> Voice-MP3 ist bewusst eigenständig, damit v8 Phase 2 (Reading→Video) es als Tonspur wiederverwenden
+> kann. Branch `claude/dazzling-knuth-5k0m70`. Siehe Abschnitt 7 + 8 + 10.
+>
 > **Changelog 2026-06-17 (Video-Pipeline E2E verifiziert + dokumentiert):** Prüfung ergab,
 > dass die Runway/Seedance-Video-Pipeline **bereits vollständig E2E gebaut** ist (CLAUDE.md
 > beschrieb sie bisher gar nicht). **.138:** Migration `2026060301_video_jobs.sql` (angewandt

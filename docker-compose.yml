@@ -156,6 +156,11 @@ services:
       - RUNWAY_VIDEO_MODEL=${RUNWAY_VIDEO_MODEL:-seedance2}
       - VIDEO_TIMEOUT_MS=${VIDEO_TIMEOUT_MS:-900000}
 
+      # ElevenLabs Voice-Reading (audio-worker, v8 Phase 1)
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-}
+      - ELEVENLABS_MODEL_ID=${ELEVENLABS_MODEL_ID:-eleven_multilingual_v2}
+
       # Security
       - AGENT_SECRET=${AGENT_SECRET}
 

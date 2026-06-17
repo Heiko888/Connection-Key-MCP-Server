@@ -30,7 +30,7 @@
 | v5 Streaming + Real-Time | 💭 Konzept | Streaming + geführte Sessions ja; Multi-User-Collab nein | 🟡 |
 | v6 Coaching + Learning + Evolution | 💭 Konzept | **Voll live & abo-gekoppelt** | ✅ ✨ |
 | v7 Marketplace + Custom Agents | 💭 Konzept | Nicht gebaut | ❌ |
-| v8 Voice + Video + AR/VR | 💭 Vision | Nur generische Video-Generierung (≠ Reading→Video) | 🟡 |
+| v8 Voice + Video + AR/VR | 💭 Vision | **Voice-Reading (TTS→MP3) gebaut** (Phase 1, ElevenLabs); Reading→Video als Phase 2 geplant; AR/VR offen | 🟡 ✨ |
 | v9 Global + Enterprise | 💭 Vision | Nicht gebaut | ❌ |
 | v10 AI-Evolution + Autonomy | 💭 Vision | Nicht gebaut | ❌ |
 
@@ -122,12 +122,14 @@ Keine `readings-v7`-Routen im Code.
 
 ---
 
-## 🟡 v8 — Voice & Multimedia — **TEILWEISE / ANGRENZEND**
+## 🟡 v8 — Voice & Multimedia — **PHASE 1 GEBAUT**
+
+Phasenweiser Ausbau (Entscheidung: Voice zuerst, dann Video):
 
 | Roadmap-Feature | Realer Stand |
 |-----------------|--------------|
-| Video-Readings (animierter Bodygraph + Voiceover des Readings) | 🟡 **Angrenzend:** Es gibt eine **generische, prompt-basierte Video-Generierung** (Runway/Seedance: `video-worker.js`, Queue `video-queue`, `POST /api/videos/generate`, Tabelle `video_jobs`, Bucket `generated-videos`, UI `VideoGenerationPanel`). Das ist **nicht** die geplante „Reading → animiertes Video"-Funktion. |
-| Voice-Readings (TTS → MP3) | ❌ Nicht gebaut |
+| **Voice-Readings (TTS → MP3)** | ✅ **Phase 1 gebaut (2026-06-17, ElevenLabs):** `audio-worker.js` (Queue `audio-queue`), `POST /api/audio/generate` + `GET /api/audio/:id` (reading-worker, .138), Tabelle `audio_jobs` + Bucket `generated-audio`, Chunking langer Readings, Fast-Fail ohne Key. .167: Proxy `/api/agents/audio-generation` (+Status), `AudioGenerationPanel` + Seite `/agents/audio-generation` (Player + Download), in Agenten-Übersicht verlinkt. ⚠️ Betrieb: `ELEVENLABS_API_KEY` auf .138 setzen. |
+| Video-Readings (animierter Bodygraph + Voiceover des Readings) | 🟡 **Phase 2 (geplant):** baut auf dem Voice-MP3 als Tonspur auf. Aktuell existiert nur die **generische** prompt-basierte Video-Generierung (Runway/Seedance: `video-worker.js`, `video-queue`, `video_jobs`, `generated-videos`, `VideoGenerationPanel`) — noch **nicht** die „Reading → animiertes Video"-Funktion. |
 | AR/VR-Integration | ❌ Nicht gebaut |
 
 ---

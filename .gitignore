@@ -43,3 +43,5 @@ reading-engine-138-*.txt
 
 # Lokales Scratch-Verzeichnis (Einmal-Skripte, Parsing-Tools)
 data/
+# Next.js Build-Output
+.next/

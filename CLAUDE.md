@@ -1,6 +1,24 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-14 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (.138 Systemprüfung — Härtung + Doku-Abgleich):** (1) **CORS-Wildcard
+> geschlossen** — `docker-compose.yml` (connection-key:3000) hatte `CORS_ORIGINS:-*` als Fallback;
+> ersetzt durch explizite Produktionsdomains (the-connection-key.de, coach./agent. +
+> werdemeisterdeinergedankenagent.de). Override via gesetztes `CORS_ORIGINS` bleibt; Server→Server-
+> Calls (kein Origin-Header) unberührt. Deploy: `docker compose up -d connection-key`.
+> (2) **Auth-Gate auf alle `/agent/*`-Routen** (`mcp-gateway.js`, `agentAuthGate`) — vorher offen
+> (jeder konnte Claude-Calls auslösen). Akzeptiert Bearer **oder** `x-api-key` gegen
+> `VALID_AGENT_KEYS`; **Grace-Mode** per Default (`AGENT_AUTH_ENFORCE=false`, loggt nur), scharf
+> via `AGENT_AUTH_ENFORCE=true`. Greift NICHT auf `/agents/run` (hat eigene `authMiddleware`).
+> docker-compose: Gateway bekommt `CK_AGENT_SECRET`/`CONNECTION_KEY_API_KEY`/`GATEWAY_ALLOWED_KEYS`/
+> `AGENT_AUTH_ENFORCE`. Deploy: `docker compose build mcp-gateway && up -d mcp-gateway`, dann Logs
+> (`grep agent-auth`) prüfen, bevor enforced wird. (3) **Doku-Korrekturen verifiziert:** die früher
+> als „fehlend/404" gelisteten Gateway-Routen (`chart`/`yearly`/`automation`/`depth-analysis`/`tasks`)
+> **existieren** (via `makeSimpleAgent`); `/agents/reading` ist **kein Platzhalter** mehr (echter
+> Claude-Call); Duplikat-Queue `reading-v4-queue` ist **totes Legacy** (Produzent `.167/scripts/v4.js`
+> nirgends gemountet, kein Worker konsumiert sie) → kein Live-Bug. Branch
+> `claude/system-check-138-extensions-6qjf8b`. Siehe Abschnitt 8 + 15.
+>
 > **Changelog 2026-06-14 (.138 — W7 Evolution-Engine, ersetzt oberflächliches V6-Evolution):**
 > Das V6-Feature `/v6/evolution` lief bisher als **ein einziger** Claude-Call auf ck-agent
 > (.167) → flach, und in der Praxis kaputt (Live-DB: `evolution_analyses` hatte 3 Zeilen/1 User,
@@ -520,24 +538,27 @@ Supabase v4.reading_results + public.readings
 
 ### Server .138 — MCP Gateway (Port 7000, `mcp-gateway.js`)
 
-**Auth:** `/agents/run` per Bearer Token (`MCP_API_KEY` / `CK_AGENT_SECRET`). Die dedizierten `/agent/*`-Routen sind aktuell **ohne** eigenen Auth-Check.
+**Auth:** `/agents/run` per Bearer Token (`MCP_API_KEY` / `CK_AGENT_SECRET`). Die dedizierten `/agent/*`-Routen haben **seit 2026-06-17 ein Auth-Gate** (`agentAuthGate`, akzeptiert `Authorization: Bearer` **oder** `x-api-key` gegen `VALID_AGENT_KEYS` = `MCP_API_KEY`/`CK_AGENT_SECRET`/`CONNECTION_KEY_API_KEY`/`GATEWAY_ALLOWED_KEYS`). Default ist **Grace-Mode** (`AGENT_AUTH_ENFORCE=false`): unautorisierte Calls werden nur geloggt; mit `AGENT_AUTH_ENFORCE=true` → echtes 401. Hintergrund: die internen .167-Aufrufer (frontend-coach, Muster A) senden `x-api-key`, **nicht** Bearer.
 
 | Methode | Pfad | Funktion |
 |---------|------|----------|
 | POST | `/agents/run` | Generischer Dispatcher (`domain`/`task`/`payload`) → spawnt MCP-Core (`index.js`) per stdio; max. 1 Request gleichzeitig |
 | GET | `/health` | Health-Check |
 
-**Dedizierte Agent-Endpunkte (real in `mcp-gateway.js`, 16 Stück):**
+**Dedizierte Agent-Endpunkte (real in `mcp-gateway.js`):**
 ```
 /agent/marketing         /agent/sales           /agent/social-youtube
 /agent/video             /agent/video-creation  /agent/ui-ux
 /agent/chart-architect   /agent/reading         /agent/reflection
 /agent/shadow-work       /agent/relationship    /agent/transit
 /agent/business-hd       /agent/emotions        /agent/health
-/agent/abundance
+/agent/abundance         /agent/knowledge
+/agent/chart             /agent/yearly          /agent/automation
+/agent/depth-analysis    /agent/tasks
+/agent/video/generate (POST) · /agent/video/status/:taskId (GET)
 ```
-⚠️ **Kein** dedizierter Endpunkt für `chart`, `yearly`, `automation`, `depth-analysis`, `tasks` — diese müssten über `/agents/run` gegen die MCP-Core-Tools laufen. `index.js` registriert nur: `ping`, `echo`, `getDateTime`, `calculate`, `generateUUID`, `callN8N`, `createN8NWorkflow`, `triggerN8NWebhook`, `generateReading`, `analyzeChart`, `matchPartner`, `saveUserData`. Das erklärt die 404er aus `AGENTEN_404_FEHLER_ANALYSE.md`.
-⚠️ `/agent/reading` fällt ohne `ANTHROPIC_API_KEY` auf Placeholder-Text zurück (`mcp-gateway.js:246`); `/agents/reading` (mit s) ist ein reiner Platzhalter (`:302`, TODO `:312`).
+✅ **Korrektur 2026-06-17:** Die früher fehlenden Routen `chart`, `yearly`, `automation`, `depth-analysis`, `tasks` **existieren jetzt** (via `makeSimpleAgent`, System-Prompt aus `AGENT_SYSTEM_PROMPTS`) → die alten 404er aus `AGENTEN_404_FEHLER_ANALYSE.md` sind behoben. Ebenfalls neu: `/agent/knowledge` und die echte Video-Generierung (`/agent/video/generate` + `/agent/video/status`, Runway/Seedance).
+⚠️ `/agent/reading` fällt ohne `ANTHROPIC_API_KEY` auf Placeholder-Text zurück. `/agents/reading` (mit s, `mcp-gateway.js:426`) ist **kein** Platzhalter mehr — es macht einen echten Claude-Call (503 ohne API-Key). Einziger Aufrufer ist das **auskommentierte** Legacy-Frontend (`docker-compose.yml` `#frontend:`).
 
 ### Server .138 — Sync Reading Service (Port 7001)
 

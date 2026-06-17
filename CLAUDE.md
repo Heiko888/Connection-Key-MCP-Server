@@ -1,6 +1,19 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
 
+> **Changelog 2026-06-17 (Video-Pipeline E2E verifiziert + dokumentiert):** Prüfung ergab,
+> dass die Runway/Seedance-Video-Pipeline **bereits vollständig E2E gebaut** ist (CLAUDE.md
+> beschrieb sie bisher gar nicht). **.138:** Migration `2026060301_video_jobs.sql` (angewandt
+> 2026-06-03) + Bucket `generated-videos`; `workers/video-worker.js` (Queue `video-queue`,
+> `startVideoWorker()` aktiv); Endpunkte `POST /api/videos/generate` (202 +jobId) und
+> `GET /api/videos/:id`. **.167:** Proxy `/api/agents/video-generation` (+Status-Poll-Route),
+> UI `VideoGenerationPanel` + Seite `/agents/video-generation` (sendet → pollt 5 s → rendert
+> `<video>` + Download), in Navigation/Marketing-Hub/Admin verlinkt. Kette korrekt verdrahtet,
+> keine Code-Änderung nötig — nur dokumentiert (§7 Worker+Queue, §10 `video_jobs`+Bucket).
+> ⚠️ Betriebsvoraussetzung: `RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (Default leer),
+> sonst Jobs `failed`/`NO_API_KEY`. `/agents/video-creation` (Text-Agent) ist ein separates
+> Feature, kein Duplikat. Siehe Abschnitt 7.
+>
 > **Changelog 2026-06-17 (.138 Systemprüfung — Härtung + Doku-Abgleich):** (1) **CORS-Wildcard
 > geschlossen** — `docker-compose.yml` (connection-key:3000) hatte `CORS_ORIGINS:-*` als Fallback;
 > ersetzt durch explizite Produktionsdomains (the-connection-key.de, coach./agent. +
@@ -422,6 +435,7 @@ Agent Timeout: 300s
 | `reading-worker/server.js` | .138 | reading-worker | 4000 | BullMQ (Redis) | HD-Readings via Claude | ✅ Aktiv |
 | `workers/psychology-worker.js` | .138 | reading-worker | — | `reading-queue-v4-psychology` | Psychologie-Readings | ✅ Integriert |
 | `workers/evolution-worker.js` | .138 | reading-worker | — | `reading-queue-v4-evolution` | Evolution-/Dekonditionierungs-Analyse (V6) | ✅ Integriert (2026-06-14) |
+| `workers/video-worker.js` | .138 | reading-worker | — | `video-queue` | Echte Video-Generierung (Runway/Seedance 2.0) | ✅ Integriert (E2E verifiziert 2026-06-17) |
 | `lib/live-reading/routes.js` | .138 | reading-worker | — | HTTP (SSE/WS) | Live-Readings | ✅ Integriert |
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
@@ -458,6 +472,24 @@ Liste: `GET /api/readings/evolution/user/:userId`. Bei nur **einem** Reading: Ba
 (konservativer Score). Deploy = **Rebuild**. Frontend-Anbindung (`/api/v6/evolution`-Proxy
 umstellen) liegt im .167-Repo.
 
+**Video-Worker — Flow (E2E verifiziert 2026-06-17):** Vollständige Kette über beide Server.
+**.138** (`reading-worker`, Port 4000): `POST /api/videos/generate` (Body `{mode:text|image|reference,
+prompt, shots?, images?, ratio?, duration?, userId}`) legt eine `public.video_jobs`-Zeile
+(`status=pending`) an und enqueued `{ jobId }` in die BullMQ-Queue `video-queue`; gibt `202 {jobId}`
+zurück. `workers/video-worker.js` ruft Runway/Seedance (`@runwayml/sdk`, `RUNWAYML_API_SECRET`,
+Modell `RUNWAY_VIDEO_MODEL` Default `seedance2`), pollt bis fertig (`VIDEO_TIMEOUT_MS`, Default
+15 min), lädt das MP4 herunter und speichert es **permanent** im Storage-Bucket `generated-videos`,
+schreibt `status/progress/video_url` in `video_jobs` fort. Status-Abruf: `GET /api/videos/:id`.
+Multi-Shot via `shots[]` (Seedance), `text|image|reference`-Modi. **.167** (`frontend-coach`):
+Proxy `POST /api/agents/video-generation` → `workerFetch /api/videos/generate` (+`userId`);
+`GET /api/agents/video-generation/status/[jobId]` pollt; UI `components/VideoGenerationPanel.tsx`
+(Seite `/agents/video-generation`) sendet, pollt alle 5 s, rendert `<video>` + Download. Beide
+Seiten in Navigation/Marketing-Hub/Admin verlinkt. ⚠️ **Abgrenzung:** `/agents/video-creation`
+(Text-Agent: Skript/Shot-List/Produktionsanleitung) ist ein **anderes** Feature als
+`/agents/video-generation` (echte Video-Erzeugung) — kein Duplikat. ⚠️ **Betriebsvoraussetzung:**
+`RUNWAYML_API_SECRET` muss auf .138 gesetzt sein (docker-compose Default leer) — sonst markiert
+der Worker Jobs als `failed` (`NO_API_KEY`). Deploy = reading-worker **Rebuild**.
+
 ### Inaktive / Problematische Worker
 
 | Worker | Server | Problem | Soll auf | Aktion |
@@ -478,7 +510,8 @@ umstellen) liegt im .167-Repo.
 | `bull:reading-queue-v4-evolution` | V4 | Evolution-/Dekonditionierungs-Analyse (V6) |
 | `bull:reading-queue-v4-multi-agent` | V4 | Multi-Agent-Readings |
 | `bull:reading-queue-v4-connection` | V4 | Connection-Readings |
-| `bull:reading-v4-queue` | V4 | ⚠️ Alternatives Namespace (Duplikat?) |
+| `bull:video-queue` | — | Video-Generierung (Runway/Seedance, `video-worker`) |
+| `bull:reading-v4-queue` | V4 | ⚠️ Totes Legacy — Produzent `.167/scripts/v4.js` nirgends gemountet, kein Worker konsumiert (verifiziert 2026-06-17) |
 
 ### V4 Job-Architektur
 
@@ -735,6 +768,14 @@ reflection, relationship, sexuality, shadow-work, spiritual
 | `reading_results` | Job Results (result_text, metadata) |
 | `evolution_analyses` | Evolution Analysis |
 | `mcp_usage` | MCP Server Usage Tracking |
+
+### Tabellen — public Schema (Video)
+
+| Tabelle | Beschreibung |
+|---------|-------------|
+| `video_jobs` | Video-Generierungs-Jobs (mode/prompt/shots/images, status, runway_task_id, video_url/video_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026060301_video_jobs.sql` (angewandt 2026-06-03). |
+
+**Storage-Bucket:** `generated-videos` (public) — fertige MP4s, permanente URLs (laufen nicht ab).
 
 ### Redis
 

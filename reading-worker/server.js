@@ -5394,6 +5394,26 @@ app.get("/api/reading-video/:id", async (req, res) => {
   }
 });
 
+// Neuestes fertiges Reading-Video je Reading (für das UI: vorhandenes Video zeigen
+// statt jedes Mal neu zu rendern). Zwei-Segment-Pfad → kollidiert nicht mit /:id.
+app.get("/api/reading-video/by-reading/:readingId", async (req, res) => {
+  try {
+    const { data, error } = await supabasePublic
+      .from("reading_video_jobs")
+      .select("id, status, progress, video_url, reading_id, duration, result, created_at")
+      .eq("reading_id", req.params.readingId)
+      .eq("status", "completed")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (error) throw new Error(error.message);
+    if (!data || data.length === 0) return res.json({ success: true, found: false });
+    return res.json({ success: true, found: true, jobId: data[0].id, ...data[0] });
+  } catch (err) {
+    console.error("[ReadingVideo] by-reading fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ======================================================
 // Shadow Work Endpoints
 // ======================================================

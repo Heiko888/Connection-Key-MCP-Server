@@ -15,10 +15,10 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
-import { synthesizeSpeech } from "../lib/tts.js";
+import { synthesizeLongText } from "../lib/tts.js";
 import { titleSlidePng, bodygraphSlidePng, contentSlidePng, buildContentSlides } from "../lib/slides.js";
 import { summarizeDefinition } from "../lib/bodygraph-svg.js";
-import { composeSlideshow, probeDurationSec, concatAudio } from "../lib/video-compose.js";
+import { composeSlideshow, probeDurationSec } from "../lib/video-compose.js";
 
 const QUEUE_NAME = "reading-video-queue";
 const BUCKET = "generated-reading-videos";
@@ -85,29 +85,32 @@ async function processJob(job, { supabase }) {
       ...buildContentSlides(text, { height: RES.height }).map((s) => ({ png: contentSlidePng(s, RES), speak: s.speakText })),
     ];
 
-    // 3) Pro Slide ein eigenes TTS-Segment → Slide-Dauer = Segmentdauer (Bild & Ton synchron)
+    // 3) Voiceover in EINEM Durchlauf (chunked) — EINE Synthese, NICHT pro Slide.
+    //    Pro-Slide-Calls wären bei ElevenLabs zu langsam/teuer. Reihenfolge der Narration
+    //    == Reihenfolge der Slides (inkl. Titel + Bodygraph) → kein Intro-Versatz mehr.
+    const fullNarration = segments.map((s) => s.speak).join("\n\n");
+    const { audio } = await synthesizeLongText(fullNarration, {
+      voiceId: row.voice_id || undefined,
+      onProgress: (done, total) => updateJob(supabase, jobId, { progress: 15 + Math.round((done / total) * 50) }),
+    });
+    const audioPath = path.join(workDir, "voice.mp3");
+    await fs.writeFile(audioPath, Buffer.from(audio));
+    const durationSec = await probeDurationSec(audioPath);
+    await updateJob(supabase, jobId, { progress: 70 });
+
+    // 4) Slides rendern + Dauer proportional zur gesprochenen Zeichenzahl verteilen.
+    //    Anteil je Slide == Anteil ihres Sprechtexts an der Gesamtnarration → Bild folgt dem Ton.
+    const weights = segments.map((s) => Math.max(8, (s.speak || "").length));
+    const weightSum = weights.reduce((a, b) => a + b, 0) || 1;
     const slides = [];
-    const audioSegPaths = [];
     for (let i = 0; i < segments.length; i++) {
-      const tts = await synthesizeSpeech(segments[i].speak, { voiceId: row.voice_id || undefined });
-      if (!tts.ok) throw new Error(`TTS Segment ${i}: ${tts.error}`);
-      const aPath = path.join(workDir, `seg-${String(i).padStart(3, "0")}.mp3`);
-      await fs.writeFile(aPath, Buffer.from(tts.audio));
-      const dur = await probeDurationSec(aPath);
       const pPath = path.join(workDir, `slide-${String(i).padStart(3, "0")}.png`);
       await fs.writeFile(pPath, segments[i].png);
-      slides.push({ pngPath: pPath, durationSec: dur });
-      audioSegPaths.push(aPath);
-      await updateJob(supabase, jobId, { progress: 12 + Math.round((i / segments.length) * 60) });
+      slides.push({ pngPath: pPath, durationSec: durationSec * (weights[i] / weightSum) });
     }
+    await updateJob(supabase, jobId, { progress: 80 });
 
-    // 4) Tonspur aus den Segmenten + Gesamtdauer
-    const audioPath = path.join(workDir, "voice.mp3");
-    await concatAudio(audioSegPaths, audioPath);
-    const durationSec = await probeDurationSec(audioPath);
-    await updateJob(supabase, jobId, { progress: 78 });
-
-    // 5) ffmpeg-Composition (Slide-Dauern == Segmentdauern → synchron)
+    // 5) ffmpeg-Composition (Slide-Dauern summieren sich auf die Audiolänge → synchron)
     const outPath = path.join(workDir, "out.mp4");
     await composeSlideshow({ slides, audioPath, outPath, ...RES, timeoutMs: TIMEOUT_MS });
     await updateJob(supabase, jobId, { progress: 88 });

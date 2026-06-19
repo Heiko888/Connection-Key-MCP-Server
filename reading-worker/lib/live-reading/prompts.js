@@ -196,58 +196,108 @@ function getAuthorityCenters(authority, definedCenters) {
   return definedCenters;
 }
 
-function getStepFocus(stepId, person1, person2) {
-  const { defined, open } = parseCenters(person1.centers);
+// Individuelle (Ein-Personen-)Steps. Im Connection-Mode werden sie für BEIDE
+// Personen erzeugt — nicht nur für Person 1 (sonst „Mischmasch": Person 2 wird
+// individuell nie analysiert, springt aber in den Paar-Steps unvermittelt rein).
+const INDIVIDUAL_STEPS = new Set([
+  'type_strategy', 'authority', 'profile', 'defined_centers', 'open_centers', 'channels',
+]);
+
+const STEP_FOCUS_LABEL = {
+  type_strategy: 'Typ & Strategie',
+  authority: 'Autorität',
+  profile: 'Profil',
+  defined_centers: 'Definierte Zentren',
+  open_centers: 'Offene Zentren',
+  channels: 'Channels & Gates',
+};
+
+function focusForPerson(stepId, person, label) {
+  const { defined, open } = parseCenters(person.centers);
   const definedStr = defined.join(', ') || '— (keine)';
   const openStr = open.join(', ') || '— (keine)';
-  const channels = (person1.channels || []).map((c) => formatChannelDisplay(c)).join(', ') || '—';
+  const channels = (person.channels || []).map((c) => formatChannelDisplay(c)).join(', ') || '—';
 
   switch (stepId) {
     case 'type_strategy':
-      return `Fokus: Typ (${person1.type}) und Strategie (${person1.strategy}).
-Erkläre was es bedeutet ein ${person1.type} zu sein. Was ist die korrekte Strategie? Was passiert wenn die Strategie nicht gelebt wird (Not-Self)?
-Beziehe dich auf die konkreten Chart-Daten von ${person1.name}.`;
+      return `Typ (${person.type}) und Strategie (${person.strategy}).
+Erkläre was es bedeutet ein ${person.type} zu sein. Was ist die korrekte Strategie? Was passiert wenn die Strategie nicht gelebt wird (Not-Self)?
+Beziehe dich auf die konkreten Chart-Daten von ${label}.`;
 
     case 'authority':
-      return `Fokus: Autorität (${person1.authority}).
-Wie trifft ${person1.name} korrekte Entscheidungen? Was ist der Unterschied zu Verstand-basierten Entscheidungen?
-Gib dem Coach konkrete Fragen und Beispiele die die ${person1.authority}-Autorität erfahrbar machen.`;
+      return `Autorität (${person.authority}).
+Wie trifft ${label} korrekte Entscheidungen? Was ist der Unterschied zu Verstand-basierten Entscheidungen?
+Gib dem Coach konkrete Fragen und Beispiele die die ${person.authority}-Autorität erfahrbar machen.`;
 
     case 'profile':
-      return `Fokus: Profil (${person1.profile}).
-Was sagen die Linien über die bewusste und unbewusste Seite von ${person1.name}? Wie lernt diese Person? Wie interagiert sie mit der Welt?`;
+      return `Profil (${person.profile}).
+Was sagen die Linien über die bewusste und unbewusste Seite von ${label}? Wie lernt diese Person? Wie interagiert sie mit der Welt?`;
 
     case 'defined_centers':
-      return `Fokus: DEFINIERTE Zentren von ${person1.name}: ${definedStr}.
+      return `DEFINIERTE Zentren von ${label}: ${definedStr}.
 WICHTIG: Nur diese Zentren sind definiert (= feste, konsistente Energie).
-Was sind die fixen Energien? Wie wirken sie auf andere? Wo ist der Client konsistent?
+Was sind die fixen Energien? Wie wirken sie auf andere? Wo ist ${label} konsistent?
 Erkläre für JEDES der definierten Zentren (${definedStr}) die konkrete Auswirkung im Alltag.
 Verwechsle NICHT definierte mit offenen Zentren.`;
 
     case 'open_centers':
-      return `Fokus: OFFENE/Undefinierte Zentren von ${person1.name}: ${openStr}.
+      return `OFFENE/Undefinierte Zentren von ${label}: ${openStr}.
 WICHTIG: Nur diese Zentren sind offen (= konditionierbar, nehmen Energie von außen auf).
-Wo nimmt ${person1.name} Energie von außen auf? Welche Not-Self-Themen gibt es? Wo liegt Weisheitspotenzial?
+Wo nimmt ${label} Energie von außen auf? Welche Not-Self-Themen gibt es? Wo liegt Weisheitspotenzial?
 Erkläre für JEDES der offenen Zentren (${openStr}) die spezifische Konditionierung und das Weisheitspotenzial.`;
 
     case 'channels':
-      return `Fokus: Channels von ${person1.name}: ${channels}.
-WICHTIG: Verwende NUR die oben genannten Channel-IDs. Erfinde KEINE Channel-Nummern.
+      return `Channels von ${label}: ${channels}.
+WICHTIG: Verwende NUR die genannten Channel-IDs. Erfinde KEINE Channel-Nummern.
 Welche Lebensthemen und Talente zeigen diese Channels? Wie drücken sie sich im Alltag aus?`;
 
+    default:
+      return '';
+  }
+}
+
+function getStepFocus(stepId, person1, person2) {
+  if (INDIVIDUAL_STEPS.has(stepId)) {
+    const label1 = person1.name || (person2 ? 'Person 1' : 'der Client');
+
+    // Connection-Mode: BEIDE Personen einzeln abdecken
+    if (person2) {
+      const label2 = person2.name || 'Person 2';
+      return `Fokus: ${STEP_FOCUS_LABEL[stepId]} — individuell für BEIDE Personen (Connection-Reading).
+WICHTIG: Erstelle GETRENNTE Talking Points für jede Person — wirf die beiden NICHT zusammen.
+Kennzeichne in jeder headline klar, zu wem der Punkt gehört (Präfix "${label1}:" bzw. "${label2}:").
+Generiere für JEDE Person eigene Talking Points (insgesamt 5-6, ausgewogen auf beide verteilt).
+Dies ist die individuelle Grundlage VOR den Beziehungs-Steps (Composite/Elektromagnetisch/Kompromiss).
+
+=== ${label1} ===
+${focusForPerson(stepId, person1, label1)}
+
+=== ${label2} ===
+${focusForPerson(stepId, person2, label2)}`;
+    }
+
+    // Single-Mode: nur eine Person
+    return `Fokus: ${STEP_FOCUS_LABEL[stepId]}.
+${focusForPerson(stepId, person1, label1)}`;
+  }
+
+  const name1 = person1.name || 'Person 1';
+  const name2 = person2?.name || 'Person 2';
+
+  switch (stepId) {
     case 'composite':
       if (!person2) return `Fokus: Composite-Chart. (Kein Person-2-Chart vorhanden — überspringe diesen Step.)`;
-      return `Fokus: Composite-Chart von ${person1.name} und ${person2.name}.
+      return `Fokus: Composite-Chart von ${name1} und ${name2}.
 Welche Zentren werden gemeinsam definiert die einzeln offen sind? Was entsteht als Paar-Energie?`;
 
     case 'electromagnetic':
       if (!person2) return `Fokus: Elektromagnetische Channels. (Kein Person-2-Chart vorhanden.)`;
-      return `Fokus: Elektromagnetische Channels zwischen ${person1.name} und ${person2.name}.
-Wo hat Person 1 ein Gate und Person 2 das gegenüberliegende? Das sind die stärksten Anziehungskräfte.`;
+      return `Fokus: Elektromagnetische Channels zwischen ${name1} und ${name2}.
+Wo hat ${name1} ein Gate und ${name2} das gegenüberliegende? Das sind die stärksten Anziehungskräfte.`;
 
     case 'compromise':
       if (!person2) return `Fokus: Kompromiss-Channels. (Kein Person-2-Chart vorhanden.)`;
-      return `Fokus: Kompromiss-Channels zwischen ${person1.name} und ${person2.name}.
+      return `Fokus: Kompromiss-Channels zwischen ${name1} und ${name2}.
 Wo haben beide denselben Channel definiert? Wer dominiert? Wo braucht es Kompromiss?`;
 
     default:

@@ -1,6 +1,26 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-17 | **Quellen:** Live-Analyse Server .138 + .167
+**Stand:** 2026-06-19 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-06-19 (v8 Reading-Video — Fixes: Single-Pass-Voiceover, Bodygraph, A/V-Sync,
+> Reuse-Endpoint):** Vier Folge-Commits auf Phase 2a (`8a30225`, `34c8f26`, `338aa44`, Merges
+> `d0531b1`/`70258c9`). (1) **Voiceover in EINEM Durchlauf** (`reading-video-worker.js`): die
+> Sprecher-Texte aller Slides (Titel + Bodygraph + Content) werden zu **einer** Erzählung
+> konkateniert und mit **einem** `synthesizeLongText()`-Aufruf synthetisiert (intern an TTS-Limits
+> gechunkt) statt pro Slide — vermeidet ElevenLabs-Rate-Limits, schneller/günstiger. (2) **A/V-Sync:**
+> Slide-Dauern werden **proportional zur Zeichenzahl** des jeweiligen Sprechtexts auf die per ffprobe
+> gemessene Gesamt-Audiolänge verteilt → Slide-Wechsel matchen das Audio. (3) **Bodygraph-Mapping
+> repariert** (`lib/bodygraph-svg.js` `buildDefinedState`: tolerantes Parsen von `definedCenters`/
+> `centers`/`defined_centers`, DE/EN-Aliasse) + **Markdown-Formatierung** in den Content-Slides
+> (`lib/slides.js`: `speakText` == sichtbarer Text → keine Audio/Bild-Drift). (4) **Neuer Endpunkt**
+> `GET /api/reading-video/by-reading/:readingId` (`server.js`) — liefert das **zuletzt fertige** Video
+> zu einem Reading (`status=completed`, neuestes `created_at`); die .167-UI (`ReadingVideoButton`)
+> lädt damit ein vorhandenes Video, statt immer neu zu rendern (Commit `38c0ad6` auf .167). Worker-
+> Start-Reihenfolge in `server.js`: `[W6]` Psychology, `[W7]` Evolution, `[W8]` Audio, **`[W9]`
+> Reading-Video** (+ Video/Runway-Worker ohne eigenes Log-Tag). Migrationen `2026061701_audio_jobs.sql`
+> + `2026061702_reading_video_jobs.sql` liegen vor (Tabellen `audio_jobs`/`reading_video_jobs` + Buckets
+> `generated-audio`/`generated-reading-videos` + RLS) — **vor Betrieb anwenden**. Deploy = reading-worker
+> **Rebuild**. Branch `claude/claude-md-docs-q045q6`. Siehe §7 + §8.
+>
 > **Changelog 2026-06-17 (v8 Phase 2a — Reading→Video, ffmpeg-Slideshow gebaut):** Aufbauend auf
 > Phase 1. **.138:** neuer Worker `reading-worker/workers/reading-video-worker.js` (Queue
 > `reading-video-queue`, `startReadingVideoWorker()`, `[W9]`, `concurrency=1` — CPU-schwer);
@@ -494,6 +514,8 @@ Agent Timeout: 300s
 | `workers/psychology-worker.js` | .138 | reading-worker | — | `reading-queue-v4-psychology` | Psychologie-Readings | ✅ Integriert |
 | `workers/evolution-worker.js` | .138 | reading-worker | — | `reading-queue-v4-evolution` | Evolution-/Dekonditionierungs-Analyse (V6) | ✅ Integriert (2026-06-14) |
 | `workers/video-worker.js` | .138 | reading-worker | — | `video-queue` | Echte Video-Generierung (Runway/Seedance 2.0) | ✅ Integriert (E2E verifiziert 2026-06-17) |
+| `workers/audio-worker.js` | .138 | reading-worker | — | `audio-queue` | Voice-Reading (TTS→MP3, ElevenLabs/OpenAI) `[W8]`, concurrency 2 | ✅ Integriert (v8 Phase 1, 2026-06-17) |
+| `workers/reading-video-worker.js` | .138 | reading-worker | — | `reading-video-queue` | Reading→Video (Voiceover + Bodygraph + Slides → ffmpeg-MP4) `[W9]`, concurrency 1 | ✅ Integriert (v8 Phase 2a, Fixes 2026-06-19) |
 | `lib/live-reading/routes.js` | .138 | reading-worker | — | HTTP (SSE/WS) | Live-Readings | ✅ Integriert |
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
@@ -572,6 +594,8 @@ reading-worker **Rebuild**.
 | `bull:reading-queue-v4-multi-agent` | V4 | Multi-Agent-Readings |
 | `bull:reading-queue-v4-connection` | V4 | Connection-Readings |
 | `bull:video-queue` | — | Video-Generierung (Runway/Seedance, `video-worker`) |
+| `bull:audio-queue` | — | Voice-Reading (TTS→MP3, `audio-worker`, v8 Phase 1) |
+| `bull:reading-video-queue` | — | Reading→Video (ffmpeg-Slideshow, `reading-video-worker`, v8 Phase 2a) |
 | `bull:reading-v4-queue` | V4 | ⚠️ Totes Legacy — Produzent `.167/scripts/v4.js` nirgends gemountet, kein Worker konsumiert (verifiziert 2026-06-17) |
 
 ### V4 Job-Architektur
@@ -830,13 +854,15 @@ reflection, relationship, sexuality, shadow-work, spiritual
 | `evolution_analyses` | Evolution Analysis |
 | `mcp_usage` | MCP Server Usage Tracking |
 
-### Tabellen — public Schema (Video)
+### Tabellen — public Schema (Video / Audio / Reading-Video)
 
 | Tabelle | Beschreibung |
 |---------|-------------|
 | `video_jobs` | Video-Generierungs-Jobs (mode/prompt/shots/images, status, runway_task_id, video_url/video_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026060301_video_jobs.sql` (angewandt 2026-06-03). |
+| `audio_jobs` | Voice-Reading-Jobs (source, reading_id, text/title, voice_id/model_id, status, progress, audio_url/audio_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026061701_audio_jobs.sql` (**vor Betrieb anwenden**). |
+| `reading_video_jobs` | Reading→Video-Jobs (reading_id, voice_id, status, progress, video_url/video_path, duration, RLS: service_role + `auth.uid()=user_id`). Migration `2026061702_reading_video_jobs.sql` (**vor Betrieb anwenden**). |
 
-**Storage-Bucket:** `generated-videos` (public) — fertige MP4s, permanente URLs (laufen nicht ab).
+**Storage-Buckets (alle public, permanente URLs):** `generated-videos` (Runway-MP4s) · `generated-audio` (Voice-Reading-MP3s) · `generated-reading-videos` (Reading→Video-MP4s).
 
 ### Redis
 
@@ -852,15 +878,15 @@ reflection, relationship, sexuality, shadow-work, spiritual
 
 ### Status: **MUI — vollständig** (Tailwind entfernt in Commit `35a75bd76`)
 
-### Theme (frontend-coach/styles/theme.ts)
+### Theme (`frontend/styles/theme.ts` + `frontend-coach/styles/theme.ts` — vereinheitlicht)
 
 ```
-Primary:     #F29F05  (Orange/Flame)
-Secondary:   #8C1D04  (Dark Red)
-Background:  #030200  (Almost Black)
-Font:        Inter, system-ui
+Primary:     #F5A623  (Brandbook Gold / Flame)   ⚠️ war #F29F05
+Secondary:   #3A7AE1  (Auric Blue / Pulse)       ⚠️ war #8C1D04
+Background:  #0B0F19  (Brandbook Dark)           ⚠️ war #030200
+Font:        Inter / system-ui · Headings: Space Grotesk
 
-MuiButton contained:  linear-gradient(135deg, #F29F05, #8C1D04)
+MuiButton contained:  linear-gradient(135deg, #F5A623, #D98905)
 MuiPaper:             Glassmorphism (rgba borders, backdrop-filter)
 MuiCard:              Glass + Gold border
 ```
@@ -869,10 +895,9 @@ MuiCard:              Glass + Gold border
 
 | Kategorie | Technologie |
 |-----------|------------|
-| Component Library | MUI (`@mui/material` + `@emotion`) |
+| Component Library | MUI (`@mui/material` + `@emotion`) — Tailwind entfernt |
 | Animationen | `framer-motion` |
-| 3D | `three.js` (Bodygraph) |
-| PDF Export | `html2canvas` + `jspdf` |
+| PDF Export | `html2canvas` + `jspdf` (Server-PDF via `@/lib/pdf-server`) |
 | QR Codes | `qrcode` |
 | Icons | MUI Icons |
 
@@ -1157,10 +1182,10 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 | Kategorie | Technologie |
 |-----------|------------|
 | Runtime | Node.js (Alpine) |
-| Framework | Next.js 14 (App Router) |
+| Framework | `frontend`: Next.js 14.2 / React 18.3 · `frontend-coach`: **Next.js 16 / React 19** (App Router) ⚠️ Versions-Drift |
 | UI | MUI (`@mui/material` + `@emotion`) — Tailwind komplett entfernt |
 | Animationen | `framer-motion` |
-| 3D | `three.js` |
+| Voice | TTS (proxyt nach .138) + STT (`useSpeechToText`, Web Speech API) |
 | DB Client | `@supabase/ssr`, `@supabase/supabase-js` |
 | Payments | `stripe`, `@stripe/stripe-js` |
 | PDF | `html2canvas` + `jspdf` |
@@ -1175,6 +1200,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-05-27 (Code-Abgleich .138 gegen tatsächlichen Repo-Stand)*
+*Letzte Aktualisierung: 2026-06-19 (Code-Abgleich .138 — v8 Reading-Video-Fixes, Audio/Reading-Video-Worker + Queues + Tabellen ergänzt)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

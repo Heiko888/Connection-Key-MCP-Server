@@ -25,6 +25,18 @@ function run(cmd, args, { timeoutMs = 0 } = {}) {
   });
 }
 
+/** Mehrere MP3-Segmente zu einer Tonspur concaten (gleicher Codec → copy). */
+export async function concatAudio(segPaths, outPath, { timeoutMs = 120000 } = {}) {
+  if (!Array.isArray(segPaths) || segPaths.length === 0) throw new Error("Keine Audio-Segmente");
+  const dir = path.dirname(outPath);
+  const listPath = path.join(dir, "audio-concat.txt");
+  const lines = segPaths.map((p) => `file '${p.replace(/'/g, "'\\''")}'`);
+  await fs.writeFile(listPath, lines.join("\n"), "utf8");
+  // Re-Encode (nicht copy): unterschiedliche TTS-Segmente sicher verketten.
+  await run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listPath, "-c:a", "libmp3lame", "-q:a", "4", outPath], { timeoutMs });
+  return outPath;
+}
+
 /** Audiodauer (Sekunden) via ffprobe. */
 export async function probeDurationSec(audioPath) {
   const { stdout } = await run("ffprobe", [

@@ -15,9 +15,10 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
-import { synthesizeLongText } from "../lib/tts.js";
-import { titleSlidePng, bodygraphSlidePng, textSlidePng, paginateReadingText } from "../lib/slides.js";
-import { composeSlideshow, probeDurationSec } from "../lib/video-compose.js";
+import { synthesizeSpeech } from "../lib/tts.js";
+import { titleSlidePng, bodygraphSlidePng, contentSlidePng, buildContentSlides } from "../lib/slides.js";
+import { summarizeDefinition } from "../lib/bodygraph-svg.js";
+import { composeSlideshow, probeDurationSec, concatAudio } from "../lib/video-compose.js";
 
 const QUEUE_NAME = "reading-video-queue";
 const BUCKET = "generated-reading-videos";
@@ -72,39 +73,44 @@ async function processJob(job, { supabase }) {
     const name = reading.client_name || "Dein Reading";
     const subtitle = READING_TYPE_LABEL[reading.reading_type] || "Human Design Reading";
 
-    // 2) Voiceover (TTS, Default OpenAI → kein ElevenLabs-Key nötig)
-    await updateJob(supabase, jobId, { status: "generating", progress: 15 });
-    const { audio, provider } = await synthesizeLongText(text, { voiceId: row.voice_id || undefined });
-    const audioPath = path.join(workDir, "voice.mp3");
-    await fs.writeFile(audioPath, audio);
-    const durationSec = await probeDurationSec(audioPath);
-    await updateJob(supabase, jobId, { progress: 45 });
+    // 2) Slides bauen (Titel + chart-spezifischer Bodygraph + markdown-formatierte Content-Slides)
+    await updateJob(supabase, jobId, { status: "generating", progress: 12 });
+    const sum = summarizeDefinition(chart);
+    const bgSpeak = sum.centerCount
+      ? `Werfen wir einen Blick auf deinen Bodygraph. Du hast ${sum.centerCount} definierte Zentren: ${sum.centerLabels.join(", ")}.`
+      : "Werfen wir einen Blick auf deinen Bodygraph.";
+    const segments = [
+      { png: titleSlidePng(name, subtitle, RES), speak: `${name}. ${subtitle}.` },
+      { png: bodygraphSlidePng(chart, { ...RES, caption: "Dein Bodygraph" }), speak: bgSpeak },
+      ...buildContentSlides(text, { height: RES.height }).map((s) => ({ png: contentSlidePng(s, RES), speak: s.speakText })),
+    ];
 
-    // 3) Slides rendern (Titel + Bodygraph + Text-Slides)
-    const textSlides = paginateReadingText(text);
-    const slidePlan = [];
-    slidePlan.push({ kind: "title", png: titleSlidePng(name, subtitle, RES), weight: 0.06 });
-    slidePlan.push({ kind: "bodygraph", png: bodygraphSlidePng(chart, { ...RES, caption: "Dein Bodygraph" }), weight: 0.10 });
-    const textWeightTotal = 0.84;
-    const totalChars = textSlides.reduce((s, t) => s + Math.max(1, t.chars), 0);
-    for (const ts of textSlides) {
-      slidePlan.push({ kind: "text", png: textSlidePng(ts.lines, RES), weight: textWeightTotal * (Math.max(1, ts.chars) / totalChars) });
-    }
-
-    // 4) Slide-PNGs schreiben + Dauer aus Audiolänge verteilen
-    const weightSum = slidePlan.reduce((s, p) => s + p.weight, 0);
+    // 3) Pro Slide ein eigenes TTS-Segment → Slide-Dauer = Segmentdauer (Bild & Ton synchron)
     const slides = [];
-    for (let i = 0; i < slidePlan.length; i++) {
-      const pngPath = path.join(workDir, `slide-${String(i).padStart(3, "0")}.png`);
-      await fs.writeFile(pngPath, slidePlan[i].png);
-      slides.push({ pngPath, durationSec: (slidePlan[i].weight / weightSum) * durationSec });
+    const audioSegPaths = [];
+    for (let i = 0; i < segments.length; i++) {
+      const tts = await synthesizeSpeech(segments[i].speak, { voiceId: row.voice_id || undefined });
+      if (!tts.ok) throw new Error(`TTS Segment ${i}: ${tts.error}`);
+      const aPath = path.join(workDir, `seg-${String(i).padStart(3, "0")}.mp3`);
+      await fs.writeFile(aPath, Buffer.from(tts.audio));
+      const dur = await probeDurationSec(aPath);
+      const pPath = path.join(workDir, `slide-${String(i).padStart(3, "0")}.png`);
+      await fs.writeFile(pPath, segments[i].png);
+      slides.push({ pngPath: pPath, durationSec: dur });
+      audioSegPaths.push(aPath);
+      await updateJob(supabase, jobId, { progress: 12 + Math.round((i / segments.length) * 60) });
     }
-    await updateJob(supabase, jobId, { progress: 60 });
 
-    // 5) ffmpeg-Composition
+    // 4) Tonspur aus den Segmenten + Gesamtdauer
+    const audioPath = path.join(workDir, "voice.mp3");
+    await concatAudio(audioSegPaths, audioPath);
+    const durationSec = await probeDurationSec(audioPath);
+    await updateJob(supabase, jobId, { progress: 78 });
+
+    // 5) ffmpeg-Composition (Slide-Dauern == Segmentdauern → synchron)
     const outPath = path.join(workDir, "out.mp4");
     await composeSlideshow({ slides, audioPath, outPath, ...RES, timeoutMs: TIMEOUT_MS });
-    await updateJob(supabase, jobId, { progress: 85 });
+    await updateJob(supabase, jobId, { progress: 88 });
 
     // 6) Permanent in Storage
     const buffer = await fs.readFile(outPath);
@@ -118,7 +124,7 @@ async function processJob(job, { supabase }) {
       status: "completed", progress: 100,
       video_path: `${BUCKET}/${storagePath}`, video_url: pub?.publicUrl || null,
       duration: Math.round(durationSec),
-      result: { size: buffer.length, slides: slides.length, tts_provider: provider, resolution: `${RES.width}x${RES.height}` },
+      result: { size: buffer.length, slides: slides.length, tts_provider: (process.env.TTS_PROVIDER || "openai"), resolution: `${RES.width}x${RES.height}` },
       finished_at: new Date().toISOString(),
     });
     console.log(`   ✅ [ReadingVideo] Job ${job.id} fertig → ${pub?.publicUrl}`);

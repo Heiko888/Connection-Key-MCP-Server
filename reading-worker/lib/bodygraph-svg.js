@@ -57,13 +57,23 @@ const CHANNELS = [
   [35,36],[37,40],[39,55],[42,53],[47,64],
 ];
 
-const CENTER_NAME_TO_ID = {
-  Head: "HEAD", Kopf: "HEAD", Krone: "HEAD", Ajna: "AJNA", Throat: "THROAT", Kehle: "THROAT",
-  Hals: "THROAT", G: "G", "G-Center": "G", "G-Zentrum": "G", Selbst: "G", Heart: "HEART",
-  "Heart/Ego": "HEART", Herz: "HEART", "Herz/Ego": "HEART", Ego: "HEART", Will: "HEART",
-  Sacral: "SACRAL", Sakral: "SACRAL", Spleen: "SPLEEN", Milz: "SPLEEN", Solar: "SOLAR",
-  "Solar Plexus": "SOLAR", Solarplexus: "SOLAR", Emotional: "SOLAR", Root: "ROOT", Wurzel: "ROOT",
+const CENTER_KEY_TO_ID = {
+  head: "HEAD", kopf: "HEAD", krone: "HEAD", crown: "HEAD",
+  ajna: "AJNA",
+  throat: "THROAT", kehle: "THROAT", hals: "THROAT",
+  g: "G", "g-center": "G", "g-zentrum": "G", selbst: "G", self: "G",
+  heart: "HEART", "heart/ego": "HEART", herz: "HEART", "herz/ego": "HEART", ego: "HEART", will: "HEART",
+  sacral: "SACRAL", sakral: "SACRAL",
+  spleen: "SPLEEN", milz: "SPLEEN",
+  "solar-plexus": "SOLAR", "solar_plexus": "SOLAR", "solar plexus": "SOLAR", solarplexus: "SOLAR",
+  solar: "SOLAR", emotional: "SOLAR",
+  root: "ROOT", wurzel: "ROOT",
 };
+const CENTER_LABEL_DE = {
+  HEAD: "Kopf", AJNA: "Ajna", THROAT: "Kehle", G: "G-Zentrum", HEART: "Herz",
+  SACRAL: "Sakral", SPLEEN: "Milz", SOLAR: "Solarplexus", ROOT: "Wurzel",
+};
+const centerId = (key) => CENTER_KEY_TO_ID[String(key).trim().toLowerCase()] || null;
 
 /** Aus beliebigem chart_data → { centers:Set, gates:Set, channels:Set("a-b") }. */
 export function buildDefinedState(chart) {
@@ -75,23 +85,23 @@ export function buildDefinedState(chart) {
     for (const item of rawCenters) {
       if (typeof item === "object" && item && item.defined === false) continue;
       const name = typeof item === "string" ? item : (item?.name || item?.id || "");
-      const id = CENTER_NAME_TO_ID[name] || String(name).toUpperCase();
-      if (CENTER_COLORS[id]) centers.add(id);
+      const id = centerId(name);
+      if (id) centers.add(id);
     }
   } else if (rawCenters && typeof rawCenters === "object") {
     for (const [key, val] of Object.entries(rawCenters)) {
       const truthy = val === true || val === "definiert" || val === "defined" ||
         (typeof val === "object" && val !== null && (val.defined === true || val.status === "definiert"));
       if (!truthy) continue;
-      const id = CENTER_NAME_TO_ID[key] || key.toUpperCase();
-      if (CENTER_COLORS[id]) centers.add(id);
+      const id = centerId(key);
+      if (id) centers.add(id);
     }
   }
 
   const rawGates = chart.gates || chart.activeGates || [];
   if (Array.isArray(rawGates)) {
     for (const g of rawGates) {
-      const id = typeof g === "number" ? g : (g?.id ?? g?.gate);
+      const id = typeof g === "number" ? g : (g?.number ?? g?.id ?? g?.gate);
       if (typeof id === "number" && id >= 1 && id <= 64) gates.add(id);
     }
   }
@@ -111,6 +121,14 @@ export function buildDefinedState(chart) {
     for (const [a, b] of CHANNELS) if (gates.has(a) && gates.has(b)) channels.add(`${a}-${b}`);
   }
   return { centers, gates, channels };
+}
+
+/** Kurze deutsche Zusammenfassung der Definition (für die Bodygraph-Narration). */
+export function summarizeDefinition(chart) {
+  const { centers, channels, gates } = buildDefinedState(chart);
+  const centerLabels = [...centers].map((id) => CENTER_LABEL_DE[id] || id);
+  const chDe = [...channels].map((c) => `Tor ${c.replace("-", " und Tor ")}`);
+  return { centerLabels, channelLabels: [...channels], channelSpoken: chDe, gateCount: gates.size, centerCount: centers.size };
 }
 
 function centerPoints(c) {

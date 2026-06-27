@@ -1,6 +1,36 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-19 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-06-27 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-06-27 (.167 Workshop-DOI-Mail — Zustellstatus + Zustellbarkeit, PRs #125/#126):**
+> Zwei zusammengehörige Pakete im **.167-Repo** (`The-Connection-Key`) rund um die Workshop-Double-
+> Opt-In-Mail. **(A) Zustellstatus nachverfolgbar (PR #125, `b6ae190f1`):** Bisher zeigte eine
+> Anmeldung nach dem Absenden nur `status=pending` — das sagt nur „Bestätigungslink nie geklickt",
+> **nicht** ob die DOI-Mail überhaupt zugestellt wurde. Migration
+> `supabase-migrations/023_workshop_mail_delivery_status.sql` erweitert `public.event_registrations`
+> um vier Spalten — `doi_mail_id` (Resend-Message-ID als Webhook-Match-Key), `mail_status`
+> (sent/delivered/delayed/bounced/complained/send_failed), `mail_status_at`, `mail_status_detail`
+> (z. B. Bounce-Grund) — + Index `event_registrations_doi_mail_id_idx`. Befüllt durch (1)
+> `frontend/app/api/workshops/register/route.ts` (setzt beim Versand `sent`/`send_failed` + merkt
+> die Message-ID) und (2) **neue** `frontend/app/api/workshops/resend-webhook/route.ts` (empfängt
+> Resend-Events `email.delivered`/`email.bounced`/… und schreibt den Status per `doi_mail_id` fort).
+> Coach-Workshops-Seite (`frontend-coach/app/(coach)/workshops/page.tsx` +
+> `…/[id]/registrations/route.ts`) zeigt den Mail-Status je Anmeldung. **(B) Zustellbarkeit (PR #126,
+> `3061f0f76`):** DOI-Mail (register) + Welcome-Mail (confirm) bekommen einen zusätzlichen
+> **text/plain-Teil** (vorher HTML-only → schlechterer Spam-Score, landete bei Yahoo/GMX/web.de trotz
+> „Delivered" im Spam) sowie einen optionalen **List-Unsubscribe-Header**; `frontend/lib/resend.ts`
+> `sendMail` unterstützt jetzt Custom-Header + Helper `listUnsubscribeHeaders()`. ✅ **Deploy
+> verifiziert (2026-06-27):** Migration 023 auf Projekt `wdiadklhvhlndnjojrfu` **angewandt** (alle 4
+> Spalten via `information_schema` bestätigt); `frontend` (#125+#126) **und** `frontend-coach` (#125)
+> auf .167 seriell **neu gebaut** (beide HTTP 200, Container frisch). ⚠️ **Neue ENV (alle .167
+> Root-`.env`, via `env_file` der frontend-Compose — NICHT `frontend/.env`; nach Setzen
+> `docker compose up -d frontend`, Recreate ohne Rebuild):** `RESEND_WEBHOOK_SECRET` (`whsec_…` aus
+> Resend → Webhooks; **fehlt aktuell** → Webhook verarbeitet Events **ohne** Signaturprüfung, nur
+> Log-Warnung), `RESEND_UNSUBSCRIBE_MAILTO`/`RESEND_UNSUBSCRIBE_URL` (optional, Default „aus" → kein
+> Header, zeigt nie auf toten Endpoint). ⚠️ **Betriebsvoraussetzung:** In Resend muss ein **Webhook**
+> auf `…/api/workshops/resend-webhook` konfiguriert sein, sonst kommen nach `sent` keine
+> Delivery-Events. Deploy = `frontend` (+ `frontend-coach` für #125) **Rebuild** + Migration. Siehe
+> Abschnitt 10 + 13. Verwandt: Mattermost-Workshop-Benachrichtigung (Changelog 2026-06-10).
+>
 > **Changelog 2026-06-19 (v8 Reading-Video — Fixes: Single-Pass-Voiceover, Bodygraph, A/V-Sync,
 > Reuse-Endpoint):** Vier Folge-Commits auf Phase 2a (`8a30225`, `34c8f26`, `338aa44`, Merges
 > `d0531b1`/`70258c9`). (1) **Voiceover in EINEM Durchlauf** (`reading-video-worker.js`): die
@@ -1144,6 +1174,11 @@ STRIPE_BASIC_PRICE_ID / PREMIUM / VIP
 RESEND_API_KEY                    # ✅ gesetzt (Root-.env, an frontend/frontend-coach/ck-agent)
 RESEND_FROM_DOMAIN
 RESEND_FROM_NAME
+RESEND_WEBHOOK_SECRET             # whsec_… aus Resend → Webhooks; signiert /api/workshops/resend-webhook
+                                  # ⚠️ aktuell NICHT gesetzt → Webhook verarbeitet Events ohne Signaturprüfung (nur Log-Warnung)
+                                  # ⚠️ Root-.env (env_file der frontend-Compose), NICHT frontend/.env! Danach: docker compose up -d frontend
+RESEND_UNSUBSCRIBE_MAILTO         # optional: List-Unsubscribe mailto: (Zustellbarkeit Yahoo/Gmail); Default aus = kein Header
+RESEND_UNSUBSCRIBE_URL            # optional: https One-Click-Abmelde-Endpoint (RFC 8058); nur setzen wenn überwacht
 
 # Mattermost (Workshop-Anmelde-Benachrichtigungen)
 MATTERMOST_WEBHOOK_WORKSHOPS      # Incoming-Webhook-URL (Secret) — bei bestätigter Workshop-Anmeldung
@@ -1200,6 +1235,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-06-19 (Code-Abgleich .138 — v8 Reading-Video-Fixes, Audio/Reading-Video-Worker + Queues + Tabellen ergänzt)*
+*Letzte Aktualisierung: 2026-06-27 (.167 Workshop-DOI-Mail — Zustellstatus-Tracking #125 + Plain-Text/List-Unsubscribe #126; Migration 023 + neue Resend-ENV)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

@@ -31,6 +31,8 @@ import { startAudioWorker, getAudioQueue } from "./workers/audio-worker.js";
 import { startReadingVideoWorker, getReadingVideoQueue } from "./workers/reading-video-worker.js";
 import { startNervousSystemWorker, getNervousSystemQueue } from "./workers/nervous-system-worker.js";
 import { startWomensDesignWorker, getWomensDesignQueue } from "./workers/womens-design-worker.js";
+import { startProductivityWorker, getProductivityQueue } from "./workers/productivity-worker.js";
+import { startGeneKeysWorker, getGeneKeysQueue } from "./workers/gene-keys-worker.js";
 import { synthesizeSpeech as synthesizeSpeechSync, ttsVoiceSignature } from "./lib/tts.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
@@ -3055,12 +3057,16 @@ startAudioWorker();
 startReadingVideoWorker();
 startNervousSystemWorker();
 startWomensDesignWorker();
+startProductivityWorker();
+startGeneKeysWorker();
 console.log("[W6] Psychology Worker gestartet");
 console.log("[W7] Evolution Worker gestartet");
 console.log("[W8] Audio (Voice-Reading) Worker gestartet");
 console.log("[W9] Reading-Video Worker gestartet");
 console.log("[W10] Nervous-System Worker gestartet");
 console.log("[W11] Women's-Design Worker gestartet");
+console.log("[W12] Productivity Worker gestartet");
+console.log("[W13] Gene-Keys Worker gestartet");
 
 // ======================================================
 // Job Polling System
@@ -5151,6 +5157,86 @@ app.get("/api/readings/nervous-system/:id", async (req, res) => {
     return res.json(data);
   } catch (err) {
     console.error("[NervousSystem] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// W12 — Productivity Endpoints (Produktivität ohne Burnout, Einzel-Chart)
+// ======================================================
+app.post("/api/readings/productivity/start", async (req, res) => {
+  try {
+    const { reading_id, user_id } = req.body || {};
+    if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const { data, error } = await supabase
+      .schema("public").from("productivity_readings")
+      .insert({ reading_id, user_id: user_id || null, status: "pending", progress: 0 })
+      .select("id").single();
+    if (error) throw new Error(error.message);
+
+    const queue = getProductivityQueue();
+    await queue.add("productivity", { reading_id, user_id: user_id || null, productivity_reading_id: data.id });
+    return res.status(202).json({ success: true, productivity_reading_id: data.id });
+  } catch (err) {
+    console.error("[Productivity] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/productivity/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .schema("public").from("productivity_readings")
+      .select("id, status, progress, productivity_score, work_rhythm, energy_management, decision_load, burnout_signals, focus_practices, boundaries, insights, narrative, error_message, created_at, completed_at")
+      .eq("id", req.params.id).single();
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[Productivity] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// W13 — Gene-Keys Endpoints (Schatten → Geschenk → Siddhi, Einzel-Chart)
+// ======================================================
+app.post("/api/readings/gene-keys/start", async (req, res) => {
+  try {
+    const { reading_id, user_id } = req.body || {};
+    if (!reading_id) return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+
+    const { data, error } = await supabase
+      .schema("public").from("gene_keys_readings")
+      .insert({ reading_id, user_id: user_id || null, status: "pending", progress: 0 })
+      .select("id").single();
+    if (error) throw new Error(error.message);
+
+    const queue = getGeneKeysQueue();
+    await queue.add("gene-keys", { reading_id, user_id: user_id || null, gene_keys_reading_id: data.id });
+    return res.status(202).json({ success: true, gene_keys_reading_id: data.id });
+  } catch (err) {
+    console.error("[GeneKeys] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/gene-keys/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .schema("public").from("gene_keys_readings")
+      .select("id, status, progress, core_theme, activation_sequence, spheres, shadow_work, contemplation, insights, narrative, error_message, created_at, completed_at")
+      .eq("id", req.params.id).single();
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[GeneKeys] GET fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

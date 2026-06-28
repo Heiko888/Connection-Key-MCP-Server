@@ -29,6 +29,7 @@ import { startEvolutionWorker, getEvolutionQueue } from "./workers/evolution-wor
 import { startVideoWorker, getVideoQueue } from "./workers/video-worker.js";
 import { startAudioWorker, getAudioQueue } from "./workers/audio-worker.js";
 import { startReadingVideoWorker, getReadingVideoQueue } from "./workers/reading-video-worker.js";
+import { startNervousSystemWorker, getNervousSystemQueue } from "./workers/nervous-system-worker.js";
 import { synthesizeSpeech as synthesizeSpeechSync, ttsVoiceSignature } from "./lib/tts.js";
 import { calculateCrossReference } from "./lib/transitCrossReference.js";
 import { getCrossName, getCrossNameDe, buildCrossPromptFragment } from "./lib/incarnation-cross-helper.js";
@@ -3051,10 +3052,12 @@ startEvolutionWorker();
 startVideoWorker();
 startAudioWorker();
 startReadingVideoWorker();
+startNervousSystemWorker();
 console.log("[W6] Psychology Worker gestartet");
 console.log("[W7] Evolution Worker gestartet");
 console.log("[W8] Audio (Voice-Reading) Worker gestartet");
 console.log("[W9] Reading-Video Worker gestartet");
+console.log("[W10] Nervous-System Worker gestartet");
 
 // ======================================================
 // Job Polling System
@@ -5091,6 +5094,60 @@ app.get("/api/readings/psychology/:id", async (req, res) => {
     return res.json(data);
   } catch (err) {
     console.error("[Psychology] GET fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ======================================================
+// W10 — Nervous-System Endpoints (Regulations-Reading, Einzel-Chart)
+// ======================================================
+// Bildet ein Chart auf Nervensystem-Regulation (Polyvagal) ab: Zustands-Map,
+// offene Zentren als Antennen, Autorität als Körperkompass, Not-Self als Stress.
+// Engine auf .138 (Golden Rule). Schreibt in public.nervous_system_readings.
+app.post("/api/readings/nervous-system/start", async (req, res) => {
+  try {
+    const { reading_id, user_id } = req.body || {};
+    if (!reading_id) {
+      return res.status(400).json({ success: false, error: "reading_id ist erforderlich" });
+    }
+
+    // Zeile vorab anlegen und deren id an den Job reichen, damit der Worker GENAU
+    // diese Zeile fortschreibt (kein Doppel-Insert, kein ewig-pending) — wie Psychology.
+    const { data, error } = await supabase
+      .schema("public")
+      .from("nervous_system_readings")
+      .insert({ reading_id, user_id: user_id || null, status: "pending", progress: 0 })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const queue = getNervousSystemQueue();
+    await queue.add("nervous-system", { reading_id, user_id: user_id || null, nervous_system_reading_id: data.id });
+
+    return res.status(202).json({ success: true, nervous_system_reading_id: data.id });
+  } catch (err) {
+    console.error("[NervousSystem] Start fehlgeschlagen:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/api/readings/nervous-system/:id", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .schema("public")
+      .from("nervous_system_readings")
+      .select("id, status, progress, regulation_score, baseline_state, state_map, center_sensitivities, authority_regulation, triggers, daily_practices, insights, narrative, error_message, created_at, completed_at")
+      .eq("id", req.params.id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return res.status(404).json({ success: false, error: "Nicht gefunden" });
+      throw new Error(error.message);
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[NervousSystem] GET fehlgeschlagen:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 });

@@ -5295,6 +5295,39 @@ app.get("/api/readings/womens-design/:id", async (req, res) => {
 });
 
 // ======================================================
+// W10–W13 — "by-reading": letztes fertiges Ergebnis zu einem Quell-Reading laden
+// ======================================================
+// Erlaubt der .167-UI, ein bereits generiertes Reading beim Öffnen wieder anzuzeigen
+// (Reuse statt Re-Generieren) — analog zum Reading-Video by-reading-Endpunkt.
+const BY_READING_SELECTS = {
+  "nervous-system": { table: "nervous_system_readings", cols: "id, status, progress, regulation_score, baseline_state, state_map, center_sensitivities, authority_regulation, triggers, daily_practices, insights, narrative, error_message, created_at, completed_at" },
+  "womens-design": { table: "womens_design_readings", cols: "id, status, progress, cycle_alignment_score, baseline_pattern, cycle_phases, type_rhythm, authority_in_cycle, center_amplification, not_self_amplified, selfcare_practices, insights, narrative, error_message, created_at, completed_at" },
+  "productivity": { table: "productivity_readings", cols: "id, status, progress, productivity_score, work_rhythm, energy_management, decision_load, burnout_signals, focus_practices, boundaries, insights, narrative, error_message, created_at, completed_at" },
+  "gene-keys": { table: "gene_keys_readings", cols: "id, status, progress, core_theme, activation_sequence, spheres, shadow_work, contemplation, insights, narrative, error_message, created_at, completed_at" },
+};
+
+for (const [slug, { table, cols }] of Object.entries(BY_READING_SELECTS)) {
+  app.get(`/api/readings/${slug}/by-reading/:readingId`, async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .schema("public")
+        .from(table)
+        .select(cols)
+        .eq("reading_id", req.params.readingId)
+        .eq("status", "completed")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (error) throw new Error(error.message);
+      if (!data || !data.length) return res.json({ found: false });
+      return res.json({ found: true, ...data[0] });
+    } catch (err) {
+      console.error(`[${slug}] by-reading fehlgeschlagen:`, err.message);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  });
+}
+
+// ======================================================
 // W7 — Evolution Endpoints (Dekonditionierungs-Analyse über mehrere Readings)
 // ======================================================
 // Ersetzt die alte, oberflächliche Single-Claude-Call-Variante auf ck-agent (.167)

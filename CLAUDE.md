@@ -33,13 +33,16 @@
 >   Radiance/Purpose) aus Sonne/Erde (Persönlichkeit & Design); kontemplativer Ton, **kein Score**.
 >   PRs #25/#133.
 >
-> ⚠️ **Vor Betrieb:** Migrationen `2026062801`–`2026062804` anwenden (Projekt `wdiadklhvhlndnjojrfu`);
-> **reading-worker Rebuild** (.138) + **frontend-coach Rebuild** (.167). Worker-Start-Reihenfolge in
-> `server.js`: …`[W9]` Reading-Video, `[W10]` Nervous-System, `[W11]` Women's-Design, `[W12]`
-> Productivity, `[W13]` Gene-Keys. ⚠️ Verdrahtet + syntaxgeprüft (`node --check`), aber **nicht
-> E2E-render-verifiziert** (kein Claude/Supabase-Zugriff in der Build-Umgebung). Welle 1 (Themen als
-> Content) waren 4 Blogartikel im `frontend` (`app/blogartikel`). Branch
-> `claude/human-design-nervous-system-75m9ts`. Siehe §7 + §8 + §10.
+> ✅ **Deploy verifiziert (2026-06-29):** Migrationen `2026062801`–`2026062804` auf Projekt
+> `wdiadklhvhlndnjojrfu` **angewandt** (alle 4 Tabellen `nervous_system_readings`/`womens_design_readings`/
+> `productivity_readings`/`gene_keys_readings` via `list_tables` bestätigt, RLS aktiv); **reading-worker
+> auf .138 neu gebaut** (Container `Up` :4000, Logs `[W10]`–`[W13]` aktiv: Queues `…-nervous-system`/
+> `…-womens-design`/`…-productivity`/`…-gene-keys`, alle 4 Knowledge-Files geladen); **frontend-coach
+> auf .167 neu gebaut** (Container `Up`, HTTP 200 :3002). Worker-Start-Reihenfolge in `server.js`:
+> …`[W9]` Reading-Video, `[W10]` Nervous-System, `[W11]` Women's-Design, `[W12]` Productivity,
+> `[W13]` Gene-Keys. ⚠️ Boot + Queue-Registrierung verifiziert, aber **noch nicht E2E-render-verifiziert**
+> (kein echter Reading-Lauf durchgespielt). Welle 1 (Themen als Content) waren 4 Blogartikel im
+> `frontend` (`app/blogartikel`). Branch `claude/human-design-nervous-system-75m9ts`. Siehe §7 + §8 + §10.
 >
 > **Changelog 2026-06-27 (.167 Workshop-DOI-Mail — Zustellstatus + Zustellbarkeit, PRs #125/#126):**
 > Zwei zusammengehörige Pakete im **.167-Repo** (`The-Connection-Key`) rund um die Workshop-Double-
@@ -1287,6 +1290,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-06-27 (.167 Workshop-DOI-Mail — Zustellstatus-Tracking #125 + Plain-Text/List-Unsubscribe #126; Migration 023 + neue Resend-ENV)*
+*Letzte Aktualisierung: 2026-06-29 (.138/.167 — W10–W13 Readings Nervensystem/Weibliches Design/Produktivität/Gene Keys: Migrationen 2026062801–04 angewandt, reading-worker + frontend-coach neu gebaut, Deploy verifiziert)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

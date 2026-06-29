@@ -1,6 +1,46 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-27 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-06-29 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-06-29 (.138/.167 — Vier neue HD-Readings W10–W13: Nervensystem, Weibliches
+> Design, Produktivität, Gene Keys):** Themen-Erweiterung „Human Design im Einklang mit …" als
+> eigenständige Readings im etablierten Einzel-Chart-Muster (analog Psychology/Evolution: eine vom
+> Endpoint angelegte Zeile fortschreiben, **2 Claude-Calls** strukturiertes JSON + Markdown-Narrativ,
+> `parseJSONLoose` + Sicherheitsnetz, `buildFactsBlock`-Grounding, `concurrency 2`). Jeweils
+> Worker + Wissensbasis + Migration + Endpoints auf **.138** und Proxy + Client-Lib + Panel auf
+> **.167** (Panels in der Reading-Detailseite `readings-v4/[id]`, nur `status=completed`, kein Penta).
+>
+> - **W10 Nervensystem/Regulation** — `workers/nervous-system-worker.js` (Queue
+>   `reading-queue-v4-nervous-system`), Wissen `knowledge/nervous-system/nervous-system-knowledge.md`
+>   (Polyvagal). Endpoints `POST /api/readings/nervous-system/start`, `GET …/:id`. Tabelle
+>   `public.nervous_system_readings` (Migration `2026062801`). Dimensionen: regulation_score,
+>   state_map (ventral/sympathisch/dorsal), center_sensitivities (offene Zentren), authority_regulation,
+>   triggers, daily_practices, narrative. PRs #23/#131.
+> - **W11 Weibliches Design/Hormonzyklus** — `workers/womens-design-worker.js` (Queue
+>   `reading-queue-v4-womens-design`), Wissen `knowledge/womens-design/…` (4 innere Jahreszeiten;
+>   **Selbstfürsorge, KEINE medizinische Beratung**). Endpoints `…/womens-design/…`. Tabelle
+>   `public.womens_design_readings` (Migration `2026062802`). Dimensionen: cycle_alignment_score,
+>   cycle_phases (4), type_rhythm, authority_in_cycle, center_amplification, not_self_amplified,
+>   selfcare_practices, narrative. PRs #24/#132.
+> - **W12 Produktivität ohne Burnout** — `workers/productivity-worker.js` (Queue
+>   `reading-queue-v4-productivity`), Wissen `knowledge/productivity/…`. Endpoints
+>   `…/productivity/…`. Tabelle `public.productivity_readings` (Migration `2026062803`). Dimensionen:
+>   productivity_score, work_rhythm, energy_management (definiert=Output/offen=Leck), decision_load,
+>   burnout_signals (Not-Self als Frühwarnung), focus_practices, boundaries, narrative. PRs #25/#133.
+> - **W13 Gene Keys** — `workers/gene-keys-worker.js` (Queue `reading-queue-v4-gene-keys`), Wissen
+>   `knowledge/gene-keys/…` mit **kanonischer 64-Triaden-Referenz** (Gene Key N = Tor N;
+>   Schatten→Geschenk→Siddhi) als Grounding. Endpoints `…/gene-keys/…`. Tabelle
+>   `public.gene_keys_readings` (Migration `2026062804`). Aktivierungssequenz (Life's Work/Evolution/
+>   Radiance/Purpose) aus Sonne/Erde (Persönlichkeit & Design); kontemplativer Ton, **kein Score**.
+>   PRs #25/#133.
+>
+> ⚠️ **Vor Betrieb:** Migrationen `2026062801`–`2026062804` anwenden (Projekt `wdiadklhvhlndnjojrfu`);
+> **reading-worker Rebuild** (.138) + **frontend-coach Rebuild** (.167). Worker-Start-Reihenfolge in
+> `server.js`: …`[W9]` Reading-Video, `[W10]` Nervous-System, `[W11]` Women's-Design, `[W12]`
+> Productivity, `[W13]` Gene-Keys. ⚠️ Verdrahtet + syntaxgeprüft (`node --check`), aber **nicht
+> E2E-render-verifiziert** (kein Claude/Supabase-Zugriff in der Build-Umgebung). Welle 1 (Themen als
+> Content) waren 4 Blogartikel im `frontend` (`app/blogartikel`). Branch
+> `claude/human-design-nervous-system-75m9ts`. Siehe §7 + §8 + §10.
+>
 > **Changelog 2026-06-27 (.167 Workshop-DOI-Mail — Zustellstatus + Zustellbarkeit, PRs #125/#126):**
 > Zwei zusammengehörige Pakete im **.167-Repo** (`The-Connection-Key`) rund um die Workshop-Double-
 > Opt-In-Mail. **(A) Zustellstatus nachverfolgbar (PR #125, `b6ae190f1`):** Bisher zeigte eine
@@ -546,6 +586,10 @@ Agent Timeout: 300s
 | `workers/video-worker.js` | .138 | reading-worker | — | `video-queue` | Echte Video-Generierung (Runway/Seedance 2.0) | ✅ Integriert (E2E verifiziert 2026-06-17) |
 | `workers/audio-worker.js` | .138 | reading-worker | — | `audio-queue` | Voice-Reading (TTS→MP3, ElevenLabs/OpenAI) `[W8]`, concurrency 2 | ✅ Integriert (v8 Phase 1, 2026-06-17) |
 | `workers/reading-video-worker.js` | .138 | reading-worker | — | `reading-video-queue` | Reading→Video (Voiceover + Bodygraph + Slides → ffmpeg-MP4) `[W9]`, concurrency 1 | ✅ Integriert (v8 Phase 2a, Fixes 2026-06-19) |
+| `workers/nervous-system-worker.js` | .138 | reading-worker | — | `reading-queue-v4-nervous-system` | Nervensystem-/Regulations-Reading (Polyvagal, offene Zentren) `[W10]`, concurrency 2 | ✅ Integriert (2026-06-29) |
+| `workers/womens-design-worker.js` | .138 | reading-worker | — | `reading-queue-v4-womens-design` | Weibliches Design / Hormonzyklus (4 innere Jahreszeiten) `[W11]`, concurrency 2 | ✅ Integriert (2026-06-29) |
+| `workers/productivity-worker.js` | .138 | reading-worker | — | `reading-queue-v4-productivity` | Produktivität ohne Burnout (Typ-Rhythmus, Energie-Lecks, Not-Self-Frühwarnung) `[W12]`, concurrency 2 | ✅ Integriert (2026-06-29) |
+| `workers/gene-keys-worker.js` | .138 | reading-worker | — | `reading-queue-v4-gene-keys` | Gene Keys (Schatten→Geschenk→Siddhi, Aktivierungssequenz) `[W13]`, concurrency 2 | ✅ Integriert (2026-06-29) |
 | `lib/live-reading/routes.js` | .138 | reading-worker | — | HTTP (SSE/WS) | Live-Readings | ✅ Integriert |
 | `sync-reading-service` | .138 | sync-reading | 7001 | HTTP | Sync-Readings (basic, business, etc.) | ✅ Aktiv |
 | `mcp-gateway` | .138 | mcp-gateway | 7000 | HTTP | 15+ Agent Gateway | ✅ Aktiv |
@@ -626,6 +670,10 @@ reading-worker **Rebuild**.
 | `bull:video-queue` | — | Video-Generierung (Runway/Seedance, `video-worker`) |
 | `bull:audio-queue` | — | Voice-Reading (TTS→MP3, `audio-worker`, v8 Phase 1) |
 | `bull:reading-video-queue` | — | Reading→Video (ffmpeg-Slideshow, `reading-video-worker`, v8 Phase 2a) |
+| `bull:reading-queue-v4-nervous-system` | V4 | Nervensystem-/Regulations-Reading (`nervous-system-worker`, W10) |
+| `bull:reading-queue-v4-womens-design` | V4 | Weibliches Design / Hormonzyklus (`womens-design-worker`, W11) |
+| `bull:reading-queue-v4-productivity` | V4 | Produktivität ohne Burnout (`productivity-worker`, W12) |
+| `bull:reading-queue-v4-gene-keys` | V4 | Gene Keys (`gene-keys-worker`, W13) |
 | `bull:reading-v4-queue` | V4 | ⚠️ Totes Legacy — Produzent `.167/scripts/v4.js` nirgends gemountet, kein Worker konsumiert (verifiziert 2026-06-17) |
 
 ### V4 Job-Architektur
@@ -891,6 +939,10 @@ reflection, relationship, sexuality, shadow-work, spiritual
 | `video_jobs` | Video-Generierungs-Jobs (mode/prompt/shots/images, status, runway_task_id, video_url/video_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026060301_video_jobs.sql` (angewandt 2026-06-03). |
 | `audio_jobs` | Voice-Reading-Jobs (source, reading_id, text/title, voice_id/model_id, status, progress, audio_url/audio_path, RLS: service_role + `auth.uid()=user_id`). Migration `2026061701_audio_jobs.sql` (**vor Betrieb anwenden**). |
 | `reading_video_jobs` | Reading→Video-Jobs (reading_id, voice_id, status, progress, video_url/video_path, duration, RLS: service_role + `auth.uid()=user_id`). Migration `2026061702_reading_video_jobs.sql` (**vor Betrieb anwenden**). |
+| `nervous_system_readings` | Nervensystem-/Regulations-Reading (W10): regulation_score, state_map, center_sensitivities, authority_regulation, triggers, daily_practices, narrative. RLS service_role + `auth.uid()=user_id`. Migration `2026062801` (**vor Betrieb anwenden**). |
+| `womens_design_readings` | Weibliches Design / Hormonzyklus (W11): cycle_alignment_score, cycle_phases, type_rhythm, authority_in_cycle, center_amplification, not_self_amplified, selfcare_practices, narrative. Migration `2026062802` (**vor Betrieb anwenden**). |
+| `productivity_readings` | Produktivität ohne Burnout (W12): productivity_score, work_rhythm, energy_management, decision_load, burnout_signals, focus_practices, boundaries, narrative. Migration `2026062803` (**vor Betrieb anwenden**). |
+| `gene_keys_readings` | Gene Keys (W13): core_theme, activation_sequence, spheres, shadow_work, contemplation, narrative (kein Score). Migration `2026062804` (**vor Betrieb anwenden**). |
 
 **Storage-Buckets (alle public, permanente URLs):** `generated-videos` (Runway-MP4s) · `generated-audio` (Voice-Reading-MP3s) · `generated-reading-videos` (Reading→Video-MP4s).
 

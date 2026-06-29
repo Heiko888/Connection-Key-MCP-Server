@@ -1,6 +1,17 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-29 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-06-30 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-06-30 (.167 — Welle 3 Self-Tracking: Zyklus-Tagebuch + HRV, nur Frontend):**
+> Zwei interaktive Tracking-Features in der User-App (`frontend`), die auf die Readings W10/W11
+> aufsetzen — **kein .138-Anteil**: persönliche Daten in Supabase mit RLS (`auth.uid()=user_id`),
+> CRUD client-seitig, Berechnung deterministisch im Client (Golden Rule eingehalten). **🌙 Zyklus-
+> Tagebuch** (`frontend/app/zyklus`, Tabelle `public.cycle_entries`, Migration `024_cycle_tracking.sql`)
+> berechnet die innere Jahreszeit/Phase aus den Period-Starts (`frontend/lib/cycle/phase.ts`). **📈 HRV
+> & Nervensystem** (`frontend/app/hrv`, Tabelle `public.hrv_entries`, Migration `025_hrv_tracking.sql`):
+> manuelle HRV-Eingabe + Ø/Trend/Baseline. Nav-Sektion „Wohlbefinden" in `AppShell.tsx`. Selbstfürsorge,
+> keine medizinische Beratung. ⚠️ Migrationen `024`/`025` vor Betrieb anwenden; `frontend` Rebuild auf
+> .167. PR #136. Details: CLAUDE.md im `The-Connection-Key`-Repo.
+>
 > **Changelog 2026-06-29 (.138/.167 — Vier neue HD-Readings W10–W13: Nervensystem, Weibliches
 > Design, Produktivität, Gene Keys):** Themen-Erweiterung „Human Design im Einklang mit …" als
 > eigenständige Readings im etablierten Einzel-Chart-Muster (analog Psychology/Evolution: eine vom

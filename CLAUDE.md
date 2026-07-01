@@ -1,6 +1,25 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-30 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-01 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-01 (.138 — W10–W13 by-reading-Reuse + depth-analysis TPM-Fix):**
+> - **by-reading-Endpoints für W10–W13** (PRs #28/#29, `2ab0ee9`/`17d5ff3`): neue
+>   `GET /api/readings/{nervous-system,womens-design,productivity,gene-keys}/by-reading/:readingId`
+>   (`reading-worker/server.js`) liefern das **neueste** Reading-Ergebnis zu einem Quell-Reading
+>   (`created_at desc, limit 1`, **beliebiger Status** — nicht mehr hart `completed`): `completed` →
+>   anzeigen, `pending`/`processing` → Polling fortsetzen, `failed` → Neustart anbieten. Ermöglicht der
+>   .167-UI, ein bereits generiertes (oder noch laufendes) Reading beim Öffnen wieder aufzunehmen (Reuse
+>   statt Re-Generieren) — analog Reading-Video by-reading.
+> - **depth-analysis in 2 Pässe splitten (TPM-Fix)** (PR #30, `e1fb537`): depth-analysis lief über den
+>   generischen Einzel-Call-Pfad mit 16k Output; zusammen mit den 7 Wissensdateien ~34k Tokens/Request →
+>   sprengte das OpenAI-TPM-Limit (30k → 429 „Request too large"), bei Overload brannte zudem die ganze
+>   Claude-Modell-Liste durch → abgebrochene Readings „Alle Claude-Modelle fehlgeschlagen". Fix
+>   (`reading-worker/server.js`): Fallback-Kette (Claude↔OpenAI) in Helper `generateWithModelFallback()`
+>   extrahiert; neuer 2-Pass-Zweig für `GENERIC_TWO_PASS_TEMPLATES` (depth-analysis): Sektionen 1–4 / 5–7
+>   in getrennten Calls à 8k Output.
+> ⚠️ **Deploy:** reading-worker **Rebuild**. Nicht E2E-verifiziert. Die .167-Anbindung (W10–W13 als volle
+> Reading-Typen, Reuse-Panels, Chart-Guard) ist im `The-Connection-Key`-Repo dokumentiert (Changelog
+> 2026-07-01). Branch `claude/readings-v4-save-category-sgp9vy`.
+>
 > **Changelog 2026-06-30 (.167 — Welle 3 Self-Tracking: Zyklus-Tagebuch + HRV, nur Frontend):**
 > Zwei interaktive Tracking-Features in der User-App (`frontend`), die auf die Readings W10/W11
 > aufsetzen — **kein .138-Anteil**: persönliche Daten in Supabase mit RLS (`auth.uid()=user_id`),
@@ -790,7 +809,7 @@ Supabase v4.reading_results + public.readings
 | GET | `/api/v4/readings/[id]/history` | Versionen | ✅ |
 | POST | `/api/v4/readings/[id]/share` | Teilen | ✅ |
 | POST | `/api/v4/readings/[id]/email` | E-Mail versenden | ✅ (`RESEND_API_KEY` auf .167 gesetzt) |
-| GET | `/api/v4/readings/[id]/pdf` | PDF Export | ❌ TODO |
+| GET | `/api/v4/readings/[id]/pdf` | PDF Export (`generateReadingPDFBuffer` aus `@/lib/pdf-server`, mit Auth) | ✅ |
 | GET | `/api/v4/readings/[id]/generate-stream` | Streaming | ✅ |
 | POST | `/api/v4/readings/specialized` | Spezial-Readings | ✅ |
 
@@ -1133,7 +1152,7 @@ MarketingWorkflow.tsx       Marketing
 | 8 | ✅ **ERLEDIGT:** Working Tree sauber, alle Änderungen committet | .138 |
 | 9 | CORS nicht auf Produktionsdomain: Code-Default = localhost-Liste (`config.js`), `docker-compose.yml` überschreibt mit `CORS_ORIGINS:-*` (zu offen) → auf `the-connection-key.de` setzen | .138 |
 | 10 | ✅ **ERLEDIGT:** `RESEND_API_KEY` ist auf .167 gesetzt (Root-.env, durchgereicht an frontend/frontend-coach/ck-agent) — E-Mail-Versand funktional | .167 |
-| 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) | .167 |
+| 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) — **nur noch im Legacy-`frontend`** (v3, `next.config.js:327`); `frontend-coach` hat den Flag **nicht** (verifiziert 2026-07-01) | .167 |
 
 ### 🟡 P2 — Wichtig
 
@@ -1301,6 +1320,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-06-29 (.138/.167 — W10–W13 Readings Nervensystem/Weibliches Design/Produktivität/Gene Keys: Migrationen 2026062801–04 angewandt, reading-worker + frontend-coach neu gebaut, Deploy verifiziert)*
+*Letzte Aktualisierung: 2026-07-01 (Doku-Abgleich gegen Repo-Stand — W10–W13 by-reading-Reuse-Endpoints + depth-analysis 2-Pass-TPM-Fix nachgezogen; PDF-Export als erledigt korrigiert; `ignoreBuildErrors` als nur-`frontend` präzisiert)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

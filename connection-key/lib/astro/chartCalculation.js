@@ -806,17 +806,63 @@ function lineForLongitude(longitude) {
   return Math.min(6, Math.max(1, Math.floor((pos / g.span) * 6) + 1));
 }
 
+// ── Geocoding: Cache + serialisierte Nominatim-Anfragen ─────────────────────
+// Nominatim erlaubt max. ~1 Request/Sekunde und blockt Bursts (403/429 oder
+// leere Antwort). Der Composite-Endpoint (Bodygraph-Vergleich) sowie das
+// Frontend geocodeten aber ALLE Personen GLEICHZEITIG via Promise.all: die
+// erste Anfrage (Person 1) wurde bedient, die zweite/dritte (weitere Personen)
+// still mit `null` beantwortet → coords=null → tz-Fallback "UTC" → die
+// Geburtszeit wurde als UTC statt Lokalzeit interpretiert → verschobenes Chart
+// (falsche Tore/Linien/Typ/Profil). Symptom: das eigene (zuerst gefeuerte)
+// Chart stimmte, die weiteren Personen waren falsch.
+//
+// Fix: Ergebnisse cachen + Anfragen global SERIALISIEREN mit Mindestabstand
+// (respektiert die Usage-Policy) + einmaliger Retry. So löst JEDE Person
+// zuverlässig ihre Koordinaten auf, auch bei parallelen Aufrufen.
+const _geoCache = new Map();
+let _geoChain = Promise.resolve();
+const GEO_MIN_INTERVAL_MS = 1100;
+const _geoDelay = () => new Promise((r) => setTimeout(r, GEO_MIN_INTERVAL_MS));
+
+async function nominatimLookup(place) {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(place.trim())}&format=json&limit=1`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": "TheConnectionKey-Chart/1.0 (+https://the-connection-key.de)" },
+  });
+  if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
+  const data = await res.json();
+  if (data && data[0]) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+  return null; // Ort nicht gefunden (kein Rate-Limit) — kein Retry nötig
+}
+
 async function geocodePlace(place) {
   if (!place || typeof place !== "string" || place.trim().length < 2) return null;
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(place.trim())}&format=json&limit=1`;
-    const res = await fetch(url, { headers: { "User-Agent": "TheConnectionKey-Chart/1.0" } });
-    const data = await res.json();
-    if (data && data[0]) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-  } catch (e) {
-    console.warn("[Chart] Geocoding failed:", e?.message);
-  }
-  return null;
+  const key = place.trim().toLowerCase();
+  if (_geoCache.has(key)) return _geoCache.get(key);
+
+  // An die globale Kette hängen → Anfragen laufen strikt nacheinander mit
+  // Mindestabstand, selbst wenn calculateHumanDesignChart parallel (Promise.all)
+  // für mehrere Personen aufgerufen wird.
+  const run = _geoChain.then(async () => {
+    // Evtl. hat ein vorheriges Kettenglied denselben Ort bereits aufgelöst.
+    if (_geoCache.has(key)) return _geoCache.get(key);
+    let coords = null;
+    for (let attempt = 0; attempt < 2 && !coords; attempt++) {
+      try {
+        coords = await nominatimLookup(place);
+        break; // erfolgreiche Antwort (auch "nicht gefunden" = null) → kein Retry
+      } catch (e) {
+        console.warn(`[Chart] Geocoding attempt ${attempt + 1} failed for "${place}":`, e?.message);
+        if (attempt === 0) await _geoDelay(); // vor dem Retry warten
+      }
+    }
+    if (coords) _geoCache.set(key, coords); // nur Treffer cachen, Fehlschläge erneut versuchbar
+    return coords;
+  });
+
+  // Nächstes Kettenglied wartet den Mindestabstand ab (unabhängig vom Ergebnis).
+  _geoChain = run.then(_geoDelay, _geoDelay);
+  return run;
 }
 
 function parseDate(date) {

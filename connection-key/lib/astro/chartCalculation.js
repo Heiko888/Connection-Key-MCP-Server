@@ -806,19 +806,115 @@ function lineForLongitude(longitude) {
   return Math.min(6, Math.max(1, Math.floor((pos / g.span) * 6) + 1));
 }
 
-// ── Geocoding: Cache + serialisierte Nominatim-Anfragen ─────────────────────
-// Nominatim erlaubt max. ~1 Request/Sekunde und blockt Bursts (403/429 oder
-// leere Antwort). Der Composite-Endpoint (Bodygraph-Vergleich) sowie das
-// Frontend geocodeten aber ALLE Personen GLEICHZEITIG via Promise.all: die
-// erste Anfrage (Person 1) wurde bedient, die zweite/dritte (weitere Personen)
-// still mit `null` beantwortet → coords=null → tz-Fallback "UTC" → die
-// Geburtszeit wurde als UTC statt Lokalzeit interpretiert → verschobenes Chart
-// (falsche Tore/Linien/Typ/Profil). Symptom: das eigene (zuerst gefeuerte)
-// Chart stimmte, die weiteren Personen waren falsch.
+// ── Geocoding ───────────────────────────────────────────────────────────────
+// Die Koordinaten des Geburtsorts werden AUSSCHLIESSLICH zur Bestimmung der
+// Zeitzone gebraucht (find(lat,lon) → IANA-tz → Lokalzeit→UTC). Die HD-Planeten
+// sind geozentrisch; der Ort beeinflusst sie NICHT — nur die exakte UTC-Zeit.
 //
-// Fix: Ergebnisse cachen + Anfragen global SERIALISIEREN mit Mindestabstand
-// (respektiert die Usage-Policy) + einmaliger Retry. So löst JEDE Person
-// zuverlässig ihre Koordinaten auf, auch bei parallelen Aufrufen.
+// Bug (Historie): Der Ort wurde live von Nominatim (OpenStreetMap) aufgelöst.
+// Der Composite-Endpoint (Bodygraph-Vergleich) + das Frontend geocodeten ALLE
+// Personen GLEICHZEITIG (Promise.all). Nominatim limitiert aber (max ~1 Req/s,
+// blockt Bursts / die Server-IP → 403/429/leer). Schlug der Call fehl, blieb
+// `coords=null` → tz-Fallback "UTC" → Geburtszeit als UTC statt Lokalzeit →
+// verschobenes Chart (falsche Tore/Linien/Typ/Profil). Bei zwei Personen
+// gleichzeitig konnten so BEIDE falsch werden.
+//
+// Fix: (1) Offline-Ortstabelle ZUERST (netzunabhängig, deckt DACH-Städte +
+// Weltgroßstädte + Länder ab → korrekte Zeitzone auch ohne Nominatim).
+// (2) Nur für unbekannte Orte Nominatim — dann gecacht + global SERIALISIERT
+// mit Mindestabstand + Retry (respektiert die Usage-Policy).
+//
+// Repräsentative Koordinaten reichen: für die Zeitzone genügt ~0,1° Genauigkeit.
+const OFFLINE_CITIES = {
+  // Deutschland
+  berlin:[52.52,13.40], hamburg:[53.55,10.00], munchen:[48.14,11.58], munich:[48.14,11.58],
+  koln:[50.94,6.96], cologne:[50.94,6.96], frankfurt:[50.11,8.68], stuttgart:[48.78,9.18],
+  dusseldorf:[51.23,6.78], leipzig:[51.34,12.37], dortmund:[51.51,7.47], essen:[51.46,7.01],
+  bremen:[53.08,8.80], dresden:[51.05,13.74], hannover:[52.37,9.73], hanover:[52.37,9.73],
+  nurnberg:[49.45,11.08], nuremberg:[49.45,11.08], duisburg:[51.43,6.77], bochum:[51.48,7.22],
+  wuppertal:[51.26,7.18], bonn:[50.74,7.10], munster:[51.96,7.63], mannheim:[49.49,8.47],
+  karlsruhe:[49.01,8.40], augsburg:[48.37,10.90], wiesbaden:[50.08,8.24], kiel:[54.32,10.14],
+  freiburg:[47.99,7.85], aachen:[50.78,6.08], kassel:[51.31,9.50], rostock:[54.09,12.14],
+  magdeburg:[52.12,11.63], erfurt:[50.98,11.03], halle:[51.48,11.97], saarbrucken:[49.24,6.99],
+  regensburg:[49.01,12.10], mainz:[50.00,8.27], braunschweig:[52.27,10.52], chemnitz:[50.83,12.92],
+  // Österreich
+  wien:[48.21,16.37], vienna:[48.21,16.37], graz:[47.07,15.44], linz:[48.31,14.29],
+  salzburg:[47.80,13.04], innsbruck:[47.27,11.39], klagenfurt:[46.62,14.31], villach:[46.61,13.85],
+  wels:[48.16,14.03], bregenz:[47.50,9.75], "sankt polten":[48.20,15.63], "st polten":[48.20,15.63],
+  // Schweiz
+  zurich:[47.37,8.54], genf:[46.20,6.14], geneva:[46.20,6.14], geneve:[46.20,6.14],
+  basel:[47.56,7.59], bern:[46.95,7.44], lausanne:[46.52,6.63], luzern:[47.05,8.31],
+  lucerne:[47.05,8.31], winterthur:[47.50,8.72], "st gallen":[47.42,9.38], lugano:[46.00,8.95],
+  // Europa
+  london:[51.51,-0.13], paris:[48.85,2.35], madrid:[40.42,-3.70], barcelona:[41.39,2.17],
+  rom:[41.90,12.50], rome:[41.90,12.50], mailand:[45.46,9.19], milan:[45.46,9.19], milano:[45.46,9.19],
+  amsterdam:[52.37,4.90], brussel:[50.85,4.35], brussels:[50.85,4.35], bruxelles:[50.85,4.35],
+  lissabon:[38.72,-9.14], lisbon:[38.72,-9.14], prag:[50.08,14.44], prague:[50.08,14.44],
+  warschau:[52.23,21.01], warsaw:[52.23,21.01], budapest:[47.50,19.04], kopenhagen:[55.68,12.57],
+  copenhagen:[55.68,12.57], stockholm:[59.33,18.06], oslo:[59.91,10.75], helsinki:[60.17,24.94],
+  athen:[37.98,23.73], athens:[37.98,23.73], dublin:[53.35,-6.26], zagreb:[45.81,15.98],
+  bukarest:[44.43,26.10], bucharest:[44.43,26.10], sofia:[42.70,23.32], belgrad:[44.79,20.45],
+  belgrade:[44.79,20.45], moskau:[55.75,37.62], moscow:[55.75,37.62], istanbul:[41.01,28.98],
+  kiew:[50.45,30.52], kyiv:[50.45,30.52], kiev:[50.45,30.52], ljubljana:[46.06,14.51],
+  bratislava:[48.15,17.11], luxemburg:[49.61,6.13], luxembourg:[49.61,6.13],
+  // Welt
+  "new york":[40.71,-74.01], "los angeles":[34.05,-118.24], chicago:[41.88,-87.63],
+  toronto:[43.65,-79.38], vancouver:[49.28,-123.12], "mexico city":[19.43,-99.13],
+  "sao paulo":[-23.55,-46.63], "buenos aires":[-34.60,-58.38], "rio de janeiro":[-22.91,-43.17],
+  tokio:[35.68,139.69], tokyo:[35.68,139.69], peking:[39.90,116.40], beijing:[39.90,116.40],
+  shanghai:[31.23,121.47], "hong kong":[22.32,114.17], singapur:[1.35,103.82], singapore:[1.35,103.82],
+  bangkok:[13.76,100.50], delhi:[28.61,77.21], mumbai:[19.08,72.88], dubai:[25.20,55.27],
+  sydney:[-33.87,151.21], melbourne:[-37.81,144.96], kairo:[30.04,31.24], cairo:[30.04,31.24],
+  johannesburg:[-26.20,28.05], kapstadt:[-33.92,18.42], "cape town":[-33.92,18.42],
+  nairobi:[-1.29,36.82], lagos:[6.52,3.38], auckland:[-36.85,174.76], seoul:[37.57,126.98],
+  jakarta:[-6.21,106.85], "tel aviv":[32.09,34.78], teheran:[35.69,51.39], tehran:[35.69,51.39],
+};
+
+// Land-Stichwort → repräsentative Koordinaten (Hauptstadt). Letzter Fallback,
+// wenn keine Stadt erkannt wurde. Für DACH ist die Zeitzone landesweit eindeutig
+// (CET/CEST), daher deckt "…, Deutschland/Österreich/Schweiz" auch jeden Kleinort ab.
+const OFFLINE_COUNTRIES = {
+  deutschland:[52.52,13.40], germany:[52.52,13.40],
+  osterreich:[48.21,16.37], austria:[48.21,16.37],
+  schweiz:[47.37,8.54], switzerland:[47.37,8.54], suisse:[47.37,8.54], svizzera:[47.37,8.54],
+  frankreich:[48.85,2.35], france:[48.85,2.35],
+  italien:[41.90,12.50], italy:[41.90,12.50], italia:[41.90,12.50],
+  spanien:[40.42,-3.70], spain:[40.42,-3.70], espana:[40.42,-3.70],
+  niederlande:[52.37,4.90], netherlands:[52.37,4.90], holland:[52.37,4.90],
+  belgien:[50.85,4.35], belgium:[50.85,4.35], portugal:[38.72,-9.14],
+  polen:[52.23,21.01], poland:[52.23,21.01], tschechien:[50.08,14.44],
+  ungarn:[47.50,19.04], hungary:[47.50,19.04], danemark:[55.68,12.57], denmark:[55.68,12.57],
+  schweden:[59.33,18.06], sweden:[59.33,18.06], norwegen:[59.91,10.75], norway:[59.91,10.75],
+  finnland:[60.17,24.94], finland:[60.17,24.94], griechenland:[37.98,23.73], greece:[37.98,23.73],
+  irland:[53.35,-6.26], ireland:[53.35,-6.26], grossbritannien:[51.51,-0.13],
+  england:[51.51,-0.13], "united kingdom":[51.51,-0.13],
+  russland:[55.75,37.62], russia:[55.75,37.62], turkei:[41.01,28.98], turkey:[41.01,28.98],
+  australien:[-33.87,151.21], australia:[-33.87,151.21], japan:[35.68,139.69], china:[39.90,116.40],
+  indien:[28.61,77.21], india:[28.61,77.21], brasilien:[-23.55,-46.63], brazil:[-23.55,-46.63],
+  kanada:[43.65,-79.38], canada:[43.65,-79.38], mexiko:[19.43,-99.13], mexico:[19.43,-99.13],
+  usa:[40.71,-74.01], "united states":[40.71,-74.01], amerika:[40.71,-74.01],
+};
+
+// Normalisiert auf ein von Leerzeichen umschlossenes ASCII-Kleinstring
+// (Umlaute/Akzente entfernt, ß→ss), damit Token-genaue includes-Matches klappen.
+const _normPlace = (s) =>
+  ` ${String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ß/g, "ss").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+
+function _tableLookup(table, placeNorm) {
+  let best = null, bestLen = 0;
+  for (const k of Object.keys(table)) {
+    if (k.length > bestLen && placeNorm.includes(` ${k} `)) { best = table[k]; bestLen = k.length; }
+  }
+  return best ? { lat: best[0], lon: best[1] } : null;
+}
+
+function offlineGeocode(place) {
+  const p = _normPlace(place);
+  if (p.trim().length < 2) return null;
+  // Städte zuerst (spezifischer), dann Länder als Fallback.
+  return _tableLookup(OFFLINE_CITIES, p) || _tableLookup(OFFLINE_COUNTRIES, p);
+}
+
 const _geoCache = new Map();
 let _geoChain = Promise.resolve();
 const GEO_MIN_INTERVAL_MS = 1100;
@@ -840,9 +936,13 @@ async function geocodePlace(place) {
   const key = place.trim().toLowerCase();
   if (_geoCache.has(key)) return _geoCache.get(key);
 
-  // An die globale Kette hängen → Anfragen laufen strikt nacheinander mit
-  // Mindestabstand, selbst wenn calculateHumanDesignChart parallel (Promise.all)
-  // für mehrere Personen aufgerufen wird.
+  // 1) Offline-Tabelle zuerst — schnell, netzunabhängig, deckt die meisten
+  //    realen Eingaben ab (DACH-Städte, Weltgroßstädte, Länder).
+  const offline = offlineGeocode(place);
+  if (offline) { _geoCache.set(key, offline); return offline; }
+
+  // 2) Unbekannter Ort → Nominatim. An die globale Kette hängen → Anfragen laufen
+  //    strikt nacheinander mit Mindestabstand, selbst bei parallelen Aufrufen.
   const run = _geoChain.then(async () => {
     // Evtl. hat ein vorheriges Kettenglied denselben Ort bereits aufgelöst.
     if (_geoCache.has(key)) return _geoCache.get(key);

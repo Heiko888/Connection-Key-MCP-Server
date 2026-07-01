@@ -2037,6 +2037,87 @@ function buildSnippetBlock(payload, placeholders) {
   ].join('\n');
 }
 
+// ── Modell-Dispatch mit Fallback (Claude→OpenAI bzw. OpenAI→Claude) ──────────
+// Einzelner Prompt → generierter Text. Kapselt die komplette Fallback-Kette, damit
+// sowohl der Standard-Einzel-Call als auch die generische 2-Pass-Generierung
+// dieselbe robuste Logik teilen (vorher inline dupliziert in _generateReading).
+async function generateWithModelFallback({ prompt, modelConfig, maxTokens, temperature = 0.7 }) {
+  if (modelConfig.provider === "claude") {
+    const modelsToTry = modelConfig.models || [];
+    let lastErr;
+    for (const modelId of modelsToTry) {
+      try {
+        console.log(`   Versuche Claude-Modell: ${modelId}`);
+        const result = await generateWithClaude(prompt, { model: modelId, maxTokens, temperature });
+        console.log(`   ✅ Claude (${modelId}) erfolgreich`);
+        return result;
+      } catch (claudeErr) {
+        lastErr = claudeErr;
+        console.warn(`   ⚠️  Claude (${modelId}) fehlgeschlagen:`, claudeErr.message);
+      }
+    }
+    // Alle Claude-Modelle gescheitert → OpenAI-Fallback statt Job-Fail (symmetrisch
+    // zum OpenAI→Claude-Fallback unten). Häufigster Grund für "alle gescheitert":
+    // transienter 529 Overloaded / 429 Rate-Limit über die ganze Modell-Liste.
+    // Reading nicht verlieren, sondern mit OpenAI weitermachen wenn verfügbar.
+    if (isOpenAIAvailable()) {
+      const fallbackModelId = "gpt-4o";
+      console.warn(`   🔁 Alle Claude-Modelle fehlgeschlagen — Fallback auf OpenAI (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
+      try {
+        const result = await generateWithOpenAI(prompt, { model: fallbackModelId, maxTokens, temperature });
+        console.log(`   ✅ OpenAI-Fallback (${fallbackModelId}) erfolgreich`);
+        return result;
+      } catch (openaiErr) {
+        console.warn(`   ⚠️  OpenAI-Fallback fehlgeschlagen:`, openaiErr.message);
+        // Beide Fehler getrennt festhalten, damit die DB-Meldung nicht "Alle
+        // Claude-Modelle fehlgeschlagen" mit einem OpenAI-Fehler vermischt.
+        throw new Error(`Claude fehlgeschlagen (${lastErr?.message || "?"}) UND OpenAI-Fallback fehlgeschlagen (${openaiErr.message})`);
+      }
+    }
+    throw new Error(`Alle Claude-Modelle fehlgeschlagen: ${lastErr?.message || "?"}`);
+  }
+
+  if (modelConfig.provider === "openai") {
+    const modelsToTry = modelConfig.models || [];
+    let lastErr;
+    for (const modelId of modelsToTry) {
+      try {
+        console.log(`   Versuche OpenAI-Modell: ${modelId}`);
+        const result = await generateWithOpenAI(prompt, { model: modelId, maxTokens, temperature });
+        console.log(`   ✅ OpenAI (${modelId}) erfolgreich`);
+        return result;
+      } catch (openaiErr) {
+        lastErr = openaiErr;
+        console.warn(`   ⚠️  OpenAI (${modelId}) fehlgeschlagen:`, openaiErr.message);
+      }
+    }
+    // Alle OpenAI-Modelle gescheitert → Claude-Fallback statt Job-Fail.
+    // Häufigster Grund: TPM-Rate-Limit (429) bei Tier-1-Accounts. Reading nicht
+    // verlieren, sondern mit Default-Claude-Modell weitermachen.
+    if (isClaudeAvailable()) {
+      const fallbackModelId = "claude-sonnet-4-6";
+      console.warn(`   🔁 OpenAI komplett fehlgeschlagen — Fallback auf Claude (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
+      try {
+        const result = await generateWithClaude(prompt, { model: fallbackModelId, maxTokens, temperature });
+        console.log(`   ✅ Claude-Fallback (${fallbackModelId}) erfolgreich`);
+        return result;
+      } catch (claudeErr) {
+        console.warn(`   ⚠️  Claude-Fallback fehlgeschlagen:`, claudeErr.message);
+      }
+    }
+    throw new Error(`Alle OpenAI-Modelle und Claude-Fallback fehlgeschlagen: ${lastErr?.message || "?"}`);
+  }
+
+  throw new Error(`Unbekannter Provider: ${modelConfig.provider}`);
+}
+
+// Generische Reading-Typen, die zu groß für einen einzelnen Modell-Call sind und
+// deshalb in 2 Pässe (je ~8k Output) gesplittet werden. Ein einzelner Call würde
+// sonst (System + alle Wissensdateien + 16k Output ≈ 34k Tokens) am OpenAI-TPM-
+// Limit (30k) scheitern — und selbst Claude bei Overload über die Modell-Liste
+// durchbrennen. Siehe Fix für abgebrochene depth-analysis-Readings.
+const GENERIC_TWO_PASS_TEMPLATES = new Set(['depth-analysis']);
+
 // Thin Wrapper: setzt den Kosten-Tracking-Kontext (reading_id, coach_id, agent)
 // für diesen Job. Alle generateWithClaude-Calls darunter — inkl. sämtlicher
 // 2-Pass-Hilfsfunktionen — erben die Metadaten via AsyncLocalStorage.
@@ -2309,87 +2390,35 @@ ${userData.client_data ? JSON.stringify(userData.client_data, null, 2) : ''}`;
 
   const fullPrompt = `${systemPrompt}\n\n---\n\n${userMessage}`;
 
-  if (modelConfig.provider === "claude") {
-    const modelsToTry = modelConfig.models || [];
-    let lastErr;
-    for (const modelId of modelsToTry) {
-      try {
-        console.log(`   Versuche Claude-Modell: ${modelId}`);
-        const result = await generateWithClaude(fullPrompt, {
-          model: modelId,
-          maxTokens,
-          temperature: 0.7,
-        });
-        console.log(`   ✅ Claude (${modelId}) erfolgreich`);
-        return result;
-      } catch (claudeErr) {
-        lastErr = claudeErr;
-        console.warn(`   ⚠️  Claude (${modelId}) fehlgeschlagen:`, claudeErr.message);
-      }
-    }
-    // Alle Claude-Modelle gescheitert → OpenAI-Fallback statt Job-Fail (symmetrisch
-    // zum OpenAI→Claude-Fallback unten). Häufigster Grund für "alle gescheitert":
-    // transienter 529 Overloaded / 429 Rate-Limit über die ganze Modell-Liste.
-    // Reading nicht verlieren, sondern mit OpenAI weitermachen wenn verfügbar.
-    if (isOpenAIAvailable()) {
-      const fallbackModelId = "gpt-4o";
-      console.warn(`   🔁 Alle Claude-Modelle fehlgeschlagen — Fallback auf OpenAI (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
-      try {
-        const result = await generateWithOpenAI(fullPrompt, {
-          model: fallbackModelId,
-          maxTokens,
-          temperature: 0.7,
-        });
-        console.log(`   ✅ OpenAI-Fallback (${fallbackModelId}) erfolgreich`);
-        return result;
-      } catch (openaiErr) {
-        console.warn(`   ⚠️  OpenAI-Fallback fehlgeschlagen:`, openaiErr.message);
-        lastErr = openaiErr;
-      }
-    }
-    throw new Error(`Alle Claude-Modelle fehlgeschlagen: ${lastErr?.message || "?"}`);
+  // ── Generische 2-Pass-Generierung für zu große Reading-Typen (z.B. depth-analysis) ──
+  // Ein einzelner Call (System + alle Wissensdateien ≈ 18k Input + 16k Output ≈ 34k
+  // Tokens) sprengt das OpenAI-TPM-Limit (30k → 429 "Request too large") und lässt
+  // bei Overload die ganze Claude-Modell-Liste durchbrennen. Lösung: Output in 2
+  // Pässe (je ~8k) splitten. Der volle Prompt (Template + Fakten + Wissen) bleibt in
+  // beiden Pässen erhalten (Faktentreue), nur die auszugebenden Sektionen werden
+  // aufgeteilt. Teil 1 wird bewusst NICHT als Kontext in Teil 2 injiziert — sonst
+  // wüchse Teil 2 wieder über die 30k-Grenze und der OpenAI-Fallback bräche erneut.
+  if (GENERIC_TWO_PASS_TEMPLATES.has(template)) {
+    const tokensPerPart = 8000;
+    const part1Prompt = `${fullPrompt}
+
+=== AUSGABE-ANWEISUNG (TEIL 1 von 2) ===
+Schreibe NUR die Abschnitte "## 1." bis einschließlich "## 4." der oben beschriebenen Struktur — vollständig und in voller Tiefe.
+Höre nach Abschnitt 4 auf. Schreibe KEINE Abschnitte 5, 6, 7 und KEINEN Schlussteil. Beginne direkt mit "## 1.".`;
+    const part2Prompt = `${fullPrompt}
+
+=== AUSGABE-ANWEISUNG (TEIL 2 von 2) ===
+Die Abschnitte "## 1." bis "## 4." wurden bereits geschrieben — wiederhole sie NICHT.
+Schreibe JETZT NUR die Abschnitte "## 5." bis einschließlich "## 7." der oben beschriebenen Struktur — vollständig und in voller Tiefe — inklusive des abschließenden Stil-/Längenhinweises. Beginne direkt mit "## 5.".`;
+
+    console.log(`   [2-Pass:${template}] Split in 2 Pässe (je ${tokensPerPart} Tokens) — TPM-schonend`);
+    const part1 = await generateWithModelFallback({ prompt: part1Prompt, modelConfig, maxTokens: tokensPerPart });
+    const part2 = await generateWithModelFallback({ prompt: part2Prompt, modelConfig, maxTokens: tokensPerPart });
+    console.log(`   ✅ [2-Pass:${template}] fertig (${part1.length + part2.length} Zeichen gesamt)`);
+    return `${part1}\n\n---\n\n${part2}`;
   }
 
-  if (modelConfig.provider === "openai") {
-    const modelsToTry = modelConfig.models || [];
-    let lastErr;
-    for (const modelId of modelsToTry) {
-      try {
-        console.log(`   Versuche OpenAI-Modell: ${modelId}`);
-        const result = await generateWithOpenAI(fullPrompt, {
-          model: modelId,
-          maxTokens,
-          temperature: 0.7,
-        });
-        console.log(`   ✅ OpenAI (${modelId}) erfolgreich`);
-        return result;
-      } catch (openaiErr) {
-        lastErr = openaiErr;
-        console.warn(`   ⚠️  OpenAI (${modelId}) fehlgeschlagen:`, openaiErr.message);
-      }
-    }
-    // Alle OpenAI-Modelle gescheitert → Claude-Fallback statt Job-Fail.
-    // Häufigster Grund: TPM-Rate-Limit (429) bei Tier-1-Accounts. Reading nicht
-    // verlieren, sondern mit Default-Claude-Modell weitermachen.
-    if (isClaudeAvailable()) {
-      const fallbackModelId = "claude-sonnet-4-6";
-      console.warn(`   🔁 OpenAI komplett fehlgeschlagen — Fallback auf Claude (${fallbackModelId}). Letzter Fehler: ${lastErr?.message?.slice(0, 200) || "?"}`);
-      try {
-        const result = await generateWithClaude(fullPrompt, {
-          model: fallbackModelId,
-          maxTokens,
-          temperature: 0.7,
-        });
-        console.log(`   ✅ Claude-Fallback (${fallbackModelId}) erfolgreich`);
-        return result;
-      } catch (claudeErr) {
-        console.warn(`   ⚠️  Claude-Fallback fehlgeschlagen:`, claudeErr.message);
-      }
-    }
-    throw new Error(`Alle OpenAI-Modelle und Claude-Fallback fehlgeschlagen: ${lastErr?.message || "?"}`);
-  }
-
-  throw new Error(`Unbekannter Provider: ${modelConfig.provider}`);
+  return await generateWithModelFallback({ prompt: fullPrompt, modelConfig, maxTokens });
 }
 
 // ======================================================

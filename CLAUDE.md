@@ -1,6 +1,25 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-30 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-01 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-01 (.138 — W10–W13 by-reading-Reuse + depth-analysis TPM-Fix):**
+> - **by-reading-Endpoints für W10–W13** (PRs #28/#29, `2ab0ee9`/`17d5ff3`): neue
+>   `GET /api/readings/{nervous-system,womens-design,productivity,gene-keys}/by-reading/:readingId`
+>   (`reading-worker/server.js`) liefern das **neueste** Reading-Ergebnis zu einem Quell-Reading
+>   (`created_at desc, limit 1`, **beliebiger Status** — nicht mehr hart `completed`): `completed` →
+>   anzeigen, `pending`/`processing` → Polling fortsetzen, `failed` → Neustart anbieten. Ermöglicht der
+>   .167-UI, ein bereits generiertes (oder noch laufendes) Reading beim Öffnen wieder aufzunehmen (Reuse
+>   statt Re-Generieren) — analog Reading-Video by-reading.
+> - **depth-analysis in 2 Pässe splitten (TPM-Fix)** (PR #30, `e1fb537`): depth-analysis lief über den
+>   generischen Einzel-Call-Pfad mit 16k Output; zusammen mit den 7 Wissensdateien ~34k Tokens/Request →
+>   sprengte das OpenAI-TPM-Limit (30k → 429 „Request too large"), bei Overload brannte zudem die ganze
+>   Claude-Modell-Liste durch → abgebrochene Readings „Alle Claude-Modelle fehlgeschlagen". Fix
+>   (`reading-worker/server.js`): Fallback-Kette (Claude↔OpenAI) in Helper `generateWithModelFallback()`
+>   extrahiert; neuer 2-Pass-Zweig für `GENERIC_TWO_PASS_TEMPLATES` (depth-analysis): Sektionen 1–4 / 5–7
+>   in getrennten Calls à 8k Output.
+> ⚠️ **Deploy:** reading-worker **Rebuild**. Nicht E2E-verifiziert. Die .167-Anbindung (W10–W13 als volle
+> Reading-Typen, Reuse-Panels, Chart-Guard) ist im `The-Connection-Key`-Repo dokumentiert (Changelog
+> 2026-07-01). Branch `claude/readings-v4-save-category-sgp9vy`.
+>
 > **Changelog 2026-06-30 (.167 — Welle 3 Self-Tracking: Zyklus-Tagebuch + HRV, nur Frontend):**
 > Zwei interaktive Tracking-Features in der User-App (`frontend`), die auf die Readings W10/W11
 > aufsetzen — **kein .138-Anteil**: persönliche Daten in Supabase mit RLS (`auth.uid()=user_id`),
@@ -790,7 +809,7 @@ Supabase v4.reading_results + public.readings
 | GET | `/api/v4/readings/[id]/history` | Versionen | ✅ |
 | POST | `/api/v4/readings/[id]/share` | Teilen | ✅ |
 | POST | `/api/v4/readings/[id]/email` | E-Mail versenden | ✅ (`RESEND_API_KEY` auf .167 gesetzt) |
-| GET | `/api/v4/readings/[id]/pdf` | PDF Export | ❌ TODO |
+| GET | `/api/v4/readings/[id]/pdf` | PDF Export (`generateReadingPDFBuffer` aus `@/lib/pdf-server`, mit Auth) | ✅ |
 | GET | `/api/v4/readings/[id]/generate-stream` | Streaming | ✅ |
 | POST | `/api/v4/readings/specialized` | Spezial-Readings | ✅ |
 
@@ -819,7 +838,7 @@ Supabase v4.reading_results + public.readings
 | POST | `/api/agents/video-creation` | Video Generation |
 | POST | `/api/agents/transit` | Transit Insights |
 | POST | `/api/agents/depth-analysis` | Depth Analysis |
-| POST | `/api/agents/tasks` | Task Planning ❌ TODO: MCP Endpoint fehlt |
+| POST | `/api/agents/tasks` | Task Planning ✅ (`/agent/tasks` existiert, `mcp-gateway.js:234`) |
 | POST | `/api/agents/shadow-work` | Shadow Work |
 | POST | `/api/agents/social-youtube` | Social Media |
 | POST | `/api/agents/relationship` | Relationship |
@@ -865,9 +884,9 @@ Timeout:        300s
 Max Tokens:     8000 (config) / 16000 (actual)
 ```
 
-### Agent-Übersicht (Stand: `mcp-gateway.js` abgeglichen 2026-05-27)
+### Agent-Übersicht (Stand: `mcp-gateway.js` abgeglichen 2026-07-01)
 
-**Dedizierte `/agent/*`-Routen (existieren real, 16):**
+**Dedizierte `/agent/*`-Routen (existieren real, 21):**
 
 | # | Agent | Server | Endpunkt | Modell | Status |
 |---|-------|--------|----------|--------|--------|
@@ -887,20 +906,17 @@ Max Tokens:     8000 (config) / 16000 (actual)
 | 14 | Health & Wellness | .138 | :7000/agent/health | Claude | ✅ |
 | 15 | Geld & Überfluss | .138 | :7000/agent/abundance | Claude | ✅ |
 | 16 | HD Relationship | .167 | UI-only | — | ✅ UI |
+| 17 | Chart Analysis | .138 | :7000/agent/chart | Claude | ✅ (`makeSimpleAgent`) |
+| 18 | Yearly Analysis | .138 | :7000/agent/yearly | Claude | ✅ (`makeSimpleAgent`) |
+| 19 | Automation Strategy | .138 | :7000/agent/automation | Claude | ✅ (`makeSimpleAgent`) |
+| 20 | Depth Analysis | .138 | :7000/agent/depth-analysis | Claude | ✅ (`makeSimpleAgent`) |
+| 21 | Task Planning | .138 | :7000/agent/tasks | Claude | ✅ (`makeSimpleAgent`) |
 
-**Vom Frontend (.167 `/api/agents/*`) erwartet, aber OHNE dedizierte Gateway-Route (→ 404, siehe `AGENTEN_404_FEHLER_ANALYSE.md`):**
-
-| Agent | Frontend-Route (.167) | Gateway-Route (.138) | Status |
-|-------|----------------------|----------------------|--------|
-| Chart Analysis | `/api/agents/chart` | ❌ `/agent/chart` fehlt | ❌ |
-| Yearly Analysis | `/api/agents/yearly` | ❌ `/agent/yearly` fehlt | ❌ |
-| Automation Strategy | `/api/agents/automation` | ❌ `/agent/automation` fehlt | ❌ |
-| Depth Analysis | `/api/agents/depth-analysis` | ❌ `/agent/depth-analysis` fehlt | ❌ |
-| Task Planning | `/api/agents/tasks` | ❌ `/agent/tasks` fehlt | ❌ TODO |
-
-> Hinweis: `chart`, `automation`, `chart`(Analyse) etc. haben zwar System-Prompts in
-> `AGENT_SYSTEM_PROMPTS`, aber keine registrierte HTTP-Route. Sie müssten entweder als
-> dedizierte `/agent/*`-Route ergänzt oder über `/agents/run` (MCP-Core) bedient werden.
+✅ **404er behoben (verifiziert 2026-07-01):** Die früher als „fehlend → 404" gelisteten Routen
+`chart`/`yearly`/`automation`/`depth-analysis`/`tasks` sind in `mcp-gateway.js:230–234` real registriert
+(via `makeSimpleAgent(name)`, System-Prompt aus `AGENT_SYSTEM_PROMPTS`). Damit sind **alle** vom Frontend
+(.167 `/api/agents/*`) erwarteten Agenten durch eine dedizierte Gateway-Route abgedeckt; die Analyse in
+`AGENTEN_404_FEHLER_ANALYSE.md` ist historisch. Kein offener TODO mehr für Task Planning.
 
 ### Reading-Templates (22 Stück auf .138)
 
@@ -1133,7 +1149,7 @@ MarketingWorkflow.tsx       Marketing
 | 8 | ✅ **ERLEDIGT:** Working Tree sauber, alle Änderungen committet | .138 |
 | 9 | CORS nicht auf Produktionsdomain: Code-Default = localhost-Liste (`config.js`), `docker-compose.yml` überschreibt mit `CORS_ORIGINS:-*` (zu offen) → auf `the-connection-key.de` setzen | .138 |
 | 10 | ✅ **ERLEDIGT:** `RESEND_API_KEY` ist auf .167 gesetzt (Root-.env, durchgereicht an frontend/frontend-coach/ck-agent) — E-Mail-Versand funktional | .167 |
-| 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) | .167 |
+| 11 | TypeScript Fehler ignoriert (`ignoreBuildErrors=true`) — **nur noch im Legacy-`frontend`** (v3, `next.config.js:327`); `frontend-coach` hat den Flag **nicht** (verifiziert 2026-07-01) | .167 |
 
 ### 🟡 P2 — Wichtig
 
@@ -1159,8 +1175,8 @@ MarketingWorkflow.tsx       Marketing
 |-----|--------|--------|
 | ✅ ~~AUTH_ENABLED auf true + JWT implementieren~~ | .138 | **Erledigt** — Auth (API-Key + Supabase-JWT) aktiv |
 | CORS auf `the-connection-key.de` setzen | .138 | `CORS_ORIGINS` env auf Produktionsdomain (statt `*`) |
-| `/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen | .138 | Fehlende Gateway-Routen → behebt 404er (`AGENTEN_404_FEHLER_ANALYSE.md`) |
-| `/agents/reading`-Platzhalter durch echte Generierung ersetzen | .138 | `mcp-gateway.js:302-316` |
+| ✅ ~~`/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen~~ | .138 | **Erledigt** (verifiziert 2026-07-01) — alle 5 via `makeSimpleAgent` registriert (`mcp-gateway.js:230–234`); 404er behoben |
+| ✅ ~~`/agents/reading`-Platzhalter durch echte Generierung ersetzen~~ | .138 | **Erledigt** (verifiziert 2026-07-01) — `/agents/reading` (mit s) macht echten Claude-Call (`mcp-gateway.js:426`, 503 ohne `ANTHROPIC_API_KEY`). Hinweis: `/agent/reading` (ohne s, Zeile 273) hat weiter einen Placeholder-Fallback ohne Key |
 | ✅ ~~Host-Nginx agent Config fixen (3005→4000)~~ | .167 | **Erledigt (2026-06-07)** — `sites-enabled/agent` → 4000, 200 |
 | IP-Hardcoding durch ENV-Variablen ersetzen (50+ Dateien) | .167 | `V4_BACKEND_URL`, `READING_AGENT_URL`, `MCP_SERVER_URL` |
 | `generateReading.js` STUB durch echte Engine ersetzen | .167 | Von .138 kopieren ODER v4-worker auf .138 deployen |
@@ -1301,6 +1317,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-06-29 (.138/.167 — W10–W13 Readings Nervensystem/Weibliches Design/Produktivität/Gene Keys: Migrationen 2026062801–04 angewandt, reading-worker + frontend-coach neu gebaut, Deploy verifiziert)*
+*Letzte Aktualisierung: 2026-07-01 (Doku-Abgleich gegen Repo-Stand — W10–W13 by-reading-Reuse-Endpoints + depth-analysis 2-Pass-TPM-Fix nachgezogen; PDF-Export als erledigt korrigiert; `ignoreBuildErrors` als nur-`frontend` präzisiert)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

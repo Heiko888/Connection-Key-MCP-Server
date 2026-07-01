@@ -838,7 +838,7 @@ Supabase v4.reading_results + public.readings
 | POST | `/api/agents/video-creation` | Video Generation |
 | POST | `/api/agents/transit` | Transit Insights |
 | POST | `/api/agents/depth-analysis` | Depth Analysis |
-| POST | `/api/agents/tasks` | Task Planning ❌ TODO: MCP Endpoint fehlt |
+| POST | `/api/agents/tasks` | Task Planning ✅ (`/agent/tasks` existiert, `mcp-gateway.js:234`) |
 | POST | `/api/agents/shadow-work` | Shadow Work |
 | POST | `/api/agents/social-youtube` | Social Media |
 | POST | `/api/agents/relationship` | Relationship |
@@ -884,9 +884,9 @@ Timeout:        300s
 Max Tokens:     8000 (config) / 16000 (actual)
 ```
 
-### Agent-Übersicht (Stand: `mcp-gateway.js` abgeglichen 2026-05-27)
+### Agent-Übersicht (Stand: `mcp-gateway.js` abgeglichen 2026-07-01)
 
-**Dedizierte `/agent/*`-Routen (existieren real, 16):**
+**Dedizierte `/agent/*`-Routen (existieren real, 21):**
 
 | # | Agent | Server | Endpunkt | Modell | Status |
 |---|-------|--------|----------|--------|--------|
@@ -906,20 +906,17 @@ Max Tokens:     8000 (config) / 16000 (actual)
 | 14 | Health & Wellness | .138 | :7000/agent/health | Claude | ✅ |
 | 15 | Geld & Überfluss | .138 | :7000/agent/abundance | Claude | ✅ |
 | 16 | HD Relationship | .167 | UI-only | — | ✅ UI |
+| 17 | Chart Analysis | .138 | :7000/agent/chart | Claude | ✅ (`makeSimpleAgent`) |
+| 18 | Yearly Analysis | .138 | :7000/agent/yearly | Claude | ✅ (`makeSimpleAgent`) |
+| 19 | Automation Strategy | .138 | :7000/agent/automation | Claude | ✅ (`makeSimpleAgent`) |
+| 20 | Depth Analysis | .138 | :7000/agent/depth-analysis | Claude | ✅ (`makeSimpleAgent`) |
+| 21 | Task Planning | .138 | :7000/agent/tasks | Claude | ✅ (`makeSimpleAgent`) |
 
-**Vom Frontend (.167 `/api/agents/*`) erwartet, aber OHNE dedizierte Gateway-Route (→ 404, siehe `AGENTEN_404_FEHLER_ANALYSE.md`):**
-
-| Agent | Frontend-Route (.167) | Gateway-Route (.138) | Status |
-|-------|----------------------|----------------------|--------|
-| Chart Analysis | `/api/agents/chart` | ❌ `/agent/chart` fehlt | ❌ |
-| Yearly Analysis | `/api/agents/yearly` | ❌ `/agent/yearly` fehlt | ❌ |
-| Automation Strategy | `/api/agents/automation` | ❌ `/agent/automation` fehlt | ❌ |
-| Depth Analysis | `/api/agents/depth-analysis` | ❌ `/agent/depth-analysis` fehlt | ❌ |
-| Task Planning | `/api/agents/tasks` | ❌ `/agent/tasks` fehlt | ❌ TODO |
-
-> Hinweis: `chart`, `automation`, `chart`(Analyse) etc. haben zwar System-Prompts in
-> `AGENT_SYSTEM_PROMPTS`, aber keine registrierte HTTP-Route. Sie müssten entweder als
-> dedizierte `/agent/*`-Route ergänzt oder über `/agents/run` (MCP-Core) bedient werden.
+✅ **404er behoben (verifiziert 2026-07-01):** Die früher als „fehlend → 404" gelisteten Routen
+`chart`/`yearly`/`automation`/`depth-analysis`/`tasks` sind in `mcp-gateway.js:230–234` real registriert
+(via `makeSimpleAgent(name)`, System-Prompt aus `AGENT_SYSTEM_PROMPTS`). Damit sind **alle** vom Frontend
+(.167 `/api/agents/*`) erwarteten Agenten durch eine dedizierte Gateway-Route abgedeckt; die Analyse in
+`AGENTEN_404_FEHLER_ANALYSE.md` ist historisch. Kein offener TODO mehr für Task Planning.
 
 ### Reading-Templates (22 Stück auf .138)
 
@@ -1178,8 +1175,8 @@ MarketingWorkflow.tsx       Marketing
 |-----|--------|--------|
 | ✅ ~~AUTH_ENABLED auf true + JWT implementieren~~ | .138 | **Erledigt** — Auth (API-Key + Supabase-JWT) aktiv |
 | CORS auf `the-connection-key.de` setzen | .138 | `CORS_ORIGINS` env auf Produktionsdomain (statt `*`) |
-| `/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen | .138 | Fehlende Gateway-Routen → behebt 404er (`AGENTEN_404_FEHLER_ANALYSE.md`) |
-| `/agents/reading`-Platzhalter durch echte Generierung ersetzen | .138 | `mcp-gateway.js:302-316` |
+| ✅ ~~`/agent/chart`, `/agent/yearly`, `/agent/automation`, `/agent/depth-analysis`, `/agent/tasks` ergänzen~~ | .138 | **Erledigt** (verifiziert 2026-07-01) — alle 5 via `makeSimpleAgent` registriert (`mcp-gateway.js:230–234`); 404er behoben |
+| ✅ ~~`/agents/reading`-Platzhalter durch echte Generierung ersetzen~~ | .138 | **Erledigt** (verifiziert 2026-07-01) — `/agents/reading` (mit s) macht echten Claude-Call (`mcp-gateway.js:426`, 503 ohne `ANTHROPIC_API_KEY`). Hinweis: `/agent/reading` (ohne s, Zeile 273) hat weiter einen Placeholder-Fallback ohne Key |
 | ✅ ~~Host-Nginx agent Config fixen (3005→4000)~~ | .167 | **Erledigt (2026-06-07)** — `sites-enabled/agent` → 4000, 200 |
 | IP-Hardcoding durch ENV-Variablen ersetzen (50+ Dateien) | .167 | `V4_BACKEND_URL`, `READING_AGENT_URL`, `MCP_SERVER_URL` |
 | `generateReading.js` STUB durch echte Engine ersetzen | .167 | Von .138 kopieren ODER v4-worker auf .138 deployen |

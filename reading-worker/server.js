@@ -5309,12 +5309,14 @@ const BY_READING_SELECTS = {
 for (const [slug, { table, cols }] of Object.entries(BY_READING_SELECTS)) {
   app.get(`/api/readings/${slug}/by-reading/:readingId`, async (req, res) => {
     try {
+      // Neuestes Ergebnis (beliebiger Status) zurückgeben: completed → anzeigen,
+      // pending/processing → die .167-UI kann eine laufende Generierung wieder
+      // aufnehmen (z.B. aus dem Erstellungs-Flow), failed → neu starten anbieten.
       const { data, error } = await supabase
         .schema("public")
         .from(table)
         .select(cols)
         .eq("reading_id", req.params.readingId)
-        .eq("status", "completed")
         .order("created_at", { ascending: false })
         .limit(1);
       if (error) throw new Error(error.message);

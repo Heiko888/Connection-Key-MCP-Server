@@ -25,6 +25,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildFactsBlock } from "../lib/facts-builder.js";
+import { syncNarrativeToReading } from "../lib/panel-narrative.js";
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -350,6 +351,10 @@ Schreibe einen integrierten Nervensystem-Bericht (900-1500 Wörter) in dieser St
       progress: 100,
       completed_at: new Date().toISOString(),
     });
+
+    // Narrativ ins Eltern-Reading spiegeln (reading_data.text) — sonst zeigen
+    // PDF/E-Mail/Klienten-Ansicht nur den Panel-Platzhalter. Best-Effort.
+    await syncNarrativeToReading(supabase, reading_id, narrative, "NervousSystem");
 
     console.log(`   ✅ [NervousSystem] Job ${job.id} abgeschlossen (score=${analysis.regulation_score})`);
     return { nervous_system_reading_id: recordId, status: "completed" };

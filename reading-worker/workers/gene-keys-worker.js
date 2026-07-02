@@ -19,6 +19,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildFactsBlock } from "../lib/facts-builder.js";
+import { syncNarrativeToReading } from "../lib/panel-narrative.js";
 
 const MODEL = "claude-sonnet-4-6";
 const QUEUE_NAME = "reading-queue-v4-gene-keys";
@@ -253,6 +254,10 @@ Schreibe einen kontemplativen Bericht (900-1400 Wörter) in dieser Struktur:
       progress: 100,
       completed_at: new Date().toISOString(),
     });
+
+    // Narrativ ins Eltern-Reading spiegeln (reading_data.text) — sonst zeigen
+    // PDF/E-Mail/Klienten-Ansicht nur den Panel-Platzhalter. Best-Effort.
+    await syncNarrativeToReading(supabase, reading_id, narrative, "GeneKeys");
 
     console.log(`   ✅ [GeneKeys] Job ${job.id} abgeschlossen`);
     return { gene_keys_reading_id: recordId, status: "completed" };

@@ -24,6 +24,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildFactsBlock } from "../lib/facts-builder.js";
+import { syncNarrativeToReading } from "../lib/panel-narrative.js";
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -346,6 +347,10 @@ Schreibe einen integrierten Bericht (900-1500 Wörter) in dieser Struktur:
       progress: 100,
       completed_at: new Date().toISOString(),
     });
+
+    // Narrativ ins Eltern-Reading spiegeln (reading_data.text) — sonst zeigen
+    // PDF/E-Mail/Klienten-Ansicht nur den Panel-Platzhalter. Best-Effort.
+    await syncNarrativeToReading(supabase, reading_id, narrative, "WomensDesign");
 
     console.log(`   ✅ [WomensDesign] Job ${job.id} abgeschlossen (score=${analysis.cycle_alignment_score})`);
     return { womens_design_reading_id: recordId, status: "completed" };

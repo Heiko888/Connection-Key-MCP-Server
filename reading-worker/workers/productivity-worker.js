@@ -18,6 +18,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { buildFactsBlock } from "../lib/facts-builder.js";
+import { syncNarrativeToReading } from "../lib/panel-narrative.js";
 
 const MODEL = "claude-sonnet-4-6";
 const QUEUE_NAME = "reading-queue-v4-productivity";
@@ -268,6 +269,10 @@ Schreibe einen integrierten Bericht (800-1300 Wörter) in dieser Struktur:
       progress: 100,
       completed_at: new Date().toISOString(),
     });
+
+    // Narrativ ins Eltern-Reading spiegeln (reading_data.text) — sonst zeigen
+    // PDF/E-Mail/Klienten-Ansicht nur den Panel-Platzhalter. Best-Effort.
+    await syncNarrativeToReading(supabase, reading_id, narrative, "Productivity");
 
     console.log(`   ✅ [Productivity] Job ${job.id} abgeschlossen (score=${analysis.productivity_score})`);
     return { productivity_reading_id: recordId, status: "completed" };

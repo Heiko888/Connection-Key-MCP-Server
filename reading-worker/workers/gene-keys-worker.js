@@ -130,6 +130,49 @@ function buildGatesBlock(chart) {
   return lines.join("\n");
 }
 
+// Strukturierter Markdown-Anhang für den Reading-Text (PDF/E-Mail/Klienten-Ansicht):
+// die Aktivierungssequenz als Übersicht mit kanonischen Triaden. Das Narrativ erwähnt
+// sie nur im Fließtext — ohne diesen Anhang fehlt sie im PDF-Export.
+// Gegenstück auf .167: frontend-coach/lib/panel-readings.ts (buildGeneKeysAppendix).
+export function buildActivationAppendix(analysis) {
+  const seq = Array.isArray(analysis?.activation_sequence) ? analysis.activation_sequence : [];
+  const spheres = Array.isArray(analysis?.spheres) ? analysis.spheres : [];
+  if (!seq.length && !spheres.length) return "";
+
+  const lines = ["", "---", ""];
+  if (seq.length) {
+    lines.push("## Deine Aktivierungssequenz im Überblick", "");
+    for (const s of seq) {
+      const title = [s.sphere, s.gene_key ? `Gene Key ${s.gene_key}` : null].filter(Boolean).join(" — ");
+      if (title) lines.push(`#### ${title}`);
+      const triad = [
+        s.shadow ? `**Schatten:** ${s.shadow}` : null,
+        s.gift ? `**Geschenk:** ${s.gift}` : null,
+        s.siddhi ? `**Siddhi:** ${s.siddhi}` : null,
+      ].filter(Boolean).join("  ·  ");
+      if (triad) lines.push(triad);
+      if (s.meaning) lines.push(s.meaning);
+      if (s.contemplation) lines.push(`**Kontemplation:** ${s.contemplation}`);
+      lines.push("");
+    }
+  }
+  if (spheres.length) {
+    lines.push("## Weitere Gene Keys in deinem Chart", "");
+    for (const s of spheres) {
+      if (s.gene_key) lines.push(`#### Gene Key ${s.gene_key}`);
+      const triad = [
+        s.shadow ? `**Schatten:** ${s.shadow}` : null,
+        s.gift ? `**Geschenk:** ${s.gift}` : null,
+        s.siddhi ? `**Siddhi:** ${s.siddhi}` : null,
+      ].filter(Boolean).join("  ·  ");
+      if (triad) lines.push(triad);
+      if (s.note) lines.push(s.note);
+      lines.push("");
+    }
+  }
+  return lines.join("\n");
+}
+
 function parseJSONLoose(raw) {
   try { return JSON.parse(raw); } catch { /* weiter */ }
   const stripped = raw.replace(/```(?:json)?/gi, "").trim();
@@ -255,9 +298,10 @@ Schreibe einen kontemplativen Bericht (900-1400 Wörter) in dieser Struktur:
       completed_at: new Date().toISOString(),
     });
 
-    // Narrativ ins Eltern-Reading spiegeln (reading_data.text) — sonst zeigen
-    // PDF/E-Mail/Klienten-Ansicht nur den Panel-Platzhalter. Best-Effort.
-    await syncNarrativeToReading(supabase, reading_id, narrative, "GeneKeys");
+    // Narrativ + strukturierte Aktivierungssequenz ins Eltern-Reading spiegeln
+    // (reading_data.text) — sonst zeigen PDF/E-Mail/Klienten-Ansicht nur den
+    // Panel-Platzhalter bzw. es fehlt die Aktivierungssequenz. Best-Effort.
+    await syncNarrativeToReading(supabase, reading_id, narrative + buildActivationAppendix(analysis), "GeneKeys");
 
     console.log(`   ✅ [GeneKeys] Job ${job.id} abgeschlossen`);
     return { gene_keys_reading_id: recordId, status: "completed" };

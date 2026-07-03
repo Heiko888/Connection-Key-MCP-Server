@@ -1,6 +1,19 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-06-30 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-03 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-03 (.138 — n8n-Härtung + SSL-Doku-Korrektur):** n8n auf .138 abgesichert
+> (PRs #36/#37): Port jetzt **`127.0.0.1:5678`** (nicht mehr `0.0.0.0` → nicht direkt aus dem Internet),
+> **`N8N_BLOCK_ENV_ACCESS_IN_NODE=true`** (Code-Nodes können keine Secrets aus `process.env` lesen),
+> Image auf **`n8nio/n8n:2.3.5`** gepinnt (`N8N_VERSION=2.3.5` im `.env`; lokal getaggt, kein Pull).
+> **Basic-Auth ist totes Config** — n8n ≥ v1.0 (läuft 2.3.5) ignoriert `N8N_BASIC_AUTH_*`/`N8N_PASSWORD`;
+> Zugang läuft über n8ns **User-Management (Owner-Account, verifiziert vorhanden)**, entsprechende
+> Env-Zeilen aus `docker-compose.yml` entfernt. **Korrektur:** Der frühere Vermerk „n8n ohne SSL" war
+> **veraltet** — die Host-Nginx-Site (`/etc/nginx/sites-available/n8n`) hat längst `listen 443 ssl`
+> (Certbot) + HTTP→HTTPS-301. Zusätzlich in die Live-Config aufgenommen: `proxy_http_version 1.1`
+> (WebSocket-Push im Editor), `client_max_body_size 32m`, `proxy_*_timeout 300s` (Vorlage:
+> `deployment/nginx-n8n.conf`). Deploy war `docker compose up -d n8n` (Recreate) + `nginx -t && reload`;
+> Daten/Owner-Account intakt. Siehe §5 + §13 + §15.
+>
 > **Changelog 2026-06-30 (.167 — Welle 3 Self-Tracking: Zyklus-Tagebuch + HRV, nur Frontend):**
 > Zwei interaktive Tracking-Features in der User-App (`frontend`), die auf die Readings W10/W11
 > aufsetzen — **kein .138-Anteil**: persönliche Daten in Supabase mit RLS (`auth.uid()=user_id`),
@@ -520,7 +533,7 @@ Kommunikation .167 → .138:
 | 443 | nginx (systemd) | 0.0.0.0 | ✅ | HTTPS | ✅ |
 | 3000 | connection-key (Docker) | 0.0.0.0 | ⚠️ Extern, HTTP | REST-API | ⚠️ |
 | 4000 | reading-worker (Docker) | 0.0.0.0 | ⚠️ Extern, HTTP | Worker-API | ⚠️ |
-| 5678 | n8n (Docker) | 0.0.0.0 | ⚠️ Basic Auth | Workflows | ⚠️ |
+| 5678 | n8n (Docker) | 127.0.0.1 | ✅ HTTPS (Host-Nginx) + Owner-Account | Workflows | ✅ |
 | 6379 | redis (Docker intern) | Docker-Netz | ✅ Intern | BullMQ | ✅ |
 | 6379 | redis-server (systemd) | 127.0.0.1 | ✅ Lokal | ⚠️ Unklar | ⚠️ |
 | 7000 | mcp-gateway (Docker) | 0.0.0.0 | ⚠️ Bearer Auth | Agent Gateway | ⚠️ |
@@ -1096,7 +1109,7 @@ MarketingWorkflow.tsx       Marketing
 | `coach.the-connection-key.de` | .167 | 3002 | Coach-Portal | ✅ |
 | `agent.the-connection-key.de` | .167 | 4000 | Agent-UI | ✅ (gefixt 2026-06-07) |
 | `werdemeisterdeinergedankenagent.de` | .138 | 3000 | API-Domain | ✅ |
-| `n8n.werdemeisterdeinergedankenagent.de` | .138 | 5678 | n8n | ⚠️ kein SSL |
+| `n8n.werdemeisterdeinergedankenagent.de` | .138 | 5678 | n8n | ✅ HTTPS (Certbot, HTTP→301) |
 
 ---
 
@@ -1143,7 +1156,7 @@ MarketingWorkflow.tsx       Marketing
 | 13 | ✅ **ERLEDIGT (2026-06-02):** 4 GB Swap + `vm.swappiness=10` auf .138 (und .167) eingerichtet | .138 |
 | 14 | v4-worker auf .167 definiert aber gehört auf .138 | .167 |
 | 15 | ✅ **ERLEDIGT:** `sync-reading-service` ist in `docker-compose.yml` (braucht ggf. noch Supabase-ENV) | .138 |
-| 16 | n8n ohne SSL | .138 |
+| 16 | ✅ **ERLEDIGT (2026-07-03):** n8n hat HTTPS (Certbot, `listen 443 ssl` + HTTP→301); zusätzlich `127.0.0.1`-Bind + Env-Access-Block (PRs #36/#37) | .138 |
 | 17 | ✅ **ERLEDIGT (2026-06-17):** `/agents/reading` ist kein Platzhalter mehr (echter Claude-Call); der tote `services/chart-truth/`-Baum (nicht lauffähig — Abhängigkeit `chart-calculation-astronomy.js` fehlte, nirgends gemountet, duplizierte die echte Engine) wurde **entfernt** (inkl. `integration/.../chart/truth/route.ts`). ⚠️ Rest: n8n-Templates (`n8n-workflows/*chart-truth*`) rufen noch `/api/chart/truth` auf — diesen Endpunkt serviert die connection-key-API **nicht** (sie hat `/api/chart/calculate`); Templates sind nicht live, aber vor n8n-Import anpassen | .138 |
 | 18 | ✅ **ERLEDIGT:** `depth-analysis.txt`/Reading-Templates committet | .138 |
 | 19 | Dual-Nginx auf .167 (Host + Docker parallel) | .167 |
@@ -1175,7 +1188,7 @@ MarketingWorkflow.tsx       Marketing
 | System-Redis deaktivieren | .138 | `systemctl disable redis-server` |
 | Ungenutzte UFW-Ports schließen (3005, 3456, 4001) | .138 | `ufw delete allow` |
 | ✅ ~~Swap-Space einrichten (2-4 GB)~~ | .138 | **Erledigt** — 4 GB `/swapfile`, swappiness 10 (.138 + .167) |
-| n8n hinter HTTPS | .138 | Nginx-Proxy Config |
+| ✅ ~~n8n hinter HTTPS~~ | .138 | **Erledigt** — Certbot-Site aktiv (`sites-available/n8n`), HTTP→301 |
 | Dual-Nginx auflösen | .167 | Host-Nginx direkt auf Docker-Container |
 | Dangling Docker Images | .167 | `docker image prune` (~13.7 GB) |
 | Veraltete Docker Images | .138 | ~10 Images, ~3-4 GB |

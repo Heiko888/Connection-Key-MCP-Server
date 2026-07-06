@@ -1,6 +1,33 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-03 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-06 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-06 (.138 — support-mail-bridge: IMAP-Support-Postfach → Mattermost):** Neuer
+> Kleinst-Dienst `support-mail-bridge/` (Node 20, `imapflow` + `mailparser`), der das all-inkl/KAS-
+> IMAP-Postfach **`support@the-connection-key.de`** pollt und **jede neu eingehende Mail** in einen
+> **Mattermost-Incoming-Webhook** postet (Ziel: eigener Support-Channel auf
+> `chat.werdemeisterdeinergedanken.de`). Motivation: Support-Mails laufen über all-inkl und liefen nie
+> durch den App-Code → jetzt im Team-Chat sichtbar. **Design:** Postfach wird **read-only** geöffnet
+> (verändert nie `\Seen` → Ungelesen-Status im Webmail bleibt, Forwarding hängt nicht am menschlichen
+> Lesen); Idempotenz über die **IMAP-UID** (höchste verarbeitete UID + uidValidity persistent in
+> `/data/state.json`, Named Volume `support_mail_data`); **Erststart setzt Baseline** (Bestand wird
+> nicht geflutet, nur `UID > lastUid` wird gepostet); Poll-Default 60 s; fehlgeschlagener MM-Post →
+> `lastUid` bleibt stehen → Retry (at-least-once). Als eigener `docker-compose`-Service (kein Port,
+> nur ausgehend). **ENV (Root-`.env` auf .138):** `SUPPORT_IMAP_HOST` (`w0120919.kasserver.com`),
+> `SUPPORT_IMAP_USER` (**KAS-Login `m07b46d4`**, NICHT die Mailadresse), `SUPPORT_IMAP_PASSWORD`,
+> `MATTERMOST_WEBHOOK_SUPPORT` (+ optional `SUPPORT_IMAP_PORT`/`_SECURE`/`_MAILBOX`/
+> `SUPPORT_POLL_INTERVAL_MS`/`SUPPORT_MATTERMOST_USERNAME`/`_ICON`/`_CHANNEL`). Deploy =
+> `docker compose build support-mail-bridge && up -d`. ✅ **E2E live verifiziert (2026-07-06):** IMAP
+> verbunden, Baseline `lastUid=7` gesetzt; Test-Mail via all-inkl-SMTP (⚠️ ausgehend nur **Port 587
+> STARTTLS** offen, 465/25 geblockt) → Poller erfasst **UID 8** → Mattermost-Post (Webhook HTTP 200).
+> Commit `672fae0` auf `main`.
+>
+> **Changelog 2026-07-06 (.167 — Workshop-DOI-Mail: Hinweis auf Bestätigungsmail + Spam-Ordner):**
+> Die Workshop-Double-Opt-In-Mail (`frontend/app/api/workshops/register/route.ts`) um einen Passus
+> ergänzt (HTML-Info-Block **und** text/plain-Teil): „Direkt nach deiner Bestätigung schicken wir dir
+> eine **Bestätigungsmail** mit allen Details zu deinem Workshop. Schau dafür bitte auch in deinem
+> **Spam-Ordner** nach." Deploy = `frontend` **Rebuild** auf .167 (verifiziert: Passus in der
+> kompilierten Route, HTTP 200). Commits `ec1bc1e86` + `c7b20878d` auf `The-Connection-Key`@main.
+>
 > **Changelog 2026-07-03 (.138 — n8n-Härtung + SSL-Doku-Korrektur):** n8n auf .138 abgesichert
 > (PRs #36/#37): Port jetzt **`127.0.0.1:5678`** (nicht mehr `0.0.0.0` → nicht direkt aus dem Internet),
 > **`N8N_BLOCK_ENV_ACCESS_IN_NODE=true`** (Code-Nodes können keine Secrets aus `process.env` lesen),

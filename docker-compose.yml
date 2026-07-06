@@ -268,6 +268,34 @@ services:
     networks:
       - app-network
 
+  # Support-Mail-Bridge: pollt das IMAP-Support-Postfach (all-inkl) und
+  # postet neue Mails in einen Mattermost-Incoming-Webhook.
+  support-mail-bridge:
+    build:
+      context: ./support-mail-bridge
+      dockerfile: Dockerfile
+    container_name: support-mail-bridge
+    environment:
+      - NODE_ENV=production
+      # IMAP (all-inkl / KAS)
+      - SUPPORT_IMAP_HOST=${SUPPORT_IMAP_HOST}
+      - SUPPORT_IMAP_PORT=${SUPPORT_IMAP_PORT:-993}
+      - SUPPORT_IMAP_SECURE=${SUPPORT_IMAP_SECURE:-true}
+      - SUPPORT_IMAP_USER=${SUPPORT_IMAP_USER}
+      - SUPPORT_IMAP_PASSWORD=${SUPPORT_IMAP_PASSWORD}
+      - SUPPORT_IMAP_MAILBOX=${SUPPORT_IMAP_MAILBOX:-INBOX}
+      - SUPPORT_POLL_INTERVAL_MS=${SUPPORT_POLL_INTERVAL_MS:-60000}
+      # Mattermost-Ziel
+      - MATTERMOST_WEBHOOK_SUPPORT=${MATTERMOST_WEBHOOK_SUPPORT}
+      - SUPPORT_MATTERMOST_USERNAME=${SUPPORT_MATTERMOST_USERNAME:-Support-Postfach}
+      - SUPPORT_MATTERMOST_ICON=${SUPPORT_MATTERMOST_ICON:-:email:}
+      - SUPPORT_MATTERMOST_CHANNEL=${SUPPORT_MATTERMOST_CHANNEL:-}
+    volumes:
+      - support_mail_data:/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
   # Redis
   redis:
     image: redis:7-alpine
@@ -289,6 +317,7 @@ services:
 volumes:
   n8n_data:
   redis_data:
+  support_mail_data:
 
 networks:
   app-network:

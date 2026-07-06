@@ -1,0 +1,17 @@
+{
+  "name": "support-mail-bridge",
+  "version": "1.0.0",
+  "description": "Pollt das Support-IMAP-Postfach (all-inkl) und postet neue Mails in einen Mattermost-Incoming-Webhook",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "imapflow": "^1.0.171",
+    "mailparser": "^3.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

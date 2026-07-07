@@ -3100,7 +3100,19 @@ console.log("[W13] Gene-Keys Worker gestartet");
 // ======================================================
 // Job Polling System
 // ======================================================
+// ── Poll-Resilienz gegen transiente Supabase/Cloudflare-Ausfälle (z.B. 522) ──
+// Der Poll-Query kann kurzzeitig scheitern, wenn Supabase hinter Cloudflare unter
+// Last nicht antwortet. Das ist KEIN Code-Bug — der Loop läuft danach normal weiter.
+// Ohne Dämpfung erzeugt ein 10-Minuten-Blip ~60 identische Fehlerzeilen (1 pro 10s)
+// und reißt den Monitoring-Schwellwert (error_rate_high), obwohl kein Reading betroffen
+// ist. Deshalb: pro Ausfall-Serie nur EINMAL loggen, danach exponentielles Backoff
+// (Ticks aussetzen, max ~60s), und beim ersten Erfolg eine Recovery-Zeile.
+let pollFailStreak = 0;
+let pollSkipTicks = 0;
+
 async function pollForJobs() {
+  // Backoff: nach Fehlern einige 10s-Ticks aussetzen, statt Supabase weiter zu hämmern.
+  if (pollSkipTicks > 0) { pollSkipTicks--; return; }
   try {
     const { data: pendingJobs, error } = await supabase
       .from("reading_jobs")
@@ -3110,8 +3122,20 @@ async function pollForJobs() {
       .limit(10);
 
     if (error) {
-      console.error("❌ Job Polling Fehler:", error);
+      pollFailStreak++;
+      // Nur die erste Zeile einer Ausfall-Serie loggen (Rest wäre reines Rauschen).
+      if (pollFailStreak === 1) {
+        console.error(`❌ Job Polling Fehler (transient, Poll pausiert kurz): ${error.message || error}`);
+      }
+      // Exponentielles Backoff: 1,2,4,6,6,… Ticks (à 10s), gedeckelt bei 6 (~60s).
+      pollSkipTicks = Math.min(6, 2 ** Math.min(pollFailStreak - 1, 3));
       return;
+    }
+
+    // Erfolg nach vorheriger Ausfall-Serie → genau eine Recovery-Zeile.
+    if (pollFailStreak > 0) {
+      console.log(`✅ Job Polling wiederhergestellt (nach ${pollFailStreak} Fehlversuch${pollFailStreak === 1 ? '' : 'en'})`);
+      pollFailStreak = 0;
     }
 
     if (!pendingJobs || pendingJobs.length === 0) {

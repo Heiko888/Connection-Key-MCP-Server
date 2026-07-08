@@ -3,10 +3,13 @@ version: '3.8'
 services:
   # n8n - Workflow Engine
   n8n:
-    # Version pinnen: N8N_VERSION im .env auf die AKTUELL laufende Version setzen
-    # (ermitteln via `docker exec n8n n8n --version`), damit Rebuilds reproduzierbar sind
-    # und bekannte Advisories zuordenbar bleiben. KEIN Downgrade gegen ein bereits
-    # migriertes n8n_data-Volume — das kann die n8n-DB beschaedigen.
+    # Version pinnen: N8N_VERSION im .env auf eine SICHERE, gepatchte Version setzen
+    # (aktuell laufende ermitteln via `docker exec n8n n8n --version`), damit Rebuilds
+    # reproduzierbar sind und bekannte Advisories zuordenbar bleiben. KEIN Downgrade
+    # gegen ein bereits migriertes n8n_data-Volume — das kann die n8n-DB beschaedigen.
+    # SICHERHEIT (CERT-Bund CB-Report): 2.3.5 war fuer mehrere kritische CVEs verwundbar
+    # (RCE/Expression-Injection/Sandbox-Escape, u. a. CVE-2026-25049/-27493/-27495/-44790).
+    # Fix-Floor auf der 2.x-Linie ist 2.22.1 → im .env auf >= 2.22.1 pinnen (Default: 2.29.8).
     image: n8nio/n8n:${N8N_VERSION:-latest}
     container_name: n8n
     ports:
@@ -14,7 +17,7 @@ services:
       # Zugriff ausschliesslich ueber Host-Nginx (HTTPS + Auth + Rate-Limit).
       - "127.0.0.1:5678:5678"
     environment:
-      # Auth: n8n >= v1.0 hat Basic-Auth entfernt (die laufende Instanz ist v2.3.5).
+      # Auth: n8n >= v1.0 hat Basic-Auth entfernt.
       # N8N_BASIC_AUTH_*/N8N_PASSWORD werden ignoriert -> Zugang laeuft ueber n8ns
       # User-Management (Owner-Account, Login in der App). Kein Basic-Auth-Env mehr setzen.
       - N8N_HOST=${N8N_HOST:-n8n.werdemeisterdeinergedankenagent.de}

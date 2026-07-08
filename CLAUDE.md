@@ -1,6 +1,25 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-06 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-08 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
+> CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
+> n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,
+> Expression-Injection (auch **unauthenticated** über Form-Nodes, CVE-2026-27493) und
+> JavaScript-Task-Runner-**Sandbox-Escape** (CVE-2026-27495), dazu Prototype-Pollution/AlaSQL-RCE
+> (CVE-2026-33660/-33696) und CLI-Flag-Injection im Git-Node (CVE-2026-44790). Gemeldete CVEs u. a.
+> `CVE-2026-25049`, `-25052`, `-25053`, `-27493`, `-27495`; die Advisory-Liste reicht bis
+> `-44790`. **Fix:** `N8N_VERSION` von `2.3.5` auf **`2.29.8`** (aktuelle Stable, Release 2026-07-08)
+> angehoben — deckt **alle** gelisteten CVEs ab (höchster Fix-Floor auf der 2.x-Linie ist **2.22.1**
+> aus CVE-2026-44790). Geändert: `.env.example` (`N8N_VERSION=2.29.8` + CVE-Kommentar) und
+> `docker-compose.yml` (Pin-Guidance/Kommentare, „>= 2.22.1"). **⚠️ Betriebsvoraussetzung:** Das
+> Image war bisher **lokal getaggt** („kein Pull") — für 2.29.8 muss `N8N_VERSION=2.29.8` in die
+> **Root-`.env` auf .138** und `docker compose pull n8n && docker compose up -d n8n` gefahren werden
+> (das `n8n_data`-Volume wird von n8n automatisch migriert; **kein Downgrade** danach). Mitigierend
+> ist n8n bereits **nicht direkt aus dem Internet** erreichbar (`127.0.0.1:5678` + Host-Nginx-HTTPS +
+> Owner-Account + `N8N_BLOCK_ENV_ACCESS_IN_NODE=true`, siehe Changelog 2026-07-03) — der Angriff
+> setzt aber teils nur einen authentifizierten Workflow-Editor oder eine erreichbare Form-URL voraus,
+> daher trotzdem **umgehend patchen**. Branch `claude/n8n-security-vulnerabilities-staimc`. Siehe §4 + §5 + §15.
+>
 > **Changelog 2026-07-06 (.138 — support-mail-bridge: IMAP-Support-Postfach → Mattermost):** Neuer
 > Kleinst-Dienst `support-mail-bridge/` (Node 20, `imapflow` + `mailparser`), der das all-inkl/KAS-
 > IMAP-Postfach **`support@the-connection-key.de`** pollt und **jede neu eingehende Mail** in einen
@@ -500,7 +519,7 @@ Kommunikation .167 → .138:
 | `mcp-gateway` | `mcp-connection-key-mcp-gateway` (574 MB) | 0.0.0.0:7000→7000 | ✅ Up 5d | 172.18.0.3 | ✅ |
 | `sync-reading-service` | (234 MB) | 0.0.0.0:7001→7001 | ✅ Up 2w | 172.18.0.2 | ✅ (nur `ANTHROPIC_API_KEY` als ENV) |
 | `redis-queue-secure` | `redis:7-alpine` | intern 6379 | ✅ Healthy | 172.18.0.5 | ✅ |
-| `n8n` | `n8nio/n8n:latest` (1.64 GB) | 0.0.0.0:5678→5678 | ✅ Up 2w | 172.18.0.6 | ✅ |
+| `n8n` | `n8nio/n8n:2.29.8` (Pin, war 2.3.5) | 127.0.0.1:5678→5678 | ✅ | 172.18.0.6 | ✅ |
 | Frontend | auskommentiert | — | ❌ | — | Auskommentiert |
 | chatgpt-agent | Image vorhanden (2×287 MB) | — | ❌ | — | Nicht aktiv |
 
@@ -1161,6 +1180,7 @@ MarketingWorkflow.tsx       Marketing
 | 1 | ✅ **ERLEDIGT (2026-05-27):** Auth aktiv für alle `/api`-Routen (`x-api-key` + Supabase-JWT), `AUTH_ENABLED` Default `true` | .138 |
 | 2 | ✅ **ERLEDIGT:** Token-Verifikation via Supabase-JWT implementiert (`auth.js`). Offen nur: eigener JWT-Secret-Flow (`JWT_SECRET` in config.js, aktuell ungenutzt für Verifikation) | .138 |
 | 3 | Stripe LIVE-Modus aktiv — durch aktivierte Auth jetzt geschützt, aber LIVE-Keys + Webhook-Signatur prüfen/rotieren | .138 |
+| 4 | ⚠️ **n8n CVEs (CERT-Bund 2026-07-07):** 2.3.5 verwundbar (RCE/Sandbox-Escape, CVE-2026-25049/-27493/-27495/-44790 u. a.). **Repo-Fix committet** (`N8N_VERSION=2.29.8`); **offen: auf .138 deployen** — `N8N_VERSION=2.29.8` in Root-`.env`, dann `docker compose pull n8n && up -d n8n` | .138 |
 
 ### 🟠 P1 — Dringend
 
@@ -1341,6 +1361,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-06-29 (.138/.167 — W10–W13 Readings Nervensystem/Weibliches Design/Produktivität/Gene Keys: Migrationen 2026062801–04 angewandt, reading-worker + frontend-coach neu gebaut, Deploy verifiziert)*
+*Letzte Aktualisierung: 2026-07-08 (.138 — n8n Security-Update 2.3.5 → 2.29.8 wegen CERT-Bund-Advisory, CVE-2026-25049/-27493/-27495/-44790 u. a.; Repo-Pin gesetzt, Deploy auf .138 offen)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

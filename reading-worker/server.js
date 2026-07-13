@@ -1385,6 +1385,50 @@ ANWEISUNG FÜR TEIL 2:
   return contextBlock + part2Prompt;
 }
 
+// Not-Self-Theme je Person — bevorzugt das (seit 2026-06-13) im Chart geführte
+// Feld, fällt sonst deterministisch auf die Typ-Map zurück (deckt Altbestand ab).
+function notSelfThemeFor(chart) {
+  if (chart?.not_self_theme) return chart.not_self_theme;
+  const map = {
+    'Generator': 'Frustration',
+    'Manifesting Generator': 'Frustration und Wut',
+    'Manifestor': 'Wut',
+    'Projector': 'Verbitterung',
+    'Reflector': 'Enttäuschung',
+  };
+  return map[chart?.type] || 'Not-Self-Emotion';
+}
+
+// Variante C: 4-Quadranten-Schattenmatrix als optionale Reading-Sektion.
+// Geerdet auf Not-Self-Theme + Autorität + Konditionierungsrichtung beider
+// Personen — es wird KEIN neues HD-Wissen erfunden. Als Prompt-Anweisungsblock,
+// der ans Ende eines 2-Personen-Readings gehängt wird.
+function buildShadowMatrixSection(chartA, chartB, nameA, nameB, sectionNumber = 9) {
+  const nsA = notSelfThemeFor(chartA);
+  const nsB = notSelfThemeFor(chartB);
+  const authA = chartA?.authority || 'die eigene Autorität';
+  const authB = chartB?.authority || 'die eigene Autorität';
+  const typeA = chartA?.type || '?';
+  const typeB = chartB?.type || '?';
+  return `
+
+# ${sectionNumber}. Schattendynamik — die vier Konstellationen
+Spiele die Verbindung durch ALLE VIER Zustands-Kombinationen von ${nameA} und ${nameB} durch.
+Grundlage: Im Nicht-Selbst zeigt ${nameA} (${typeA}) typischerweise „${nsA}", ${nameB} (${typeB}) „${nsB}".
+Beziehe die Konditionierung (ein definiertes Zentrum strahlt in das offene Zentrum des Partners) und die jeweilige Autorität als Ausstiegspunkt konsequent mit ein.
+Formuliere durchgehend als Selbsterkenntnis & gemeinsame Beziehungsdynamik — NIEMALS als Schuldzuweisung an eine Person. Kein Kanal-Typ wird pauschal „elektromagnetisch" genannt.
+
+Gib GENAU diese vier Unter-Abschnitte (je 2–3 konkrete Absätze):
+## ${sectionNumber}.1 Beide im Design (${nameA} ↔ ${nameB})
+Das stimmige Resonanzfeld: Wie sich ihre Signaturen gegenseitig nähren, wenn beide ihrer Strategie & Autorität folgen.
+## ${sectionNumber}.2 ${nameA} im Schatten („${nsA}") · ${nameB} im Design
+Wie ${nameA}s Nicht-Selbst über die offenen Zentren von ${nameB} wirkt, woran ${nameB} es früh erkennt und wie ${nameB} über ${authB} nicht mit hineingezogen wird.
+## ${sectionNumber}.3 ${nameA} im Design · ${nameB} im Schatten („${nsB}")
+Gespiegelt: Wie ${nameB}s Nicht-Selbst auf ${nameA} wirkt, die Frühwarnzeichen, und wie ${nameA} über ${authA} stabil bleibt.
+## ${sectionNumber}.4 Beide im Schatten („${nsA}" × „${nsB}")
+Die Eskalationsspirale: Wie sich „${nsA}" und „${nsB}" gegenseitig aufschaukeln — plus der konkrete gemeinsame Ausstiegspunkt (beide Autoritäten + Strategie) zurück nach ${sectionNumber}.1.`;
+}
+
 // ── 2-Pass: Connection / Relationship / Compatibility ────────────────────────
 async function generateConnectionReadingTwoParts({ userData, personAChart, personBChart, modelConfig, templateName }) {
   const knowledgeText = buildReadingKnowledge('connection');
@@ -1473,10 +1517,16 @@ Konkrete, sofort umsetzbare Empfehlungen für beide:
 - Kommunikationsrituale passend zu den Autoritäten
 - Energie-Hygiene für diese Verbindung
 - Die drei wichtigsten Erkenntnisse und wie sie im Alltag verankert werden
-
+${userData.shadowMatrix ? buildShadowMatrixSection(personAChart, personBChart, nameA, nameB, 9) : ''}
 Schreibe mindestens 2000 Wörter. Deutsch, Du/Ihr-Form, tiefgründig und konkret.`;
 
-  return generateTwoParts({ readingType: 'connection', part1Prompt, part2Prompt, modelConfig });
+  return generateTwoParts({
+    readingType: 'connection',
+    part1Prompt,
+    part2Prompt,
+    modelConfig,
+    tokensPerPart: userData.shadowMatrix ? 10000 : 8000,
+  });
 }
 
 // ── 2-Pass: Business / Career / Life-Purpose ─────────────────────────────────
@@ -3797,6 +3847,7 @@ async function processConnectionJob(job, reading) {
   const birthTimeB = payload.birthtime2 || payload.personB?.birthTime;
   const birthPlaceB = payload.birthplace2 || payload.personB?.birthPlace;
   const connectionQuestion = payload.connectionQuestion || payload.personA?.connectionQuestion;
+  const shadowMatrix = !!(payload.shadow_matrix || payload.shadowMatrix);
   const readingId = payload.reading_id;
   const connectionReadingId = payload.connection_reading_id;
   const personAId = payload.person_a_id;
@@ -3879,6 +3930,7 @@ async function processConnectionJob(job, reading) {
       dynamics,
       compositeData,
       connectionQuestion,
+      shadowMatrix,
     },
     personAChart,
     personBChart,
@@ -3928,6 +3980,7 @@ async function processConnectionJob(job, reading) {
     chart_data2: personBChart,
     personA: { name: nameA },
     personB: { name: nameB },
+    shadow_matrix: shadowMatrix,
     ...(reflexionsfragen ? { reflexionsfragen } : {}),
     _pipeline: pipelineInfo,
   };
@@ -4412,13 +4465,16 @@ ${buildReadingKnowledge('sexuality')}`;
   const factsB = `=== ${nameB} ===\n${buildChartInfo(chartB)}`;
   const compositeBlock = buildTwoPersonCompositeBlock(chartA, chartB, nameA, nameB);
 
+  const shadowMatrix = !!(payload.shadow_matrix || payload.shadowMatrix);
+  const shadowSection = shadowMatrix ? buildShadowMatrixSection(chartA, chartB, nameA, nameB, 9) : '';
+
   const userMessage = `Erstelle ein Intimität & Sexualität Resonanz-Reading für ${nameA} & ${nameB}.
 
 ${factsA}
 
 ${factsB}
 ${compositeBlock}
-
+${shadowSection}
 WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren Namen!`;
 
   const aiModel = payload.ai_model || DEFAULT_MODEL;
@@ -4430,7 +4486,7 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
     try {
       content = await generateWithClaude(systemPrompt + '\n\n' + userMessage, {
         model: modelId,
-        maxTokens: 8000,
+        maxTokens: shadowMatrix ? 10000 : 8000,
         temperature: 0.7,
       });
       if (content) break;
@@ -4458,6 +4514,7 @@ WICHTIG: Nenne beide Personen (${nameA} UND ${nameB}) in jeder Sektion bei ihren
     chart_data2: chartB,
     personA: { name: nameA },
     personB: { name: nameB },
+    shadow_matrix: shadowMatrix,
     ...(reflexionsfragen ? { reflexionsfragen } : {}),
     _pipeline: pipelineInfoSex,
   };

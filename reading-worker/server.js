@@ -1487,7 +1487,7 @@ WICHTIG: Konditionierung gibt es NUR zentrum-zu-zentrum gleichen Typs (Sakral ko
 Wie unterscheiden sich die Autoritäten (${personAChart?.authority || '?'} vs. ${personBChart?.authority || '?'})? Was bedeutet das konkret, wenn wichtige Entscheidungen gemeinsam getroffen werden müssen? Praktische Empfehlungen.
 
 # 4. Aktivierte Kanäle nach Block-2-Klassifikation
-Analysiere jeden aktivierten Kanal aus dem COMPOSITE-Block oben. Pro Kanal: korrekte Kategorie (Elektromagnetisch / Kompromiss / Companionship / Parallel), wer trägt was, was das für die Verbindung bedeutet. Verwende NICHT den Begriff "Goldader" — nutze die exakte Kategorie aus dem Composite-Block.
+Analysiere jeden aktivierten Kanal aus dem COMPOSITE-Block oben. Pro Kanal: korrekte Kategorie (Elektromagnetisch / Kompromiss / Companionship / Parallel), wer trägt was, was das für die Verbindung bedeutet. Ordne dabei jeden Kanal seiner exakten Kategorie aus dem Composite-Block zu und bezeichne niemals pauschal alle Kanäle gleich. Die Kanäle, die durch eure Verbindung NEU entstehen bzw. bei denen ein definiertes Zentrum ein offenes Zentrum neu aktiviert, darfst und sollst du zusätzlich als »Goldadern« benennen — das ist die Marken-Sprache des Connection Key und der energetische Kern dieses Readings.
 
 Schreibe mindestens 2000 Wörter. Deutsch, Du/Ihr-Form, tiefgründig und konkret.`;
 

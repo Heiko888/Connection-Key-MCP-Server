@@ -269,14 +269,15 @@ Wenn ein Kanal elektromagnetisch (A+B zusammen) entsteht, hat er eine besondere 
 ## 8. GOLDADERN — Die neu entstehenden Kanäle
 
 ### Was sind Goldadern?
-Goldadern sind Kanäle die **NUR entstehen wenn zwei spezifische Menschen zusammen sind** — weil Person A ein Gate hat und Person B das gegenüberliegende Gate. Allein existiert dieser Kanal bei keinem von beiden. Zusammen entsteht eine neue, kraftvolle Energie.
+Goldadern sind die Kanäle, die durch **eure Verbindung** neu wirksam werden — überall dort, wo ein **definiertes Zentrum** des einen ein **offenes Zentrum** des anderen durch die Verbindung neu aktiviert. Allein trägt mindestens einer von euch diese Energie nicht durchgängig; erst zusammen entsteht bzw. fließt sie.
 
-Das ist der energetische Kern des Connection Key: Goldadern zeigen was zwei Menschen GEMEINSAM in die Welt bringen können — was weder A noch B allein hat.
+Das ist der energetische Kern des Connection Key: Goldadern zeigen was zwei Menschen GEMEINSAM in die Welt bringen können — was so vorher nicht da war.
 
-### Wie entstehen Goldadern?
-- Person A hat Gate X (hängendes Gate — definiert aber kein Kanal)
-- Person B hat Gate Y (das Polaritäts-Gate zu X)
-- Zusammen: Kanal X-Y entsteht — eine Goldader
+### Wie entstehen Goldadern? (drei Konstellationen — alle sind Goldadern)
+- **Elektromagnetisch:** A hat Gate X, B das Polaritäts-Gate Y → der Kanal X-Y entsteht NUR gemeinsam. Stärkste, aber vom Zusammensein abhängige Goldader.
+- **Dominanz:** A trägt beide Gates des Kanals, B keines → A „beschenkt" B konstant mit dieser Energie und aktiviert Bs offenes Zentrum. Stabile Goldader, hängt nicht vom Zusammensein ab.
+- **Kompromiss:** A trägt beide Gates, B eines der beiden → derselbe Kanal, gemeinsam verstärkt; ebenfalls eine Goldader.
+- **KEINE Goldader:** Wenn **beide** den ganzen Kanal unabhängig besitzen (stabile Parallelenergie) — dann wird nichts neu aktiviert, die Energie ist nur verdoppelt.
 
 Je mehr Goldadern, desto mehr neue Energie entsteht in der Verbindung — aber auch desto mehr gegenseitige Konditionierung.
 
@@ -396,24 +397,35 @@ Goldader-Thema: Gemeinsame intuitive Gegenwärtigkeit. Zusammen kommunizieren un
 
 Der Code berechnet für jeden Kanal einen Typ. Diese vier Typen haben fundamental verschiedene Alltagswirkungen:
 
-### EM — Elektromagnetische Verbindung
+> **„Goldader" ist der Oberbegriff** für die drei Konstellationen, in denen durch die Verbindung
+> ein offenes Zentrum NEU aktiviert wird: **Elektromagnetisch, Dominanz und Kompromiss**.
+> **Stabile Parallelenergie** (beide tragen den ganzen Kanal) ist **KEINE Goldader** — da wird
+> nichts neu aktiviert. (Mechanisch korrekte Definition, konsistent zur Frontend-Logik.)
+
+### EM — Elektromagnetische Verbindung  → Goldader: JA
 **Was es ist:** Person A hat Gate X, Person B hat Gate Y — zusammen schließen sie den Kanal. Keiner hat ihn allein.
 **Alltagswirkung:** Intensive, oft unwiderstehliche Anziehung. Die Energie entsteht NUR wenn sie zusammen sind — und verschwindet wenn sie sich trennen.
 **Wichtig:** EM ist keine Kompatibilität. Es ist Anziehung + gegenseitige Konditionierung.
 **Im Reading:** "Dieser Kanal entsteht nur wenn ihr zusammen seid. Das erklärt die intensive Anziehung — und warum du dich anders fühlst wenn du bei [Name] bist."
 
-### Goldader — Eine Person trägt den ganzen Kanal
+### Dominanz — Eine Person trägt den ganzen Kanal  → Goldader: JA
 **Was es ist:** Person A hat BEIDE Gates des Kanals definiert. B hat keines der Gates.
-**Alltagswirkung:** A "beschenkt" B mit dieser Energie konstant. B erlebt diese Qualität durch A.
+**Alltagswirkung:** A "beschenkt" B mit dieser Energie konstant. B erlebt diese Qualität durch A (Bs offenes Zentrum wird aktiviert).
 **Wichtig:** Stabiler als EM — hängt nicht vom Zusammensein ab. Aber B kann abhängig von As Energie werden.
 **Im Reading:** "[Name A] trägt diesen Kanal vollständig. [Name B] erlebt diese Energie durch [Name A] — das ist ein echtes Geschenk in der Verbindung."
 
-### Stabile Parallelenergie — Beide tragen den Kanal unabhängig
+### Kompromiss (Kanal) — Eine Person trägt den ganzen Kanal, die andere eine Hälfte  → Goldader: JA
+**Was es ist:** Person A hat BEIDE Gates des Kanals, B hat genau eines der beiden Gates.
+**Alltagswirkung:** Derselbe Kanal, gemeinsam verstärkt — B trägt einen Teil bei, A hält das Ganze.
+**Im Reading:** "[Name A] trägt diesen Kanal, [Name B] bringt eine Hälfte ein — gemeinsam wird diese Energie besonders stark und stabil."
+
+### Stabile Parallelenergie — Beide tragen den Kanal unabhängig  → Goldader: NEIN
 **Was es ist:** Beide Personen haben diesen Kanal bereits in ihrem eigenen Chart definiert.
 **Alltagswirkung:** Diese Energie ist im Composite doppelt stark. Tiefes gegenseitiges Verstehen — aber potenzielle Dominanz-Reibung.
+**Wichtig:** KEINE Goldader — es wird kein offenes Zentrum neu aktiviert, die Energie ist nur verdoppelt.
 **Im Reading:** "Ihr beide habt diese Energie unabhängig voneinander. Das schafft tiefes Verständnis — aber auch potenzielle Reibung wenn beide ihren Weg durchsetzen wollen."
 
-### Kompromiss — Beide haben dasselbe Gate
+### Gate-Verstärkung — Beide haben dasselbe Gate (kein Kanal, keine Goldader)
 **Was es ist:** Beide Personen haben dasselbe Gate aktiviert (nicht das Polaritäts-Gate).
 **Alltagswirkung:** Das Gate-Thema ist im Feld verstärkt. Kein neuer Kanal — aber das gemeinsame Thema dominiert.
 **Im Reading:** "Ihr teilt dieses Gate. Das Thema [Gate-Thema] ist in eurer Verbindung besonders präsent."

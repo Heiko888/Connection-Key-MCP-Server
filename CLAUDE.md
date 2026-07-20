@@ -38,6 +38,19 @@
 > HTTP 200 :3002. **Kein .138-Anteil.** Damit ist die Override-Funktion vollständig: User-Gate
 > (`frontend`) + Admin-Setz-UI (`frontend-coach`).
 >
+> **Nachtrag 2026-07-21 (.167 — Middleware respektiert Feature-Freigaben, #219, deployt):** Letzter
+> fehlender Baustein: die **Edge-Middleware** (`frontend/middleware.ts`) gatete `/blueprint` & Co.
+> server-seitig **nur nach Paketstufe** und leitete freigeschaltete Premium-User auf
+> `/pricing?upgrade=vip` um — **bevor** die override-fähige Client-Logik (`ProtectedRoute`/`AppShell`)
+> überhaupt lief, sodass `extra_features:["blueprint"]` für Einzel-User nicht durchgriff. Fix: die
+> Middleware liest jetzt `app_metadata` (`parseOverrides`/`featureKeyForPath` aus `lib/access/overrides`)
+> aus der Session und lässt einen gezielt freigeschalteten Pfad durch (`grantedForPath`-Bypass in
+> `enforcePlan`), auch wenn die Stufe allein nicht reicht. Sperren (`excluded_features`) werden hier
+> bewusst **nicht** geblockt (die Stufe reicht ja; der neutrale Hinweis kommt clientseitig). ✅ **Deploy
+> verifiziert (2026-07-21):** `frontend` **Rebuild**, Container `Recreated`, `Up (healthy)` :3000
+> HTTP 200 (Commit `0d2e5114e`). **Kein .138-Anteil.** Override-Kette jetzt durchgängig server- **und**
+> clientseitig: **Middleware → ProtectedRoute/AppShell → API-Gate**.
+>
 > **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
 > CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
 > n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,

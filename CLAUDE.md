@@ -23,6 +23,21 @@
 > `Up (healthy)` :3000 HTTP 200; Branch `claude/premium-blueprint-unlock-ktzewf` nach `main` gemergt
 > (`377dbe7ca`) + gepusht. Siehe Abschnitt 12.
 >
+> **Nachtrag 2026-07-21 (.167 — Coach-Admin-UI zum Setzen der Feature-Overrides, deployt):**
+> Passend zum obigen Override-Mechanismus bekam **`frontend-coach`** eine Admin-Oberfläche zum
+> Verwalten der Freigaben/Sperren: `frontend-coach/app/(coach)/admin/page.tsx` (Abschnitt Feature-
+> Overrides), API-Route `frontend-coach/app/api/admin/users/features/route.ts` (`PUT/GET`, Admin-only
+> via Service-Role, User-Auflösung per `userId` **oder** `email` mit paginiertem Scan) und Katalog
+> `frontend-coach/lib/access/featureCatalog.ts` (`FEATURE_CATALOG`, `sanitizeFeatureKeys`).
+> ⚠️ **Build-Stolperstein (gefixt):** Der strenge `frontend-coach`-Build (Next 16) brach zunächst an
+> einem SupabaseClient-**Generic-Drift** ab — `resolveUserId(adminSupabase, …)` war als
+> `ReturnType<typeof createClient>` typisiert, `getAdminClient()` liefert wegen der `{auth:…}`-Options
+> aber eine abweichende Generic-Variante (`<any,"public",…>` vs. `<unknown,{PostgrestVersion}…>`). Fix:
+> Param an `NonNullable<ReturnType<typeof getAdminClient>>` gekoppelt (Commit `ff8c5fa37`). ✅ **Deploy
+> verifiziert (2026-07-21):** `frontend-coach` **Rebuild** (2. Anlauf sauber, Container `Recreated`),
+> HTTP 200 :3002. **Kein .138-Anteil.** Damit ist die Override-Funktion vollständig: User-Gate
+> (`frontend`) + Admin-Setz-UI (`frontend-coach`).
+>
 > **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
 > CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
 > n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,

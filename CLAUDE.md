@@ -1,6 +1,28 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-08 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-21 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-21 (.167 — Pro-User-Feature-Overrides: einzelne Features entkoppelt von der
+> Paketstufe, deployt):** Der geschützte Bereich war bisher **rein hierarchisch** gated
+> (basic < premium < vip < admin) — kein Mechanismus, um einem **einzelnen** User ein Feature ON TOP
+> seiner Stufe freizuschalten oder gezielt zu sperren. Neu: eine additive/subtraktive Schicht
+> `frontend/lib/access/overrides.ts` (`FEATURE_CATALOG`, `featureKeyForPath`, `parseOverrides`,
+> `evaluateRouteAccess`, `canUseFeature`), verdrahtet in `ProtectedRoute` (Seiten-Gate; neue
+> `excluded`-Variante von `LockedOverlay` = neutraler Hinweis statt Upgrade-CTA),
+> `app/components/AppShell.tsx` (Nav: Freigabe entsperrt das Item, Sperre blendet es aus) und
+> `lib/access/requirePackage.ts` (`resolveUserAccess` + `requireFeature(supabase, key)` fürs API-Gate).
+> Gespeichert in **`app_metadata`** des Auth-Users (NICHT `user_metadata` — app_metadata ist im JWT
+> les-, aber **nur per Service-Role setzbar** → User kann sich nicht selbst freischalten):
+> `extra_features: []` (Zusatz-Freigaben), `excluded_features: []` (gezielte Sperren). **Vorrang:
+> Sperre > Freigabe > Stufe.** **Admin-Endpoint** `PUT/GET /api/admin/users/features` (Admin-only,
+> Service-Role) setzt/liest die Overrides per `userId` oder `email`. Anwendungsfälle: „Premium-User
+> bekommt zusätzlich Blueprint, ohne voll VIP zu werden" → `extra_features:["blueprint"]`; „VIP, aber
+> Beziehungswelt deaktiviert" → `excluded_features:["beziehungen"]`. Wirkt nach dem nächsten
+> Token-Refresh (Re-Login erzwingt es sofort). **Kein .138-Anteil, keine DB-Migration** (nur
+> `app_metadata`). ✅ **Deploy verifiziert (2026-07-21):** `frontend` auf .167 **Rebuild** +
+> `--force-recreate` (der reine `--build` hatte den Container nicht neu erstellt), Container
+> `Up (healthy)` :3000 HTTP 200; Branch `claude/premium-blueprint-unlock-ktzewf` nach `main` gemergt
+> (`377dbe7ca`) + gepusht. Siehe Abschnitt 12.
+>
 > **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
 > CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
 > n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,

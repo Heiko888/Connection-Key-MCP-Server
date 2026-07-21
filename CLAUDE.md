@@ -51,6 +51,21 @@
 > HTTP 200 (Commit `0d2e5114e`). **Kein .138-Anteil.** Override-Kette jetzt durchgängig server- **und**
 > clientseitig: **Middleware → ProtectedRoute/AppShell → API-Gate**.
 >
+> **Nachtrag 2026-07-21 (.167 — Feature-Overrides im Seitenmenü: 2 Lücken, #220, deployt):** Zwei
+> Menü-Lücken im Override-System (AppShell) geschlossen. **(1)** `/transits` hatte **keinen**
+> Feature-Key im Katalog → `isExcluded` konnte den Punkt nie ausblenden (Sperren wirkungslos) und die
+> VIP-Middleware-Sperre ließ sich nicht per Freigabe umgehen. Neuer Key **`transite`** (Prefix
+> `/transits`, tier vip) in **beiden** Katalogen (`frontend/lib/access/overrides.ts` +
+> `frontend-coach/lib/access/featureCatalog.ts`) → Sperre blendet aus, Freigabe umgeht die
+> VIP-Middleware, Toggle erscheint automatisch in der Coach-Admin-UI. **(2)** Freigeschaltete Features
+> **ohne festen Menüpunkt** (planets, lilith, energetische-signatur, telegram-community,
+> v6-coaching/learning/evolution) tauchten trotz `extra_features` nie im Menü auf → neue dynamische
+> Nav-Sektion **„Freigeschaltet"** in `frontend/app/components/AppShell.tsx` rendert für jedes solche
+> Feature automatisch einen Eintrag (Label+Route aus dem Katalog, dedupliziert gegen die Basis-Nav;
+> gesperrte werden nicht eingeblendet). ✅ **Deploy verifiziert (2026-07-21):** `frontend` **und**
+> `frontend-coach` **seriell** neu gebaut, beide Container `Recreated`/`healthy`, HTTP 200 :3000/:3002
+> (Commit `45aa7dd7c`). **Kein .138-Anteil.**
+>
 > **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
 > CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
 > n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,

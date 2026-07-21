@@ -1,0 +1,68 @@
+{
+  "name": "Google Mail → Mattermost",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {}
+      },
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "Google Mail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MATTERMOST_WEBHOOK_URL }}",
+        "authentication": "none",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": '#### 📧 Neue E-Mail in Google Mail\\n\\n**Von:** ' + ($json.from || $json.From || $json.headers?.from || 'Unbekannt') + '\\n**Betreff:** ' + ($json.subject || $json.Subject || $json.headers?.subject || '(kein Betreff)') + '\\n\\n---\\n' + (($json.snippet || $json.textPlain || $json.text || '').toString().slice(0, 1500)), \"channel\": $env.MATTERMOST_CHANNEL_MAIL || $env.MATTERMOST_CHANNEL || '#googlemail', \"username\": $env.MATTERMOST_MAIL_USERNAME || 'Google Mail', \"icon_emoji\": ':email:' } }}",
+        "options": {}
+      },
+      "id": "mattermost",
+      "name": "Send to Mattermost",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [550, 300]
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send to Mattermost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-07-01T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -66,6 +66,25 @@
 > `frontend-coach` **seriell** neu gebaut, beide Container `Recreated`/`healthy`, HTTP 200 :3000/:3002
 > (Commit `45aa7dd7c`). **Kein .138-Anteil.**
 >
+> **Nachtrag 2026-07-21 (.167 — 🐛 Middleware-Key-Bug: Premium/VIP-User aus geschütztem Bereich
+> geworfen, #221, deployt):** Ernster Access-Bug: eingeloggte User wurden im geschützten Bereich sofort
+> wieder herausgeführt. **Ursache:** `frontend/middleware.ts` baute den Supabase-Client mit
+> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (+ hardcodiertem Stale-Fallback) — diese Var wird im Deployment
+> aber **nie gesetzt** (`docker-compose.yml`/`.env.example` reichen ausschließlich
+> `NEXT_PUBLIC_SUPABASE_ANON_KEY` durch), während Browser-Client + alle Server-Helper den ANON-Key
+> nutzen. Die Middleware lief also permanent mit falschem Key → (a) Subscription-Query zur
+> Paket-Ermittlung scheiterte → Paket fiel auf „basic" zurück → **zahlende Premium/VIP-User bei jeder
+> geschützten Route auf `/pricing` umgeleitet**; (b) Token-Refresh scheiterte bei Access-Token-Ablauf →
+> `getSession()` = null → Umleitung auf `/login`. **Fix:** Middleware auf dieselbe Key-Auflösung wie der
+> Rest der Codebase umgestellt (`ANON_KEY` zuerst, Publishable nur Fallback), Stale-Key entfernt (Commit
+> `1877bd840`). **Kein .138-Anteil.**
+>
+> **Nachtrag 2026-07-21 (.167 — Hover-Tooltips im HD-Chart, #222, deployt):** Die Human-Design-
+> Chart-Seite (`frontend/app/human-design-chart/page.tsx`) zeigt bei Hover über **Kanäle, Tore &
+> Zentren** jetzt erklärende Tooltips (Desktop; auf Touch bewusst ohne Hover-Listener). Zusammen mit
+> #221 in **einem** `frontend`-Rebuild deployt: ✅ **verifiziert (2026-07-21):** Container `Recreated`/
+> `healthy`, HTTP 200 :3000 (main `684db77bf`). **Kein .138-Anteil.**
+>
 > **Changelog 2026-07-08 (.138 — n8n Security-Update: 2.3.5 → 2.29.8, CERT-Bund-Advisory):**
 > CERT-Bund (BSI) meldete für `138.199.237.34:443` (Timestamp 2026-07-07) die laufende
 > n8n-Version **2.3.5** als **verwundbar** für mehrere kritische CVEs — Remote Code Execution,

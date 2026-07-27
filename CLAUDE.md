@@ -1,6 +1,19 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-07-27 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Doku-Korrektur 2026-07-27 (.167 — „Dual-Nginx" ist überholt, nur Host-Nginx aktiv):** Beim
+> Container-Check fiel auf, dass auf .167 **kein Nginx-Container existiert** (auch nicht gestoppt) —
+> die Doku beschrieb aber seit Monaten ein paralleles Host-+-Docker-Nginx-Setup als offenes Problem
+> (P1 #19). **Realität:** der **Host-Nginx (systemd)** ist der einzige Reverse-Proxy und bedient alle
+> Domains direkt auf `127.0.0.1:3000/3002/4000` (SSL via Certbot). Abschnitte 2, 4, 5, 6, 15, 16 und 18
+> entsprechend korrigiert. **Zwei Rest-Punkte (kosmetisch, nicht funktionsgefährdend):** (1) der
+> `nginx:`-Service steht **weiterhin in `docker-compose.yml`** mit `80:80`/`443:443` → ein pauschales
+> `docker compose up -d` **ohne** Service-Namen würde ihn starten und mit dem Host-Nginx kollidieren
+> (Deploys deshalb immer service-spezifisch, wie im `deploy-167`-Skill); (2) in `sites-enabled/` hängt
+> neben `coach` noch der tote Symlink `coach.bak-20260616-194049` → `nginx -t` meldet
+> `conflicting server name … ignored` (aktiv ist die richtige, neuere `coach`-Datei mit den
+> 300s-Timeouts). **Keine Code-Änderung, reine Doku.**
+>
 > **Changelog 2026-07-27 (.167 — 🔒 Member-Einwilligung für Coach-Einblick in Blueprint-Chat-
 > Erkenntnisse, #226, deployt):** Der **private** Blueprint-Chat des Members
 > (`frontend/app/api/blueprint/chat/route.ts`) leitete bisher **automatisch** alle ~6 Nachrichten
@@ -563,9 +576,9 @@ The Connection Key ist eine Human-Design-Plattform mit KI-gestützten Readings, 
 │       │         │                    │  │  ┌─────────┐┌────────┐┌─────────┐       │
 │       ▼         ▼                    │  │  │conn-key ││reading ││  mcp-   │       │
 │  ┌──────────────────────────────┐    │  │  │  :3000  ││worker  ││gateway  │       │
-│  │ Docker-Nginx (80/443) ⚠️DUAL│    │  │  │  (API)  ││ :4000  ││ :7000   │       │
-│  │ Rate Limiting: 10r/s API    │    │  │  │ Express ││ BullMQ ││ Agents  │       │
-│  │ Timeout: 300s Agents        │    │  │  └────┬────┘└───┬────┘└────┬────┘       │
+│  │ Docker-Nginx: NICHT AKTIV 🗑️│    │  │  │  (API)  ││ :4000  ││ :7000   │       │
+│  │ (Service noch im Compose,   │    │  │  │ Express ││ BullMQ ││ Agents  │       │
+│  │  Container läuft nicht)     │    │  │  └────┬────┘└───┬────┘└────┬────┘       │
 │  └────┬─────────┬──────┬───────┘    │  │       │         │          │            │
 │       │         │      │            │  │       ▼         ▼          ▼            │
 │       ▼         ▼      ▼            │  │  ┌─────────────────────────────┐         │
@@ -642,7 +655,7 @@ Kommunikation .167 → .138:
 | `frontend` | build (Next.js) | 3000→3000 | ✅ Healthy | app-network | ✅ |
 | `frontend-coach` | build (Next.js) | 3002→3000 | ✅ Up | app-network | ✅ |
 | `ck-agent` | build (Express.js) | 4000→4000 | ✅ Up | app-network | ✅ |
-| `nginx` | `nginx:alpine` | 80, 443 | ✅ Up | app-network | ✅ |
+| `nginx` | `nginx:alpine` | 80, 443 | ❌ **Läuft nicht** (kein Container, auch nicht gestoppt — Traffic via Host-Nginx; Service-Def noch im Compose ⚠️ Port-Konflikt bei pauschalem `up -d`) | app-network | ✅ (Def) |
 | `redis` | `redis:alpine` | 6379 intern | ✅ Up | app-network | ✅ |
 | `grafana` | `grafana/grafana` | 3001→3000 | ✅ Up | app-network | ✅ |
 | `prometheus` | `prom/prometheus` | 9090→9090 | ✅ Up | app-network | ✅ |
@@ -702,8 +715,8 @@ Kommunikation .167 → .138:
 | Port | Service/Container | Sicherheit | Zweck | Status |
 |------|-------------------|-----------|-------|--------|
 | 22 | sshd | ✅ | Admin SSH | ✅ |
-| 80 | nginx (Docker) | ✅ | HTTP→HTTPS | ✅ |
-| 443 | nginx (Docker) | ✅ | HTTPS (alle Domains) | ✅ |
+| 80 | nginx (**systemd/Host**) | ✅ | HTTP→HTTPS | ✅ |
+| 443 | nginx (**systemd/Host**) | ✅ | HTTPS (alle Domains) | ✅ |
 | 3000 | frontend (Docker) | via Nginx/SSL | the-connection-key.de | ✅ |
 | 3001 | grafana (Docker) | ⚠️ Intern | Monitoring | ⚠️ |
 | 3002 | frontend-coach (Docker) | via Nginx/SSL | coach.the-connection-key.de | ✅ |
@@ -726,34 +739,37 @@ werdemeisterdeinergedankenagent.de → localhost:3000 (HTTPS, Let's Encrypt)
 ```
 ⚠️ `/opt/mcp-connection-key/nginx/conf.d/` ist LEER
 
-### Server .167 — DUAL-NGINX PROBLEM ⚠️
+### Server .167 — nur Host-Nginx aktiv (Stand 2026-07-27)
 
-**Host-Nginx (sites-enabled/):**
+> ⚠️ **Korrektur 2026-07-27:** Der frühere Vermerk „DUAL-NGINX PROBLEM — Host- und Docker-Nginx
+> laufen parallel" ist **überholt**. Live-Prüfung (`docker ps -a`) zeigt: der **Docker-Nginx läuft
+> nicht** und existiert nicht einmal als gestoppter Container. **Der gesamte Traffic läuft
+> ausschließlich über den Host-Nginx** (systemd, `active`, `nginx -t` ok). Es gibt also **kein**
+> paralleles Dual-Setup mehr.
+
+**Host-Nginx (`/etc/nginx/sites-enabled/`) — der einzige aktive Reverse-Proxy:**
 ```
-the-connection-key.de           → localhost:3000  ✅
-coach.the-connection-key.de     → localhost:3002  ✅
-agent.the-connection-key.de     → localhost:4000  ✅ (gefixt 2026-06-07, war 3005)
-n8n                             → n8n Server
-```
-
-**Docker-Nginx (nginx/nginx.conf):**
-```
-Upstreams:
-  frontend        → frontend:3000
-  frontend-coach  → frontend-coach:3000
-  ck-agent        → ck-agent:4000
-
-Domains (HTTPS):
-  the-connection-key.de         → frontend        ✅
-  coach.the-connection-key.de   → frontend-coach   ✅
-  agent.the-connection-key.de   → ck-agent:4000    ✅
-
-Security: X-Frame-Options, HSTS (2 Jahre), XSS-Protection
-Rate Limiting: API 10r/s, Login 5r/m
-Agent Timeout: 300s
+the-connection-key.de + www + connectionkey.de + www   → 127.0.0.1:3000  (frontend)
+coach.the-connection-key.de                            → 127.0.0.1:3002  (frontend-coach)
+agent.the-connection-key.de                            → 127.0.0.1:4000  (ck-agent, gefixt 2026-06-07, war 3005)
+n8n                                                    → n8n Server
+Alle mit listen 443 ssl http2 (Let's Encrypt) + HTTP→HTTPS
 ```
 
-**Problem:** Host-Nginx und Docker-Nginx laufen parallel. ✅ **Teil-Fix (2026-06-07):** Host-Nginx (`sites-enabled/agent`) leitet `agent.the-connection-key.de` jetzt korrekt auf Port 4000 (ck-agent) → 200 statt 502. Offen bleibt die generelle Dual-Nginx-Auflösung (Host + Docker parallel).
+⚠️ **Latente Falle:** Der Service `nginx:` ist in `docker-compose.yml` (Zeile ~101, `image: nginx:alpine`)
+**weiterhin definiert** und bindet dort `80:80`/`443:443`. Ein pauschales `docker compose up -d` (ohne
+Service-Namen) würde ihn starten → **Port-Konflikt mit dem Host-Nginx**. Deshalb Deploys immer
+**service-spezifisch** fahren (`docker compose up -d --build frontend`), so wie im `deploy-167`-Skill
+beschrieben. Die Datei `nginx/nginx.conf` (+ 6 Varianten `nginx-hetzner/-dev/-staging/…`) liegt noch im
+Repo, ist aber **nicht in Betrieb** — Aufräum-Kandidat inkl. Entfernen des Compose-Service.
+
+⚠️ **Doppelt eingehängte Coach-Site:** In `sites-enabled/` liegen **zwei** Definitionen für
+`coach.the-connection-key.de` — die Datei `coach` **und** der Alt-Symlink
+`coach.bak-20260616-194049 → sites-available/coach`. `nginx -t` meldet dafür
+`[warn] conflicting server name … ignored`. Aktiv ist (alphabetische Ladereihenfolge) die Datei
+`coach` — also die **neuere** Variante **mit** `proxy_connect/send/read_timeout` (75s/300s/300s); der
+Symlink zeigt auf die ältere Fassung **ohne** diese Timeouts und wird ignoriert. Funktional korrekt,
+aber der tote Symlink sollte entfernt werden (dann verschwinden auch die Warnungen).
 
 ---
 
@@ -1316,7 +1332,7 @@ MarketingWorkflow.tsx       Marketing
 | 16 | ✅ **ERLEDIGT (2026-07-03):** n8n hat HTTPS (Certbot, `listen 443 ssl` + HTTP→301); zusätzlich `127.0.0.1`-Bind + Env-Access-Block (PRs #36/#37) | .138 |
 | 17 | ✅ **ERLEDIGT (2026-06-17):** `/agents/reading` ist kein Platzhalter mehr (echter Claude-Call); der tote `services/chart-truth/`-Baum (nicht lauffähig — Abhängigkeit `chart-calculation-astronomy.js` fehlte, nirgends gemountet, duplizierte die echte Engine) wurde **entfernt** (inkl. `integration/.../chart/truth/route.ts`). ⚠️ Rest: n8n-Templates (`n8n-workflows/*chart-truth*`) rufen noch `/api/chart/truth` auf — diesen Endpunkt serviert die connection-key-API **nicht** (sie hat `/api/chart/calculate`); Templates sind nicht live, aber vor n8n-Import anpassen | .138 |
 | 18 | ✅ **ERLEDIGT:** `depth-analysis.txt`/Reading-Templates committet | .138 |
-| 19 | Dual-Nginx auf .167 (Host + Docker parallel) | .167 |
+| 19 | ✅ **ERLEDIGT/HINFÄLLIG (verifiziert 2026-07-27):** Kein Dual-Nginx mehr — der Docker-Nginx läuft auf .167 **nicht** (existiert nicht mal als gestoppter Container), alles läuft über den Host-Nginx. **Rest-Aufgabe (kosmetisch):** `nginx:`-Service aus `docker-compose.yml` entfernen (sonst Port-Konflikt bei pauschalem `docker compose up -d`) + toten Symlink `sites-enabled/coach.bak-20260616-194049` löschen (erzeugt `conflicting server name`-Warnungen) | .167 |
 | 20 | `bull:reading-v4-queue` Duplikat-Namespace | .138 |
 
 ---
@@ -1346,7 +1362,7 @@ MarketingWorkflow.tsx       Marketing
 | Ungenutzte UFW-Ports schließen (3005, 3456, 4001) | .138 | `ufw delete allow` |
 | ✅ ~~Swap-Space einrichten (2-4 GB)~~ | .138 | **Erledigt** — 4 GB `/swapfile`, swappiness 10 (.138 + .167) |
 | ✅ ~~n8n hinter HTTPS~~ | .138 | **Erledigt** — Certbot-Site aktiv (`sites-available/n8n`), HTTP→301 |
-| Dual-Nginx auflösen | .167 | Host-Nginx direkt auf Docker-Container |
+| ✅ ~~Dual-Nginx auflösen~~ | .167 | **Erledigt/hinfällig (2026-07-27)** — nur Host-Nginx aktiv (Docker-Nginx läuft nicht). Rest: `nginx:`-Service aus `docker-compose.yml` + toten Symlink `coach.bak-20260616-194049` entfernen |
 | Dangling Docker Images | .167 | `docker image prune` (~13.7 GB) |
 | Veraltete Docker Images | .138 | ~10 Images, ~3-4 GB |
 | TypeScript `ignoreBuildErrors` entfernen | .167 | Fehler fixen |
@@ -1465,7 +1481,7 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 | Shared Code | `@ck/shared` (packages/shared/) |
 | Monitoring | Grafana + Prometheus + Node Exporter + AlertManager + Redis Exporter |
 | Container | Docker Compose (10 Services) |
-| Reverse Proxy | Nginx (Docker) + Host-Nginx (⚠️ Dual) |
+| Reverse Proxy | **Host-Nginx (systemd)** — einziger aktiver Proxy; Docker-Nginx-Service noch im Compose definiert, aber nicht laufend |
 | SSL | Let's Encrypt |
 | CI/CD | GitHub Actions |
 

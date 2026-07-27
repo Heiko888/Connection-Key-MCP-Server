@@ -1,6 +1,32 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-21 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-27 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-27 (.167 — 🔒 Member-Einwilligung für Coach-Einblick in Blueprint-Chat-
+> Erkenntnisse, #226, deployt):** Der **private** Blueprint-Chat des Members
+> (`frontend/app/api/blueprint/chat/route.ts`) leitete bisher **automatisch** alle ~6 Nachrichten
+> (`BLUEPRINT_INSIGHT_EVERY_N`, Default 6) eine „Insight" ab und legte sie — **inklusive wörtlicher
+> Chatnachrichten** (`source_messages`, letzte 8) — in `blueprint_insights` für Coach/Admin ab:
+> ohne Einwilligung, ohne Hinweis, ohne nutzerseitige Kontrolle. **Neu: Member-gesteuertes Opt-in,
+> Default AUS.** Migration `supabase-migrations/026_blueprint_coach_share_consent.sql` (additiv,
+> idempotent) ergänzt `public.profiles.blueprint_coach_share` (bool, `not null default false`) +
+> `blueprint_coach_share_at` sowie `public.blueprint_insights.member_consent` (bool, nullable =
+> Einwilligungs-**Snapshot** beim Erzeugen). Verdrahtet in: **(1)** neue Route
+> `frontend/app/api/blueprint/consent/route.ts` (`GET`/`POST {share}`, user-authentifizierter
+> Client → RLS `profiles_update_own`, der Member setzt/widerruft also nur für sich selbst);
+> **(2)** `…/blueprint/chat`: die Insight-Ableitung läuft **nur** bei aktivem Opt-in
+> (`shareInsightsWithCoach`-Guard vor `generateBlueprintInsight`), erzeugte Insights tragen
+> `member_consent: true`; **(3)** `frontend/app/api/v6/learning/route.ts` („An Blueprint senden" =
+> explizite Nutzeraktion → gilt als Einwilligung, `member_consent: true`); **(4)**
+> `frontend-coach/app/api/blueprint-insights/route.ts` filtert `.eq('member_consent', true)` →
+> **Alt-Bestand (`NULL`) bleibt dem Coach bewusst verborgen** und wird **nicht** rückwirkend
+> freigegeben; **(5)** UI: Datenschutz-Schalter + Transparenz-Hinweis in
+> `frontend/app/blueprint/chat/page.tsx`, präzisierte Privacy-Note auf `…/blueprint/page.tsx`.
+> ✅ **Deploy verifiziert (2026-07-27):** Migration `026` auf Projekt `wdiadklhvhlndnjojrfu`
+> **angewandt** (alle 3 Spalten via `information_schema` bestätigt); `frontend` **und**
+> `frontend-coach` auf .167 **seriell** neu gebaut (beide `EXIT=0`, Container `Recreated`),
+> HTTP 200 auf :3000/:3002 **und** extern; neue Route im Build vorhanden
+> (`/api/blueprint/consent` → **401** ohne Session). **Kein .138-Anteil** (Commit `518167a4f`).
+>
 > **Changelog 2026-07-21 (.167 — Pro-User-Feature-Overrides: einzelne Features entkoppelt von der
 > Paketstufe, deployt):** Der geschützte Bereich war bisher **rein hierarchisch** gated
 > (basic < premium < vip < admin) — kein Mechanismus, um einem **einzelnen** User ein Feature ON TOP
@@ -1445,6 +1471,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-08 (.138 — n8n Security-Update 2.3.5 → 2.29.8 wegen CERT-Bund-Advisory, CVE-2026-25049/-27493/-27495/-44790 u. a.; Repo-Pin gesetzt, Deploy auf .138 offen)*
+*Letzte Aktualisierung: 2026-07-27 (.167 — Member-Einwilligung für Coach-Einblick in Blueprint-Chat-Erkenntnisse, #226: Migration 026 angewandt, frontend + frontend-coach deployt)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

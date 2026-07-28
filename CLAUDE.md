@@ -1,6 +1,24 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-07-28 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 5: A11y, Desktop-Nav, Breadcrumbs, #231,
+> deployt):** Abschluss des Coach-Portal-Umbauplans. Betroffen nur drei Dateien:
+> `frontend-coach/components/CoachNavigation.tsx` (Fokus-/Menü-Semantik, **Auto-Hide der Nav nur noch
+> auf Mobile** → auf dem Desktop bleibt sie stehen), `components/AgentChatPage.tsx` (Breadcrumbs,
+> −19/+5 Zeilen — profitiert davon, dass Phase 4a das Layout an **einer** Stelle gebündelt hat) und
+> die `CLAUDE.md` **des .167-Repos** (nicht diese hier). ✅ **Deploy verifiziert (2026-07-28):**
+> `frontend-coach` neu gebaut (`EXIT=0`, Container `Recreated`), HTTP 200 :3002 intern + extern,
+> 10 Stichproben-Routen (Dashboard/Katalog/Agenten/Redirects/Admin/Insights/Readings) alle 200,
+> `aria-current`/Breadcrumb-Code im Bundle nachweisbar; .167-Tree wieder deckungsgleich mit
+> `origin/main` (`598915ae7`). **Kein .138-Anteil, keine Migration.** Merge-Commit `39faf9f53`.
+> ⚠️ **Ablauf-Hinweis für künftige Deploys:** #231 landete auf `origin/main`, **während** der
+> Naming-Nachzug lief → `git push` wurde abgelehnt; gelöst per `git pull --rebase --autostash`
+> (nötig, weil der .167-Working-Tree dauerhaft „unsauber" ist: gelöschtes `movie.png`,
+> `.env.bak-*`-Dateien). Danach war der Tree #231 voraus, der Container aber noch nicht → **immer
+> prüfen, ob nach einem Rebase ein weiterer Rebuild fällig ist.** Damit sind die Phasen 1–5 des
+> `COACH_PORTAL_UMBAUPLAN_2026-07-28.md` deployt; offen bleibt nur **4.5** (Duplikat-Komponenten
+> `GlassTiltCard`/`AdminAuth`/`AuthGuard`).
+>
 > **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 4b: Hub-Duplikate, Naming, PDF-Stub, #230 +
 > Naming-Nachzug, deployt):** **4.2** `/business` und `/marketing` duplizierten die
 > `/agents`-Katalogdaten (inkl. Off-Brand-Farben `#34D399`/`#FB6B4A`) und waren seit Phase 1 nicht
@@ -1562,6 +1580,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal Phase 4b (#230) + Naming-Nachzug deployt; zuvor Phase 4a (#229), Phase 1–3 (#228), Blueprint-Chat mobil (#227), Nginx-Doku-Korrektur. ⚠️ Offen: Phase 5 (#231) gepullt, aber noch nicht gebaut)*
+*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal-Umbauplan Phasen 1–5 vollständig deployt: #228 Nav/Design-Tokens/Palette, #229 Agent-Scaffold, #230 Hub-Duplikate/Naming + Nachzug, #231 A11y/Breadcrumbs; dazu #227 Blueprint-Chat mobil, #226 Blueprint-Consent + Migration 026, Nginx-Doku-Korrektur. Offen: nur Phase 4.5)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

@@ -1,6 +1,28 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-07-28 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 4a: 15 Chat-Agent-Seiten auf ein Scaffold,
+> #229, deployt):** Die einfachen Chat-Agenten im Coach-Portal waren **15 nahezu byte-identische
+> ~134-Zeilen-Templates**, die sich nur in Daten unterschieden (Hero-Icon, Titel, Untertitel,
+> 4 Capabilities, `agentId`). Neu hält `frontend-coach/components/AgentChatPage.tsx` das Layout
+> **einmal**; jede Route ist ein **~23-Zeilen-Wrapper**, der nur seine Daten übergibt (typkorrekt
+> über eine `AgentId`-Union). Betroffen: `transit`, `emotions`, `hd-relationship`, `depth-analysis`,
+> `reflection`, `shadow-work`, `business-hd`, `yearly`, `chart`, `chart-architect`, `abundance`,
+> `health`, `reading-crisis`, `reading-personality`, `reading-relationship` (**−1.959 / +390
+> Zeilen**, netto ~1.500 Zeilen dupliziertes Layout weg). **Verhalten unverändert:**
+> `agentId`/`agentName`/`apiPath` exakt übernommen (inkl. der Abweichung bei `hd-relationship` →
+> `/api/agents/relationship`), `ReadingContextSelector` + `AgentChat` + `readingContext` wie zuvor,
+> Farbe weiter aus `agentColor(agentId)`. **Bewusst NICHT gefaltet** (eigene Logik): Workflow-Agenten
+> (`sales`/`marketing`/`automation`/`ui-ux`/`social-youtube`/`video-creation`), `multi-agent`,
+> `tasks`, `video-`/`audio-generation`, `reading-business`. ✅ **Deploy verifiziert (2026-07-28):**
+> nur `frontend-coach` neu gebaut (`EXIT=0`, TS-Check des strengen Next-16-Builds sauber, Container
+> `Recreated`), HTTP 200 :3002 intern + extern; **alle 15 refaktorierten Agent-Seiten liefern 200**,
+> und die `agentId`-Zuordnung wurde je Route quellseitig gegengeprüft (jede Seite ihre eigene ID,
+> `hd-relationship` mit korrekt abweichendem `apiPath`). `frontend` **nicht** angefasst (kein Anteil
+> am Commit). **Kein .138-Anteil, keine Migration.** Merge-Commit `9dea0a92f`. ⚠️ Ein echter
+> Chat-Durchlauf pro Agent (Klick → Backend-Call) wurde **nicht** durchgespielt. Phasen **4b–5** des
+> Umbauplans bleiben offen.
+>
 > **Changelog 2026-07-28 (.167 — Coach-Portal-Audit Phase 1–3 + Blueprint-Chat mobil, #227/#228,
 > deployt):** Zwei Pakete aus dem `The-Connection-Key`-Repo, **reine Frontend-Arbeit, kein
 > .138-Anteil, keine Migration.** **(A) #227 — Blueprint-Chat mobil:** Der innere Container von
@@ -1518,6 +1540,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal-Audit Phase 1–3 (Nav/Design-Tokens/On-Brand-Palette, #228) + Blueprint-Chat mobil (#227) deployt; zuvor .167-Nginx-Doku korrigiert)*
+*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal Phase 4a: 15 Chat-Agent-Seiten auf ein Scaffold (#229) deployt; zuvor Phase 1–3 (#228) + Blueprint-Chat mobil (#227) + Nginx-Doku-Korrektur)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

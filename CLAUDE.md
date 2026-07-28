@@ -1,6 +1,37 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-27 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-28 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-28 (.167 — Coach-Portal-Audit Phase 1–3 + Blueprint-Chat mobil, #227/#228,
+> deployt):** Zwei Pakete aus dem `The-Connection-Key`-Repo, **reine Frontend-Arbeit, kein
+> .138-Anteil, keine Migration.** **(A) #227 — Blueprint-Chat mobil:** Der innere Container von
+> `frontend/app/blueprint/chat/page.tsx` nutzte `height: calc(100vh - 80px)` + `minHeight 600`;
+> `100vh` ist auf Mobile-Browsern die **große** Viewporthöhe (hinter der Adressleiste) → Eingabe/
+> unterer Teil rutschten unter die Falz, der Nachrichtenbereich wurde zwischen den fixen Elementen
+> (Hero, Consent-Hinweis, Eingabe) gequetscht. Fix: **`100dvh`** (dynamische Viewporthöhe).
+> **(B) #228 — Coach-Portal-Audit, Phasen 1–3** (Plan-Doc `COACH_PORTAL_UMBAUPLAN_2026-07-28.md`,
+> 5 Phasen, 4–5 offen): **Phase 1 (Nav)** `frontend-coach/components/CoachNavigation.tsx` — Chat-
+> Agenten (Transit/Jahres/Tiefenanalyse) aus dem **Readings**-Dropdown entfernt (enthält jetzt nur
+> strukturierte Readings) → behebt den **Active-State-Bug** (Pfade `/agents/*` und Readings-Logik
+> konkurrierten); Agenten-Dropdown → Direktlink `/agents`, redundante Sub-Kataloge `/business` +
+> `/marketing` aus der Nav (Seiten bleiben bestehen). **Phase 2 (Fundament)** neues
+> `frontend-coach/styles/tokens.ts` (`BG` `#0B0F19`, `GOLD` `#F5A623`, `GOLD_DEEP` `#D98905`,
+> `SUCCESS` `#46A06A`, `GRADIENT_GOLD`, `ACCENTS`, `glassSoft`/`glassCard`/`glassCardSx`) als **eine
+> Quelle der Wahrheit** gegen die Farb-/Glas-Drift (das MUI-Theme war sauber, wurde von den Seiten
+> aber mit hunderten hartkodierten Werten umgangen); `components/dashboard/shared.tsx` re-exportiert
+> die Tokens (Alt-Importe bleiben gültig); neue `components/PageShell.tsx` (einheitliche max-width/
+> Padding/Titel-Slot, erster Adopter `insights/page.tsx`); Alt-Gradient **Gold→Dunkelrot**
+> (`#F5A623→#8C1D04`) in Nav-Avatar ×2 + `ScrollToMenuButton` auf den Marken-Gradient ersetzt, drei
+> „Schwarz"-Töne auf `BG` vereinheitlicht (`CosmicBackground`, Mobile-Drawer). **Phase 3 (Palette)**
+> sechs Seiten mit Off-Brand-Tailwind-Palette (Lila/Cyan/Koralle/Pink) auf on-brand remappt —
+> `v6-sessions`, `readings-v4`, `readings-v4/list`, `admin`, `channel-content`,
+> `agents/multi-agent`; Reading-Typen/Agenten bleiben **innerhalb** der Farbfamilie unterscheidbar,
+> **semantische Farben** (Fehler-Rot, Pending-Grau) bewusst unangetastet. ✅ **Deploy verifiziert
+> (2026-07-28):** `frontend` **und** `frontend-coach` **seriell** neu gebaut (beide `EXIT=0`,
+> Container `Recreated`), HTTP 200 :3000/:3002 intern **und** extern; alle 6 umgebauten Coach-Seiten
+> + `/dashboard` liefern 200, `/blueprint/chat` 307 (Login-Redirect ohne Session = erwartet).
+> Danach `image prune` + `buildx prune --max-used-space=15GB` (7,2 GB frei, Disk 31 %). Merge-Commit
+> `0377be472`.
+>
 > **Doku-Korrektur 2026-07-27 (.167 — „Dual-Nginx" ist überholt, nur Host-Nginx aktiv):** Beim
 > Container-Check fiel auf, dass auf .167 **kein Nginx-Container existiert** (auch nicht gestoppt) —
 > die Doku beschrieb aber seit Monaten ein paralleles Host-+-Docker-Nginx-Setup als offenes Problem
@@ -1487,6 +1518,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-27 (.167 — Member-Einwilligung für Coach-Einblick in Blueprint-Chat-Erkenntnisse, #226: Migration 026 angewandt, frontend + frontend-coach deployt)*
+*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal-Audit Phase 1–3 (Nav/Design-Tokens/On-Brand-Palette, #228) + Blueprint-Chat mobil (#227) deployt; zuvor .167-Nginx-Doku korrigiert)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

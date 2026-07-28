@@ -1,6 +1,28 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-07-28 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 4b: Hub-Duplikate, Naming, PDF-Stub, #230 +
+> Naming-Nachzug, deployt):** **4.2** `/business` und `/marketing` duplizierten die
+> `/agents`-Katalogdaten (inkl. Off-Brand-Farben `#34D399`/`#FB6B4A`) und waren seit Phase 1 nicht
+> mehr verlinkt → beide Seiten sind jetzt **`redirect('/agents')`**-Stubs (Bookmarks bleiben heil),
+> die ~9 „Zurück"-Verweise der Workflow-/Content-Seiten zeigen direkt auf `/agents`.
+> ⚠️ **Verhalten beachten:** Da beide Routen **statisch vorgerendert** sind (`x-nextjs-prerender: 1`),
+> antwortet Next **HTTP 200** mit `<meta http-equiv="refresh" content="1;url=/agents">` statt eines
+> echten 307/308 → im Browser ~1 s Zwischenseite. Funktioniert, aber ein `redirects()`-Eintrag in
+> `next.config` wäre sauberer. **4.3** Naming entwirrt: „Video-Kreativ-Helfer" → **„Video-Skript-
+> Helfer"** (Text-Assistent, erzeugt den Plan) vs. „Video-Generierung (KI)" → **„KI-Video (Runway)"**
+> (echtes MP4). ⚠️ **PR #230 benannte nur den Katalog `/agents` um** — Admin-Agentenliste
+> (`admin/page.tsx:29–30`) und **beide Seitentitel** trugen weiter die Alt-Namen, ein Klick vom
+> Katalog führte also auf eine anders betitelte Seite. **Nachgezogen (Commit `598915ae7`):** alle
+> 4 Stellen deckungsgleich, Alt-Namen im Coach-Code nicht mehr auffindbar; die Überschrift in
+> `components/VideoGenerationPanel.tsx` bleibt bewusst unverändert. **4.4** irreführenden Stub-Button
+> „Als PDF exportieren (bald)" aus dem Live-Reading entfernt. **4.5 bewusst NICHT:**
+> `GlassTiltCard`/`AdminAuth`/`AuthGuard` sind aktiv genutzt (3/4/2 Dateien) — Migration nur mit
+> Build-Verifikation. ✅ **Deploy verifiziert (2026-07-28):** `frontend-coach` **zweimal** gebaut
+> (#230, dann Naming-Nachzug; beide `EXIT=0`, Container `Recreated`), HTTP 200 :3002 intern + extern,
+> Katalog + 8 Workflow-/Content-Seiten 200, neue Namen im Bundle, keine Alt-Treffer, PDF-Stub weg.
+> `frontend` nicht angefasst. **Kein .138-Anteil, keine Migration.** Merge-Commit `cba7a0078`.
+>
 > **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 4a: 15 Chat-Agent-Seiten auf ein Scaffold,
 > #229, deployt):** Die einfachen Chat-Agenten im Coach-Portal waren **15 nahezu byte-identische
 > ~134-Zeilen-Templates**, die sich nur in Daten unterschieden (Hero-Icon, Titel, Untertitel,
@@ -1540,6 +1562,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal Phase 4a: 15 Chat-Agent-Seiten auf ein Scaffold (#229) deployt; zuvor Phase 1–3 (#228) + Blueprint-Chat mobil (#227) + Nginx-Doku-Korrektur)*
+*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal Phase 4b (#230) + Naming-Nachzug deployt; zuvor Phase 4a (#229), Phase 1–3 (#228), Blueprint-Chat mobil (#227), Nginx-Doku-Korrektur. ⚠️ Offen: Phase 5 (#231) gepullt, aber noch nicht gebaut)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

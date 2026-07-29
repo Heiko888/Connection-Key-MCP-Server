@@ -1,6 +1,22 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
-**Stand:** 2026-07-28 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
+**Stand:** 2026-07-29 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Changelog 2026-07-29 (.167 — Blueprint-Chat mobil: größeres Fenster + horizontaler Scroll,
+> #232, deployt):** Nachzug zu #227 (dort war nur die Gesamthöhe auf `100dvh` umgestellt — die
+> eigentliche Enge kam von den fixen Elementen darüber). Zwei Mobile-Probleme in
+> `frontend/app/blueprint/chat/page.tsx`: **(1) Horizontaler Scroll** — ein dekorativer Glow-Kreis
+> (`width:500`, `left:15%`) ragte auf schmalen Screens über den Viewport hinaus → äußerer Wrapper
+> `overflow-x:hidden`, Glow `max-width:100%`. **(2) Zu kleines Chat-Fenster** — Hero-Karte und
+> Datenschutz-Leiste (der Consent-Schalter aus #226) fraßen die Höhe; auf Mobile jetzt kompakt
+> (Eyebrow-Zeile aus, Consent-Beschreibung aus, kleinere Paddings/Margins), sodass die
+> Nachrichtenliste (`flex:1`) den Platz bekommt: **Portrait 390×750: 318 px → 431 px (+36 %)**.
+> **Desktop unverändert** (alles in `@media max-width:768px`). ✅ **Deploy verifiziert (2026-07-29):**
+> nur `frontend` neu gebaut (`EXIT=0`, Container `Recreated`, `Up (healthy)`), HTTP 200 :3000 intern +
+> extern, `/blueprint/chat` → 307 (Login-Redirect ohne Session = erwartet), Fix in der kompilierten
+> Seite nachweisbar. `frontend-coach` **nicht** angefasst. **Kein .138-Anteil, keine Migration**
+> (Commit `504ec28a7`). ⚠️ Die tatsächliche Darstellung auf einem echten Mobilgerät wurde **nicht**
+> geprüft — verifiziert ist nur, dass der Code gebaut und ausgeliefert wird.
+>
 > **Nachtrag 2026-07-28 (.167 — Coach-Portal Phase 5: A11y, Desktop-Nav, Breadcrumbs, #231,
 > deployt):** Abschluss des Coach-Portal-Umbauplans. Betroffen nur drei Dateien:
 > `frontend-coach/components/CoachNavigation.tsx` (Fokus-/Menü-Semantik, **Auto-Hide der Nav nur noch
@@ -1580,6 +1596,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-28 (.167 — Coach-Portal-Umbauplan Phasen 1–5 vollständig deployt: #228 Nav/Design-Tokens/Palette, #229 Agent-Scaffold, #230 Hub-Duplikate/Naming + Nachzug, #231 A11y/Breadcrumbs; dazu #227 Blueprint-Chat mobil, #226 Blueprint-Consent + Migration 026, Nginx-Doku-Korrektur. Offen: nur Phase 4.5)*
+*Letzte Aktualisierung: 2026-07-29 (.167 — Blueprint-Chat mobil #232 deployt; zuvor Coach-Portal-Umbauplan Phasen 1–5 komplett (#228–#231), #227 Blueprint-Chat 100dvh, #226 Blueprint-Consent + Migration 026, Nginx-Doku-Korrektur. Offen: nur Phase 4.5)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 

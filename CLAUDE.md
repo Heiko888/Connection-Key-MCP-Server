@@ -1,6 +1,24 @@
 # CLAUDE.md — The Connection Key — Komplette Systemdokumentation
 **Stand:** 2026-07-29 | **Quellen:** Live-Analyse Server .138 + .167; Repo-Bestandsaufnahme 2026-06-19
 
+> **Nachtrag 2026-07-29 (.167 — Blueprint-Chat: Eingabefeld höher + wächst mit, #233, deployt):**
+> Dritter Nachzug der Mobile-Serie (#227 → #232 → #233), wieder nur
+> `frontend/app/blueprint/chat/page.tsx` (+17/−3). Das Nachrichten-`<textarea>` startete mit
+> `rows={1}` und wuchs **nicht** mit dem Inhalt → auf Mobile war nur **eine** Zeile sichtbar. Neu:
+> **(1)** `rows={2}` + `minHeight: 48` (Desktop) bzw. `.bp-input { min-height: 68px }` (Mobile);
+> **(2) Auto-Grow** per `useEffect` auf `[input]` (`height='auto'` → `min(scrollHeight, 160)px`) —
+> greift bei Tippen, **Spracheingabe (STT)** und beim Zurücksetzen nach dem Senden, `maxHeight`
+> 120 → **160 px**; **(3)** `font-size: 16px` auf Mobile — verhindert den **iOS-Safari-Zoom beim
+> Fokussieren** (Safari zoomt bei < 16 px automatisch hinein). Auto-Grow wirkt auf allen Viewports,
+> der Rest steckt in `@media max-width:768px` → **Desktop weitgehend unverändert.** ✅ **Deploy
+> verifiziert (2026-07-29):** nur `frontend` neu gebaut (`EXIT=0`, Container `Recreated`,
+> `Up (healthy)`), HTTP 200 :3000 intern + extern, `/blueprint/chat` → 307 (Login-Redirect =
+> erwartet); **alle drei Bestandteile im ausgelieferten Bundle nachgewiesen** —
+> `.bp-input { min-height: 68px !important; font-size: 16px !important; }` im SSR-Bundle,
+> `minHeight:48`/`maxHeight:160` im Inline-Style, `e.style.height=Math.min(e.scrollHeight,160)+"px"`
+> im Client-Chunk. `frontend-coach` **nicht** angefasst. **Kein .138-Anteil, keine Migration**
+> (Commit `ae0b4624b`). ⚠️ Auf einem echten Mobilgerät **nicht** nachgeprüft.
+>
 > **Changelog 2026-07-29 (.167 — Blueprint-Chat mobil: größeres Fenster + horizontaler Scroll,
 > #232, deployt):** Nachzug zu #227 (dort war nur die Gesamthöhe auf `100dvh` umgestellt — die
 > eigentliche Enge kam von den fixen Elementen darüber). Zwei Mobile-Probleme in
@@ -1596,6 +1614,6 @@ NODE_ENV / NODE_OPTIONS / TSC_COMPILE_ON_ERROR
 
 ---
 
-*Letzte Aktualisierung: 2026-07-29 (.167 — Blueprint-Chat mobil #232 deployt; zuvor Coach-Portal-Umbauplan Phasen 1–5 komplett (#228–#231), #227 Blueprint-Chat 100dvh, #226 Blueprint-Consent + Migration 026, Nginx-Doku-Korrektur. Offen: nur Phase 4.5)*
+*Letzte Aktualisierung: 2026-07-29 (.167 — Blueprint-Chat Eingabefeld #233 + Mobile-Layout #232 deployt; zuvor Coach-Portal-Umbauplan Phasen 1–5 komplett (#228–#231), #227 Blueprint-Chat 100dvh, #226 Blueprint-Consent + Migration 026, Nginx-Doku-Korrektur. Offen: nur Phase 4.5)*
 *Quellen: SERVER_138_SYSTEMANALYSE_2026-03-27.md + SYSTEM_ANALYSE.md (.167) + Live-Code-Analyse .138*
 
